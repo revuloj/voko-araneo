@@ -10,12 +10,24 @@
 
 use strict;
 
+#use CGI qw(:standard *table -utf8);
 use CGI qw(:standard *table);
 use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
+use utf8;
+#use feature 'unicode_strings';
+use open ':std', ':encoding(UTF-8)';
+
+#use open ':utf8';
+#binmode STDOUT, ":utf8";
+#binmode STDOUT, ':encoding(UTF-8)';
+
 $| = 1;
+
+## my $verbose=1; # 1 = debugging...
+
 #print "Content-type: text/html\n\n";
 
 #### preparu stirantajn parametrojn  ####
@@ -24,6 +36,8 @@ my %unicode = ( cx => "ĉ", gx => "ĝ", hx => "ĥ", jx => "ĵ", sx => "ŝ", ux =
 
 my $sercxata = param('q2');
 $sercxata = param('sercxata') if param('sercxata');
+utf8::decode($sercxata);
+
 my $cx2cx = param('x');
 $cx2cx = "checked" if $cx2cx;
 my $neniu_trafo = 1;
@@ -35,13 +49,15 @@ $param_lng = '' unless $param_lng;
 my $pado = "..";
 $pado = "/revo" if param('pado') eq 'revo';
 
-my $kadroj = param('kadroj');
+my $kadroj = param('kadroj'); # uzata de kono.be/vivo
 
 #### serĉformularo aperas en HTML-kadraro ... ####
 
 if ($kadroj) {
-  print "Content-type: text/html\n\n";
+  # uzata de kono.be/vivo
+  print "Content-type: text/html; charset=utf-8\n\n";
 
+  utf8::encode($sercxata);
   $sercxata = uri_escape($sercxata);
 
   $sercxata .= "&lng=".uri_escape(param('lng')) if param('lng');
@@ -58,6 +74,8 @@ if ($kadroj) {
   close IN;
   exit 1;
 }
+
+#utf8::decode($sercxata);
 
 #### Javoskripto por la serĉormularo ####
 my $JSCRIPT=<<END;
@@ -139,7 +157,12 @@ EOD
 } else {
 
   print header(-charset=>'utf-8'),
-        start_html(-style=>{-src=>'/revo/stl/indeksoj.css'},
+        start_html(
+                 -dtd => ['-//W3C//DTD HTML 4.01 Transitional//EN',
+                              'http://www.w3.org/TR/html4/loose.dtd'],
+                 -lang => 'eo',
+                 -title => 'Revo',
+                 -style=>{-src=>'/revo/stl/indeksoj.css'},
                  -script=>$JSCRIPT,
                  -onLoad=>"sf()"
   );
@@ -154,17 +177,18 @@ EOD
            ]
            );
 
-  print <<EOD;
-<td colspan="4" class="enhavo">
+print <<EOD;
+<tr><td colspan="4" class="enhavo">
 EOD
 
-   if (param('ans')) {
+  if (param('ans')) {
     print "Altnivela serĉo";
   }
 
   print <<EOD;
 <form method="post" action="" target="indekso" name="f">
-<input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata">
+<input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" 
+  onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata"  placeholder="Ĵokeroj: % (pluraj) kaj _ (unu)">
 <input type="submit" value="trovu">
 <br>
 EOD
@@ -207,7 +231,6 @@ if (param('ans')) {
 }
 
   print <<EOD;
-</p>
 </form>
 EOD
 }
@@ -236,7 +259,7 @@ EOD
 # propraj perl moduloj estas en:
 use lib("/var/www/web277/files/perllib");
 use revodb;
-use eosort;
+#use eosort;
 
 my $sercxata_eo = $sercxata;
 if (param('cx')) {
@@ -254,20 +277,21 @@ if (param('cx')) {
   $sercxata_eo =~ s/U[xX]/Ŭ/g;
 }
 
-my $sorter = new eosort;
-
-if ($sercxata_eo eq $sercxata) {
-  $sercxata = $sorter->remap_ci($sercxata);
-  $sercxata_eo = $sercxata;
-} else {
-  $sercxata = $sorter->remap_ci($sercxata);
-  $sercxata_eo = $sorter->remap_ci($sercxata_eo);
-}
+#my $sorter = new eosort;
+#
+#if ($sercxata_eo eq $sercxata) {
+#  $sercxata = $sorter->remap_ci($sercxata);
+#  $sercxata_eo = $sercxata;
+#} else {
+#  $sercxata = $sorter->remap_ci($sercxata);
+#  $sercxata_eo = $sorter->remap_ci($sercxata_eo);
+#}
 
 # Connect to the database.
 my $dbh = revodb::connect();
 
-#$dbh->{'mysql_enable_utf8'}=1;
+# necesas!
+$dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
 use Time::HiRes qw (gettimeofday tv_interval);
@@ -379,6 +403,12 @@ sub Sercxu
 
 #  print h2("qry = $addqry") if $verbose;
 
+# ekz. aĝ -> AI:
+# SELECT d.*, a.*, v.*, d.drv_teksto LIKE 'AI%' as drv_match
+#    FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
+#    WHERE (d.drv_teksto LIKE 'AI%' or v.var_teksto LIKE 'AI%')
+#      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto, a.art_amrk
+
   if ($param_lng eq 'eo' or $param_lng eq '') {
     $sth2 = $dbh->prepare(
       "SELECT distinct t.trd_teksto
@@ -386,12 +416,16 @@ sub Sercxu
         WHERE s.snc_drv_id = ?
           AND t.trd_snc_id = s.snc_id
           AND t.trd_lng = ?
-        ORDER BY t.trd_teksto");
+        ORDER BY t.trd_teksto collate utf8_unicode_ci");
   
-    $sth = $dbh->prepare("SELECT d.*, a.*, v.*, d.drv_teksto_ci " . $komparo . " ? drv_match
+    $sth = $dbh->prepare("SELECT d.*, a.*, v.*, d.drv_teksto " . $komparo . " ? drv_match
     FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
-    WHERE (d.drv_teksto_ci " . $komparo . " ? or v.var_teksto_ci " . $komparo . " ?)
-      AND a.art_id = d.drv_art_id$addqry GROUP BY d.drv_id ORDER BY d.drv_teksto_ci, d.drv_teksto desc, a.art_amrk");
+    WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
+      AND a.art_id = d.drv_art_id$addqry GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk");
+    
+    #print h2($sth->{Statement}) if $verbose;
+    #print h3($sth2->{Statement}) if $verbose;
+    
     eval {
       $sth->execute($sercxata2_eo, $sercxata2_eo, $sercxata2_eo);
     };
@@ -419,31 +453,31 @@ sub Sercxu
          FROM trd t
          WHERE t.trd_lng = ?
 		  AND t.trd_snc_id = ?
-        ORDER BY t.trd_teksto_ci");
+        ORDER BY t.trd_teksto collate utf8_unicode_ci");
 	}
 
     if ($param_lng) {	# nur unu lingvo
 	  $preferata_lingvo = $param_lng;
       $sth = $dbh->prepare(
         "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
-         FROM trd t, snc s, drv d, art a, lng l
-         WHERE t.trd_teksto_ci " . $komparo . " ?
-          AND t.trd_lng = ?
-		  AND t.trd_snc_id = s.snc_id
-          AND t.trd_lng = l.lng_kodo
-          AND d.drv_id = s.snc_drv_id
-          AND a.art_id = d.drv_art_id
-        ORDER BY l.lng_nomo, t.trd_teksto_ci, d.drv_teksto_ci, s.snc_numero");
+        FROM trd t, snc s, drv d, art a, lng l
+        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+        AND t.trd_lng = ?
+		    AND t.trd_snc_id = s.snc_id
+        AND t.trd_lng = l.lng_kodo
+        AND d.drv_id = s.snc_drv_id
+        AND a.art_id = d.drv_art_id
+        ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero");
 	} else {			# cxiuj lingvojn
       $sth = $dbh->prepare(
         "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
-         FROM trd t, snc s, drv d, art a, lng l
-         WHERE t.trd_teksto_ci " . $komparo . " ?
-          AND t.trd_snc_id = s.snc_id
-          AND t.trd_lng = l.lng_kodo
-          AND d.drv_id = s.snc_drv_id
-          AND a.art_id = d.drv_art_id
-        ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto_ci, d.drv_teksto_ci, s.snc_numero");
+        FROM trd t, snc s, drv d, art a, lng l
+        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+        AND t.trd_snc_id = s.snc_id
+        AND t.trd_lng = l.lng_kodo
+        AND d.drv_id = s.snc_drv_id
+        AND a.art_id = d.drv_art_id
+        ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero");
 	}
 
     eval {
@@ -481,10 +515,10 @@ sub MontruRezultojn
     my $klr;
 
     if ($lng eq 'eo') {
-      if ($$ref{'drv_match'}) {
-        $trd = $$ref{'drv_teksto'};
+      if ($$ref{'var_org'}) {
+        $trd = $$ref{'var_org'};
       } else {
-        $trd = $$ref{'var_teksto'};
+        $trd = $$ref{'drv_teksto'};
       }
       $anchor = $$ref{'drv_mrk'};
       $lng_nomo = "esperante";
@@ -518,17 +552,17 @@ sub MontruRezultojn
       if ($formato eq "txt") {
 	    foreach (split ",", param("trd")) {
           $klr .= "|";
-  	      my $sep;
-		  if ($_ eq "eo") {
-		    $klr .= $$ref{'drv_teksto'};
-		  } else {
-            $sth2->execute($_, $$ref{'snc_id'});
-            while (my $ref2 = $sth2->fetchrow_hashref()) {
-              $klr .= $sep.$$ref2{'trd_teksto'};
-              $sep = ",";
-		    }
-	      }
+            my $sep;
+        if ($_ eq "eo") {
+          $klr .= $$ref{'drv_teksto'};
+        } else {
+              $sth2->execute($_, $$ref{'snc_id'});
+              while (my $ref2 = $sth2->fetchrow_hashref()) {
+                $klr .= $sep.$$ref2{'trd_teksto'};
+                $sep = ",";
+          }
         }
+      }
 	  } else {
         $klr = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\">$$ref{'drv_teksto'}";
         $klr .= "  <sup><i>$$ref{'snc_numero'}</i></sup>" if $$ref{'snc_numero'};

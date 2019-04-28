@@ -116,7 +116,7 @@ sub checkencode {
     close IN;
     
     my $vers;
-    if ($html =~ m#artikolversio</a>:\s+([0-9.]+) ([0-9/]+) ([0-9:]+) \]#sm) {
+    if ($html =~ m#artikolversio</a>:\s+([0-9.]+) ([0-9/]+) ([0-9:]+) #sm) {
 #        print "html versio: $1 $2 $3".br."\n";
         $vers = "$1 $2 $3";
     } else {

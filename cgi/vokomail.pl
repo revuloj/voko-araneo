@@ -19,15 +19,17 @@ use POSIX qw(strftime);
 
 # propraj perl moduloj estas en:
 use lib("/var/www/web277/files/perllib");
+# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /var/www/web277/files/
+
 use revo::decode;
 use revo::encode;
 use revo::xml2html;
 use revo::wrap;
 use revodb;
-use XML::RSS;
 
 $| = 1;
 
+# por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
 my $homedir = "/var/www/web277";
 my $htmldir    = "$homedir/html";
 my $revo_base    = "$homedir/html/revo";
@@ -387,18 +389,41 @@ function sf(pos, line, lastline) {
 //    alert("scrollTop="+scrollTop);
     txtarea.scrollTop = scrollTop;
   }
+
+  checkCookieConsent();
 }
+
+function checkCookieConsent() {
+    var cookies = document.cookie;
+    var found = cookies.indexOf('revo-konsento=jes');
+    if (found >= 0) {
+	document.getElementById('kuketoaverto').style.display = 'none'; 
+    } else {
+	document.getElementById('kuketoaverto').style.display = 'block'; 
+    }
+}
+
+function setCookieConsent() {
+    var CookieDate = new Date;
+    var ExpireDate = new Date; ExpireDate.setFullYear(CookieDate.getFullYear() + 50);
+    document.cookie = 'revo-konsento=jes ' + CookieDate.toISOString() +'; expires=' + ExpireDate.toUTCString() + '; path=/;';
+    document.getElementById('kuketoaverto').style.display = 'none'; 
+}    
 END
 
 my $enc = "utf-8";
 
 my @cookies;
-push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto')) if param('redaktanto');
-push @cookies, cookie(-name=>'trdlng',     -value => param('trdlng'))     if param('trdlng');
-push @cookies, cookie(-name=>'klrtip',     -value => param('klrtip'))     if param('klrtip');
-push @cookies, cookie(-name=>'reftip',     -value => param('reftip'))     if param('reftip');
-push @cookies, cookie(-name=>'sxangxo',    -value => param('sxangxo'))    if param('sxangxo');
-push @cookies, cookie(-name=>'cx',         -value => param('cx') || 0 );
+my $konsento = substr(cookie(-name=>'revo-konsento'),0,3) eq 'jes';
+
+if ($konsento) {
+    push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto'), -path => '/cgi-bin/') if param('redaktanto');
+    push @cookies, cookie(-name=>'trdlng',     -value => param('trdlng'), -path => '/cgi-bin/')     if param('trdlng');
+    push @cookies, cookie(-name=>'klrtip',     -value => param('klrtip'), -path => '/cgi-bin/')     if param('klrtip');
+    push @cookies, cookie(-name=>'reftip',     -value => param('reftip'), -path => '/cgi-bin/')     if param('reftip');
+    push @cookies, cookie(-name=>'sxangxo',    -value => param('sxangxo'), -path => '/cgi-bin/')    if param('sxangxo');
+    push @cookies, cookie(-name=>'cx',         -value => param('cx') || 0 , -path => '/cgi-bin/');
+}
 
 my $debugmsg;
 my $art = param('art');
@@ -420,7 +445,7 @@ if ($xmlTxt) {
 }
 my $xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 #$xml2 = Encode::decode($enc, $xml2);
-my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retpo&#349;ta adreso';
+my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
 my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
 
 #$debugmsg .= "xmlTxt = $xmlTxt\n";
@@ -586,20 +611,26 @@ input {
 textarea {
   margin: 3px 1px 0px 1px;
 }
+.piedlinio {color: #104040; text-align: center}
+.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
+		background-color: #c0c090; margin: 0; display: none;
+		border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
+	      }
+.kuketoaverto P { text-align:center }
+.kuketoaverto FORM { text-align:center }
 EOD
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
-			 -pragma => 'no-cache',
-            '-cache-control' =>  'no-cache',
-			 -cookie=>\@cookies),
-      start_html(-style=>{-src=>'/revo/stl/indeksoj.css',
-                          -code=>$mycss},
+             -pragma => 'no-cache', '-cache-control' =>  'no-cache',
+             -cookie=>\@cookies),
+      start_html(-style=>{-src=>'/revo/stl/artikolo.css',
+                 -code=>$mycss},
                  -title=>"redakti $art",
-				 -lang=>'eo', #'de',
-				 -encoding => 'UTF-8',
-				 -head => [ '<meta http-equiv="Cache-Control" content="no-cache">',
-						  ],
+                 -lang=>'eo', #'de',
+		 -encoding => 'UTF-8',
+		 -head => [ '<meta http-equiv="Cache-Control" content="no-cache">'
+			  ],
                  -script=>$JSCRIPT,
                  -onLoad=>"sf($pos, $line, $lastline)"
 );
@@ -622,8 +653,8 @@ if ($debug and $debugmsg) {
 print <<'EOD' if 0;
 <div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
 <p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Provversio</b></span></p>
-<p>Momente tio pagxo estas nur por elprovi</p>
-<p><i>Viaj &#349;angxoj momente estas sendata al vi kaj al la auxtoro (sendepende de la subaj butonoj) !</i></p>
+<p>Momente tiu pa&#x011D;o estas nur por elprovi</p>
+<p><i>Viaj &#349;an&#x011D;oj momente estas sendataj al vi kaj al la a&#x016d;toro (sendepende de la subaj butonoj) !</i></p>
 </div><br>
 EOD
 
@@ -808,7 +839,7 @@ EOD
 }
 
 if ($redaktanto) {
-  # cxu unu redaktanto havas tion retadreson? Kiu?
+  # cxu iu redaktanto havas tiun retadreson? Kiu?
   my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
   $sth->execute($redaktanto);
   my ($permeso, $red_id) = $sth->fetchrow_array();
@@ -843,8 +874,8 @@ EOD
     if ($ne_konservu) {
       print "ne konservita";
     } else {
-      my $from    = $redaktanto;
-      my $name    = "Revo redaktu.pl";
+      my $from    = 'noreply@retavortaro.de';
+      my $name    = "\"Revo redaktu.pl $redaktanto\"";
       my (@to, $sxangxo2);
       push @to, $redaktanto; # if param('sendu_al_tio');
       push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
@@ -863,7 +894,7 @@ EOD
         print SENDMAIL <<End_of_Mail;
 From: $name <$from>
 To: $to
-Reply-To: $from
+Reply-To: $redaktanto
 Subject: $subject
 X-retadreso: $ENV{REMOTE_ADDR}
 
@@ -871,64 +902,18 @@ $sxangxo2
 
 $xml2
 End_of_Mail
+
         close SENDMAIL;
 
         print "sendita al $to";
 		
-		if (-s $smlog) {
+	if (-s $smlog) {
 		  open L, "<", $smlog;
 		  my $ltxt = join "", <L>;
 		  close L;
 		  print pre("sendmail.log: $ltxt");
-		}
-		
-#		my $maxnum = 200;
-#	    my $rss = new XML::RSS;
-#        $rss->parsefile("$htmldir/sendita.rdf");
-##		my $rss = XML::RSS->new(version => '1.0');
-##		$rss->channel(
-##		   title        => "retavortaro: sendita",
-##		   link         => "http://reta-vortaro.de",
-##		   description  => "Senditaj sxangxoj de la redaktilo por ReVo",
-##		   dc => {
-##			 date       => '2010-02-23T07:00+00:00',
-##			 subject    => "ReVo",
-##			 creator    => 'wieland@wielandpusch.de',
-##			 publisher  => 'wieland@wielandpusch.de',
-##			 rights     => 'Copyright 2010, GPL',
-##			 language   => 'eo',
-##		   },
-##		   syn => {
-##			 updatePeriod     => "hourly",
-##			 updateFrequency  => "1",
-##			 updateBase       => "1901-01-01T00:00+00:00",
-##		   },
-##		);
-#        pop(@{$rss->{'items'}}) while (@{$rss->{'items'}} > $maxnum);
-#
-#        my $fname = "sendita/".(strftime "%Y%d%m%H%M%S", gmtime)."_$art.txt";
-#
-#        open F, ">", "$htmldir/$fname" or print pre("ne povas skribi sendita/$fname");
-#		print F "$sxangxo2\n\n$xml2";
-#		close F;
-#        
-#        my $dato = strftime "%Y/%d/%m", gmtime;		
-#        my $tempo = strftime "%H:%M:%S", gmtime;		
-##		my $dato = "2010/02/22";
-##		my $tempo = "17:30:22";
-#
-#		$sxangxo2 = "ReVo: $sxangxo2" if param('sendu_al_revo');
-#	    $rss->add_item(title => "$red_nomo $subject",
-#			 link  => "http://www.reta-vortaro.de/revo/art/$art.html",
-#			 description => a({href=>"/$fname"}, $sxangxo2),
-#			 dc => { subject=>$subject,
-#					 creator=>"ReVo", 
-#					 rights=>"GPL",
-#					 date=>"$dato\T$tempo+00:00",
-#		     },
-#	         mode  => 'insert',
-#        );
-#		$rss->save("$htmldir/sendita.rdf");
+	}
+	
       } else {
         print "ne sendita, elektu adreson sube";
       }
@@ -1094,17 +1079,18 @@ print "\n&nbsp;prilabori:\n".
 if (param('nova') or param('button') eq 'kreu') {
   print hidden(-name=>'nova', -default=>1);
 } else {
-  print br."\n&nbsp;&#348;an&#285;o: ".textfield(-name=>'sxangxo',
-                    -value=>Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
-					-title     => "Klarigu la ŝanĝon ĉi tie.",
-                    -size=>70,
-                    -maxlength=>80);
+  print br."\n&nbsp;&#348;an&#285;o: ".textfield(
+       -name => 'sxangxo',
+       -value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
+       -title => "Klarigu la ŝanĝon ĉi tie.",
+       -size => 70,
+       -maxlength => 80);
 }
 print br."\n&nbsp;Retpo&#349;ta adreso:".textfield(-name=>'redaktanto',
                     -size      => 70,
                     -maxlength => 80,
-					-title     => "Skribu vian registritan retpoŝtan adreson ĉi tie.",
-                    -value     => (cookie(-name=>'redaktanto') || 'via retpo&#349;ta adreso')
+                    -title     => "Skribu vian registritan retadreson ĉi tie.",
+                    -value     => (cookie(-name=>'redaktanto') || 'via retadreso')
       ),
       br."\n",
       submit(-name => 'button', -label => 'antaŭrigardu'),
@@ -1113,12 +1099,12 @@ print checkbox(-name    => 'sendu_al_revo',
                -checked => 1,
                -value   => '1',
                -label   => 'sendu al ReVo') if $art and $debug and 0;
-print endform if $art;
+print end_form if $art;
 
 print start_form(-id => "n", -name => "n");
 print "&nbsp;Preparu novan artikolon: ".textfield(-name=>'art', -size=>20, -maxlength=>20)."&nbsp;";
 print submit(-name => 'button', -label => 'kreu')."&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/revoserv.html'}, "[helpo]")."\n";
-print endform;
+print end_form;
 
 print <<"EOD" if $art;
 <h1>Klarigoj:</h1>
@@ -1129,9 +1115,36 @@ klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
 klavo kontrolo-F ebligas ser&#265;i<br>
 via retadreso estas $ENV{REMOTE_ADDR}<br>
 </div>
+
+<p class="piedlinio">
+<a class="redakto" title="Reta Vortaro, konstanta URL" target="_top"
+   href="http://purl.org/net/voko/revo/">&#x211B;evo</a> |
+<a class="redakto" title="Datumprotekta deklaro" target="_new"
+   href="/revo/dok/datumprotekto.html">datumprotekto</a> |
+<a class="redakto" title="Permeso de uzado" target="_new"
+   href="/revo/dok/copying.txt">permeso</a> |
+<a class="redakto" title="Alternativa redaktilo" target="_new"
+   href="https://revaj.steloj.de/">alia redaktilo</a> |
+<a class="redakto" title="Bibliografio" target="indekso"
+   href="/revo/dok/bibliogr.html">bibliografio</a> |
+<a class="redakto" title="Vortaraj mallongigoj" target="indekso"
+   href="/revo/dok/mallongigoj.html">mallongigoj</a> |
+<a class="redakto" title="Superserĉo per ViVo" target="_new"
+   href="http://kono.be/vivo">ViVo</a>
+</p>
+
+<div class="kuketoaverto" id="kuketoaverto">
+<p>
+  Ni uzas kuketojn (retumilajn memoretojn).
+  Uzante nian servon vi konsentas al konservado de informoj en kuketoj.
+  Eksciu pli pri la uzado de personaj datumoj en la
+  <a href="/revo/dok/datumprotekto.html">datumprotekta deklaro</a>.<br/>
+  <button name="konfirmo" onClick="setCookieConsent()">Mi konfirmas</button>
+</p>
+</div>
 EOD
 
-print p('<!-- svn versio: $Id: vokomail.pl 614 2013-08-26 17:04:08Z wielandp $'.br.
+print p('<!-- svn versio: $Id: vokomail.pl 1142 2018-02-10 12:48:25Z wdiestel $'.br.
 	'hg versio: $HgId: vokomail.pl 62:d81c22cbe76e 2010/04/21 17:24:51 Wieland $ -->');
 
 print end_html();

@@ -72,7 +72,8 @@ sub parse {
     print h2("xsl = $xsldir/sercho.xsl") if $verbose;
 
     my $ret;
-    $_ = `xalan -XSL $xsldir/sercho.xsl <$pado`;
+    #$_ = `xalan -XSL $xsldir/sercho.xsl <$pado`;
+    $_ = `xsltproc $xsldir/sercho.xsl $pado`;
     $_ = Encode::decode($enc, $_);
 
     print pre(escapeHTML("co:\n$_\nend co.\n")) if $verbose;
@@ -148,17 +149,20 @@ sub parse {
     
     print pre(escapeHTML("parse kap:\n$_")) if $verbose;
     # legu la kapvorton
-    if (s/\s*<kap[^>]*>(.*?)\n*\s*<\/kap\s*>//si) { 
+    if (s/^\s*<kap[^>]*>(.*?)\n*\s*<\/kap\s*>(?=<[ds]|$)//si) { 
       $arad = $1;
-      $arad =~ s/<ofc>(.*)<\/ofc>//sg;
-      $arad =~ s/<fnt>(.*)<\/fnt>//sg;
+      $arad =~ s/<ofc>(.*?)<\/ofc>//sg;
+      $arad =~ s/<fnt>(.*?)<\/fnt>//sg;
       $akap = $arad;
-      $arad =~ s/.*<rad>(.*)<\/rad>.*/\1/sg;
+      #print pre("akap: $akap\n") if $verbose;
+
+      $arad =~ s/.*?<rad>(.*?)<\/rad>.*/\1/sg;
       $arad =~ s/<[^<]*>//sg;
       $arad =~ s/\s+Z?$//;
       $arad =~ s/\s+/ /sg;
       $arad =~ s/^\s+//;
       $arad =~ s/^\n+//;
+
       $akap =~ s/<[^<]*>//sg;
       $akap =~ s/\s+Z?$//;
       $akap =~ s/\s+/ /sg;
@@ -173,7 +177,7 @@ sub parse {
     $aid = $dbh->{'mysql_insertid'} unless defined($aid);
     print "aid = $aid\n" if $verbose;
 
-    # tildojn anstataıigu per la radiko
+    # tildojn anstataï¿½igu per la radiko
 #      print pre(escapeHTML("lit:\n$_\n"));# if $verbose;
     { my $subst_arad = substr($arad,1);   # anstatauxigu unuan literon
       s/<tld lit="([^"]+)"\/?>/\1$subst_arad/sig;
@@ -237,11 +241,11 @@ sub parse {
       my $kap;
   
       print pre(escapeHTML("drv $mrk:\n$drv")) if $verbose;
-      if ($drv =~ s/\s*<kap[^>]*>(.*?)\n*\s*<\/kap\s*>\s*\n*//si) {
+      if ($drv =~ s/\s*<kap[^>]*>(.*)\n*\s*<\/kap\s*>\s*\n*//si) {
         $kap = $1;
-        $kap =~ s/<ofc>(.*)<\/ofc>//sg;
-        $kap =~ s/<var>//g;
-        $kap =~ s/<kap>//g;
+        $kap =~ s/<ofc>(.*?)<\/ofc>//sg;
+        $kap =~ s/<\/?var>//g;
+        $kap =~ s/<\/?kap>//g;
         $kap =~ s/[\t\n]+/ /g;
         $kap =~ s/ +/ /g;
         $kap =~ s/^ //;

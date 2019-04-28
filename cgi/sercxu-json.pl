@@ -11,15 +11,21 @@
 use strict;
 
 use CGI qw(:standard *table);
+#use CGI qw(:standard *table -utf8);
 use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
+
+use utf8;
+#use open ':std', ':encoding(UTF-8)';
+#binmode(STDOUT, ":utf8");
+
 
 $| = 1;
 
 my $debug = 0;
 
-#print "Content-type: text/html\n\n";
+#print "Content-type: text/html; charset=utf-8\n\n";
 
 # testu ekz. per:
 # perl sercxu-json.pl "sercxata=test%&cx=1&moktesto=0"
@@ -30,7 +36,7 @@ my $MOCK = param("moktesto");
 if ($MOCK) {
 
 print <<EOT;
-Content-type: application/json
+Content-type: application/json; charset=utf-8
 
 [ 
   {
@@ -92,7 +98,7 @@ else {
 
 # komenco
 print <<EOT;
-Content-type: application/json
+Content-type: application/json; charset=utf-8
 
 [
 EOT
@@ -109,6 +115,7 @@ my $formato = "json";
 # kion serĉi
 my $sercxata = param('q2');
 $sercxata = param('sercxata') if param('sercxata');
+utf8::decode($sercxata);
 
 # ĉu traduki cx al ĉ ktp.
 my $cx2cx = param('cx');
@@ -149,7 +156,10 @@ use eosort;
 
 # serĉo en la datumbazo
 my $dbh = revodb::connect();
+# necesas!
+$dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
+
 use Time::HiRes qw (gettimeofday tv_interval);
 Sercxu($sercxata, $preferata_lingvo);
 $dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
@@ -186,21 +196,19 @@ sub Sercxu
   if ($param_lng eq 'eo' or $param_lng eq '') {
 
     my $QUERY_eo =  
-      "SELECT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
-        d.drv_teksto_ci " . $komparo . " ? AS drv_match
-       FROM art a, drv d
-       LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id 
-       WHERE (d.drv_teksto_ci " . $komparo . " ? or v.var_teksto_ci " . $komparo . " ?)
-       AND a.art_id = d.drv_art_id 
-       GROUP BY d.drv_id 
-       ORDER BY d.drv_teksto_ci, d.drv_teksto desc, a.art_amrk";
+    "SELECT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
+       d.drv_teksto " . $komparo . " ? AS drv_match
+    FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
+    WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
+      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk";
+
     my $QUERY_eo_trd = 
       "SELECT distinct t.trd_teksto
        FROM trd t, snc s
-       WHERE s.snc_drv_id = ?
+        WHERE s.snc_drv_id = ?
           AND t.trd_snc_id = s.snc_id
           AND t.trd_lng = ?
-       ORDER BY t.trd_teksto";
+        ORDER BY t.trd_teksto collate utf8_unicode_ci";
 
     $sth2 = $dbh->prepare($QUERY_eo_trd);
     $sth = $dbh->prepare($QUERY_eo);
@@ -233,11 +241,11 @@ sub Sercxu
     $sth2 = undef;
     if (param("trd")) {
       my $QUERY_lng_trd =
-	"SELECT t.*
-         FROM trd t
-         WHERE t.trd_lng = ?
-	   AND t.trd_snc_id = ?
-         ORDER BY t.trd_teksto_ci";
+      "SELECT t.*
+      FROM trd t
+      WHERE t.trd_lng = ?
+      AND t.trd_snc_id = ?
+      ORDER BY t.trd_teksto_ci";
 	  
       $sth2 = $dbh->prepare($QUERY_lng_trd);
     }
@@ -254,16 +262,14 @@ sub Sercxu
     if ($param_lng) { # nur unu lingvo
       $preferata_lingvo = $param_lng;
       $QUERY_lng .=
-	"WHERE t.trd_teksto_ci " . $komparo . " ?
-          AND t.trd_lng = ?
-        ORDER BY l.lng_nomo, t.trd_teksto_ci, 
-        d.drv_teksto_ci, s.snc_numero";
+      "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+      AND t.trd_lng = ?
+      ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero";
 
     } else { # cxiuj lingvojn, sed preferata unue
       $QUERY_lng.=
-        "WHERE t.trd_teksto_ci " . $komparo . " ?
-        ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, 
-      t.trd_teksto_ci, d.drv_teksto_ci, s.snc_numero";
+    "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+    ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero";
     }
 
     $sth = $dbh->prepare($QUERY_lng);
@@ -306,17 +312,17 @@ sub normiguSercxon {
     $sercxata_eo =~ s/U[xX]/Ŭ/g;
   }
 
-  my $sorter = new eosort;
+  #my $sorter = new eosort;
   
-  if ($sercxata_eo eq $sercxata) {
-    $sercxata = $sorter->remap_ci($sercxata);
-    $sercxata_eo = $sercxata;
-  } else {
-    $sercxata = $sorter->remap_ci($sercxata);
-    $sercxata_eo = $sorter->remap_ci($sercxata_eo);
-  }
+  #if ($sercxata_eo eq $sercxata) {
+  #  $sercxata = $sorter->remap_ci($sercxata);
+  #  $sercxata_eo = $sercxata;
+  #} else {
+  #  $sercxata = $sorter->remap_ci($sercxata);
+  #  $sercxata_eo = $sorter->remap_ci($sercxata_eo);
+  #}
 
-  return ($sercxata,$sercxata_eo);
+  return ($sercxata_eo,$sercxata_eo);
 }
 
 
@@ -329,6 +335,7 @@ sub MontruRezultojn
   my ($res, $lng, $preferata_lingvo, $sth2) = @_;
   my $num = 0;
   my $last_lng;
+
 
   # trakuru ĉiujn DB-serĉrezultojn...
   while (my $ref = $res->fetchrow_hashref()) {

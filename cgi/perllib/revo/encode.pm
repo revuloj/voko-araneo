@@ -17,7 +17,7 @@ use HTML::Entities;
 use CGI qw(:standard); 	# nur por verbose
 
 ######################################################################
-sub encode {
+sub encode($$;$) {
   my $str = shift @_;
   my $verbose = shift @_;
   return encode2($str, 0, $verbose);
@@ -120,7 +120,7 @@ sub encode2 {
   $str =~ s/\x{00b2}/&quadrat;/g;
   $str =~ s/\x{00b3}/&cubic;/g;
   $str =~ s/\x{00B6}/&para;/g;
-  $str =~ s/\x{00a7}/&FE;/g;
+#  $str =~ s/\x{00a7}/&FE;/g;
   $str =~ s/\x{2015}/&dash;/g;
   $str =~ s/\x{2014}/&mdash;/g;
   $str =~ s/\x{2013}/&ndash;/g;

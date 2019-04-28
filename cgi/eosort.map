@@ -1,0 +1,130 @@
+lit = 97, lit = a
+lit = 65, lit = A
+lit = 225, lit = \u00E1
+lit = 224, lit = \u00E0
+lit = 226, lit = \u00E2
+lit = 192, lit = \u00C0
+lit = 194, lit = \u00C2
+lit = 228, lit = \u00E4
+lit = 196, lit = \u00C4
+lit = 230, lit = \u00E6
+lit = 198, lit = \u00C6
+lit = 98, lit = b
+lit = 66, lit = B
+lit = 99, lit = c
+lit = 67, lit = C
+lit = 231, lit = \u00E7
+lit = 199, lit = \u00C7
+lit = 265, lit = \u0109
+lit = 264, lit = \u0108
+lit = 100, lit = d
+lit = 68, lit = D
+lit = 101, lit = e
+lit = 69, lit = E
+lit = 233, lit = \u00E9
+lit = 201, lit = \u00C9
+lit = 232, lit = \u00E8
+lit = 200, lit = \u00C8
+lit = 234, lit = \u00EA
+lit = 202, lit = \u00CA
+lit = 235, lit = \u00EB
+lit = 203, lit = \u00CB
+lit = 102, lit = f
+lit = 70, lit = F
+lit = 103, lit = g
+lit = 71, lit = G
+lit = 285, lit = \u011D
+lit = 284, lit = \u011C
+lit = 104, lit = h
+lit = 72, lit = H
+lit = 293, lit = \u0125
+lit = 292, lit = \u0124
+lit = 105, lit = i
+lit = 73, lit = I
+lit = 237, lit = \u00ED
+lit = 205, lit = \u00CD
+lit = 236, lit = \u00EC
+lit = 204, lit = \u00CC
+lit = 238, lit = \u00EE
+lit = 206, lit = \u00CE
+lit = 239, lit = \u00EF
+lit = 207, lit = \u00CF
+lit = 106, lit = j
+lit = 74, lit = J
+lit = 309, lit = \u0135
+lit = 308, lit = \u0134
+lit = 107, lit = k
+lit = 75, lit = K
+lit = 108, lit = l
+lit = 76, lit = L
+lit = 109, lit = m
+lit = 77, lit = M
+lit = 110, lit = n
+lit = 78, lit = N
+lit = 111, lit = o
+lit = 79, lit = O
+lit = 243, lit = \u00F3
+lit = 211, lit = \u00D3
+lit = 242, lit = \u00F2
+lit = 210, lit = \u00D2
+lit = 244, lit = \u00F4
+lit = 212, lit = \u00D4
+lit = 246, lit = \u00F6
+lit = 214, lit = \u00D6
+lit = 339, lit = \u0153
+lit = 338, lit = \u0152
+lit = 112, lit = p
+lit = 80, lit = P
+lit = 113, lit = q
+lit = 81, lit = Q
+lit = 114, lit = r
+lit = 82, lit = R
+lit = 115, lit = s
+lit = 83, lit = S
+lit = 223, lit = \u00DF
+lit = 349, lit = \u015D
+lit = 348, lit = \u015C
+lit = 116, lit = t
+lit = 84, lit = T
+lit = 117, lit = u
+lit = 85, lit = U
+lit = 249, lit = \u00F9
+lit = 217, lit = \u00D9
+lit = 251, lit = \u00FB
+lit = 219, lit = \u00DB
+lit = 252, lit = \u00FC
+lit = 220, lit = \u00DC
+lit = 365, lit = \u016D
+lit = 364, lit = \u016C
+lit = 118, lit = v
+lit = 86, lit = V
+lit = 119, lit = w
+lit = 87, lit = W
+lit = 120, lit = x
+lit = 88, lit = X
+lit = 121, lit = y
+lit = 89, lit = Y
+lit = 122, lit = z
+lit = 90, lit = Z
+lit = 44, lit = ,
+lit = 46, lit = .
+lit = 39, lit = '
+lit = 99-120-101-118-97-108-111
+lit = 99-120-101-118-97-108-111
+lit = 99 -> C
+lit = 120 -> d
+lit = 101 -> F
+lit = 118 -> b
+lit = 97 -> A
+lit = 108 -> P
+lit = 111 -> S
+lit = C-d-F-b-A-P-S
+lit = 265-101-118-97-108-111
+lit = 265-101-118-97-108-111
+lit = 265 -> D
+lit = 101 -> F
+lit = 118 -> b
+lit = 97 -> A
+lit = 108 -> P
+lit = 111 -> S
+lit = D-F-b-A-P-S

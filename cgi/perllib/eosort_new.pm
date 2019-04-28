@@ -1,10 +1,14 @@
+
 use strict;
 
 package eosort;
 
+
 use feature 'unicode_strings';
-#use Unicode::String qw(utf8);
+sub utf8 { return shift; } # dummy to replace Unicode::String utf8
 use utf8;
+
+#use Unicode::String qw(utf8);
 
 my @_order_kodoj = ('A'..'Z','a'..'z');
 
@@ -35,10 +39,10 @@ my @_order_ci = (
 ['p', 'P'],
 ['q', 'Q'],
 ['r', 'R'],
-['s', 'S', '\u00DF'],  # s S sz
+['s', 'S', '\u00DF'],  # s S ß
 ['\u015D', '\u015C'],  # sx SX
 ['t', 'T'],
-['u', 'U', '\u00F9', '\u00D9', '\u00FB', '\u00DB', '\u00FC', '\u00DC'],  # u U . . . . ue Ue
+['u', 'U', '\u00F9', '\u00D9', '\u00FB', '\u00DB', '\u00FC', '\u00DC'],  # u U . . . . ü Ü
 ['\u016D', '\u016C'],  # ux, UX
 ['v', 'V'],
 ['w', 'W'],
@@ -49,7 +53,7 @@ my @_order_ci = (
 );
 
 #####################################################
-# cxiuj postaj literoj estas egala al la unua litero
+# cxiuj postaj literoj estas egalaj al la unua litero
 #####################################################
 my @_order_ci2 = (
 [ '\u0401',  # c_Jo
@@ -201,20 +205,35 @@ sub new
     print "i = $i\n" if $self->{dbg};
     my $kodo = $_order_kodoj[$i];
     print "kodo = $kodo\n" if $self->{dbg};
+    
     foreach (@$aref) {
-      my $u = $_;
+      my $u = utf8($_);
+
+      my @lit;
       if (/^\\[u](....)$/) {
-        print "u $1\n" if $self->{dbg};
-#        $u->hex($1);
+	print "u $1\n" if $self->{dbg};
+	  
+##	$u->hex($1);
+##	@lit = unpack('C0U*',$u);
+	$lit[0] = hex($1);
+#	print "c $u\n" if $self->{dbg};
+#exit;	
+      } else {
+#      my @lit = $u->unpack('U*');
+	  @lit = unpack('C0U*',$u);
       }
-      my @lit = unpack('U*', $u);
-#      die "pli ol unu unikodo letero: $u" if $#lit > 0;
+      print "-> ".join(',',@lit)."\n" if $self->{dbg};
+      
+      die "pli ol unu unikodo-litero: $u" if $#lit > 0;
       print "lit = $lit[0], lit = $_\n" if $self->{dbg};
       $mapper_ci{$lit[0]} = $kodo;
+
+#      use open ':std', ':encoding(UTF-8)';
+#      print "map: $lit[0] => $kodo\n" if $self->{dbg};
     }
     print "\n" if $self->{dbg};
   }
-
+#exit;
   my $count = $#_order_ci2;
   print "count = $count\n" if $self->{dbg};
   for my $i (0..$count) {
@@ -222,22 +241,37 @@ sub new
     print "$i: " if $self->{dbg};
     my $start_val;
     foreach (@$aref) {
-      my $u = $_;
+      my @lit;
+      my $u = utf8($_);
+      
       if (/^\\[u](....)$/) {
         print "u $1 " if $self->{dbg};
-#        $u->hex($1);
+       # $u->hex($1);
+	$lit[0] = hex($1);
+#	print "c $u\n" if $self->{dbg};
+      } else {
+#      my @lit = $u->unpack('U*');
+        @lit = unpack('C0U*',$u);
+#      print "-> ".join(',',@lit)."\n" if $self->{dbg};
       }
-      my @lit = unpack('U*', $u);
-#      die "pli ol unu unikodo letero: ".$u->utf8() if $#lit > 0;
+      
+      die "pli ol unu unikodo letero: ".$u->utf8() if $#lit > 0;
       $start_val = $lit[0] unless $start_val;
-      print "$lit[0] -> $start_val " if $self->{dbg};
-#      $u->chr($start_val);
-#      $mapper_ci{$lit[0]} = $u->utf8();
-      $mapper_ci{$lit[0]} = "a";
+      print "$lit[0] -> $start_val \n" if $self->{dbg};
+
+      ##$u->chr($start_val);
+      ##$mapper_ci{$lit[0]} = $u->utf8();
+      ##print "map: $lit[0] => $u\n" if $self->{dbg};
+      
+      $u = chr($start_val);
+      $mapper_ci{$lit[0]} = $u; #->utf8();
+      use open ':std', ':encoding(UTF-8)';
+#      print "map: $lit[0] => $u\n" if $self->{dbg};
     }
     print "\n" if $self->{dbg};
   }
-
+#exit;
+  
 #  my $count = $#_order_ci3;
 #  print "ci3 count = $count\n" if $self->{dbg};
 #  for my $i (0..$count) {
@@ -270,8 +304,10 @@ sub remap_ci
   $u =~ s/[- ]//g;
 #  $u = utf8($u);
   print "remap_ci ($u)\n" if $self->{dbg};
-  print "$_ len=".$u->length()."\n" if $self->{dbg};
-  my @lit = unpack('U*', $u);
+#  print "$_ len=".$u->length()."\n" if $self->{dbg};
+  #  my @lit = $u->unpack('U*');
+  my @lit = unpack('U*',$u);
+  
   print "lit = ".join('-', @lit)."\n" if $self->{dbg};
   for (my $i = $#lit; $i >= 0; $i--) {
     print "test $i: $lit[$i]\n" if $self->{dbg};
@@ -279,17 +315,21 @@ sub remap_ci
   }
   print "lit = ".join('-', @lit)."\n" if $self->{dbg};
   my $mapref = $self->{mapper_ci};
+  
   foreach (@lit) {
     print "lit = $_ -> $$mapref{$_}\n" if $self->{dbg};
     if (exists($$mapref{$_})) {
       $_ = $$mapref{$_} 
     } else {
       print "noexist: $_\n" if $self->{dbg};
-#      $u->chr($_);
-#      $_ = $u->utf8();
+#           $u->chr($_);
+#            $_ = $u->utf8();
+      $u = chr($_);
+      $_ = $u;
       print "lit = -> $_\n" if $self->{dbg};
     }
   }
+#exit;  
   print "lit = ".join('-', @lit)."\n" if $self->{dbg};
   return join('', @lit);
 }

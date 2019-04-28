@@ -79,19 +79,29 @@ sub parse {
     my $minsxangxo = -M $pado;
     $minsxangxo = $prgsxangxo if $prgsxangxo < $minsxangxo;
     print h2("pado = $pado M=$minsxangxo art=$art") if $verbose;
-#    print h2("xsl = $xsldir/inx_kategorioj.xsl") if $verbose;
+    print h2("xsl = $xsldir/inx_\{eltiro|kategorioj\}.xsl") if $verbose;
     $qry_mod->execute($minsxangxo, $art) or die "execute qry_mod";
     my ($dbmod) = $qry_mod->fetchrow_array();
     print h2("dbmod = $dbmod") if $verbose;
-    next if $dbmod < 0;
-    last if time - $^T >= 300;
+    next if $dbmod < 0 and not $verbose;
+    if (time - $^T >= 900) {
+      print h2("pli da laboro post 900 sekundoj");
+      last;
+    }
     $count++;
 
+    $dbh->do("DELETE FROM r2_indekso WHERE ind_kapvorto = ?", undef, $art) or die "delete indekso ne funkciis";
+    $dbh->do("DELETE FROM r2_stat WHERE sta_kapvorto = ?", undef, $art) or die "delete stat ne funkciis";
+    $dbh->do("DELETE FROM r2_stlng WHERE stl_kapvorto = ?", undef, $art) or die "delete stlng ne funkciis";
+
     my $ret;
-    my $eltiro = `xalan -XSL $xsldir/inx_eltiro.xsl <$pado`;
-#    print pre(escapeHTML("eltiro:\n$eltiro\n\n")) if $verbose;
+#    my $eltiro = `xalan -XSL $xsldir/inx_eltiro.xsl <$pado`;
+    my $eltiro = `xsltproc $xsldir/inx_eltiro.xsl $pado`;
+
+    print pre(escapeHTML("eltiro:\n$eltiro\n\n")) if $verbose;
     my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
-		    "xalan -XSL $xsldir/inx_kategorioj.xsl");
+#		    "xalan -XSL $xsldir/inx_kategorioj.xsl");
+		    "xsltproc $xsldir/inx_kategorioj.xsl -");
 #    print "cvs pid = $pid\n";
     print CHLD_IN $eltiro;
     close CHLD_IN;
@@ -103,14 +113,10 @@ sub parse {
 
     $_ = Encode::decode($enc, $_);
 
-#    print pre(escapeHTML("co:\n$_\nend co.\n")) if $verbose;
+    print pre(escapeHTML("co:\n$_\nend co.\n")) if $verbose;
 
     s/^<\?xml version="1.0" encoding="utf-8"\?>\s*<indekso>\s*//sm;
     s/<\/indekso>\s*$//sm;
-
-    $dbh->do("DELETE FROM r2_indekso WHERE ind_kapvorto = ?", undef, $art) or die "delete indekso ne funkciis";
-    $dbh->do("DELETE FROM r2_stat WHERE sta_kapvorto = ?", undef, $art) or die "delete stat ne funkciis";
-    $dbh->do("DELETE FROM r2_stlng WHERE stl_kapvorto = ?", undef, $art) or die "delete stlng ne funkciis";
 
     ######### Kapvortoj #############
     while (m/<kap-oj lng="(.*?)">(.*?)<\/kap-oj>\s*/smg) {
@@ -124,9 +130,9 @@ sub parse {
         my ($mrk, $v) = ($1, $2);
         $mrk =~ tr/./_/;
 #        print pre("tez: $mrk, $v\n");
-        my ($kap_ci) = $sorter->remap_ci_lng('eo', $v);
+#        my ($kap_ci) = $sorter->remap_ci_lng('eo', $v);
         $dbh->do("INSERT INTO r2_indekso (ind_kapvorto, ind_teksto, ind_traduko, ind_kat, ind_subkat, ind_celref, ind_ord, ind_kaplit, ind_subord) VALUES (?,?,?,?,?,?,?,?,?)",
-		 undef, $art, $v, undef, 'LNG', 'eo', "tez/tz_$mrk.html", $kap_ci, ' ', undef) or die "insert ne funkciis";
+		 undef, $art, $v, undef, 'TEZ', 'eo', "tez/tz_$mrk.html", undef, ' ', undef) or die "insert ne funkciis";
       }
 
       while ($kapoj =~ m/<v mrk="(.*?)">\s*(?:<r>(.*?)<\/r>)?\s*<k>(.*?)<\/k>\s*(?:<k1>(.*?)<\/k1>)?(.*?)<\/v>\s*([^<]*)/smg) {
@@ -139,16 +145,18 @@ sub parse {
         } else {
           $mrk = "#$mrk";
         }
-#        print pre(escapeHTML("v art=$art, mrk=$mrk, rev=$rev, k=$k, k1=$k1, v=$v, poste=$poste\n"));
-#        print pre(escapeHTML("k=$k\n"));
-        my ($kap_ci, $unua) = $sorter->remap_ci_lng('eo', $k);
+        print pre(escapeHTML("v art=$art, mrk=$mrk, rev=$rev, k=$k, k1=$k1, v=$v, poste=$poste\n"));
+        print pre(escapeHTML("k=$k\n"));
+#        my ($kap_ci, $unua) = $sorter->remap_ci_lng('eo', $k);
+        my ($kap_ci, $unua, $subord) = $sorter->sortval_lng('LNG', 'eo', $k);
         $dbh->do("INSERT INTO r2_indekso (ind_kapvorto, ind_teksto, ind_traduko, ind_kat, ind_subkat, ind_celref, ind_ord, ind_kaplit, ind_subord) VALUES (?,?,?,?,?,?,?,?,?)",
-		 undef, $art, $k, undef, 'LNG', 'eo', "art/$art.html$mrk", $kap_ci, $unua, undef) or die "insert ne funkciis";
+		 undef, $art, $k, undef, 'LNG', 'eo', "art/$art.html$mrk", $kap_ci, $unua, $subord) or die "insert ne funkciis";
         if ($rev) {
 #          print pre(escapeHTML("rev=$rev\n"));
-          my ($kap_ci, $unua) = $sorter->remap_ci_lng('eo', $rev);
+#          my ($kap_ci, $unua) = $sorter->remap_ci_lng('eo', $rev);
+          my ($kap_ci, $unua, $subord) = $sorter->sortval_lng('INV', 'eo', $rev);
           $dbh->do("INSERT INTO r2_indekso (ind_kapvorto, ind_teksto, ind_traduko, ind_kat, ind_subkat, ind_celref, ind_ord, ind_kaplit, ind_subord) VALUES (?,?,?,?,?,?,?,?,?)",
-		 undef, $art, $k1, undef, 'INV', 'eo', "art/$art.html", $kap_ci, $unua, undef) or die "insert ne funkciis";
+		 undef, $art, $k1, undef, 'INV', 'eo', "art/$art.html", $kap_ci, $unua, $subord) or die "insert ne funkciis";
         }
       }
       print pre(escapeHTML("resto kapoj $art = $kapoj\n")) if $kapoj =~ /\S/;
@@ -195,7 +203,7 @@ sub parse {
 
     while (m/<trd-oj lng="(.*?)" n="(.*?)" p="(.*?)">(.*?)<\/trd-oj>\s*/smg) {
       my ($lng, $trd_n, $trd_p, $trdoj) = ($1, $2, $3, $4);
-#      print pre(escapeHTML("trdoj lng=$lng, n=$trd_n, p=$trd_p, trdoj=$trdoj\n"));
+      print pre(escapeHTML("trdoj lng=$lng, n=$trd_n, p=$trd_p, trdoj=$trdoj\n"));
       s///;
 
       $dbh->do("INSERT INTO r2_stlng (stl_kapvorto, stl_lng, stl_n, stl_p) VALUES (?,?,?,?)",
@@ -203,6 +211,7 @@ sub parse {
 
       while ($trdoj =~ m/<v mrk="(.*?)">\s*(?:<t>(.*?)<\/t>)?\s*(?:<t1>(.*?)<\/t1>)?\s*<k>(.*?)<\/k>(.*?)<\/v>\s*/smg) {
         my ($mrk, $t, $t1, $k, $v) = ($1, $2, $3, $4, $5);
+        print pre(escapeHTML("mrk=$mrk, t=$t, t1=$t1, k=$k, v=$v\n"));
         $trdoj =~ s///;
         if ($mrk eq $art) {
           $mrk = "";
@@ -211,15 +220,17 @@ sub parse {
         }
         $k =~ s/[ ,]+$//;  # Bugfix por VARiantoj
         $t1 =~ s/[\n]+$//;
-#        print pre(escapeHTML("v mrk=$mrk t=$t t1=$t1 k=$k v=$v\n"));
+        print pre(escapeHTML("v mrk=$mrk t=$t t1=$t1 k=$k v=$v\n"));
         my $t2 = $t;
         my $trdgrp;
-        $t2 =~ s/['[(\/].*$//;
+        $t2 =~ s/^[ (]+//;
+        $t2 =~ s/[[(\/].*$//;   # ne plu ' pro lng=be
         $trdgrp = $t unless $t1 or $t2 eq $t;
         $t2 =~ s/[-]//g;
         $t1 = $t unless $t1 or $t2 eq $t;
-#        print pre(escapeHTML("v mrk=$mrk t=$t t1=$t1 t2=$t2 k=$k v=$v\n"));
+        print pre(escapeHTML("v mrk=$mrk t=$t t1=$t1 t2=$t2 k=$k v=$v\n"));
         my ($kap_ci, $unua) = $sorter->remap_ci_lng($lng, $t2);
+        print pre(escapeHTML("kap_ci=$kap_ci, unua=$unua\n"));
         my ($sub_ci) = $sorter->remap_ci_lng($lng, $t1);
         my ($ord2_ci) = $sorter->remap_ci_lng('eo', $k);
         ($t, $t1) = ($t1, $t) if $t1;
@@ -316,7 +327,8 @@ sub parse {
 
     ######### Tezauro ###############################
     my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
-		    "xalan -XSL $xsldir/tez_retigo.xsl");
+#		    "xalan -XSL $xsldir/tez_retigo.xsl");
+		    "xsltproc $xsldir/tez_retigo.xsl -");
 #    print "cvs pid = $pid\n";
     print CHLD_IN $eltiro;
     close CHLD_IN;
@@ -333,7 +345,7 @@ sub parse {
 
     $dbh->do("DELETE FROM r2_tezauro WHERE tez_kapvorto = ?", undef, $art) or die "delete tezauro ne funkciis";
 
-    print pre(escapeHTML("tez:\n$_\nend.\n")) if $verbose;
+#    print pre(escapeHTML("tez:\n$_\nend.\n")) if $verbose;
 
     ########### unua prilaboro: nodoj ####################
     my %markoj;
@@ -492,7 +504,8 @@ sub parse {
   }
 
 
-  print h2("Dauxro: ".(time() - $start_time)." sekundoj por $count el $art_count artikoloj.");# if $verbose;
+  print a({name=>"fino"}, "").
+	h2("Dauxro: ".(time() - $start_time)." sekundoj por $count el $art_count artikoloj.") if $verbose;
   return $art_count;
 }
     

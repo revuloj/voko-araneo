@@ -16,8 +16,9 @@ use DBI();
 ######################################################################
 sub connect {
   # Connect to the database.
-  my $dbh = DBI->connect("DBI:mysql:database=test;host=localhost",
-                         "nobody", "",
+  #  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=127.0.0.1",
+  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=0.0.0.0;port=3366",
+                         "root", "sekreto",
                          {'RaiseError' => 1}) or die "DB ne funkcias";
   $dbh->do("set names utf8");
   return $dbh;

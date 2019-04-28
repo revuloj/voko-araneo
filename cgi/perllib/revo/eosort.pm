@@ -3,7 +3,10 @@ use strict;
 
 package revo::eosort;
 
-use Unicode::String qw(utf8);
+
+
+use Encode;
+use CGI qw(escapeHTML);   # nur por trovi erarojn
 
 my @_order_kodoj = ('!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0'..'9','A'..'Z','a'..'z');
 
@@ -107,6 +110,8 @@ my %_order_ci = (
 [ {name=>'e'},'э','Э'],
 [ {name=>'ju'},'ю','Ю'],
 [ {name=>'ja'},'я','Я'],
+#[ {name=>'ap'},'\x{6E}'],
+[ "ign", qr/'/ ],
 ],
 'bg' => [
 [ {name=>'a'},'а','А'],
@@ -372,6 +377,8 @@ my %_order_ci = (
 [ {name=>'x'},'x','X'],
 [ {name=>'y'},'y','Y'],
 [ {name=>'z'},'z','Z'],
+[ "sp", qr/['\.]/],
+[ "ign", qr/[- ]/ ],
 ],
 'es' => [
 [ {name=>'a'},'a','A','á','Á'],
@@ -461,6 +468,8 @@ my %_order_ci = (
 [ {name=>'x'},'x','X'],
 [ {name=>'y'},'y','Y','ÿ'],
 [ {name=>'z'},'z','Z'],
+[ "sp", qr/['\.]/],
+[ "ign", qr/[- ]/ ],
 ],
 'gd' => [
 [ {name=>'a'},'a','A','à','À'],
@@ -1071,6 +1080,20 @@ my %_order_ci = (
 [ {name=>'ju'},'ю','Ю'],
 [ {name=>'ja'},'я','Я'],
 ],
+'zh' => [
+[ {name=>'ling2'},'〇'],
+[ {name=>'ai4'},'爱','愛','伌','僾','叆','唆','嗋','嗳','噯','堥','塧','壒','嫒','嬡','懓','懝',
+  '戳','暧','曖','濭','瑷','璦','皧','瞹','砨','砱','硋','碍','礙','艾','薆','譪','賹','鑀','閝',
+  '阦','阵','隘','靉','餱','鴱'],
+[ {name=>'pa1'},'啪','夿','妑','扒','派','皅','舥','芭','葩','蚆','趴'],
+[ {name=>'pa2'},'扒','掭','杷','潖','爬','琶','筢','耙','跁','鈀','钭'],
+[ {name=>'ba1'},'八','仈','叭','吧','哵','夿','岜','岰','巴','扒','捌','朳','玐',
+  '疤','笆','粑','羓','芭','豝','釟','鈀','鲃'],
+[ {name=>'bai3'},'百','伫','佰','捭','摆','擺','柏','栢','百','矲','粨','絔','罞','署','襬'],
+
+[ {name=>'yi1'},'一'],
+],
+
 'utf' => [
 [ {name=>'a'},'a','A','ä','Ä'],
 [ {name=>'b'},'b','B'],
@@ -1108,6 +1131,8 @@ sub new
   my %params = @_;
   my $self = {dbg=>$params{dbg}};
   my %mapper_ci;
+  my %ignoru;
+  my %spacigu;
 	
 #  print "count_lng = ".(keys %_order_ci)."\n" if $self->{dbg};
   foreach my $lng (keys %_order_ci) {
@@ -1125,6 +1150,16 @@ sub new
 #$self->{dbg} = ($lng eq "eo");
 #$self->{dbg} = ($lng eq "eo" and $i == 3);
       my $aref = $$lingvo[$i];
+      if (ref($aref->[1]) eq "Regexp") {
+#        print "<pre>ref aref=ref(".ref($aref).")</pre>\n" if $lng eq "be" and $self->{dbg};
+        if ($aref->[0] eq 'sp') {
+          $spacigu{$lng} = $aref->[1];
+        } elsif ($aref->[0] eq 'ign') {
+          $ignoru{$lng} = $aref->[1];
+        } else {
+        }
+        next;
+      }
 #      print "i = $i\n" if $self->{dbg};
 #      print "aref = $aref\n" if $self->{dbg};
       my $litparam = $aref->[0];
@@ -1138,8 +1173,11 @@ sub new
       my $kodo = $_order_kodoj[$i];
 #      print "kodo = $kodo\n" if $self->{dbg};
       foreach my $i (1..$#$aref) {
-        my $u = utf8(@$aref[$i]);
-        my @lit = $u->unpack('U*');
+#        my $u = utf8(@$aref[$i]);
+#        my @lit = $u->unpack('U*');
+        my $enc = "utf-8";
+        my $u = Encode::decode($enc, @$aref[$i]);
+        my @lit = unpack 'U*', $u;
         die "pli ol $$litparam{'n'} unikodo letero: $u" if $#lit >= $$litparam{'n'};
 #        print "lit = ".(join ',', @lit).", lit = @$aref[$i], kodo=$kodo\n" if $self->{dbg};
         $mapper_ci{$lng}->[0]->{join(',', @lit)} = $i;
@@ -1156,7 +1194,27 @@ sub new
 #  }
 
   $self->{mapper_ci}  = \%mapper_ci;
+  $self->{ignoru}     = \%ignoru;
+  $self->{spacigu}    = \%spacigu;
   bless $self, $type;
+}
+
+sub sortval_lng
+{
+  my ($self, $kat, $lng, $str) = @_;
+  my $str2 = $str;
+  print "sortval_lng ($lng, $str)\n" if $self->{dbg};
+  if ($str =~ s/^.*?<u>(.*?)<\/u>.*/$1/
+   || $str =~ s/ ?\(.*?\) ?//) {
+    $str2 =~ s/<\/?u>//g;
+  } else {
+    $str2 = undef;
+  }
+  my ($kap_ci, $unua) = $self->remap_ci_lng($lng, $str);
+  my ($kap_ci2) = $self->remap_ci_lng($lng, $str2) if $str2;
+  print "sortval_lng: str=$str, kap_ci=$kap_ci, unua=$unua\n" if $self->{dbg};
+
+  return ($kap_ci, $unua, $kap_ci2);
 }
 
 sub remap_ci_lng
@@ -1164,18 +1222,39 @@ sub remap_ci_lng
   my $self = shift;
   my $lng = shift;
   my $arg = shift;
-  my $u = utf8($arg);
+  my $enc = "utf-8";
+  my $u = $arg;
+#  print "arg $arg is not utf8\n" if not Encode::is_utf8($arg) and $self->{dbg};
+#  print "arg $u is not utf8\n" if not Encode::is_utf8($u) and $self->{dbg};
+  $u = Encode::decode($enc, $u) if not Encode::is_utf8($u);
+#  my $u = utf8($arg);
 #  print "remap_ci_lng err arg=$arg\n";# unless $u;
-#  print "remap_ci_lng (".$u->utf8().", $lng)\n";# if $self->{dbg};
+#  print "remap_ci_lng (".$u->utf8().", $lng)\n" if $self->{dbg};
+  print "remap_ci_lng (".escapeHTML(encode('UTF-8', $u)).", $lng)\n" if $self->{dbg};
+
+  if (exists $self->{ignoru}->{$lng}) {
+    $u =~ s/$self->{ignoru}->{$lng}//g;
+    print "remap_re\n" if $self->{dbg};
+    print "remap_ci_lng (".encode('UTF-8', $u).", $lng)\n" if $self->{dbg};
+  }
+  if (exists $self->{spacigu}->{$lng}) {
+    $u =~ s/$self->{spacigu}->{$lng}/ /g;
+    print "remap spacigu re\n" if $self->{dbg};
+    print "remap_ci_lng (".encode('UTF-8', $u).", $lng)\n" if $self->{dbg};
+  }
+#  if ($lng eq "zh") {
+#    return ($u, '?', '?', undef);
+#  }
 
 #  $u->utf8() =~ s/[- ]//g;
 #  print "remap_ci ($u)\n";# if $self->{dbg};
 #  print "$_ len=".$u->length()."\n" if $self->{dbg};
-  my @lit = $u->unpack('U*');
-#  print "lit1 = ".join('-', @lit)."\n";# if $self->{dbg};
+#  my @lit = $u->unpack('U*');
+  my @lit = unpack 'U*', $u;
+#  print "lit1 = ".join('-', @lit)."\n" if $self->{dbg};
   for (my $i = $#lit; $i >= 0; $i--) {
 #    print "test $i: $lit[$i]\n" if $self->{dbg};
-    splice(@lit,$i,1) if $lit[$i] == ord('(') or $lit[$i] == ord(')') or $lit[$i] == ord(' ')	 # or $lit[$i] == ord('-') 
+    splice(@lit,$i,1) if $lit[$i] == ord('(') or $lit[$i] == ord(')');  # or $lit[$i] == ord(' ')	 # or $lit[$i] == ord('-') 
   }
   my $mapref = $self->{mapper_ci}->{$lng};
   $mapref = $self->{mapper_ci}->{'utf'} unless $mapref;
@@ -1203,35 +1282,27 @@ sub remap_ci_lng
               splice(@lit, $i+1, $j-1);
 #              $i -= $j - 1;
             }
-#            print "lit1 = ".join('-', @lit)."\n";# if $self->{dbg};
+#            print "lit1 = ".join('-', @lit)."-\n" if $self->{dbg};
             last;
           }
         }
       }
-#      die "ne konata letero $lng $lit[$i]" if $j <= 0;
+#      print "ne konata letero $lng $lit[$i]" if $j <= 0;
       if ($j <= 0) {
-        if ($lit[$i] == ord('-')) {
-          $lit[$i] = 'y';
-        } elsif ($lit[$i] == ord(',') or $lit[$i] == ord('.')) {
-          $lit[$i] = '!';
+#        if ($lit[$i] == ord('-')) {
+#          $lit[$i] = 'y';
+#        } els
+	if ($lit[$i] == ord(',') or $lit[$i] == ord(' ')) {
+          $lit[$i] = ' ';
         } else {
           splice(@lit, $i, 1);
-#          next;
         }
       }
     }
-    push @lit, chr($ord+10);
 
     ($unua_utf8, $name) = $self->ord2utf8($lng, $unua);
-#  } else {
-#    for (my $i = 0; $i <= $#lit; $i++) {
-#      if ($lit[$i] == ord('짩)
-#      $lit[$i] = lc(chr($lit[$i]));
-#      $unua = $lit[$i] if $i == 0;
-#      $unua_utf8 = $unua;
-#      $name = $unua;
-#    }
   }
+  print "remap_ci_lng -> ".join('', @lit)."-\n" if $self->{dbg};
   return (join('', @lit), $unua, $unua_utf8, $name);
 }
 
@@ -1246,7 +1317,8 @@ sub ord2utf8
   $orderref = $_order_ci{'utf'} unless $orderref;
 
   return ($arg, $arg) unless $orderref;
-
+  return ($arg, 0) if $arg eq '?';
+  
   for (my $i = 0; $i < $#_order_kodoj; $i++) {
     if ($_order_kodoj[$i] eq $arg) {
 #      print "found i=$i\n";
@@ -1270,9 +1342,11 @@ sub name2utf8
   $orderref = $_order_ci{'utf'} unless $orderref;
 
   return ($arg, $arg) unless $orderref;
+  return ('?', '?') if $arg eq '0';
 
 #  print pre("name2utf8: lng=$lng, arg=$arg\n");
   for (my $i = 0; $i <= $#$orderref; $i++) {
+    next if ref($orderref->[$i]->[1]) eq "Regexp";
     if ($orderref->[$i]->[0]->{name} eq $arg) {
       $arg_utf8 = $orderref->[$i]->[1];
       $kodo = $_order_kodoj[$i];
