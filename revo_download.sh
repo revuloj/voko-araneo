@@ -1,6 +1,7 @@
 #!/bin/bash
 #set -e
-curl -sO http://reta-vortaro.de/tgz/dosieroj.xml
+revo=http://reta-vortaro.de
+curl -sO ${revo}/tgz/dosieroj.xml
     
 # extract entries of the form: 
 #  <file name="revobld_2019-04-14.zip" size="3.7 MB"/>
@@ -8,18 +9,24 @@ curl -sO http://reta-vortaro.de/tgz/dosieroj.xml
 
 for file in $(grep -o "\(revoxml_\|revohtml_\|revobld_\|revonov_\).*\.zip" dosieroj.xml)
 do
-    echo "curl -O http://reta-vortaro.de/tgz/${file}"
-    curl -O http://reta-vortaro.de/tgz/${file}
+    echo "curl -O ${revo}/tgz/${file}"
+    curl -O ${revo}/tgz/${file}
 done
 
-unzip -q revo?ml*.zip
-unzip -q revobld*.zip
+unzip -qo revohtml*.zip
+unzip -qo revoxml*.zip
+unzip -qo revobld*.zip
 for zip in $(ls revonov*.zip | sort)
 do
-    unzip -q -o ${zip}
+    unzip -quo ${zip}
 done
 
 rm *.zip dosieroj.xml
 
+cd revo 
 
-    
+for f in index.html sercho.html titolo.html revo.jpg revo.ico
+do
+    echo "curl -sO ${revo}/revo/${f}"
+    curl -sO ${revo}/revo/${f}
+done

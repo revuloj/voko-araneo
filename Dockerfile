@@ -35,6 +35,10 @@ RUN apk --update add mysql-client perl-dbd-mysql fcgi libxslt \
 
 ADD . ./
 
+# Ni kopias la tutan Retan Vortaron de http://retavortaro.de/tgz 
+# Alternativa ebleco estus preni nur la XML kaj rekrei la tutan
+# vortaron per voko-formiko...
+#
 # en revodb.pm estas la konekto-parametroj...
 RUN ./revo_download.sh && mv revo /usr/local/apache2/htdocs/ && mv cgi/* /usr/local/apache2/cgi-bin/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
