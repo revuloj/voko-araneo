@@ -32,8 +32,8 @@ services:
     build: https://github.com/revuloj/voko-abelo.git
     # command: --default-authentication-plugin=mysql_native_password
     # restart: always
-    ports:
-      - 3366:3306
+    #expost:
+    #  - 3306
     environment:
       # ŝanĝu la pasvorton se vi lanĉas en publika ĉirkaŭaĵo...
       # necesas tion fari ankaŭ en la dosiero revodb.pm

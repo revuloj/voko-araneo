@@ -24,9 +24,8 @@ done
 rm *.zip dosieroj.xml
 
 cd revo 
-
-for f in index.html sercho.html titolo.html revo.jpg revo.ico
+for f in revo.jpg revo.ico
 do
-    echo "curl -sO ${revo}/revo/${f}"
-    curl -sO ${revo}/revo/${f}
+   echo "curl -sO ${revo}/revo/${f}"
+   curl -sO ${revo}/revo/${f}
 done
