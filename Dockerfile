@@ -42,20 +42,16 @@ ADD . ./
 # en revodb.pm estas la konekto-parametroj...
 RUN ./revo_download.sh && mv revo /usr/local/apache2/htdocs/ && mv cgi/* /usr/local/apache2/cgi-bin/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-  && unzip -q master.zip voko-grundo-master/xsl/* && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/ \
+  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
+  && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/ \
+  && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && mv revodb.pm /usr/local/apache2/cgi-bin/perllib/ \
   && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
-  &&  mkdir -p /var/www/web277/files && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
-  &&  mkdir -p /var/www/web277 && ln -sT /usr/local/apache2/htdocs /var/www/web277/html
+  && mkdir -p /var/www/web277/files && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
+  && mkdir -p /var/www/web277 && ln -sT /usr/local/apache2/htdocs /var/www/web277/html
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
-
-
-
-
-
-
-
-
-
+# Ankoraŭ farenda
+# certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...
+# oni povas kunmeti COPY+ADD kaj ambaŭ RUN per redukti tavolojn
