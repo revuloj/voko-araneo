@@ -1,5 +1,5 @@
 FROM httpd:2.4-alpine
-MAINTAINER Wolfram Diestel
+LABEL Author=<diestel@steloj.de>
 
 # see:
 # https://hub.docker.com/_/httpd/
