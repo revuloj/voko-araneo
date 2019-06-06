@@ -18,13 +18,13 @@ print header,
       start_html('Sendu sxangxitajn pagxojn'),
       h1('fname='.param('fname'));
 
-open LOG, ">>../../../files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush LOG 1;
 
 my $fname = param('fname');
 
 my $homedir = "/var/www/web277";
 #print h1("homedir = $homedir");
+open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+autoflush LOG 1;
 
 $ret = `du -sh $homedir`;
 print LOG "du -> $exitcode\n$ret\n";

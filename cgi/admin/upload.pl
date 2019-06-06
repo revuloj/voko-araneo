@@ -15,13 +15,13 @@ print header,
       start_html('Sendu sxangxitajn arkivojn'),
       h1('fname='.param('fname'));
 
-open LOG, ">>../../../files/log/upload.log" or die("ne eblas skribi log");	
-autoflush LOG 1;
 
 my $fname = param('fname');
 
 my $homedir = "/var/www/web277";
 #print h1("homedir = $homedir");
+open LOG, ">>$homedir/files/log/upload.log" or die("ne eblas skribi log");	
+autoflush LOG 1;
 
 #my $cvsdir = "$homedir/files/CVS";
 
@@ -39,7 +39,7 @@ unless ($fname =~ /^revocvs-\d\d\d\d\d\d\d\d_\d\d\d\d\d\d\.tgz$/) {
 
 my $ret;
 
-chdir '../../../files/CVS' or die "chdir ne funkciis";
+chdir "$homedir/files/CVS" or die "chdir ne funkciis";
 
 #print h1("cwd=".cwd());
 

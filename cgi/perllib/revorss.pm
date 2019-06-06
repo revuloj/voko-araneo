@@ -27,9 +27,10 @@ sub write {
 
   my $rss = new XML::RSS;
 
-  $rss->parsefile("$htmldir/sxangxoj.rdf");
-
-  pop(@{$rss->{'items'}}) while (@{$rss->{'items'}} > $maxnum);
+  if (-e "$htmldir/sxangxoj.rdf") {
+    $rss->parsefile("$htmldir/sxangxoj.rdf");
+    pop(@{$rss->{'items'}}) while (@{$rss->{'items'}} > $maxnum);
+  }
 
   while ($tar =~ m,revo/art/([^.]+)\.html\n,smg) {
     my ($art) = ($1);
