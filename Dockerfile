@@ -59,7 +59,11 @@ RUN /usr/local/bin/revo_download.sh && mv revo /usr/local/apache2/htdocs/ \
   && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
-  && ln -sT /usr/local/apache2/htdocs /var/www/web277/html
+  && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
+  && chown -R ${DAEMON_UID} /var/www/web277/html/revo
+
+COPY sxangxoj.rdf /var/www/web277/html/
+RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 

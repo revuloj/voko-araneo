@@ -30,11 +30,14 @@ sub write {
   if (-e "$htmldir/sxangxoj.rdf") {
     $rss->parsefile("$htmldir/sxangxoj.rdf");
     pop(@{$rss->{'items'}}) while (@{$rss->{'items'}} > $maxnum);
+  } else {
+    die "Ne ekzistas: $htmldir/sxangxoj.rdf\nProvizu almenaŭ malplenan RSS-dosieron kiel ŝablonon."
   }
 
-  while ($tar =~ m,revo/art/([^.]+)\.html\n,smg) {
+  while ($tar =~ m,revo/art/([^.\n]+)\.html\n,smg) {
     my ($art) = ($1);
-#    print pre("art = $art");
+    #
+    print pre("art = $art");
 
     open IN, "<", "$htmldir/revo/xml/$art.xml" or warn "error open xml/$art.xml";
     my $xml = join '', <IN>;
@@ -42,7 +45,7 @@ sub write {
 
     if ($xml =~ m!<\!--\n+ *\$Log: [^,]+,v \$\n *Revision ([0-9.]+)  ([0-9/]+) ([0-9:]+)  revo\n *([^\n]*)\n!) {
       my ($rev, $dato, $tempo, $sxangxo) = ($1, $2, $3, $4);
-#      print pre("rev = $rev, dato = $dato $tempo, log = $sxangxo");
+      # print pre("rev = $rev, dato = $dato $tempo, log = $sxangxo");
       $dato =~ s,/,-,g;
       my $prevrev = "1.1";
       if ($rev =~ /^(\d+)\.(\d+)$/) {
@@ -59,15 +62,15 @@ sub write {
       }
 
       $rss->add_item(title => "$art",
-                     link  => "http://www.reta-vortaro.de/revo/art/$art.html",
-                     description => a({href=>$hrefdiff}, "$dato $tempo").br."$sxangxo", 
-                     dc => { subject=>$subject,
-	  	             creator=>"ReVo", 
-		             rights=>"GPL",
-                             date=>"$dato\T$tempo+01:00",
-	             },
-		     mode  => 'insert',
-    );
+        link  => "http://www.reta-vortaro.de/revo/art/$art.html",
+        description => a({href=>$hrefdiff}, "$dato $tempo").br."$sxangxo", 
+        dc => { subject=>$subject,
+	  	    creator=>"ReVo", 
+		      rights=>"GPL",
+          date=>"$dato\T$tempo+01:00",
+	      },
+		    mode  => 'insert');
+        # print pre("Nova ero en RSS: " + $hrefdiff)
     } else {
       print pre("eraro en art = $art\n".escapeHTML("xml = $xml"));
     }

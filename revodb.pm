@@ -35,7 +35,13 @@ sub pop3login {
 ######################################################################
 
 sub mysqldump {
-  return "mysqldump --user=root --password=$(cat /run/secrets/voko-abelo.mysql_root_password) --databases usr_web277_1";
+  open(my $fh,'<','/run/secrets/voko-abelo.mysql_root_password')
+    or die "Mi ne trovis la pasvort-sekreton: $!";
+  my $mysql_root_password = <$fh>;
+  chomp $mysql_root_password;
+  close $fh;
+
+  return "mysqldump --user=root --password=$mysql_root_password --databases usr_web277_1";
 }
 ######################################################################
 
