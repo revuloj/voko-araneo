@@ -1,3 +1,29 @@
+FROM alpine:3.5 as builder
+
+# build and install rxp
+RUN apk update \
+  && apk upgrade \
+  && apk add --no-cache \
+          ca-certificates \
+  && update-ca-certificates \
+      \
+  # Install tools for building
+  && apk add --no-cache --virtual .tool-deps \
+          curl coreutils autoconf g++ libtool make \
+      \
+  # Install  build dependencies
+  && apk add --no-cache --virtual .build-deps \
+          linux-headers \
+      \
+  # Download and prepare Postfix sources
+  && curl -fL -o /tmp/rxp.tar.gz \
+          http://deb.debian.org/debian/pool/main/r/rxp/rxp_1.5.0.orig.tar.gz \
+  && (echo "	5f6c4cd741bbeaf77b5a5918cb26df2f  /tmp/rxp.tar.gz" \
+          | md5sum -c -) \
+  && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
+  && cd /tmp/rxp-* \
+  && ./configure && make install
+
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 
@@ -19,6 +45,16 @@ RUN apk --update add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
     curl unzip  && rm -f /var/cache/apk/* \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
+
+COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
+COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
+
+# mankas "rxp" pro Alpine. Vd.:
+# http://www.cogsci.ed.ac.uk/~richard/rxp.html
+# http://www.inf.ed.ac.uk/research/isdd/admin/package?view=1&id=145
+# https://packages.debian.org/source/jessie/rxp
+#
+# alternative oni povus uzi9 https://pkgs.alpinelinux.org/package/edge/testing/x86/xerces-c
 
 #    && install "shadow"... && usermod -u ${DAEMON_UID} daemon
     
@@ -56,6 +92,7 @@ RUN /usr/local/bin/revo_download.sh && mv revo /usr/local/apache2/htdocs/ \
   && rm master.zip \
   && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/ \
   && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && cp -r /usr/local/apache2/htdocs/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
   && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \

@@ -114,8 +114,8 @@ if (open IN, "<bv_forigu_tiujn.lst") {
       print LOG "forigi $_\n";
       my $ret = unlink $_;
       $count += $ret;
-      print h2("forigi $_ malsucesis") if !$ret;
-      print LOG "forigi $_ malsucesis\n" if !$ret;
+      print h2("forigi $_ malsukcesis") if !$ret;
+      print LOG "forigi $_ malsukcesis\n" if !$ret;
     } else {
       print h2("nelegala $_");
       print LOG "nelegala $_\n";
@@ -149,7 +149,9 @@ if (! -e "$htmldir/alveno/$dbfname") {
     print h2("Ne sendas retmesagxon.")."\n";
   } else {
     print h2("Sendas retmesagxon.")."\n";
-
+# FARENDA: unuecigu sendadon de poŝto en uprevo, vokomail, processmail
+# kreu poshtsendo.pm aŭ simile kaj anstataŭ sendmail
+# eble uzu estonte: https://metacpan.org/pod/Mail::Sendmail::Enhanced
     my $from    = revodb::mail_from;
     my $name    = "Revo Upload";
     my $to      = revodb::mail_to;

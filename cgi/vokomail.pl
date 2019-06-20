@@ -889,6 +889,10 @@ EOD
         my $subject = "Revo redaktu.pl $art";
 		my $smlog = "sendmail.log";
 
+    # FARENDA: unuecigu sendadon de poŝto en uprevo, vokomail, processmail
+    # kreu poshtsendo.pm aŭ simile kaj anstataŭ sendmail
+    # eble uzu estonte: https://metacpan.org/pod/Mail::Sendmail::Enhanced
+    
         # konektu al retposxtservilo
         open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
         print SENDMAIL <<End_of_Mail;
