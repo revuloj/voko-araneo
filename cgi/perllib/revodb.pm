@@ -31,7 +31,8 @@ sub pop3login {
 ######################################################################
 
 sub mysqldump {
-  return "mysqldump --user=XXX --password=XXX --databases XXX";
+#  return "mysqldump --user=XXX --password=XXX --databases XXX";
+  return "mysqldump --user=web277 --password=<pwd> --ignore-table=usr_web277_1.r2_vikititolo --ignore-table=usr_web277_1.email --ignore-table=usr_web277_1.redaktanto --databases usr_web277_1";
 }
 ######################################################################
 
@@ -40,7 +41,7 @@ sub mail_from {
 }
 
 sub mail_to {
-  return 'XXX';
+  return 'revuloj@groups.io'; # povas esti pluraj dividitaj per komo
 }
 
 1;

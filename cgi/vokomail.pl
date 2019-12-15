@@ -887,36 +887,42 @@ EOD
       }
       if (my $to = join(', ', @to)) {
         my $subject = "Revo redaktu.pl $art";
-		my $smlog = "sendmail.log";
 
-    # FARENDA: unuecigu sendadon de poŝto en uprevo, vokomail, processmail
-    # kreu poshtsendo.pm aŭ simile kaj anstataŭ sendmail
-    # eble uzu estonte: https://metacpan.org/pod/Mail::Sendmail::Enhanced
-    
-        # konektu al retposxtservilo
-        open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
-        print SENDMAIL <<End_of_Mail;
-From: $name <$from>
-To: $to
-Reply-To: $redaktanto
-Subject: $subject
-X-retadreso: $ENV{REMOTE_ADDR}
+    my $header = [
+      To => $to,
+      From => "$name <$from>",
+      "Reply-To" => $redaktanto,
+      Subject => $subject,
+      X-retadreso: $ENV{REMOTE_ADDR}
+    ];
+    retposhto::sendu(
+      \%mail,
+      "$sxangxo2\n\n$xml2");
 
-$sxangxo2
-
-$xml2
-End_of_Mail
-
-        close SENDMAIL;
+##      my $smlog = "sendmail.log";
+##        open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
+##        print SENDMAIL <<End_of_Mail;
+##From: $name <$from>
+##To: $to
+##Reply-To: $redaktanto
+##Subject: $subject
+##X-retadreso: $ENV{REMOTE_ADDR}
+##
+##$sxangxo2
+##
+##$xml2
+##End_of_Mail
+##
+##        close SENDMAIL;
 
         print "sendita al $to";
 		
-	if (-s $smlog) {
-		  open L, "<", $smlog;
-		  my $ltxt = join "", <L>;
-		  close L;
-		  print pre("sendmail.log: $ltxt");
-	}
+##	if (-s $smlog) {
+##		  open L, "<", $smlog;
+##		  my $ltxt = join "", <L>;
+##		  close L;
+##		  print pre("sendmail.log: $ltxt");
+##	}
 	
       } else {
         print "ne sendita, elektu adreson sube";
@@ -1194,7 +1200,7 @@ sub checkxml {
       $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 cxi tie/smg;
       $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua finokodero: atendis $1, trovis $2/smg;
       $err =~ s/^ at line (\d+) char (\d+)$/ cxe linio $1 pozicio $2/smg;
-      $err =~ s/Document contains multiple elements/Artikolo enhavas pli ol unu elemento (kaj tio devas esti <vortaro>)/smg;
+      $err =~ s/Document contains multiple elements/Artikolo enhavas pli ol unu elementon (kaj tio devas esti <vortaro>)/smg;
       $err =~ s/Root element is ([^ ,\n]*), should be ([^ \n]*)/Radika elemento estas $1, devus esti $2/smg;
       $err =~ s/Content model for ([^ \n]*) does not allow PCDATA/Enhavo de elemento $1 estas malpermesita/smg;
       $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ENUMERATION but is empty/La atributo $1 de la kodero $2 mankas/smg;

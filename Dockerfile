@@ -43,7 +43,10 @@ ARG DAEMON_UID=13731
 
 RUN apk --update add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
+    perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
+    perl-app-cpanminus perl-extutils-installpaths make \
     curl unzip  && rm -f /var/cache/apk/* \
+    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
