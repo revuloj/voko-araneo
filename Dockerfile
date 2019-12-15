@@ -110,3 +110,14 @@ RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...
 # oni povas kunmeti COPY+ADD kaj ambaŭ RUN per redukti tavolojn
+
+# Basic Auth por cgi/admin
+# https://tecadmin.net/setup-apache-basic-authentication/
+# https://dzone.com/articles/apache-http-24-how-to-build-a-docker-image-for-ssl
+# https://devops.ionos.com/tutorials/set-up-basic-authentication-in-apache-using-htaccess-on-centos-7/
+
+
+USER root
+EXPOSE 80
+ENTRYPOINT ["docker-entrypoint.sh"]
+#CMD ["/usr/sbin/apache2","-k","start"]
