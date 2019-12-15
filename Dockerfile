@@ -118,6 +118,5 @@ RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 
 
 USER root
-EXPOSE 80
 ENTRYPOINT ["docker-entrypoint.sh"]
-#CMD ["/usr/sbin/apache2","-k","start"]
+CMD ["httpd-foreground"]
