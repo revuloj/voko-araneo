@@ -83,7 +83,7 @@ revorss::write($ret, $htmldir, -1, 0);
 my $dbh = parseart::connect();
 #chdir $revodir or die "chdir revo ne funkciis";
 chdir $xmldir or die "chdir revo ne funkciis";
-while ($ret =~ m/revo\/xml\/([^.]+)\.xml/gm) {
+while ($ret =~ m/revo\/xml\/([^.\s]+)\.xml/gm) {
 #  print pre("- $1 -")."\n";
   parseart::parse($dbh, $1, $xmldir, 0);
   parseart2::parse($dbh, $1, $xmldir, 0);
