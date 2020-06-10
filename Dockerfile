@@ -1,4 +1,4 @@
-FROM alpine:3.5 as builder
+FROM alpine:3.10 as builder
 
 # build and install rxp
 RUN apk update \
@@ -41,7 +41,7 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 
-RUN apk --update add mysql-client perl-dbd-mysql fcgi libxslt \
+RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
