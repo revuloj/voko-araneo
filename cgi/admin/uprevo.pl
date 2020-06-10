@@ -72,7 +72,7 @@ $ret = `rm bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print LOG "rm bv_forigu_tiujn.lst -> $exitcode\n";
 
-$ret = `tar -xvzf alveno/$fname revo/eta revo/dtd revo/art tgz revo/xml revo/xsl revo/cfg revo/tez revo/bld revo/stl revo/jsc revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
+$ret = `tar -xvzf alveno/$fname revo/eta revo/dtd revo/art revo/hst tgz revo/xml revo/xsl revo/cfg revo/tez revo/bld revo/stl revo/jsc revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("tar -xv -> $exitcode");
 print LOG "tar -xv -> $exitcode\n$ret";
@@ -83,7 +83,7 @@ revorss::write($ret, $htmldir, -1, 0);
 my $dbh = parseart::connect();
 #chdir $revodir or die "chdir revo ne funkciis";
 chdir $xmldir or die "chdir revo ne funkciis";
-while ($ret =~ m/revo\/xml\/([^.]+)\.xml/gm) {
+while ($ret =~ m/revo\/xml\/([^.\s]+)\.xml/gm) {
 #  print pre("- $1 -")."\n";
   parseart::parse($dbh, $1, $xmldir, 0);
   parseart2::parse($dbh, $1, $xmldir, 0);

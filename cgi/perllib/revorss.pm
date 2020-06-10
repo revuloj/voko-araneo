@@ -43,7 +43,7 @@ sub write {
     my $xml = join '', <IN>;
     close IN;
 
-    if ($xml =~ m!<\!--\n+ *\$Log: [^,]+,v \$\n *Revision ([0-9.]+)  ([0-9/]+) ([0-9:]+)  revo\n *([^\n]*)\n!) {
+    if ($xml =~ m!<\!--\n+ *\$Log: [^,]+,v \$\n *(?:Revision|versio) ([0-9.]+) +([0-9/]+) ([0-9:]+)(?:\s+revo)?\n *([^\n]*)\n!) {
       my ($rev, $dato, $tempo, $sxangxo) = ($1, $2, $3, $4);
       # print pre("rev = $rev, dato = $dato $tempo, log = $sxangxo");
       $dato =~ s,/,-,g;

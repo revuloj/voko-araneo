@@ -45,7 +45,7 @@ RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi l
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
-    curl unzip  && rm -f /var/cache/apk/* \
+    curl unzip jq && rm -f /var/cache/apk/* \
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
@@ -89,7 +89,7 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 #
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
-RUN /usr/local/bin/revo_download.sh && mv revo /usr/local/apache2/htdocs/ \
+RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
   && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
   && rm master.zip \
