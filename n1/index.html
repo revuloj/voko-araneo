@@ -6,64 +6,85 @@
         <title>Reta Vortaro - Serĉo</title>
 <!--        <link rel="icon" type="image/png" href="images/favicon.png"> -->
         <link rel="SHORTCUT ICON" href="revo.ico">
-
+        <link rel="stylesheet" href="stl/normalize.css">
         <style>
-/*
+
             html {
                 height: 100%;
-                width: 100%
+                /* width: 100% */
             }
-            */
-
+            
             body {
                 display: grid;
                 gap: 1em;
                 grid-template-columns: auto 1fr; 
+                grid-template-rows: auto 1fr auto;
+                height: 100%;
                 background-color: lightgoldenrodyellow;
                 font-size: 120%;
                 /* font-family: serif; */
+                font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Geneva, sans-serif;
             }
 
             nav {
                 grid-row: 1 / 4;
                 padding: 1em;
-                border: 1px solid blue;
+                background-color: goldenrod;
+                /*border: 1px solid blue;*/
             }
 
             header {
                 grid-column: 2;
                 display: flex;
-                text-align: center;
-                border: 1px solid red;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 3.5em;
+                /*border: 1px solid red;*/
             }
 
             main {
                 grid-column: 2;
-                border: 1px solid green;
+                /*border: 1px solid green;*/
             }
 
             #sercho {
-                margin-top: 3.5em;
                 text-align: center;
             }
 
+            /*
             #sercho input {
-                border-radius: 0.6em;
-            }
+                border-radius: 0.2em;
+                padding: 0.5em;
+                margin: 0.3em;
+            }*/
 
             #trovoj {
                 display: flex;
-                border: 1px solid orange;
+                /*border: 1px solid orange;*/
             }
 
             #trovoj table {
-                min-width: 40%;
+                min-width: 48%;
                 padding: 1em;
+                margin-right: 1em;
             }
+
 
             #trovoj td {
                 padding: 0.5em;
+                border-bottom: 1px solid gray;
+            }
+
+            #trovoj td:first-child {
+                background-color: palegoldenrod;
+            }
+
+            #trovoj td:nth-child(2) {
                 background-color: khaki;
+            }
+
+            #trovoj td:nth-child(2):hover {
+                background-color: goldenrod;
             }
 
             #lng, #kat {
@@ -92,9 +113,131 @@
                 position: relative;
             }
             .cirklo.R { top: 0em; }
-            .cirklo.E { z-index: 10; top: 0.7em }
-            .cirklo.V { top: 0.3em }
-            .cirklo.O { top: 0.5em }
+            .cirklo.E { z-index: 10; top: 0.7em; left: -0.2em; }
+            .cirklo.V { top: 0.3em; left: -0.3em; }
+            .cirklo.O { top: 0.5em; left: -0.35em; }
+
+            /* Buttons
+            –––––––––––––––––––––––––––––––––––––––––––––––––– */
+            .button,
+            button,
+            input[type="submit"],
+            input[type="reset"],
+            input[type="button"] {
+            display: inline-block;
+            height: 38px;
+            padding: 0 30px;
+            color: #555;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 38px;
+            letter-spacing: .1rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+            background-color: transparent;
+            border-radius: 4px;
+            border: 1px solid #bbb;
+            cursor: pointer;
+            box-sizing: border-box; }
+            .button:hover,
+            button:hover,
+            input[type="submit"]:hover,
+            input[type="reset"]:hover,
+            input[type="button"]:hover,
+            .button:focus,
+            button:focus,
+            input[type="submit"]:focus,
+            input[type="reset"]:focus,
+            input[type="button"]:focus {
+            color: #333;
+            border-color: #888;
+            outline: 0; }
+            .button.button-primary,
+            button.button-primary,
+            input[type="submit"].button-primary,
+            input[type="reset"].button-primary,
+            input[type="button"].button-primary {
+            color: #FFF;
+            background-color: #33C3F0;
+            border-color: #33C3F0; }
+            .button.button-primary:hover,
+            button.button-primary:hover,
+            input[type="submit"].button-primary:hover,
+            input[type="reset"].button-primary:hover,
+            input[type="button"].button-primary:hover,
+            .button.button-primary:focus,
+            button.button-primary:focus,
+            input[type="submit"].button-primary:focus,
+            input[type="reset"].button-primary:focus,
+            input[type="button"].button-primary:focus {
+            color: #FFF;
+            background-color: #1EAEDB;
+            border-color: #1EAEDB; }
+
+            /* Forms
+            –––––––––––––––––––––––––––––––––––––––––––––––––– */
+            input[type="email"],
+            input[type="number"],
+            input[type="search"],
+            input[type="text"],
+            input[type="tel"],
+            input[type="url"],
+            input[type="password"],
+            textarea,
+            select {
+            height: 38px;
+            padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+            background-color: #fff;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            box-shadow: none;
+            box-sizing: border-box; }
+            /* Removes awkward default styles on some inputs for iOS */
+            input[type="email"],
+            input[type="number"],
+            input[type="search"],
+            input[type="text"],
+            input[type="tel"],
+            input[type="url"],
+            input[type="password"],
+            textarea {
+            -webkit-appearance: none;
+                -moz-appearance: none;
+                    appearance: none; }
+            textarea {
+            min-height: 65px;
+            padding-top: 6px;
+            padding-bottom: 6px; }
+            input[type="email"]:focus,
+            input[type="number"]:focus,
+            input[type="search"]:focus,
+            input[type="text"]:focus,
+            input[type="tel"]:focus,
+            input[type="url"]:focus,
+            input[type="password"]:focus,
+            textarea:focus,
+            select:focus {
+            border: 1px solid #33C3F0;
+            outline: 0; }
+            label,
+            legend {
+            display: block;
+            margin-bottom: .5rem;
+            font-weight: 600; }
+            fieldset {
+            padding: 0;
+            border-width: 0; }
+            input[type="checkbox"],
+            input[type="radio"] {
+            display: inline; }
+            label > .label-body {
+            display: inline-block;
+            margin-left: .5rem;
+            font-weight: normal; }
+
+
 
 /*
            .revo_btn {border-radius: 2em; width: 4em; height:4em; 
@@ -108,12 +251,12 @@
 
 <nav>
     <ul>
-        <li>Esperanto</li>
-        <li>Kategorioj</li>
-        <li>Fakoj</li>
-        <li>otnarepsE</li>
-        <li>Bildoj</li>
-        <li>Mallongigoj</li>
+        <li><a href="eo" class="button">Esperanto</a></li>
+        <li><a class="button">Kategorioj</a></li>
+        <li><a class="button">Fakoj</a></li>
+        <li><a class="button">otnarepsE</a></li>
+        <li><a class="button">Bildoj</a></li>
+        <li><a class="button">Mallongigoj</a></li>
         <li>--</li>
         <li>Alilingvaj</li>
         <li>--</li>
@@ -132,8 +275,9 @@
 
 <main>   
     <form id="sercho">
-        <input type="text" size="50" name="sercho" placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
-        <input type="submit"></input>
+        <input type="text" size="50" name="sercho" 
+            placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
+        <input type="submit" value="LU" class="button"></input>
         <div>
             indeksoj | helpo | ktp.  
         </div>
