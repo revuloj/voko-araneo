@@ -28,9 +28,47 @@
 
             nav {
                 grid-row: 1 / 4;
-                padding: 1em;
+                padding: 0;
                 background-color: goldenrod;
                 /*border: 1px solid blue;*/
+                /*background-color: lightgoldenrodyellow;*/
+            }
+
+            /* https://www.w3schools.com/howto/howto_css_display_element_hover.asp 
+            ...
+               https://www.w3schools.com/howto/howto_js_popup.asp
+               https://www.w3schools.com/howto/howto_js_collapsible.asp
+            */
+            .nav_btn {
+                background-color: goldenrod;
+            }
+
+            .nav_btn:hover + ul {
+                display: block;
+                background-color: goldenrod;
+            }
+
+            nav ul {
+                display: none;
+                padding-inline-start: 0;
+                margin-left: 0;
+                margin-top: 0.5em;
+                margin-right: 2.2em;
+            }
+
+            nav li {
+                list-style-type: none;
+                padding-left: 2em;
+                padding-right: 0.2em;
+                padding-top: 0.4em;
+                padding-bottom: 0.4em;
+                width: 100%;
+                letter-spacing: .09rem;
+                text-transform: uppercase;
+            }
+
+            nav li:hover {
+                background-color: khaki;
             }
 
             header {
@@ -67,20 +105,27 @@
                 min-width: 48%;
                 padding: 1em;
                 margin-right: 1em;
+                border-collapse: separate;
+                border-spacing: 0 0.3em;
             }
-
 
             #trovoj td {
                 padding: 0.5em;
-                border-bottom: 1px solid gray;
+                /*border-bottom: 1px solid gray;*/
             }
 
             #trovoj td:first-child {
                 background-color: palegoldenrod;
+                border-top-left-radius: 0.5em;
+                border-bottom-left-radius: 0.5em;
+                border-right: 2px solid gainsboro;
             }
 
             #trovoj td:nth-child(2) {
                 background-color: khaki;
+                border-top-right-radius: 0.5em;
+                border-bottom-right-radius: 0.5em;
+                /*border-bottom: 1px solid gray;*/
             }
 
             #trovoj td:nth-child(2):hover {
@@ -108,14 +153,15 @@
 /*                vertical-align: middle; 
                 border: 1px hidden darkblue;*/
                 border-radius: 50%;
-                background-color: gainsboro;
+/*                background-color: gainsboro; */
+                background-color: wheat;
                 opacity: 0.5;
                 position: relative;
             }
             .cirklo.R { top: 0em; }
-            .cirklo.E { z-index: 10; top: 0.7em; left: -0.2em; }
-            .cirklo.V { top: 0.3em; left: -0.3em; }
-            .cirklo.O { top: 0.5em; left: -0.35em; }
+            .cirklo.E { z-index: 10; top: 0.6em; left: -0.2em; }
+            .cirklo.V { top: 0.25em; left: -0.3em; }
+            .cirklo.O { top: 0.5em; left: -0.4em; }
 
             /* Buttons
             –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -250,13 +296,14 @@
     <body>
 
 <nav>
+    <div class="nav_btn">&#x2630;</div>
     <ul>
-        <li><a href="eo" class="button">Esperanto</a></li>
-        <li><a class="button">Kategorioj</a></li>
-        <li><a class="button">Fakoj</a></li>
-        <li><a class="button">otnarepsE</a></li>
-        <li><a class="button">Bildoj</a></li>
-        <li><a class="button">Mallongigoj</a></li>
+        <li><a href="eo">Esperanto</a></li>
+        <li><a>Kategorioj</a></li>
+        <li><a>Fakoj</a></li>
+        <li><a>otnarepsE</a></li>
+        <li><a>Bildoj</a></li>
+        <li><a>Mallongigoj</a></li>
         <li>--</li>
         <li>Alilingvaj</li>
         <li>--</li>
