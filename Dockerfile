@@ -57,7 +57,7 @@ COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 # http://www.inf.ed.ac.uk/research/isdd/admin/package?view=1&id=145
 # https://packages.debian.org/source/jessie/rxp
 #
-# alternative oni povus uzi9 https://pkgs.alpinelinux.org/package/edge/testing/x86/xerces-c
+# alternative oni povus uzi https://pkgs.alpinelinux.org/package/edge/testing/x86/xerces-c
 
 #    && install "shadow"... && usermod -u ${DAEMON_UID} daemon
     
@@ -83,9 +83,11 @@ COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
 COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 
-# Ni kopias la tutan Retan Vortaron de http://retavortaro.de/tgz 
-# Alternativa ebleco estus preni nur la XML kaj rekrei la tutan
-# vortaron per voko-formiko...
+# Ni kopias la tutan Retan Vortaron de 
+# https://api.github.com/repos/revuloj/revo-fonto/releases/latest
+# (Alternativa ebleco estus, preni nur la XML kaj rekrei la tutan
+# vortaron per voko-formiko, sed tio daŭras tro longe kaj Github 
+# jam faras tion ĉiunokte...)
 #
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
