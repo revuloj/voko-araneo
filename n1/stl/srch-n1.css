@@ -171,7 +171,6 @@
                 width: 3em;
             }
 
-
             .cirklo {
                 height: 1.1em;
                 width: 1.1em;
@@ -183,9 +182,10 @@
 /*                vertical-align: middle; 
                 border: 1px hidden darkblue;*/
                 border-radius: 50%;
-                border: 1px solid gray;
+                border: 2px solid gray;
 /*                background-color: gainsboro; */
                 background-color: goldenrod;
+                background-image: radial-gradient(darkgoldenrod 20%, goldenrod 60%, khaki 80%);
                 box-shadow: 10px 10px 20px;
                 /* opacity: 0.9; */
                 position: relative;
@@ -194,6 +194,18 @@
             .cirklo.E { z-index: 10; top: 0.6em; left: -0.2em; }
             .cirklo.V { z-index: 5; top: 0.25em; left: -0.3em; }
             .cirklo.O { top: 0.5em; left: -0.4em; }
+
+            @media all and (max-width: 50em) {
+                #serchteksto { width: 70% }
+            }
+            @media all and (max-height: 50em) {
+                header { margin-bottom: 1.5em }
+                .cirklo { font-size: 280% }
+            }
+            @media all and (max-width: 30em) {
+                header { padding-left: 1.8em; margin-right: -0.4em }
+                .cirklo { font-size: 250% }
+            }
 
             /* Buttons
             –––––––––––––––––––––––––––––––––––––––––––––––––– */
