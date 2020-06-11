@@ -31,8 +31,11 @@
                 position: absolute;
                 z-index: 200;
                 font-size: 150%;
+                text-shadow: 1px 1px silver;
                 padding: 0.1em;
                 background-color: goldenrod;
+                border-right: 2px solid gray;
+                border-bottom: 2px solid gray;
                 border-bottom-right-radius: 0.2em;
             }
             .nav_btn:hover {
@@ -195,7 +198,7 @@
                 border: 2px solid gray;
 /*                background-color: gainsboro; */
                 background-color: goldenrod;
-                background-image: radial-gradient(darkgoldenrod 20%, goldenrod 60%, khaki 80%);
+                background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
                 box-shadow: 10px 10px 20px;
                 /* opacity: 0.9; */
                 position: relative;
@@ -223,24 +226,31 @@
             button,
             input[type="submit"],
             input[type="reset"],
-            input[type="button"] {
-            display: inline-block;
-            height: 38px;
-            padding: 0 30px;
-            color: #555;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 38px;
-            letter-spacing: .1rem;
-            text-transform: uppercase;
-            text-decoration: none;
-            white-space: nowrap;
-            background-color: transparent;
-            border-radius: 4px;
-            border: 1px solid #bbb;
-            cursor: pointer;
-            box-sizing: border-box; }
+                input[type="button"] {
+                display: inline-block;
+                text-align: center;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-transform: uppercase;
+                text-decoration: none;
+                text-shadow: 1px 1px silver;
+                white-space: nowrap;
+                padding: 0.4em;
+                font-size: 127%;
+                /*
+                height: 38px;
+                padding: 0 30px;
+                font-size: 11px;
+                line-height: 38px;
+                */
+                background-color: goldenrod;
+                background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
+                box-shadow: 4px 4px 8px;
+                border-radius: 2em;
+                border: 2px solid gray;
+                cursor: pointer;
+                box-sizing: border-box; 
+            }
             .button:hover,
             button:hover,
             input[type="submit"]:hover,
@@ -251,30 +261,15 @@
             input[type="submit"]:focus,
             input[type="reset"]:focus,
             input[type="button"]:focus {
-            color: #333;
-            border-color: #888;
-            outline: 0; }
-            .button.button-primary,
-            button.button-primary,
-            input[type="submit"].button-primary,
-            input[type="reset"].button-primary,
-            input[type="button"].button-primary {
-            color: #FFF;
-            background-color: #33C3F0;
-            border-color: #33C3F0; }
-            .button.button-primary:hover,
-            button.button-primary:hover,
-            input[type="submit"].button-primary:hover,
-            input[type="reset"].button-primary:hover,
-            input[type="button"].button-primary:hover,
-            .button.button-primary:focus,
-            button.button-primary:focus,
-            input[type="submit"].button-primary:focus,
-            input[type="reset"].button-primary:focus,
-            input[type="button"].button-primary:focus {
-            color: #FFF;
-            background-color: #1EAEDB;
-            border-color: #1EAEDB; }
+                /*color: lightgoldenrodyellow; 
+                text-shadow: 0; */
+                box-shadow: 2px 2px 4px darkslategray;
+                background-image: none;
+                /*
+                background-color: khaki;
+                background-image: radial-gradient(at 49.5% 49.5%, goldenrod 20%, khaki 60%, lightgoldenrodyellow 80%);
+                */
+            }
 
             /* Forms
             –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -286,14 +281,15 @@
             input[type="url"],
             input[type="password"],
             textarea,
-            select {
-            height: 38px;
-            padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-            background-color: #fff;
-            border: 1px solid #D1D1D1;
-            border-radius: 4px;
-            box-shadow: none;
-            box-sizing: border-box; }
+                select {
+                height: 38px;
+                padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+                background-color: #fff;
+                border: 2px solid darkgray;
+                border-radius: 4px;
+                box-shadow: none;
+                box-sizing: border-box; 
+            }
             /* Removes awkward default styles on some inputs for iOS */
             input[type="email"],
             input[type="number"],
@@ -319,23 +315,29 @@
             input[type="password"]:focus,
             textarea:focus,
             select:focus {
-            border: 1px solid #33C3F0;
-            outline: 0; }
+                border: 2px dashed darkgoldenrod;
+                outline: 0; 
+            }
             label,
             legend {
-            display: block;
-            margin-bottom: .5rem;
-            font-weight: 600; }
+                display: block;
+                margin-bottom: .5rem;
+                font-weight: 600; 
+            }
             fieldset {
-            padding: 0;
-            border-width: 0; }
+                padding: 0;
+                border-width: 0; 
+            }
             input[type="checkbox"],
-            input[type="radio"] {
-            display: inline; }
+            input[type="radio"] 
+            {
+                display: inline; 
+            }
             label > .label-body {
-            display: inline-block;
-            margin-left: .5rem;
-            font-weight: normal; }
+                display: inline-block;
+                margin-left: .5rem;
+                font-weight: normal; 
+            }
 
 
 
