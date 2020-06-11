@@ -42,18 +42,26 @@
             .nav_btn {
                 background-color: goldenrod;
             }
-
+/*
             .nav_btn:hover + ul {
                 display: block;
                 background-color: goldenrod;
             }
-
+*/
             nav ul {
-                display: none;
+                /*display: none;*/
                 padding-inline-start: 0;
+                z-index: 100;
                 margin-left: 0;
                 margin-top: 0.5em;
                 margin-right: 2.2em;
+            }
+
+            @media all and (max-width: 70em) {
+                nav ul {
+                    font: 0/0 serif;   /* Kaŝu navigadon */
+                    z-index: -1;
+                }
             }
 
             nav li {
@@ -65,6 +73,11 @@
                 width: 100%;
                 letter-spacing: .09rem;
                 text-transform: uppercase;
+            }
+
+            nav a {
+                display: block;
+                /*width: 100%;*/
             }
 
             nav li:hover {
@@ -299,8 +312,8 @@
     <div class="nav_btn">&#x2630;</div>
     <ul>
         <li><a href="eo">Esperanto</a></li>
-        <li><a>Kategorioj</a></li>
-        <li><a>Fakoj</a></li>
+        <li><a href="kat">Kategorioj</a></li>
+        <li><a href="fak">Fakoj</a></li>
         <li><a>otnarepsE</a></li>
         <li><a>Bildoj</a></li>
         <li><a>Mallongigoj</a></li>
