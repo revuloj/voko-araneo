@@ -15,10 +15,8 @@
             }
             
             body {
-                display: grid;
-                gap: 1em;
-                grid-template-columns: auto 1fr; 
-                grid-template-rows: auto 1fr auto;
+                display: flex;
+                flex-direction: row;
                 height: 100%;
                 background-color: lightgoldenrodyellow;
                 font-size: 120%;
@@ -27,7 +25,6 @@
             }
 
             nav {
-                grid-row: 1 / 4;
                 padding: 0;
                 background-color: goldenrod;
                 /*border: 1px solid blue;*/
@@ -59,7 +56,8 @@
 
             @media all and (max-width: 70em) {
                 nav ul {
-                    font: 0/0 serif;   /* Kaŝu navigadon */
+                    /* Kaŝu navigadon */
+                    font: 0/0 serif;   
                     z-index: -1;
                 }
             }
@@ -84,18 +82,33 @@
                 background-color: khaki;
             }
 
-            header {
-                grid-column: 2;
+            main {
                 display: flex;
+                flex-direction: column;
+                width: 100%;
+                /*border: 1px solid green;*/
+            }
+
+            header {
+                flex-grow: 0;
+                display: flex;
+                flex-direction: row;
                 align-items: center;
                 justify-content: center;
                 margin-bottom: 3.5em;
-                /*border: 1px solid red;*/
+                border: 1px solid red;
             }
 
-            main {
-                grid-column: 2;
-                /*border: 1px solid green;*/
+            footer {
+                flex-grow: 0;
+                text-align: center;
+                border: 1px solid red;
+            }
+
+            section {
+                flex-grow: 1;
+                text-align: center;
+                border: 1px solid red;
             }
 
             #sercho {
@@ -149,11 +162,6 @@
                 width: 3em;
             }
 
-            footer {
-                grid-column: 2;
-                text-align: center;
-                border: 1px solid red;
-            }
 
             .cirklo {
                 height: 1.1em;
@@ -326,59 +334,62 @@
     </ul>
 </nav>
 
-<header>
-    <div class="R cirklo">R</div>
-    <div class="E cirklo">E</div>
-    <div class="V cirklo">V</div>
-    <div class="O cirklo">O</div>
-</header>
+<main> 
+        
+    <header>
+        <div class="R cirklo">R</div>
+        <div class="E cirklo">E</div>
+        <div class="V cirklo">V</div>
+        <div class="O cirklo">O</div>
+    </header>
 
-<main>   
-    <form id="sercho">
-        <input type="text" size="50" name="sercho" 
-            placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
-        <input type="submit" value="LU" class="button"></input>
-        <div>
-            indeksoj | helpo | ktp.  
+    <section>
+        <form role="search" id="sercho">
+            <input type="text" size="50" name="sercho" 
+                placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
+            <input type="submit" value="LU" class="button"></input>
+            <div>
+                indeksoj | helpo | ktp.  
+            </div>
+        </form>
+        <div id="trovoj">
+
+            <table id="alfabete">
+                <colgroup><col id="lng"/><col/></colgroup>
+                <tr>
+                    <td>eo</td><td>insulo</td>
+                </tr>
+                <tr>
+                    <td>de</td><td>Insel</td>
+                </tr>
+                <tr>
+                    <td>en</td><td>island</td>
+                </tr>
+            </table>
+
+            <table id="kategorie">
+                <colgroup><col id="kat"/><col/></colgroup>
+                <tr>
+                    <td>GEOG</td><td>geografio (fako)</td>
+                </tr>
+                <tr>
+                    <td>LST</td><td>insuloj (listo)</td>
+                </tr>
+                <tr>
+                    <td>VID</td><td>atolo</td>
+                </tr>
+                <tr>
+                    <td>DRV</td><td>duoninsulo</td>
+                </tr>
+            </table>
+
         </div>
-    </form>
-    <div id="trovoj">
+    </section>
 
-        <table id="alfabete">
-            <colgroup><col id="lng"/><col/></colgroup>
-            <tr>
-                <td>eo</td><td>insulo</td>
-            </tr>
-            <tr>
-                <td>de</td><td>Insel</td>
-            </tr>
-            <tr>
-                <td>en</td><td>island</td>
-            </tr>
-        </table>
-
-        <table id="kategorie">
-            <colgroup><col id="kat"/><col/></colgroup>
-            <tr>
-                <td>GEOG</td><td>geografio (fako)</td>
-            </tr>
-            <tr>
-                <td>LST</td><td>insuloj (listo)</td>
-            </tr>
-            <tr>
-                <td>VID</td><td>atolo</td>
-            </tr>
-            <tr>
-                <td>DRV</td><td>duoninsulo</td>
-            </tr>
-        </table>
-
-    </div>
+    <footer>
+        .. | datumprotekto | permeso | projekto 
+    </footer>
 </main>
-
-<footer>
-    .. | datumprotekto | permeso | projekto 
-</footer>
 
     </body>
 </html>
