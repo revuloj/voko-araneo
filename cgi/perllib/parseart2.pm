@@ -5,6 +5,11 @@
 # 
 # 2008-03-24 Wieland Pusch
 #
+# W.D.:
+# aktualigo de informoj pri artikolo en la datumbazo
+# tabeloj: r2_indekso, r2_stlng, r2_stat, r2_tezauro
+#
+# ŝajne nur r2_tezauro estas uzata en vokomail.pl tra xml2html.pm
 
 use strict;
 
