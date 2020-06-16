@@ -1,15 +1,21 @@
 /* HTML-elementoj */
 BODY {background: #F5F5D5; 
-      margin-right: 0.5cm}
+      margin-right: 0.5cm;
+      
+      
+    }
 
-H1 {color: #000000; font-size: large}
+H1 {color: #000000; font-size: large; font-family: monospace}
 H2 {color: #000000; 
     font-size: 110%; 
-    background: #E0E0A0;
+    font-family: monospace;
+    background: khaki;
 /*    background-image: url(angulo.png);
     background-repeat: no-repeat;
     */
-    border: 1px solid #E0E0A0;
+/*    border: 1px solid #E0E0A0;*/
+    border: 0;
+    box-shadow: 1px 1px 2px;
     border-top-left-radius: .7em;
 /*    border-color: gray;
     border-style: outset;
@@ -25,6 +31,7 @@ H3 {font-size: 90%; border-top-width: 2px; border-top-style: solid;
 
 DD {text-align: justify}
 
+/**
 @media
 only screen and (-webkit-min-device-pixel-ratio: 2),
 only screen and (   min--moz-device-pixel-ratio: 2),
@@ -37,9 +44,9 @@ only screen and (                min-resolution: 2dppx) {
     H1 {font-size: xx-large}
     H2 {font-size: xx-large}
     H3 {font-size: x-large}
-/*    img { min-width: 36 } */
     DD {text-align: left}
 }
+**/
 
 
 

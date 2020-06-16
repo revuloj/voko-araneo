@@ -8,6 +8,12 @@
         <link rel="SHORTCUT ICON" href="revo.ico">
         <link rel="stylesheet" href="stl/normalize.css">
         <link rel="stylesheet" href="stl/srch-n1.css">
+        <link rel="stylesheet" href="stl/artikolo.css">
+
+        <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous"></script>
 
         <script>
             // vd. https://wiki.selfhtml.org/wiki/HTML/Tutorials/Navigation/Dropdown-Men%C3%BC
@@ -36,7 +42,7 @@
 <nav>
     <div class="nav_btn" onclick="nav_toggle()">&#x2630;</div>
     <ul id="nav_menu">
-        <li><a href="eo">Esperanto</a></li>
+        <li><a href="eo"onclick="$('#s_artikolo').load('kap_a.html .enhavo'); return false">Esperanto</a></li>
         <li><a href="kat">Kategorioj</a></li>
         <li><a href="fak">Fakoj</a></li>
         <li><a>otnarepsE</a></li>
@@ -60,7 +66,9 @@
         <div class="O cirklo">O</div>
     </header>
 
-    <section>
+    <section id="s_artikolo">
+    </section>
+    <section id="s_sercho">
         <form role="search" id="sercho">
             <input type="text" size="50" id="serchteksto" name="sercho" 
                 placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
@@ -74,7 +82,9 @@
             <table id="alfabete">
                 <colgroup><col id="lng"/><col/></colgroup>
                 <tr>
-                    <td>eo</td><td><a href="insul.html#insul.0o">insulo</a></td>
+                    <td>eo</td><td><a href="insul.html#insul.0o"
+                        onclick="$('#s_artikolo').load('insul.html #artikolo'); return false"
+                        >insulo</a></td>
                 </tr>
                 <tr>
                     <td>de</td><td>Insel</td>
