@@ -35,6 +35,52 @@
                 }
 
             }
+
+            function load_inx(ev) {
+                ev.preventDefault();
+                var href = $(this).attr("href");
+                if ( href_external(href) ) {
+                    window.open(href);
+                } else {
+                    if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/inx/'+href;
+                    $('#s_artikolo').load('/revo/inx/_eo.html .enhavo',
+                        function() { 
+                            $('#s_artikolo a').off("click");
+                            $('#s_artikolo a:not([href^="#"])').click(load_art) 
+                        });
+                }
+            }
+
+            function load_art(ev) {
+                ev.preventDefault();
+                var href = $(this).attr("href");
+                if ( href_external(href) ) {
+                    window.open(href);
+                } else {
+                    if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/art/'+href;
+                    $('#s_artikolo').load(href, 
+                        function() { 
+                            $('#s_artikolo a').off("click");
+                            $('#s_artikolo a:not([href^="#"])').click(load_art);
+                        });                 
+                }
+            }
+
+            function href_external(href) {
+                var revo_url = "reta-vortaro.de";
+                return (
+                    href.startsWith('http://') && href.substring('http://'.length-1,revo_url.length) != revo_url
+                    || href.startsWith('https://') && href.substring('https://'.length-1,revo_url.length) != revo_url
+                );
+            }
+
+            function setup_a_click() {
+                $('nav a:not([href^="#"])').click(load_inx);
+                $('main a:not([href^="#"])').click(load_art);
+            }
+
+            $(function() { setup_a_click(); })
+
         </script>
     </head>
     <body>
@@ -42,14 +88,14 @@
 <nav>
     <div class="nav_btn" onclick="nav_toggle()">&#x2630;</div>
     <ul id="nav_menu">
-        <li><a href="eo" onclick="$('#s_artikolo').load('kap_a.html .enhavo'); return false">Esperanto</a></li>
-        <li><a href="/revo/inx/_eo.html" onclick="$('#s_artikolo').load('/revo/inx/_eo.html .enhavo'); return false">Kategorioj</a></li>
-        <li><a href="fak">Fakoj</a></li>
-        <li><a>otnarepsE</a></li>
-        <li><a>Bildoj</a></li>
-        <li><a>Mallongigoj</a></li>
+        <li><a href="/revo/inx/kap_a.html">Esperanto</a></li>
+        <li><a href="/revo/inx/_eo.html">Kategorioj</a></li>
+        <li><a href="/revo/inx/_fak.html">Fakoj</a></li>
+        <li><a href="/revo/inx/inv_a.html">otnarepsE</a></li>
+        <li><a href="/revo/inx/bildoj.html">Bildoj</a></li>
+        <li><a href="/revo/inx/mallong.html">Mallongigoj</a></li>
         <li>--</li>
-        <li>Alilingvaj</li>
+        <li href="/revo/inx/_lng.html">Alilingvaj</li>
         <li>--</li>
         <li>Manlibroj</li>
         <li>Redaktado</li>
@@ -83,7 +129,6 @@
                 <colgroup><col id="lng"/><col/></colgroup>
                 <tr>
                     <td>eo</td><td><a href="/revo/art/insul.html#insul.0o"
-                        onclick="$('#s_artikolo').load('/revo/art/insul.html'); return false"
                         >insulo</a></td>
                 </tr>
                 <tr>
@@ -103,10 +148,10 @@
                     <td>LST</td><td>insuloj (listo)</td>
                 </tr>
                 <tr>
-                    <td>VID</td><td>atolo</td>
+                    <td>VID</td><td><a href="/revo/art/atol.html#atol0o">atolo</a></td>
                 </tr>
                 <tr>
-                    <td>DRV</td><td>duoninsulo</td>
+                    <td>DRV</td><td><a href="/revo/art/insul.html#insul.duon0o">duoninsulo</a></td>
                 </tr>
             </table>
 
