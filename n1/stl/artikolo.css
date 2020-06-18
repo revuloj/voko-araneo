@@ -1,15 +1,10 @@
-/* HTML-elementoj */
-BODY {background: #F5F5D5; 
-      margin-right: 0.5cm;
-      
-      
-    }
+@import "koloroj.css";
 
-H1 {color: #000000; font-size: large; font-family: monospace}
-H2 {color: #000000; 
+H1 {color: var(--main-color); font-size: large; font-family: monospace}
+H2 {color: var(--main-color); 
     font-size: 110%; 
     font-family: monospace;
-    background: khaki;
+    background: var(--list2-bg-color);
 /*    background-image: url(angulo.png);
     background-repeat: no-repeat;
     */
@@ -17,6 +12,7 @@ H2 {color: #000000;
     border: 0;
     box-shadow: 1px 1px 2px;
     border-top-left-radius: .7em;
+    border-top-right-radius: .7em;
 /*    border-color: gray;
     border-style: outset;
     border-width: medium;
@@ -86,11 +82,11 @@ A.ekz:visited {text-decoration: underline; color: #303030}
 A.ekz:active {text-decoration: underline; color: silver}
 
 /* difinoj */
-.drvdif {color: black}
-.sncgrpdif {color: black}
-.dif {color: black}
-A.dif:link {text-decoration: underline; color: black}
-A.dif:visited {text-decoration: underline; color: black}
+.drvdif {color: var(--main-color)}
+.sncgrpdif {color: var(--main-color)}
+.dif {color: var(--main-color)}
+A.dif:link {text-decoration: underline; color: var(--main-color)}
+A.dif:visited {text-decoration: underline; color: var(--main-color)}
 A.dif:active {text-decoration: underline; color: gray}
 
 /* rimarkoj */
@@ -106,8 +102,8 @@ A.ref:visited {text-decoration: underline; color: #600000}
 A.ref:active {text-decoration: underline; color: red}
 
 /* bildoj */
-A.bld:link {text-decoration: underline; color: black}
-A.bld:visited {text-decoration: underline; color: black}
+A.bld:link {text-decoration: underline; color: var(--main-color)}
+A.bld:visited {text-decoration: underline; color: var(--main-color)}
 A.bld:active {text-decoration: underline; color: gray}
 
 /* klarigo */
@@ -121,13 +117,13 @@ A.klr:active {text-decoration: underline; color: #775533}
 p.trd_ref {text-align: right}
 A.trd_ref:link {text-decoration: underline; color: #666666}
 A.trd_ref:visited {text-decoration: underline; color: #666666}
-A.trd_ref:active {text-decoration: underline; color: black}
+A.trd_ref:active {text-decoration: underline; color: var(--main-color)}
 .trd {color: #104040}
 .rimtrd {font-style: italic}
 .diftrd {font-style: italic}
 .trdeo {color: black; font-weight: bold}
 .trdnac {color: #104040}
-A.trdeo:link {text-decoration: underline; font-weight: bold; color: black}
+A.trdeo:link {text-decoration: underline; font-weight: bold; color: var(--main-color)}
 A.trdeo:visited {text-decoration: underline; font-weight: bold; color:
 black}
 A.trdeo:active {text-decoration: underline; font-weight: bold; color: gray}
@@ -165,8 +161,8 @@ sup.ofc { margin-right: 0.7ex; }
 
 /* redaktolinio malsupre de la artikolo */
 .redakto {color: #104040}
-A.redakto:link {text-decoration: underline; color: black}
-A.redakto:visited {text-decoration: underline; color: black}
+A.redakto:link {text-decoration: underline; color: var(--main-color)}
+A.redakto:visited {text-decoration: underline; color: var(--main-color)}
 A.redakto:active {text-decoration: underline; color: gray}
 
 .flago {  border-color: #cccccc; border-width: 1px;  border-style: outset}
