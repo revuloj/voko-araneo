@@ -1,49 +1,5 @@
 @import "koloroj.css";
 
-<<<<<<< HEAD
-            html {
-                height: 100%;
-                /* width: 100% */
-            }
-            
-            body {
-                display: flex;
-                flex-direction: row;
-                height: 100%;
-                background-color: lightgoldenrodyellow;
-                font-size: 120%;
-                font-family: monospace; 
-                /*font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Geneva, sans-serif;*/
-            }
-
-            nav {
-                padding: 0;
-
-                /*border: 1px solid blue;*/
-                /*background-color: lightgoldenrodyellow;*/
-            }
-
-            /* https://www.w3schools.com/howto/howto_css_display_element_hover.asp 
-            ...
-               https://www.w3schools.com/howto/howto_js_popup.asp
-               https://www.w3schools.com/howto/howto_js_collapsible.asp
-            */
-            .nav_btn {
-                display: none;
-                position: absolute;
-                z-index: 200;
-                font-size: 150%;
-                text-shadow: 1px 1px silver;
-                padding: 0.1em;
-                background-color: goldenrod;
-                border-right: 2px solid gray;
-                border-bottom: 2px solid gray;
-                border-bottom-right-radius: 0.2em;
-            }
-            .nav_btn:hover {
-                background-color: khaki;
-            }
-=======
 html {
     height: 100%;
     /* width: 100% */
@@ -78,6 +34,9 @@ nav {
     z-index: 200;
     font-size: 150%;
     padding: 0.1em;
+    text-shadow: 1px 1px silver;
+    border-right: 2px solid gray;
+    border-bottom: 2px solid gray;    
     background-color: var(--nav-bg-color);
     border-bottom-right-radius: 0.2em;
 }
@@ -85,160 +44,13 @@ nav {
     background-color: var(--highlight-bg-color);
     color: var(--highlight-color);
 }
->>>>>>> f0823f310556398d688055e244e8caf997cd1c17
+
 /*
 .nav_btn:hover + ul {
     display: block;
     background-color: goldenrod;
 }
 */
-<<<<<<< HEAD
-            nav ul {
-                /*display: none;*/
-                /*font-family: monospace;*/
-                padding-inline-start: 0;
-                background-color: goldenrod;
-                z-index: 100;
-                box-shadow: 1px 1px 2px;
-
-                margin: 0;
-                padding-top: 2.2em;
-                padding-right: 2.2em;
-            }
-
-            @media all and (max-width: 70em) {
-                .nav_btn {
-                    display: block;
-                }
-                nav ul {
-                    position: absolute;
-                    /* Kaŝu navigadon 
-                    font: 0/0 serif;   
-                    z-index: -1;
-                    */
-                    display: none;
-                    box-shadow: 5px 5px 20px;
-                }
-            }
-
-            nav li {
-                list-style-type: none;
-                padding-left: 2em;
-                padding-right: 0.2em;
-                padding-top: 0.4em;
-                padding-bottom: 0.4em;
-                width: 100%;
-                letter-spacing: .09rem;
-                text-transform: uppercase;
-            }
-
-            nav a {
-                display: block;
-                /*width: 100%;*/
-            }
-
-            nav li:hover {
-                background-color: khaki;
-            }
-
-            main {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                /*border: 1px solid green;*/
-            }
-
-            header {
-                flex-grow: 0;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-                margin-top: 0.5em;
-                margin-bottom: 3.5em;
-                /*border: 1px dotted red;*/
-            }
-
-            footer {
-                flex-grow: 0;
-                text-align: center;
-                /*border: 1px dotted red;*/
-            }
-
-            section {
-                flex-grow: 1;
-                text-align: center;
-                margin-top: 1em;
-                /*border: 1px dotted red;*/
-            }
-
-            #sercho {
-                text-align: center;
-            }
-
-            #sercho_ek {
-                font-size: 200%;
-            }
-
-            /*
-            #sercho input {
-                border-radius: 0.2em;
-                padding: 0.5em;
-                margin: 0.3em;
-            }*/
-
-            #trovoj {
-                display: flex;
-                flex-wrap: wrap;
-                /* border: 1px dotted green; */
-            }
-
-            #trovoj table {
-                min-width: 48%;
-                padding: 1em;
-                margin: auto;
-                /* margin-right: 1em; */
-                border-collapse: separate;
-                border-spacing: 0 0.3em;
-            }
-
-            #trovoj td {
-                padding: 0.5em;
-                /*border-bottom: 1px solid gray;*/
-            }
-
-            #trovoj td:first-child {
-                background-color: palegoldenrod;
-                border-top-left-radius: 0.5em;
-                border-bottom-left-radius: 0.5em;
-                border-right: 2px solid gainsboro;
-            }
-
-            #trovoj td:nth-child(2) {
-                background-color: khaki;
-                border-top-right-radius: 0.5em;
-                border-bottom-right-radius: 0.5em;
-                /*border-bottom: 1px solid gray;*/
-            }
-
-            #trovoj td:nth-child(2):hover {
-                background-color: goldenrod;
-            }
-
-            #lng, #kat {
-                width: 3em;
-            }
-
-            .cirklo {
-                height: 1.1em;
-                width: 1.1em;
-                font-size: 333%;
-                font-family: sans-serif;
-                font-weight: 900;
-                text-shadow: 1px 1px silver;
-                padding: 0.2em;
-                text-align: center;
-=======
 nav ul {
     /*display: none;*/
     /*font-family: monospace;*/
@@ -393,157 +205,13 @@ footer {
     text-shadow: 1px 1px silver;
     padding: 0.2em;
     text-align: center;
->>>>>>> f0823f310556398d688055e244e8caf997cd1c17
 /*                vertical-align: middle; 
     border: 1px hidden darkblue;*/
     border-radius: 50%;
     border: 2px solid gray;
 /*                background-color: gainsboro; */
-<<<<<<< HEAD
-                background-color: goldenrod;
-                background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
-                box-shadow: 10px 10px 20px;
-                /* opacity: 0.9; */
-                position: relative;
-            }
-            .cirklo.R { top: 0em; }
-            .cirklo.E { z-index: 10; top: 0.6em; left: -0.2em; }
-            .cirklo.V { z-index: 5; top: 0.25em; left: -0.3em; }
-            .cirklo.O { top: 0.5em; left: -0.4em; }
-
-            @media all and (max-width: 50em) {
-                #serchteksto { width: 70% }
-            }
-            @media all and (max-height: 50em) {
-                header { margin-bottom: 1.5em }
-                .cirklo { font-size: 280% }
-            }
-            @media all and (max-width: 30em) {
-                header { padding-left: 1.8em; margin-right: -0.4em }
-                .cirklo { font-size: 250% }
-            }
-
-            /* Buttons
-            –––––––––––––––––––––––––––––––––––––––––––––––––– */
-            .button,
-            button,
-            input[type="submit"],
-            input[type="reset"],
-                input[type="button"] {
-                display: inline-block;
-                text-align: center;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-transform: uppercase;
-                text-decoration: none;
-                text-shadow: 1px 1px silver;
-                white-space: nowrap;
-                padding: 0.4em;
-                font-size: 127%;
-                /*
-                height: 38px;
-                padding: 0 30px;
-                font-size: 11px;
-                line-height: 38px;
-                */
-                background-color: goldenrod;
-                background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
-                box-shadow: 4px 4px 8px;
-                border-radius: 2em;
-                border: 2px solid gray;
-                cursor: pointer;
-                box-sizing: border-box; 
-            }
-            .button:hover,
-            button:hover,
-            input[type="submit"]:hover,
-            input[type="reset"]:hover,
-            input[type="button"]:hover,
-            .button:focus,
-            button:focus,
-            input[type="submit"]:focus,
-            input[type="reset"]:focus,
-            input[type="button"]:focus {
-                /*color: lightgoldenrodyellow; 
-                text-shadow: 0; */
-                box-shadow: 2px 2px 4px darkslategray;
-                background-image: none;
-                /*
-                background-color: khaki;
-                background-image: radial-gradient(at 49.5% 49.5%, goldenrod 20%, khaki 60%, lightgoldenrodyellow 80%);
-                */
-            }
-
-            /* Forms
-            –––––––––––––––––––––––––––––––––––––––––––––––––– */
-            input[type="email"],
-            input[type="number"],
-            input[type="search"],
-            input[type="text"],
-            input[type="tel"],
-            input[type="url"],
-            input[type="password"],
-            textarea,
-                select {
-                height: 38px;
-                padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-                background-color: #fff;
-                border: 2px solid darkgray;
-                border-radius: 4px;
-                box-shadow: none;
-                box-sizing: border-box; 
-            }
-            /* Removes awkward default styles on some inputs for iOS */
-            input[type="email"],
-            input[type="number"],
-            input[type="search"],
-            input[type="text"],
-            input[type="tel"],
-            input[type="url"],
-            input[type="password"],
-            textarea {
-            -webkit-appearance: none;
-                -moz-appearance: none;
-                    appearance: none; }
-            textarea {
-            min-height: 65px;
-            padding-top: 6px;
-            padding-bottom: 6px; }
-            input[type="email"]:focus,
-            input[type="number"]:focus,
-            input[type="search"]:focus,
-            input[type="text"]:focus,
-            input[type="tel"]:focus,
-            input[type="url"]:focus,
-            input[type="password"]:focus,
-            textarea:focus,
-            select:focus {
-                border: 2px dashed darkgoldenrod;
-                outline: 0; 
-            }
-            label,
-            legend {
-                display: block;
-                margin-bottom: .5rem;
-                font-weight: 600; 
-            }
-            fieldset {
-                padding: 0;
-                border-width: 0; 
-            }
-            input[type="checkbox"],
-            input[type="radio"] 
-            {
-                display: inline; 
-            }
-            label > .label-body {
-                display: inline-block;
-                margin-left: .5rem;
-                font-weight: normal; 
-            }
-=======
     background-color: var(--button-bg-color);
-    background-image: radial-gradient(darkgoldenrod 20%, goldenrod 60%, khaki 80%);
+    background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
     box-shadow: 10px 10px 20px;
     /* opacity: 0.9; */
     position: relative;
@@ -572,23 +240,28 @@ button,
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
-display: inline-block;
-height: 38px;
-padding: 0 30px;
-color: #555;
-text-align: center;
-font-size: 11px;
-font-weight: 600;
-line-height: 38px;
-letter-spacing: .1rem;
-text-transform: uppercase;
-text-decoration: none;
-white-space: nowrap;
-background-color: transparent;
-border-radius: 4px;
-border: 1px solid #bbb;
-cursor: pointer;
-box-sizing: border-box; }
+    display: inline-block;
+    /*
+    height: 38px;
+    padding: 0 30px;
+    font-size: 11px;
+    line-height: 38px;
+    */
+    background-color: goldenrod;
+    background-image: radial-gradient(at 49.5% 49.5%, darkgoldenrod 20%, goldenrod 60%, khaki 80%);
+    box-shadow: 4px 4px 8px;
+    border-radius: 2em;
+    border: 2px solid gray;
+    cursor: pointer;
+    box-sizing: border-box; 
+
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: .1rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+}
 .button:hover,
 button:hover,
 input[type="submit"]:hover,
@@ -599,30 +272,10 @@ button:focus,
 input[type="submit"]:focus,
 input[type="reset"]:focus,
 input[type="button"]:focus {
-color: #333;
-border-color: #888;
-outline: 0; }
-.button.button-primary,
-button.button-primary,
-input[type="submit"].button-primary,
-input[type="reset"].button-primary,
-input[type="button"].button-primary {
-color: #FFF;
-background-color: #33C3F0;
-border-color: #33C3F0; }
-.button.button-primary:hover,
-button.button-primary:hover,
-input[type="submit"].button-primary:hover,
-input[type="reset"].button-primary:hover,
-input[type="button"].button-primary:hover,
-.button.button-primary:focus,
-button.button-primary:focus,
-input[type="submit"].button-primary:focus,
-input[type="reset"].button-primary:focus,
-input[type="button"].button-primary:focus {
-color: #FFF;
-background-color: #1EAEDB;
-border-color: #1EAEDB; }
+    box-shadow: 2px 2px 4px darkslategray;
+    background-image: none;    
+}
+
 
 /* Forms
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -635,14 +288,16 @@ input[type="url"],
 input[type="password"],
 textarea,
 select {
-height: 38px;
-padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
-background-color: var(--input-bg-color);
-color: var(--input-color);
-border: 1px solid #D1D1D1;
-border-radius: 4px;
-box-shadow: none;
-box-sizing: border-box; }
+    height: 38px;
+    padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+    background-color: var(--input-bg-color);
+    color: var(--input-color);
+    border: 2px solid darkgray;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box; 
+}
+
 /* Removes awkward default styles on some inputs for iOS */
 input[type="email"],
 input[type="number"],
@@ -652,13 +307,17 @@ input[type="tel"],
 input[type="url"],
 input[type="password"],
 textarea {
--webkit-appearance: none;
+    -webkit-appearance: none;
     -moz-appearance: none;
-        appearance: none; }
+    appearance: none; 
+}
+
 textarea {
-min-height: 65px;
-padding-top: 6px;
-padding-bottom: 6px; }
+    min-height: 65px;
+    padding-top: 6px;
+    padding-bottom: 6px; 
+}
+
 input[type="email"]:focus,
 input[type="number"]:focus,
 input[type="search"]:focus,
@@ -668,24 +327,32 @@ input[type="url"]:focus,
 input[type="password"]:focus,
 textarea:focus,
 select:focus {
-border: 1px solid #33C3F0;
-outline: 0; }
+    border: 2px dashed darkgoldenrod;
+    outline: 0; 
+}
+
 label,
 legend {
-display: block;
-margin-bottom: .5rem;
-font-weight: 600; }
+    display: block;
+    margin-bottom: .5rem;
+    font-weight: 600; 
+}
+
 fieldset {
-padding: 0;
-border-width: 0; }
+    padding: 0;
+    border-width: 0; 
+}
+
 input[type="checkbox"],
-input[type="radio"] {
-display: inline; }
+    input[type="radio"] {
+    display: inline; 
+}
+
 label > .label-body {
-display: inline-block;
-margin-left: .5rem;
-font-weight: normal; }
->>>>>>> f0823f310556398d688055e244e8caf997cd1c17
+    display: inline-block;
+    margin-left: .5rem;
+    font-weight: normal; 
+}
 
 
 
