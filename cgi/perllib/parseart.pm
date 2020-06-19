@@ -5,6 +5,9 @@
 # 
 # 2006-09-__ Wieland Pusch
 #
+#
+# aldono aŭ aktualigo de la informoj pri artikolo en la datumbazo
+# tabeloj: art, drv, var, snc, rim, trd
 
 use strict;
 
@@ -194,7 +197,7 @@ sub parse {
       }
     }
 
-    # forigu ekzemploj gxis kiam mi bone traktas ili
+    # traktu tradukojn ene de ekzemploj...
     {
       my $nova_drv;
       while (s/<ekz>\s*(.*?)\s*<\/ekz>//si) {
@@ -207,31 +210,13 @@ sub parse {
           while ($ekz =~ s/\s*<trd\s+lng="([^"]+)"\s*>(.*?)<\/trd>//si) { 
             print pre(escapeHTML("ind = $ind lng = $1 trd = $2")) if $verbose;
             print pre(escapeHTML("rest = $ekz")) if $verbose;
-	    $nova_drv .= "<trd lng=\"$1\">$2</trd>";
+	          $nova_drv .= "<trd lng=\"$1\">$2</trd>";
           }          
           $nova_drv .= "</drv>";
         }
       }
       print pre(escapeHTML("nova drv:\n$nova_drv")) if $verbose;
-#      $_ = $nova_drv . $_;
 
-#      foreach (@ekz) {
-#          my $ind = $1;
-#          $_ = substr $_, length($&);
-##          print pre(escapeHTML("ind: $ind len=".length($ind))) if $verbose;
-##          print pre(escapeHTML("rest: $_")) if $verbose;
-#          while (/^\s*<trd\s+lng="([^"]+)"\s*>(.*?)<\/trd>/si) { 
-#            print pre(escapeHTML("ind = $ind lng = $1 trd = $2")) if $verbose;
-#	    $nova_drv .= "<trd lng=\"$1\">$2</trd>";
-##            print pre(escapeHTML("*: $& len=".length($&))) if $verbose;
-#            $_ = substr $_, length($&);
-##            print pre(escapeHTML("rest: $_")) if $verbose;
-#          }
-#          $nova_drv .= "</drv>";
-#        }
-#      }
-#      print pre(escapeHTML("nova drv:\n$nova_drv")) if $verbose;
-#      $_ = $nova_drv . $_;
     }
 
     print pre(escapeHTML("parse drv:\n$_")) if $verbose;
@@ -256,7 +241,7 @@ sub parse {
 
       my $fak;
       my $stl;
-      # legu la uzo indikon
+      # legu la uzo-indikon
       {
         my %fak;
         my %stl;
@@ -306,36 +291,39 @@ sub parse {
         my $kap_ci = $sorter->remap_ci($_);
         print pre("insert var $_, $kap_ci")."\n" if $verbose;
         $dbh->do("INSERT INTO var (var_drv_id, var_teksto, var_teksto_ci, var_org) VALUES (?,?,?,?)",
-		undef, $did, $_, $kap_ci, $var_org) or die "insert var ne funkciis";
+		      undef, $did, $_, $kap_ci, $var_org) or die "insert var ne funkciis";
       }
     
       my $snccnt = 1;
+      # traktu snc-ojn ene de drv, ili eltranĉiĝas dum traktado
       while ($drv =~ s/<snc(?:\s+mrk="([^"]+)"\s*)?>(.*?)<\/snc\s*>\n*//si) {
         print pre(escapeHTML("snc $snccnt:\n$2")) if $verbose;
         do_snc($dbh, $sorter, $did, $1, $snccnt++, $2, $verbose);
       };
+      # traktu restintajn snc-komencojn ...? Tio ne povas okazi en valida XML, ĉu!?
       while ($drv =~ s/<snc(?:\s+mrk="([^"]+)"\s*)?\/>\n*//si) {
         print pre(escapeHTML("snc $snccnt :\n$2")) if $verbose;
         do_snc($dbh, $sorter, $did, $1, $snccnt++, "", $verbose);
       };
+      # traktu ĉion ekster snc-oj en drv, povas esti trd-oj de drv, subdrv...
       print pre(escapeHTML("snc:\n$drv")) if $verbose;
       do_snc($dbh, $sorter, $did, "", undef, $drv, $verbose);
     };
 	
-	{
-	  open IN, "<", $pado;
-	  my $xml = join('', <IN>);
-	  close IN;
-#      print pre(escapeHTML("xml:\n$xml")) if $verbose;
-      while ($xml =~ /<rim\s+mrk="([^"]+)"/sgi) {
-	    print pre("rim mrk=$1")."\n";
-        $dbh->do("INSERT INTO rim (rim_art_id, rim_mrk) VALUES (?,?)",
-		undef, $aid, $1) or die "insert rim ne funkciis";
-	  }
-	}
+    # traktu rimarkojn en drv
+    {
+      open IN, "<", $pado;
+      my $xml = join('', <IN>);
+      close IN;
+  #      print pre(escapeHTML("xml:\n$xml")) if $verbose;
+        while ($xml =~ /<rim\s+mrk="([^"]+)"/sgi) {
+        print pre("rim mrk=$1")."\n";
+          $dbh->do("INSERT INTO rim (rim_art_id, rim_mrk) VALUES (?,?)",
+      undef, $aid, $1) or die "insert rim ne funkciis";
+      }
+    }
     
-    #print "$_";
-    
+    #print "$_";    
     #print pre(escapeHTML($_));
   }
   print h2("Dauxro: ".(time() - $start_time)." sekundoj por $art_count artikoloj.") if $verbose;
@@ -343,6 +331,7 @@ sub parse {
 }
     
 ######################################################################
+
 sub do_snc {
   my ($dbh, $sorter, $did, $smrk, $snccnt, $snc, $verbose) = @_;
 
@@ -353,29 +342,29 @@ sub do_snc {
   my $sid = $dbh->{'mysql_insertid'};
   print "sid = $sid, smrk = $smrk\n" if $verbose;
 
+  # traktu tradukojn ene de snc-oj...
   while ($snc =~ /<trd\s+lng="([^"]+)"\s*>(.*?)<\/trd\s*>/sig) {
     my ($lng, $trd) = ($1, $2);
 
     if ($trd =~ / *\[([^,]+)\]/) {
+      # se troviĝas [...] en la traduko, ni aparte indeksas la parton antaŭ [
       if ($`) {
         print "prekrampoj = $`\n" if $verbose;
         print "krampoj = $1\n" if $verbose;
         print "postkrampoj = $'\n" if $verbose;
         do_trd($dbh, $sorter, $sid, $lng, $`, $verbose);
       }
+
+      # ... kaj la parton ene de [...]
       do_trd($dbh, $sorter, $sid, $lng, $1, $verbose);
+
     } else {
+      # aliokaze ni indeksas la tutan tradukon
       do_trd($dbh, $sorter, $sid, $lng, $trd, $verbose);
     }
   };
-#  while ($snc =~ /<trdgrp\s+lng="([^"]+)"\s*>(.*?)<\/trdgrp\s*>/sig) {
-#    my $lng = $1;
-#    my $trd = $2;
-#    while ($trd =~ /<trd\s*>(.*?)<\/trd\s*>/sig) {
-#      do_trd($dbh, $sorter, $sid, $lng, $1, $verbose);
-#    };
-#  };
 }
+
 ######################################################################
 sub do_trd {
   my ($dbh, $sorter, $sid, $lng, $trd, $verbose) = @_;
