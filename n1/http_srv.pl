@@ -62,9 +62,12 @@ proxy_path(URI,RevoUrl) :-
       atomic_list_concat(['..'|RelPath],'/',URI),
       atomic_list_concat([Revo,revo|RelPath],'/',RevoUrl)
       ;
-      % korektu poste: la komencaj '..' ial glutiĝæs en URI...
+      % korektu poste: la komencaj '..' ial glutiĝas en URI...
       atomic_list_concat(['',smb|_],'/',URI),
       atomic_list_concat([Revo,'/revo',URI],RevoUrl)
+      ;
+      atomic_list_concat(['','cgi-bin'|_],'/',URI),
+      atomic_list_concat([Revo,URI],RevoUrl)
       ;
       atomic_list_concat(['',revo|_],'/',URI),
       atomic_list_concat([Revo,URI],RevoUrl)

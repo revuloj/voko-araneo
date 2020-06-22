@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-
+#!/usr/bin/perl 
 #
 # sercxu.pl
 # 
@@ -342,19 +341,20 @@ sub MontruRezultojn
 
     $num++;
 
-    # lng=eo
+    #### lng=eo ####
+
     if ($lng eq 'eo') {
 
       if ($num == 1) {
-	#print " ]\n },\n {" unless ($num==1);
-	print " {\n";
-	attribute("lng1",'eo');
-	attribute("lng2",$preferata_lingvo);
-	attribute("titolo",'esperante'.($preferata_lingvo?" (de)":""));
-	print " \"trovoj\": [\n";
-	$last_lng = $lng;
+        #print " ]\n },\n {" unless ($num==1);
+        print " {\n";
+        attribute("lng1",'eo');
+        attribute("lng2",$preferata_lingvo);
+        attribute("titolo",'esperante'.($preferata_lingvo?" (de)":""));
+        print " \"trovoj\": [\n";
+        $last_lng = $lng;
       } else {
-	print ",\n";
+	      print ",\n";
       }
 
       print "  {";
@@ -362,40 +362,40 @@ sub MontruRezultojn
       attribute("mrk1",$$ref{'drv_mrk'});
       attribute("vrt1",$$ref{'drv_match'}?$$ref{'drv_teksto'}:$$ref{'var_teksto'});
       if ($preferata_lingvo) {
-	# aldonu tradukojn en preferata lingvo
-	$sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
-	my $tradukoj=''; my $sep='';
-	while (my $ref2 = $sth2->fetchrow_hashref()) {
-	  $tradukoj .= $sep.$$ref2{'trd_teksto'};
-	  $sep = ", ";
-	}
+        # aldonu tradukojn en preferata lingvo
+        $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
+        my $tradukoj=''; my $sep='';
+        while (my $ref2 = $sth2->fetchrow_hashref()) {
+          $tradukoj .= $sep.$$ref2{'trd_teksto'};
+          $sep = ", ";
+        }
         attribute("mrk2","lng_".$preferata_lingvo);
         attribute("vrt2",$tradukoj,1);
       }
       print "}";
 
-    # lng != eo
+    #### lng != eo ####
+    
     } else {
-
 
       if ($num == 1 or $$ref{'trd_lng'} ne $last_lng) {
 
-	if ($num == 1) { 
-	  print ",\n" unless ($lng eq 'eo' or $neniu_trafo);
-	  print " {\n" 
-	}
-	else { 
-	  print " ]\n },\n {" 
-	}; 
+        if ($num == 1) { 
+          print ",\n" unless ($lng eq 'eo' or $neniu_trafo);
+          print " {\n" 
+        }
+        else { 
+          print " ]\n },\n {" 
+        }; 
 
-	attribute("lng1",$$ref{'trd_lng'});
-	attribute("lng2",'eo');
-	attribute("titolo",$$ref{'lng_nomo'}.
-		  ($preferata_lingvo eq  $$ref{'trd_lng'}?" (preferata)":""));
-	print " \"trovoj\": [\n";
-	$last_lng = $$ref{'trd_lng'};
+        attribute("lng1",$$ref{'trd_lng'});
+        attribute("lng2",'eo');
+        attribute("titolo",$$ref{'lng_nomo'}.
+		    ($preferata_lingvo eq  $$ref{'trd_lng'}?" (preferata)":""));
+        print " \"trovoj\": [\n";
+        $last_lng = $$ref{'trd_lng'};
       } else {
-	print ",\n";
+	      print ",\n";
       }
 
       print "  {";

@@ -84,14 +84,32 @@
                 $('main a:not([href^="#"])').click(load_art);
             }
 
-            $(function() { setup_a_click(); })
+            function serchu(event) {
+                event.preventDefault();
+                $.get("/cgi-bin/sercxu-json.pl",
+                    { 
+                        sercxata: $("#serchteksto").val() 
+                    })
+                .done(function(data) {
+                    //alert( "Data Loaded: " + data );
+                    for (tr of data) {
+                        cosole.log(tr);
+                    }
+                });
+            }
+
+            // preparu la paĝon: evento-reagoj...
+            $(function() { 
+                    setup_a_click(); 
+                    $("#sercho_frm").submit(serchu);
+                })
 
         </script>
     </head>
     <body>
 
 <nav>
-    <div class="nav_btn" onclick="nav_toggle()">&#x2630;</div>
+    <div class="nav_btn" onclick="nav_toggle()"><a href="#nav_menu">&#x2630;</a></div>
     <ul id="nav_menu">
         <li><a href="/revo/inx/kap_a.html">Esperanto</a></li>
         <li><a href="/revo/inx/_eo.html">Kategorioj</a></li>
@@ -120,10 +138,10 @@
     <section id="s_artikolo">
     </section>
     <section id="s_sercho">
-        <form role="search" id="sercho">
+        <form role="search" id="sercho_frm" action="/cgi-bin/sercxu.pl">
             <input type="text" size="50" id="serchteksto" name="sercho" 
                 placeholder="Tajpu kion vi serĉas; cx=ĉ, cxx=cx, ĵokeroj: _=iu, %=iuj"></input>
-            <input type="submit" id="sercho_ek" value="Ek! &#x23ce;" class="button"></input>
+            <input type="submit" id="sercho_btn" value="Ek!" class="button"></input>
             <div>
                 indeksoj | helpo | ktp.  
             </div>
