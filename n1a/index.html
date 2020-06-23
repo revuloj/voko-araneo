@@ -7,7 +7,7 @@
 <!--        <link rel="icon" type="image/png" href="images/favicon.png"> -->
         <link rel="SHORTCUT ICON" href="stl/revo.png">
         <link rel="stylesheet" href="stl/normalize.css">
-        <link rel="stylesheet" href="stl/srch-n1.css">
+        <link rel="stylesheet" href="stl/revo-n1a.css">
         <!-- link rel="stylesheet" href="stl/artikolo.css" -->
 
         <script
@@ -42,6 +42,14 @@
                     menu.style.display = ""
                 }
 
+            }
+
+            function load_nav() {
+                $('#nav_menu').load('/revo/inx/_eo.html .enhavo>*',
+                    function() { 
+                        $('#nav_menu a').off("click");
+                        $('#nav_menu a:not([href^="#"])').click(load_inx) 
+                    });
             }
 
             function load_inx(ev) {
@@ -104,7 +112,8 @@
 
             // preparu la paĝon: evento-reagoj...
             $(function() { 
-                    setup_a_click(); 
+                    //setup_a_click(); 
+                    load_nav();
                     $("#sercho_frm").submit(serchu);
                 })
 
@@ -114,20 +123,8 @@
 
 <nav>
     <div class="nav_btn" onclick="nav_toggle()"><a href="#nav_menu">&#x2630;</a></div>
-    <ul id="nav_menu">
-        <li><a href="/revo/inx/kap_a.html">Esperanto</a></li>
-        <li><a href="/revo/inx/_eo.html">Kategorioj</a></li>
-        <li><a href="/revo/inx/_fak.html">Fakoj</a></li>
-        <li><a href="/revo/inx/inv_a.html">otnarepsE</a></li>
-        <li><a href="/revo/inx/bildoj.html">Bildoj</a></li>
-        <li><a href="/revo/inx/mallong.html">Mallongigoj</a></li>
-        <li>--</li>
-        <li><a href="http://retavortaro.de/revo/inx/_lng.html">Varilingvaj</a></li>
-        <li>--</li>
-        <li><a href="https://revuloj.github.io/manlibroj.html">Manlibroj</a></li>
-        <li><a href="https://revuloj.github.io/">Redaktado</a></li>
-        <li><a href="https://github.com/revuloj">Projekto</a></li>
-    </ul>
+    <div id="nav_menu">
+    </div>
 </nav>
 
 <main> 

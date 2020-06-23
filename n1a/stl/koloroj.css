@@ -1,0 +1,34 @@
+:root {
+    --main-bg-color: lightgoldenrodyellow;
+    --nav-bg-color:  darkgoldenrod;
+    --button-bg-color:  goldenrod;
+    --highlight-bg-color: lightgoldenrodyellow;
+    --active-bg-color: goldenrod;
+    --active-border-color: black;
+
+    --list1-bg-color: palegoldenrod;
+    --list2-bg-color: khaki;
+    --list2-highlight-bg-color: goldenrod;
+    --main-color: black;
+    --highlight-color: black;
+    --input-bg-color: white;
+    --input-color: black;
+}
+
+
+@media (prefers-color-scheme: dark) {
+    /* CSS por malhela aspekto */ 
+    :root {
+        --main-bg-color: #222222;
+        --nav-bg-color:  darkgoldenrod;
+        --button-bg-color:  darkgoldenrod;
+        --highlight-bg-color: palegoldenrod;
+        --list1-bg-color: darkgoldenrod;
+        --list2-bg-color: goldenrod;
+        --list2-highlight-bg-color: palegoldenrod;
+        --main-color: ivory;
+        --highlight-color: slategray;
+        --input-bg-color: darkslategray;
+        --input-color: white;
+    }
+}
