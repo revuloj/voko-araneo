@@ -54,7 +54,11 @@ nav {
 #nav_menu {
     display: inline-block;
     /*font-family: monospace;*/
-    overflow-y: scroll;
+    overflow-x: visible;
+    min-width: 16em;
+    max-width: 24em;
+
+    overflow-y: auto;
     height: 100%;
 
     /*padding-inline-start: 0;*/    
@@ -93,8 +97,6 @@ nav {
     }
     #nav_menu {
         position: absolute;
-        min-width: 16em;
-        max-width: 24em;
         /* Kaŝu navigadon 
         font: 0/0 serif;   
         z-index: -1;

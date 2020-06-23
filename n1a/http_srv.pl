@@ -14,11 +14,13 @@ revo_url('http://retavortaro.de').
 %:- dynamic   http:location/3.
 
 user:file_search_path(stl,'./stl').
+user:file_search_path(jsc,'./jsc').
 %http:location(stl,root(stl),[]).
 
 :- http_handler('/', http_reply_from_files('.', []), [id(root)]).       
 :- http_handler('/index.html', http_reply_from_files('.', []), [id(index)]).       
 :- http_handler(root(stl), serve_files_in_directory(stl), [prefix, id(stl), priority(100)]).       
+:- http_handler(root(jsc), serve_files_in_directory(jsc), [prefix, id(jsc), priority(100)]).       
 :- http_handler(root(revo), revo_proxy, [prefix, id(revo), priority(100)]).
 :- http_handler(root(.), revo_proxy, [prefix, id(revo), priority(100)]).
 %:- http_handler(root(home), home_page, []).

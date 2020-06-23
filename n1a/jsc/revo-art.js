@@ -1,8 +1,15 @@
-var js_sojlo = 30+3;
+var js_sojlo = 3; // 33
+var sec_art = "s_artikolo";
 
+/*
 window.onload = function() {
+    preparu_art()
+}
+*/
+
+function preparu_art() {
     top.document.title='Reta Vortaro ['
-        + document.getElementsByTagName("H1")[0].textContent.trim()
+        + document.getElementById(sec_art).getElementsByTagName("H1")[0].textContent.trim()
         + ']';
     /* aktivigu nur por longaj artikoloj... */
     var d = document.getElementsByClassName("kasxebla");
@@ -52,7 +59,7 @@ function malfaldu_chiujn() {
 
 function faldu_malfaldu_butonoj() {
     // aldonu faldo/malfaldo-butonojn  
-    var h1 = document.getElementsByTagName("H1")[0];   
+    var h1 = document.getElementById(sec_art).getElementsByTagName("H1")[0];   
     h1.appendChild(make_button("\u23eb\uFE0E",faldu_chiujn,"faldu ĉiujn"));
     h1.appendChild(make_button("\u23ec\uFE0E",malfaldu_chiujn,"malfaldu ĉiujn"));
 }
