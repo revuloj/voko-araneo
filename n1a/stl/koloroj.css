@@ -1,8 +1,8 @@
 :root {
     --main-bg-color: lightgoldenrodyellow;
-    --nav-bg-color:  darkgoldenrod;
+    --nav-bg-color:  goldenrod;
     --button-bg-color:  goldenrod;
-    --highlight-bg-color: lightgoldenrodyellow;
+    --highlight-bg-color: #FAC540;
     --active-bg-color: goldenrod;
     --active-border-color: black;
 
