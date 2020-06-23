@@ -47,23 +47,29 @@
             function load_nav() {
                 $('#nav_menu').load('/revo/inx/_eo.html .enhavo>*',
                     function() { 
+                        $('#nav_menu').click(load_inx)
+                        /*
                         $('#nav_menu a').off("click");
                         $('#nav_menu a:not([href^="#"])').click(load_inx) 
+                        */
                     });
             }
 
             function load_inx(ev) {
-                ev.preventDefault();
-                var href = $(this).attr("href");
-                if ( href_external(href) ) {
-                    window.open(href);
-                } else {
-                    if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/inx/'+href;
-                    $('#s_artikolo').load('/revo/inx/_eo.html .enhavo',
-                        function() { 
-                            $('#s_artikolo a').off("click");
-                            $('#s_artikolo a:not([href^="#"])').click(load_art) 
-                        });
+                var elm = $(ev.target)
+                var href = elm.attr("href");
+                var trg = elm.attr("target");
+                if (! href.startsWith('#')) {
+                    ev.preventDefault();
+                    if ( href_external(href) ) {
+                        window.open(href);
+                    } else if (trg == "precipa") {
+                        if (href.startsWith('../')) href = '/revo/' + href.substr(3);
+                        $('#s_artikolo').load(href); //+' body>*');
+                    } else {                        
+                        if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/inx/'+href;
+                        $('#nav_menu').load(href+' .enhavo>*');
+                    }
                 }
             }
 

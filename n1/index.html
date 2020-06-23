@@ -51,10 +51,10 @@
                     window.open(href);
                 } else {
                     if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/inx/'+href;
-                    $('#s_artikolo').load('/revo/inx/_eo.html .enhavo',
+                    $('#nav_menu').load('/revo/inx/'+href+' .enhavo',
                         function() { 
-                            $('#s_artikolo a').off("click");
-                            $('#s_artikolo a:not([href^="#"])').click(load_art) 
+                            $('#nav_menu a').off("click");
+                            $('#nav_menu a:not([href^="#"])').click(load_inx) 
                         });
                 }
             }

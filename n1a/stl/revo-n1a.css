@@ -93,6 +93,7 @@ nav {
     }
     #nav_menu {
         position: absolute;
+        min-width: 16em;
         max-width: 24em;
         /* Kaŝu navigadon 
         font: 0/0 serif;   
