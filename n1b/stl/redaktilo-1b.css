@@ -47,15 +47,30 @@ fieldset legend {
     padding: 0.3em 0.5em; */
     width: 66%;
 }
+
+button, input, select {
+    padding: 0.3em 0.5em;
+}
+
+.help_btn {
+    width: 2em;
+    height: 2em;
+    font-weight: bold;
+    border-radius: 50%;
+    border: 1px solid black
+}
+
 input {
     margin: 3px 1px 0px 1px;
 }
 .rubriko {
     text-align: right;
 }
+
 textarea {
     margin: 3px 1px 0px 1px;
 }
+
 .piedlinio {color: #104040; text-align: center}
 
 .kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;

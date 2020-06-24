@@ -17,7 +17,7 @@
 
 <h1>Redakti <a href="/revo/art/pilk.html">pilk</a></h1>
 
-<form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="f" id="f">
+<form name="f" id="f">
 
 prilabori:
  <button
@@ -71,34 +71,37 @@ prilabori:
   <button
     onclick="var i=str_indent();insertTags2(&#39;<trdgrp lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\n&#39;+i+&#39;  <trd></trd>\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false" 
     title="Aldonu grupon de tradukoj.">trdgrp lng</button> 
-  lng = <input id="trdlng"
+  <input id="trdlng"
     type="text" 
     name="trdlng"  
+    placeholder="lng"
     size="2" 
     maxlength="3" 
-    title="Tajpu la lingvokodon por tradukoj ĉi tie." />
-
+    title="Lingvokodo por tradukoj." />
+|
   <button
     onclick="insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false"
     title="Aldonu unu tradukon al grupo (sen lingvo).">trd</button> 
+|    
   <button
     onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false" 
     title="Aldonu klarigon sen tipo.">klr</button> 
+|    
   <button
     onclick="insertTags2(&#39;<klr tip=\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false"
     title="Aldonu klarigon kun tipo.">klr tip</button> 
-  tip = <select name="klrtip"  title="Elektu la tipon de la klarigo." id="klrtip">
+    <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="klrtip">
       <option value=""></option>
       <option value="ind">ind-ekso</option>
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
- 
+| 
   <button
     onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
     title="Aldonu indikon por la indekso.">ind</button> 
-  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#tradukoj"><b>?</b></button>
-  <a target="_new" href="https://revuloj.github.io/temoj/rnc#tradukiloj-">&#x23e7;</a><br />
+|
+  <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
+  <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
 
 
@@ -109,7 +112,7 @@ prilabori:
   <button
     onclick="var i=str_indent();insertTags(&#39;<refgrp tip=\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\&#34;>\n&#39;+i+&#39;  <ref cel=\&#34;\&#34;>&#39;,&#39;</ref>\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false" 
     title="Aldonu grupon de refencoj.">refgrp tip</button> 
-  tip=<select name="reftip"  
+  <select name="reftip"  
       title="Elektu tipon de referenco." id="reftip">
       <option selected="selected" value=""></option>
       <option value="vid">vid-u</option>
@@ -123,27 +126,25 @@ prilabori:
       <option value="malprt">malpart-o</option>
       <option value="ekz">ekz-emplo</option>
     </select>
+|    
   <button
     onclick="insertTags(&#39;<ref cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
     title="Aldonu unu referencon al grupo (sen tipo).">ref</button>
+|
   <button
     onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
     title="Aldonu rimarkon.">rim</button>
-  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#referencoj"><b>?</b></button>
-  <a target="_new" href="https://revuloj.github.io/temoj/rnc#referenciloj-">&#x23e7;</a><br />
+|
+  <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
+  <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
 
 
 <fieldset id="fs_rind" class="collapsed">
-    <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#uzindikoj"><b>?</b></button>
-    <a target="_new" href="https://revuloj.github.io/temoj/rnc#uzo-">&#x23e7;</a>
-  </legend>
   <button
     onclick="insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false" 
     title="Aldonu indikon pri oficialeco.">ofc</button>
-    = <select name="ofc"  title="Elektu indikon pri oficialeco." id="ofc">
+    <select name="ofc"  title="Elektu indikon pri oficialeco." id="ofc">
     <option selected="selected" value=""></option>
     <option value="*">*</option>
     <option value="1">1</option>
@@ -156,19 +157,19 @@ prilabori:
     <option value="8">8</option>
     <option value="9">9</option>
   </select>
+|  
   <button
     onclick="insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false"
     title="Aldonu indikon pri gramatiko.">gra</button>
-    = <select name="gra"  title="Elektu indikon pri gramatiko." id="gra">
-    <option value="<vspec>tr</vspec>">v tr</option>
-    <option value="<vspec>ntr</vspec>">v ntr</option>
+    <select name="gra"  title="Elektu indikon pri gramatiko." id="gra">
+    <option value="<vspec>tr</vspec>">vspec tr</option>
+    <option value="<vspec>ntr</vspec>">vspec ntr</option>
   </select>
-
-  uzo:
+|
   <button
    onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
-   title="Aldonu fakon (elektu dekstre).">fak</button>
-  = <select name="uzofak"  title="Elektu uzofakon." id="uzofak">
+   title="Aldonu fakon (elektu dekstre).">uzo fak</button>
+  <select name="uzofak"  title="Elektu uzofakon." id="uzofak">
     <option selected="selected" value=""></option>
     <option value="AGR">AGR-agrokulturo</option>
     <option value="ANA">ANA-homa anatomio, histologio</option>
@@ -249,10 +250,11 @@ prilabori:
     <option value="TRA">TRA-trafiko</option>
     <option value="ZOO">ZOO-zoologio</option>
   </select>
+|  
   <button
     onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
-    title="Aldonu stilon (elektu dekstre).">stl</button>
-  = <select name="uzostl"  title="Elektu uzostilon." id="uzostl">
+    title="Aldonu stilon (elektu dekstre).">uzo stl</button>
+   <select name="uzostl"  title="Elektu uzostilon." id="uzostl">
     <option selected="selected" value=""></option>
     <option value="ARK">ARK-arkaismo</option>
     <option value="EVI">EVI-evitinde</option>
@@ -264,40 +266,43 @@ prilabori:
     <option value="RAR">RAR-malofte</option>
     <option value="VULG">VULG-vulgare</option>
   </select>
-  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#indikiloj"><b>?</b></button>
-  <a target="_new" href="https://revuloj.github.io/temoj/rnc#uzo-">&#x23e7;</a><br />
-  
+|  
+  <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
+  <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
   
 <fieldset id="fs_rekz" class="collapsed">
   <button
     onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
     title="Aldonu ekzemplon.">ekz</button>
+|
   <button
     onclick="insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false" 
     title="Aldonu tildon (anstataŭigas la radikon).">tld</button>
+|
   <button
     onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
     title="Aldonu fonton (kun kelkaj informoj).">fnt</button>
-  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#ekzemploj"><b>?</b></button>
-  <a target="_new" href="https://revuloj.github.io/temoj/rnc#ekz-">&#x23e7;</a><br />
+|
+  <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
+  <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
   
 <fieldset id="fs_rdif" class="collapsed">
   <button
     onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
     title="Aldonu novan derivaĵon.">drv</button>
+|
   <button
     onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
     title="Aldonu novan sencon.">snc</button>  
+|
   <button
     onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
     title="Aldonu novan difinon.">dif</button>
-  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
-    target="_new" href="https://revuloj.github.io/temoj/manlibro#deriva%C4%B5oj"><b>?</b></button>
-  <a target="_new" href="https://revuloj.github.io/temoj/rnc#drv-">&#x23e7;</a><br />
+|
+  <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
+  <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
   
 <fieldset>
@@ -318,7 +323,7 @@ prilabori:
   <input type="hidden" name=".cgifields" value="cx"  />
 </form>
 
-<form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="n" id="n">
+<formname="n" id="n">
 <fieldset>
   <legend>Nova:</legend>
   <label for="art">Kreu artikolon:</label>

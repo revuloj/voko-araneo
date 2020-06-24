@@ -332,6 +332,10 @@ function nextTag(tag, dir) {
      }
 }
 
+function helpo_pagho(url) {
+  window.open('https://revuloj.github.io/temoj/'+url);
+}
+
 function fs_toggle(id) {
   var el = document.getElementById(id);
   var fs_id;
