@@ -56,6 +56,14 @@ prilabori:
 
 <!-- buton-grupoj por redaktado -->
 
+<div id="fs_toggle">
+  <a class="aktiva" href="#rtrd">tradukoj</a>
+  <a href="#rref">referencoj</a>
+  <a href="#rind">indikiloj</a>
+  <a href="#rekz">ekzemploj</a>
+  <a href="#rdif">difinoj</a>
+</div>
+
 <fieldset>
   <legend><a href="#rtrd">tradukoj</a></legend>
   <button accesskey="t" 
@@ -95,7 +103,7 @@ prilabori:
 </fieldset>
 
 
-<fieldset>
+<fieldset class="collapsed">
   <legend><a href="#rref">referencoj</a></legend>
   <button
     onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
@@ -129,7 +137,7 @@ prilabori:
 </fieldset>
 
 
-<fieldset>
+<fieldset class="collapsed">
   <legend><a href="#rind">indikiloj</a>
     <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
     target="_new" href="https://revuloj.github.io/temoj/manlibro#uzindikoj"><b>?</b></button>
@@ -262,7 +270,7 @@ prilabori:
   
 </fieldset>
   
-<fieldset>
+<fieldset class="collapsed">
   <legend><a href="#rekz">ekzemploj</a></legend>
   <button
     onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
@@ -278,7 +286,7 @@ prilabori:
   <a target="_new" href="https://revuloj.github.io/temoj/rnc#ekz-">&#x23e7;</a><br />
 </fieldset>
   
-<fieldset>
+<fieldset class="collapsed">
   <legend><a href="#dif">difinoj</a></legend>
   <button
     onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
