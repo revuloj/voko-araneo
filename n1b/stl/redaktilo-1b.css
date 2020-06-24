@@ -1,3 +1,9 @@
+H1 {
+    font-family: monospace;
+}
+
+
+
 #rteksto {
     display: flex;
 }
@@ -111,7 +117,11 @@ input {
     text-align: right;
 }
 
-.piedlinio {color: #104040; text-align: center}
+.piedlinio {
+    color: #104040; 
+    font-family: monospace;
+    text-align: center
+}
 
 .kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
     background-color: #c0c090; margin: 0; display: none;
