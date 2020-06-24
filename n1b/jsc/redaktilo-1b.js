@@ -331,6 +331,21 @@ function nextTag(tag, dir) {
    //    alert("scrollTop="+txtarea.scrollTop+" scrollHeight="+txtarea.scrollHeight);
      }
 }
+
+function fs_toggle(id) {
+  var el = document.getElementById(id);
+  var fs_id;
+  if (! el.classList.contains('aktiva')) {
+    for (ch of el.parentElement.children) {
+      ch.classList.remove('aktiva')
+      fs_id = 'fs_'+ch.id;
+      document.getElementById(fs_id).classList.add('collapsed');
+    }
+    el.classList.add('aktiva');
+    fs_id = 'fs_'+el.id;
+    document.getElementById(fs_id).classList.remove('collapsed');
+  }
+}
    
 function sf(pos, line, lastline) {
      document.f.xmlTxt.focus();

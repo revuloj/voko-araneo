@@ -10,7 +10,7 @@
   <link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
   <link rel="stylesheet" href="stl/redaktilo-1b.css">
 
-  <script src="jsc/redaktilo-1a.js"></script>
+  <script src="jsc/redaktilo-1b.js"></script>
 
 </head>
 <body onload="sf(0, 0, 1)">
@@ -57,15 +57,14 @@ prilabori:
 <!-- buton-grupoj por redaktado -->
 
 <div id="fs_toggle">
-  <a class="aktiva" href="#rtrd">tradukoj</a>
-  <a href="#rref">referencoj</a>
-  <a href="#rind">indikiloj</a>
-  <a href="#rekz">ekzemploj</a>
-  <a href="#rdif">difinoj</a>
+  <a class="aktiva" id="rtrd" href="#rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
+  <a id="rref" href="#rref" onclick="fs_toggle('rref');">referencoj</a>
+  <a id="rind" href="#rind" onclick="fs_toggle('rind');">indikiloj</a>
+  <a id="rekz" href="#rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
+  <a id="rdif" href="#rdif" onclick="fs_toggle('rdif');">difinoj</a>
 </div>
 
-<fieldset>
-  <legend><a href="#rtrd">tradukoj</a></legend>
+<fieldset id="fs_rtrd">
   <button accesskey="t" 
     onclick="insertTags2(&#39;<trd lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false" 
     title="Aldonu unu tradukon."><u>t</u>rd lng</button> 
@@ -103,8 +102,7 @@ prilabori:
 </fieldset>
 
 
-<fieldset class="collapsed">
-  <legend><a href="#rref">referencoj</a></legend>
+<fieldset id="fs_rref" class="collapsed">
   <button
     onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
     title="Aldonu unu referencon.">ref tip</button>
@@ -137,8 +135,7 @@ prilabori:
 </fieldset>
 
 
-<fieldset class="collapsed">
-  <legend><a href="#rind">indikiloj</a>
+<fieldset id="fs_rind" class="collapsed">
     <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
     target="_new" href="https://revuloj.github.io/temoj/manlibro#uzindikoj"><b>?</b></button>
     <a target="_new" href="https://revuloj.github.io/temoj/rnc#uzo-">&#x23e7;</a>
@@ -267,11 +264,13 @@ prilabori:
     <option value="RAR">RAR-malofte</option>
     <option value="VULG">VULG-vulgare</option>
   </select>
+  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#indikiloj"><b>?</b></button>
+  <a target="_new" href="https://revuloj.github.io/temoj/rnc#uzo-">&#x23e7;</a><br />
   
 </fieldset>
   
-<fieldset class="collapsed">
-  <legend><a href="#rekz">ekzemploj</a></legend>
+<fieldset id="fs_rekz" class="collapsed">
   <button
     onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
     title="Aldonu ekzemplon.">ekz</button>
@@ -286,8 +285,7 @@ prilabori:
   <a target="_new" href="https://revuloj.github.io/temoj/rnc#ekz-">&#x23e7;</a><br />
 </fieldset>
   
-<fieldset class="collapsed">
-  <legend><a href="#dif">difinoj</a></legend>
+<fieldset id="fs_rdif" class="collapsed">
   <button
     onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
     title="Aldonu novan derivaĵon.">drv</button>
@@ -303,16 +301,18 @@ prilabori:
 </fieldset>
   
 <fieldset>
-  <legend>Redakto</legend>
+  <legend>Redakto:</legend>
+  <p>
   <label for="sxangxo">Ŝanĝo:</label>
   <input type="text" name="sxangxo" value="kor. ref-cel" size="70" maxlength="80" title="Klarigu la ŝanĝon ĉi tie." />
-
+  <br/>
   <label for="redaktanto">Retpoŝtadreso:</label>
   <input type="text" name="redaktanto" value="diestel@steloj.de" size="70" maxlength="80" title="Skribu vian registritan retadreson ĉi tie." />
-
+  </p>  
+  <p>
   <input type="submit" name="button" value="antaŭrigardu" />
   <input type="submit" name="button" value="konservu" />
-  
+  </p>
 </fieldset>
 
   <input type="hidden" name=".cgifields" value="cx"  />
@@ -320,7 +320,7 @@ prilabori:
 
 <form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="n" id="n">
 <fieldset>
-  <legend>Nova</legend>
+  <legend>Nova:</legend>
   <label for="art">Kreu artikolon:</label>
   <input type="text" name="art" value="pilk" size="20" maxlength="20" />
   <input type="submit" name="button" value="kreu" />

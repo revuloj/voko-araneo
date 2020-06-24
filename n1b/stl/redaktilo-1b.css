@@ -1,11 +1,33 @@
-#f fieldset.collapsed {
-   /* display: none;*/
+fieldset {
+    border: none;
+    border-bottom: 2px dotted gray;
+    margin: 0.5em;
+    padding: 0.5em;
+    background-color: palegoldenrod;
+}
+
+fieldset.collapsed {
+    display: none;
     /*position: absolute;
     top: -1000em;
     left: -1000em;*/
-   }
+}
+
+fieldset legend {
+    text-decoration: underline;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+#fs_toggle {
+    margin-left: 0.5em;
+    margin-top: 0.4em;
+    margin-bottom: 0em;
+}   
 
 #fs_toggle a {
+    padding: 0.5em;
+    /*background-color: palegoldenrod; */
     font-family: monospace;
     font-weight: bold;
     color: black;
@@ -16,7 +38,7 @@
    font-weight: bold;
    color: black;
    text-transform: uppercase;
-   border-bottom: 2px solid black;
+   border-bottom: 4px solid goldenrod;
 }
 
 .averto {
