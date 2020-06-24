@@ -1,0 +1,384 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="eo" xml:lang="eo">
+<head>
+<title>redakti pilk</title>
+<meta http-equiv="Cache-Control" content="no-cache">
+<link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
+<style type="text/css">
+<!--/* <![CDATA[ */
+
+a.butono1 {
+  background-color: LightGray;
+  font-family: monospace;
+  font-size: 90%;
+  letter-spacing: -0,1pt;
+  padding: 0px 1px 0px 1px;
+}
+a.butono1:link, a.butono1:visited {
+  border: 1px outset black;
+  line-height:150%;
+  color: #000;
+  text-decoration: none;
+  text-align: center;
+}
+a.butono1:hover {
+ border-color: red;
+ color: red;
+}
+.averto {
+  border: 2px solid #E0E0A0;
+  font-style: italic;
+  padding: 0.3em 0.5em;
+  width: 66%;
+}
+input {
+  margin: 3px 1px 0px 1px;
+}
+.rubriko {
+  text-align: right;
+}
+textarea {
+  margin: 3px 1px 0px 1px;
+}
+.piedlinio {color: #104040; text-align: center}
+.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
+		background-color: #c0c090; margin: 0; display: none;
+		border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
+	      }
+.kuketoaverto P { text-align:center }
+.kuketoaverto FORM { text-align:center }
+
+
+/* ]]> */-->
+</style>
+<script src="jsc/redaktilo-1a.js"></script>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body onload="sf(0, 0, 1)">
+<h1>Redakti <a href="/revo/art/pilk.html">pilk</a></h1>
+<form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="f" id="f">
+
+prilabori:
+ <button
+   onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
+ <button
+   onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
+ <label>
+  <input type="checkbox" name="cx" value="1" accesskey="x" 
+    onclick="document.f.xmlTxt.focus()" />anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux
+ </label>
+<div id="ajxb">
+  navigadi:
+  <br />
+  <button
+    onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">&#x2303;drv</button>
+  <br />
+  <button
+    onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">&#x2304;drv</button>
+</div>
+
+<input type="hidden" name="art" value="pilk"  />
+<input type="hidden" name="mrk" value=""  />&nbsp;
+<textarea name="xmlTxt"  rows="25" cols="80" onkeypress="return klavo(event)" id="xmlTxt"><?xml version="1.0"?>
+<!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
+
+<vortaro>
+<art mrk="$Id: pilk.xml,v 1.33 2017/01/10 15:10:14 revo Exp $">
+<kap>
+  <ofc>*</ofc>
+  <rad>pilk</rad>/o <fnt><bib>PV</bib></fnt>
+</kap>
+...
+
+</vortaro>
+</textarea>
+
+<!-- buton-grupoj por redaktado -->
+
+<fieldset>
+  <legend><a href="#rtrd">tradukoj</a></legend>
+  <button accesskey="t" 
+    onclick="insertTags2(&#39;<trd lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false" 
+    title="Aldonu unu tradukon."><u>t</u>rd lng</button> 
+  <button
+    onclick="var i=str_indent();insertTags2(&#39;<trdgrp lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\n&#39;+i+&#39;  <trd></trd>\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false" 
+    title="Aldonu grupon de tradukoj.">trdgrp lng</button> 
+  lng = <input id="trdlng"
+    type="text" 
+    name="trdlng"  
+    size="2" 
+    maxlength="3" 
+    title="Tajpu la lingvokodon por tradukoj ĉi tie." />
+
+  <button
+    onclick="insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false"
+    title="Aldonu unu tradukon al grupo (sen lingvo).">trd</button> 
+  <button
+    onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false" 
+    title="Aldonu klarigon sen tipo.">klr</button> 
+  <button
+    onclick="insertTags2(&#39;<klr tip=\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false"
+    title="Aldonu klarigon kun tipo.">klr tip</button> 
+  tip = <select name="klrtip"  title="Elektu la tipon de la klarigo." id="klrtip">
+      <option value=""></option>
+      <option value="ind">ind-ekso</option>
+      <option selected="selected" value="amb">amb-aŭ</option>
+    </select>
+ 
+  <button
+    onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
+    title="Aldonu indikon por la indekso.">ind</button> 
+  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#tradukoj"><b>?</b></button>
+  <a target="_new" href="https://revuloj.github.io/temoj/rnc#tradukiloj-">&#x23e7;</a><br />
+</fieldset>
+
+
+<fieldset>
+  <legend><a href="#rref">referencoj</a></legend>
+  <button
+    onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+    title="Aldonu unu referencon.">ref tip</button>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<refgrp tip=\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\&#34;>\n&#39;+i+&#39;  <ref cel=\&#34;\&#34;>&#39;,&#39;</ref>\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false" 
+    title="Aldonu grupon de refencoj.">refgrp tip</button> 
+  tip=<select name="reftip"  
+      title="Elektu tipon de referenco." id="reftip">
+      <option selected="selected" value=""></option>
+      <option value="vid">vid-u</option>
+      <option value="hom">hom-onima</option>
+      <option value="dif">dif-ina</option>
+      <option value="sin">sin-onimo</option>
+      <option value="ant">ant-onimo</option>
+      <option value="super">super-nocio</option>
+      <option value="sub">sub-nocio</option>
+      <option value="prt">part-o</option>
+      <option value="malprt">malpart-o</option>
+      <option value="ekz">ekz-emplo</option>
+    </select>
+  <button
+    onclick="insertTags(&#39;<ref cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+    title="Aldonu unu referencon al grupo (sen tipo).">ref</button>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
+    title="Aldonu rimarkon.">rim</button>
+  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#referencoj"><b>?</b></button>
+  <a target="_new" href="https://revuloj.github.io/temoj/rnc#referenciloj-">&#x23e7;</a><br />
+</fieldset>
+
+
+<fieldset>
+  <legend><a href="#rind">indikiloj</a>
+    <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#uzindikoj"><b>?</b></button>
+    <a target="_new" href="https://revuloj.github.io/temoj/rnc#uzo-">&#x23e7;</a>
+  </legend>
+  <button
+    onclick="insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+    title="Aldonu indikon pri oficialeco.">ofc</button>
+    = <select name="ofc"  title="Elektu indikon pri oficialeco." id="ofc">
+    <option selected="selected" value=""></option>
+    <option value="*">*</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+  </select>
+  <button
+    onclick="insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false"
+    title="Aldonu indikon pri gramatiko.">gra</button>
+    = <select name="gra"  title="Elektu indikon pri gramatiko." id="gra">
+    <option value="<vspec>tr</vspec>">v tr</option>
+    <option value="<vspec>ntr</vspec>">v ntr</option>
+  </select>
+
+  uzo:
+  <button
+   onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+   title="Aldonu fakon (elektu dekstre).">fak</button>
+  = <select name="uzofak"  title="Elektu uzofakon." id="uzofak">
+    <option selected="selected" value=""></option>
+    <option value="AGR">AGR-agrokulturo</option>
+    <option value="ANA">ANA-homa anatomio, histologio</option>
+    <option value="ARKE">ARKE-arkeologio</option>
+    <option value="ARKI">ARKI-arkitekturo</option>
+    <option value="AST">AST-astronomio</option>
+    <option value="AUT">AUT-aŭtomobiloj</option>
+    <option value="AVI">AVI-aviado</option>
+    <option value="BAK">BAK-bakteriologio, virusologio</option>
+    <option value="BELA">BELA-belartoj</option>
+    <option value="BELE">BELE-beletro</option>
+    <option value="BIB">BIB-biblio</option>
+    <option value="BIO">BIO-biologio, biontologio</option>
+    <option value="BOT">BOT-botaniko</option>
+    <option value="BUD">BUD-budhismo</option>
+    <option value="EKOL">EKOL-ekologio</option>
+    <option value="EKON">EKON-ekonomiko, financo, komerco</option>
+    <option value="ELE">ELE-elektro</option>
+    <option value="ELET">ELET-elektrotekniko</option>
+    <option value="ESP">ESP-esperantismo</option>
+    <option value="FER">FER-fervojoj</option>
+    <option value="FIL">FIL-filozofio</option>
+    <option value="FIZ">FIZ-fiziko</option>
+    <option value="FIZL">FIZL-fiziologio</option>
+    <option value="FON">FON-fonetiko</option>
+    <option value="FOT">FOT-fotografio, optiko</option>
+    <option value="GEN">GEN-genealogio</option>
+    <option value="GEOD">GEOD-geodezio, topografio</option>
+    <option value="GEOG">GEOG-geografio</option>
+    <option value="GEOL">GEOL-geologio</option>
+    <option value="GRA">GRA-gramatiko</option>
+    <option value="HER">HER-heraldiko</option>
+    <option value="HIN">HIN-hinduismo</option>
+    <option value="HIS">HIS-historio</option>
+    <option value="HOR">HOR-hortikulturo, arbokulturo, silvikulturo</option>
+    <option value="ISL">ISL-islamo</option>
+    <option value="JUR">JUR-juro</option>
+    <option value="KAL">KAL-kalendaro, tempomezurado</option>
+    <option value="KAT">KAT-katolikismo</option>
+    <option value="KEM">KEM-kemio, biokemio</option>
+    <option value="KIN">KIN-kinoarto</option>
+    <option value="KIR">KIR-kirurgio</option>
+    <option value="KOMP">KOMP-komputiko</option>
+    <option value="KON">KON-konstrutekniko</option>
+    <option value="KRI">KRI-kristanismo</option>
+    <option value="KUI">KUI-kuirarto</option>
+    <option value="LIN">LIN-lingvistiko, filologio</option>
+    <option value="MAH">MAH-materialismo historia</option>
+    <option value="MAR">MAR-maraferoj</option>
+    <option value="MAS">MAS-maŝinoj, mekaniko</option>
+    <option value="MAT">MAT-matematiko</option>
+    <option value="MED">MED-medicino, farmacio</option>
+    <option value="MET">MET-meteologio</option>
+    <option value="MIL">MIL-militaferoj</option>
+    <option value="MIN">MIN-mineralogio</option>
+    <option value="MIT">MIT-mitologio</option>
+    <option value="MUZ">MUZ-muziko</option>
+    <option value="NOM">NOM-nomoj</option>
+    <option value="PAL">PAL-paleontologio</option>
+    <option value="PED">PED-pedagogio</option>
+    <option value="PERS">PERS-personoj</option>
+    <option value="POE">POE-poetiko, poezio</option>
+    <option value="POL">POL-politiko, sociologio, administrado</option>
+    <option value="POSX">POSX-poŝto</option>
+    <option value="PRA">PRA-prahistorio</option>
+    <option value="PSI">PSI-psikologio, psikiatrio</option>
+    <option value="RAD">RAD-radiofonio</option>
+    <option value="REL">REL-religioj</option>
+    <option value="RET">RET-retoj, Interreto</option>
+    <option value="SCI">SCI-sciencoj</option>
+    <option value="SHI">SHI-ŝipkonstruado, navigado</option>
+    <option value="SPO">SPO-sporto, ludoj</option>
+    <option value="TEA">TEA-teatro</option>
+    <option value="TEK">TEK-teknikoj</option>
+    <option value="TEKS">TEKS-teksindustrio, vestoj</option>
+    <option value="TEL">TEL-telekomunikoj</option>
+    <option value="TIP">TIP-presarto, libroj</option>
+    <option value="TRA">TRA-trafiko</option>
+    <option value="ZOO">ZOO-zoologio</option>
+  </select>
+  <button
+    onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+    title="Aldonu stilon (elektu dekstre).">stl</button>
+  = <select name="uzostl"  title="Elektu uzostilon." id="uzostl">
+    <option selected="selected" value=""></option>
+    <option value="ARK">ARK-arkaismo</option>
+    <option value="EVI">EVI-evitinde</option>
+    <option value="FIG">FIG-figure</option>
+    <option value="FRAZ">FRAZ-frazaĵo</option>
+    <option value="KOMUNE">KOMUNE-komune</option>
+    <option value="NEO">NEO-neologismo</option>
+    <option value="POE">POE-poezie</option>
+    <option value="RAR">RAR-malofte</option>
+    <option value="VULG">VULG-vulgare</option>
+  </select>
+  
+</fieldset>
+  
+<fieldset>
+  <legend><a href="#rekz">ekzemploj</a></legend>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
+    title="Aldonu ekzemplon.">ekz</button>
+  <button
+    onclick="insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+    title="Aldonu tildon (anstataŭigas la radikon).">tld</button>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
+    title="Aldonu fonton (kun kelkaj informoj).">fnt</button>
+  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#ekzemploj"><b>?</b></button>
+  <a target="_new" href="https://revuloj.github.io/temoj/rnc#ekz-">&#x23e7;</a><br />
+</fieldset>
+  
+<fieldset>
+  <legend><a href="#dif">difinoj</a></legend>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
+    title="Aldonu novan derivaĵon.">drv</button>
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
+    title="Aldonu novan sencon.">snc</button>  
+  <button
+    onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
+    title="Aldonu novan difinon.">dif</button>
+  <button style="width: 2em; height: 2em; border-radius: 50%; border: 1px solid black" 
+    target="_new" href="https://revuloj.github.io/temoj/manlibro#deriva%C4%B5oj"><b>?</b></button>
+  <a target="_new" href="https://revuloj.github.io/temoj/rnc#drv-">&#x23e7;</a><br />
+</fieldset>
+  
+
+
+
+<br />
+&nbsp;&#348;an&#285;o: <input type="text" name="sxangxo" value="kor. ref-cel" size="70" maxlength="80" title="Klarigu la ŝanĝon ĉi tie." /><br />
+&nbsp;Retpo&#349;ta adreso:<input type="text" name="redaktanto" value="diestel@steloj.de" size="70" maxlength="80" title="Skribu vian registritan retadreson ĉi tie." /><br />
+<input type="submit" name="button" value="antaŭrigardu" /><input type="submit" name="button" value="konservu" /><div><input type="hidden" name=".cgifields" value="cx"  /></div></form><form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="n" id="n">
+&nbsp;Preparu novan artikolon: <input type="text" name="art" value="pilk" size="20" maxlength="20" />&nbsp;<input type="submit" name="button" value="kreu" />&nbsp; &nbsp; <a target="_new" href="/revo/dok/revoserv.html">[helpo]</a>
+</form><h1>Klarigoj:</h1>
+<div class="averto">
+Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
+klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
+klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
+klavo kontrolo-F ebligas ser&#265;i<br>
+via retadreso estas 91.41.211.108<br>
+</div>
+
+<p class="piedlinio">
+<a class="redakto" title="Reta Vortaro, konstanta URL" target="_top"
+   href="http://purl.org/net/voko/revo/">&#x211B;evo</a> |
+<a class="redakto" title="Datumprotekta deklaro" target="_new"
+   href="/revo/dok/datumprotekto.html">datumprotekto</a> |
+<a class="redakto" title="Permeso de uzado" target="_new"
+   href="/revo/dok/copying.txt">permeso</a> |
+<a class="redakto" title="Alternativa redaktilo" target="_new"
+   href="https://revaj.steloj.de/">alia redaktilo</a> |
+<a class="redakto" title="Bibliografio" target="indekso"
+   href="/revo/dok/bibliogr.html">bibliografio</a> |
+<a class="redakto" title="Vortaraj mallongigoj" target="indekso"
+   href="/revo/dok/mallongigoj.html">mallongigoj</a> |
+<a class="redakto" title="Superserĉo per ViVo" target="_new"
+   href="http://kono.be/vivo">ViVo</a>
+</p>
+
+<div class="kuketoaverto" id="kuketoaverto">
+<p>
+  Ni uzas kuketojn (retumilajn memoretojn).
+  Uzante nian servon vi konsentas al konservado de informoj en kuketoj.
+  Eksciu pli pri la uzado de personaj datumoj en la
+  <a href="/revo/dok/datumprotekto.html">datumprotekta deklaro</a>.<br/>
+  <button name="konfirmo" onClick="setCookieConsent()">Mi konfirmas</button>
+</p>
+</div>
+<p><!-- svn versio: $Id: vokomail.pl 1141 2018-02-10 09:08:01Z wdiestel $<br />hg versio: $HgId: vokomail.pl 62:d81c22cbe76e 2010/04/21 17:24:51 Wieland $ --></p>
+</body>
+</html>

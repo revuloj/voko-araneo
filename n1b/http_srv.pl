@@ -18,11 +18,13 @@ user:file_search_path(jsc,'./jsc').
 %http:location(stl,root(stl),[]).
 
 :- http_handler('/', http_reply_from_files('.', []), [id(root)]).       
-:- http_handler('/index.html', http_reply_from_files('.', []), [id(index)]).       
+:- http_handler('/index.html', http_reply_file('./index.html', []), [id(index)]).       
+:- http_handler('/redaktilo.html', http_reply_file('./redaktilo.html', []), [id(redaktilo), priority(200)]).       
 :- http_handler(root(stl), serve_files_in_directory(stl), [prefix, id(stl), priority(100)]).       
 :- http_handler(root(jsc), serve_files_in_directory(jsc), [prefix, id(jsc), priority(100)]).       
 :- http_handler(root(revo), revo_proxy, [prefix, id(revo), priority(100)]).
-:- http_handler(root(.), revo_proxy, [prefix, id(revo), priority(100)]).
+:- http_handler(root(.), revo_proxy, [prefix, id(revo), priority(0)]).
+
 %:- http_handler(root(home), home_page, []).
 
 % elŝutas artikolon el retavortaro.de kaj sendas al la krozilo
