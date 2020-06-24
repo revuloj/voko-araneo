@@ -67,8 +67,18 @@ fieldset legend {
    background-color: palegoldenrod;
 }
 
+.rhelpo a {
+    font-weight: bold;
+    color: black;
+}
+h2 {
+    background-color: palegoldenrod;
+    border: 2px solid palegoldenrod;
+    margin-bottom: 0;
+}
 .averto {
-    border: 2px solid #E0E0A0;
+    margin-top: 0;
+    border: 2px solid palegoldenrod;
     /*font-style: italic; */
     padding: 0.5em 2em;
     /*width: 66%; */
