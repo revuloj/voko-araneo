@@ -3,62 +3,20 @@
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="eo" xml:lang="eo">
 <head>
-<title>redakti pilk</title>
-<meta http-equiv="Cache-Control" content="no-cache">
-<link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
-<style type="text/css">
-<!--/* <![CDATA[ */
+  <title>Redakti artikolon ("pilk")</title>
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <meta charset="utf-8">
+  
+  <link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
+  <link rel="stylesheet" href="stl/redaktilo-1b.css">
 
-a.butono1 {
-  background-color: LightGray;
-  font-family: monospace;
-  font-size: 90%;
-  letter-spacing: -0,1pt;
-  padding: 0px 1px 0px 1px;
-}
-a.butono1:link, a.butono1:visited {
-  border: 1px outset black;
-  line-height:150%;
-  color: #000;
-  text-decoration: none;
-  text-align: center;
-}
-a.butono1:hover {
- border-color: red;
- color: red;
-}
-.averto {
-  border: 2px solid #E0E0A0;
-  font-style: italic;
-  padding: 0.3em 0.5em;
-  width: 66%;
-}
-input {
-  margin: 3px 1px 0px 1px;
-}
-.rubriko {
-  text-align: right;
-}
-textarea {
-  margin: 3px 1px 0px 1px;
-}
-.piedlinio {color: #104040; text-align: center}
-.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
-		background-color: #c0c090; margin: 0; display: none;
-		border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
-	      }
-.kuketoaverto P { text-align:center }
-.kuketoaverto FORM { text-align:center }
+  <script src="jsc/redaktilo-1a.js"></script>
 
-
-/* ]]> */-->
-</style>
-<script src="jsc/redaktilo-1a.js"></script>
-
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body onload="sf(0, 0, 1)">
+
 <h1>Redakti <a href="/revo/art/pilk.html">pilk</a></h1>
+
 <form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="f" id="f">
 
 prilabori:
@@ -336,22 +294,41 @@ prilabori:
   <a target="_new" href="https://revuloj.github.io/temoj/rnc#drv-">&#x23e7;</a><br />
 </fieldset>
   
+<fieldset>
+  <legend>Redakto</legend>
+  <label for="sxangxo">Ŝanĝo:</label>
+  <input type="text" name="sxangxo" value="kor. ref-cel" size="70" maxlength="80" title="Klarigu la ŝanĝon ĉi tie." />
 
+  <label for="redaktanto">Retpoŝtadreso:</label>
+  <input type="text" name="redaktanto" value="diestel@steloj.de" size="70" maxlength="80" title="Skribu vian registritan retadreson ĉi tie." />
 
+  <input type="submit" name="button" value="antaŭrigardu" />
+  <input type="submit" name="button" value="konservu" />
+  
+</fieldset>
 
-<br />
-&nbsp;&#348;an&#285;o: <input type="text" name="sxangxo" value="kor. ref-cel" size="70" maxlength="80" title="Klarigu la ŝanĝon ĉi tie." /><br />
-&nbsp;Retpo&#349;ta adreso:<input type="text" name="redaktanto" value="diestel@steloj.de" size="70" maxlength="80" title="Skribu vian registritan retadreson ĉi tie." /><br />
-<input type="submit" name="button" value="antaŭrigardu" /><input type="submit" name="button" value="konservu" /><div><input type="hidden" name=".cgifields" value="cx"  /></div></form><form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="n" id="n">
-&nbsp;Preparu novan artikolon: <input type="text" name="art" value="pilk" size="20" maxlength="20" />&nbsp;<input type="submit" name="button" value="kreu" />&nbsp; &nbsp; <a target="_new" href="/revo/dok/revoserv.html">[helpo]</a>
-</form><h1>Klarigoj:</h1>
-<div class="averto">
-Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
-klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
-klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
-klavo kontrolo-F ebligas ser&#265;i<br>
-via retadreso estas 91.41.211.108<br>
-</div>
+  <input type="hidden" name=".cgifields" value="cx"  />
+</form>
+
+<form method="post" action="/cgi-bin/vokomail.pl?art=pilk" enctype="multipart/form-data" name="n" id="n">
+<fieldset>
+  <legend>Nova</legend>
+  <label for="art">Kreu artikolon:</label>
+  <input type="text" name="art" value="pilk" size="20" maxlength="20" />
+  <input type="submit" name="button" value="kreu" />
+</fieldset>  
+
+<a target="_new" href="https://revuloj.github.io/temoj/revoserv">/helpo/</a>
+</form>
+
+<h2>klarigoj</h2>
+<ul class="averto">
+<li>Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.</li>
+<li>klavo kontrolo-Z malfaras la lastan &#349;an&#285;on</li>
+<li>klavo kontrolo-Y refaras la lastan &#349;an&#285;on</li>
+<li>klavo kontrolo-F ebligas ser&#265;i<br>
+<li>via retadreso estas 91.41.211.108</li>
+</ul>
 
 <p class="piedlinio">
 <a class="redakto" title="Reta Vortaro, konstanta URL" target="_top"

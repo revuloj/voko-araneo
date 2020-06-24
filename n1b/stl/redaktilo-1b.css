@@ -1,0 +1,41 @@
+
+  a.butono1 {
+    background-color: LightGray;
+    font-family: monospace;
+    font-size: 90%;
+    letter-spacing: -0,1pt;
+    padding: 0px 1px 0px 1px;
+  }
+  a.butono1:link, a.butono1:visited {
+    border: 1px outset black;
+    line-height:150%;
+    color: #000;
+    text-decoration: none;
+    text-align: center;
+  }
+  a.butono1:hover {
+  border-color: red;
+  color: red;
+  }
+  .averto {
+    border: 2px solid #E0E0A0;
+    font-style: italic;
+    padding: 0.3em 0.5em;
+    width: 66%;
+  }
+  input {
+    margin: 3px 1px 0px 1px;
+  }
+  .rubriko {
+    text-align: right;
+  }
+  textarea {
+    margin: 3px 1px 0px 1px;
+  }
+  .piedlinio {color: #104040; text-align: center}
+  .kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
+      background-color: #c0c090; margin: 0; display: none;
+      border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
+          }
+  .kuketoaverto P { text-align:center }
+  .kuketoaverto FORM { text-align:center }
