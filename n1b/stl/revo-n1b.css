@@ -101,8 +101,28 @@ nav a:active {
     margin-top: 1em !important;
 }
 
-#nav br {
+#navigado br {
     display: none;
+}
+
+/*
+#navigado table tr:first {
+    position: absolut;
+    top: 0;
+}
+*/
+
+#navigado td.aktiva a {
+    width: initial;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--active-border-color);
+}
+
+#navigado td.fona a {
+    width: initial;
+    font-weight: bold;
+    border-bottom: none;
 }
 
 @media all and (max-width: 70em) {
@@ -138,16 +158,23 @@ nav li {
     line-height: 220%;
 }
 
-#navigado li, li>a, #navigado>a, p>a {
+#navigado li, li>a, p>a {
     display: block;
     width: 100%
 }
+
+#navigado td>a {
+    display: block;
+    width: 100%
+}
+
 
 /*
 #nav_menu>a, li a, 
 */ 
 
-#navigado a {
+#navigado p a {
+    max-width: 95%;
     border-radius: 4px;
     padding: 0.3em 0.5em; 
     text-decoration: none;
@@ -157,33 +184,18 @@ nav li {
     box-shadow: 1px 1px 3px;
 }
 
-/*
-#navigado p a {
-    max-width: 95%;
-    margin-top: 0.3em;
-    background-image: linear-gradient(darkgoldenrod 10%, goldenrod 60%, #FAC540 100% );
-    border: 1px solid var(--nav-bg-color);
-    box-shadow: 1px 1px 3px;
-}
-*/
-
-#navigado p a {
-    max-width: 95%;
-    margin-top: 0.3em;
-    border: 1px solid var(--nav-bg-color);
-    /*    box-shadow: 1px 1px 3px; */
-}
-
-#navigado li a {
+#navigado td a,li a {
     /*max-width: 95%;*/
-    border-radius: 4px;
     padding: 0.3em; 
     margin-top: 0.3em;
     text-decoration: none;
     color: black;
     /*border-left: 3px dotted lightgoldenrodyellow;*/
+    /**
     border: 1px solid var(--nav-bg-color);
+    border-radius: 4px;
     box-shadow: 1px 1px 3px;
+    **/
 }
 
 main {
