@@ -1,7 +1,28 @@
+#rteksto {
+    display: flex;
+}
+
+#ajxb {
+    flex-grow: 0;
+}
+
+#rvteksto {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+textarea {
+    margin: 1px;
+    width: 100%
+}
+
 fieldset {
     border: none;
     border-bottom: 2px dotted gray;
     margin: 0.5em;
+    margin-top: 0px;
+    margin-bottom: 2px;
     padding: 0.5em;
     background-color: palegoldenrod;
 }
@@ -17,12 +38,15 @@ fieldset legend {
     text-decoration: underline;
     font-weight: bold;
     font-family: monospace;
+    padding: 0.5em;
+    border-radius: 4px;
+    background-color: palegoldenrod;
 }
 
 #fs_toggle {
     margin-left: 0.5em;
-    margin-top: 0.4em;
-    margin-bottom: 0em;
+    margin-top: 0em;
+    margin-bottom: 1em;
 }   
 
 #fs_toggle a {
@@ -38,18 +62,27 @@ fieldset legend {
    font-weight: bold;
    color: black;
    text-transform: uppercase;
-   border-bottom: 4px solid goldenrod;
+   border-left: 4px solid goldenrod;
+   border-right: 4px solid goldenrod;
+   background-color: palegoldenrod;
 }
 
 .averto {
     border: 2px solid #E0E0A0;
-    /*font-style: italic;
-    padding: 0.3em 0.5em; */
-    width: 66%;
+    /*font-style: italic; */
+    padding: 0.5em 2em;
+    /*width: 66%; */
 }
 
-button, input, select {
+input, select {
+    /*border-width: 2px;
+    border-radius: 3px;*/
     padding: 0.3em 0.5em;
+}
+
+button, input[type="submit"] {
+    padding: 0.3em 0.5em;
+    box-shadow: 1px 1px 2px;
 }
 
 .help_btn {
@@ -57,7 +90,8 @@ button, input, select {
     height: 2em;
     font-weight: bold;
     border-radius: 50%;
-    border: 1px solid black
+    border: 1px solid black;
+    box-shadow: 1px 1px 2px;
 }
 
 input {
@@ -65,10 +99,6 @@ input {
 }
 .rubriko {
     text-align: right;
-}
-
-textarea {
-    margin: 3px 1px 0px 1px;
 }
 
 .piedlinio {color: #104040; text-align: center}

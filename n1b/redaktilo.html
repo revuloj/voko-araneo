@@ -19,50 +19,43 @@
 
 <form name="f" id="f">
 
-prilabori:
- <button
-   onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
- <button
-   onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
- <label>
-  <input type="checkbox" name="cx" value="1" accesskey="x" 
-    onclick="document.f.xmlTxt.focus()" />anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux
- </label>
-<div id="ajxb">
-  navigadi:
-  <br />
-  <button
-    onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">&#x2303;drv</button>
-  <br />
-  <button
-    onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">&#x2304;drv</button>
-</div>
+<div id="rteksto">
+  <div id="ajxb">
+    <button
+      onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
+    <br />
+    <button
+      onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
+  </div>
+  <div id="rvteksto">
+    <div id="rv_btn">
+      <button
+        onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button><button
+        onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
+      <label>
+        <input type="checkbox" name="cx" value="1" accesskey="x" 
+          onclick="document.f.xmlTxt.focus()" />anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux
+      </label>
+    </div>
+    <div id="rv_area">
+      <input type="hidden" name="art" value="pilk"  />
+      <input type="hidden" name="mrk" value=""  />
+      <textarea name="xmlTxt"  rows="25" cols="80" onkeypress="return klavo(event)" id="xmlTxt"><?xml version="1.0"?>      
+      <!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
 
-<input type="hidden" name="art" value="pilk"  />
-<input type="hidden" name="mrk" value=""  />&nbsp;
-<textarea name="xmlTxt"  rows="25" cols="80" onkeypress="return klavo(event)" id="xmlTxt"><?xml version="1.0"?>
-<!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
+      <vortaro>
+      <art mrk="$Id: pilk.xml,v 1.33 2017/01/10 15:10:14 revo Exp $">
+      <kap>
+        <ofc>*</ofc>
+        <rad>pilk</rad>/o <fnt><bib>PV</bib></fnt>
+      </kap>
+      ...
 
-<vortaro>
-<art mrk="$Id: pilk.xml,v 1.33 2017/01/10 15:10:14 revo Exp $">
-<kap>
-  <ofc>*</ofc>
-  <rad>pilk</rad>/o <fnt><bib>PV</bib></fnt>
-</kap>
-...
-
-</vortaro>
-</textarea>
-
+      </vortaro>
+      </textarea>
+    </div>
 <!-- buton-grupoj por redaktado -->
-
-<div id="fs_toggle">
-  <a class="aktiva" id="rtrd" href="#rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
-  <a id="rref" href="#rref" onclick="fs_toggle('rref');">referencoj</a>
-  <a id="rind" href="#rind" onclick="fs_toggle('rind');">indikiloj</a>
-  <a id="rekz" href="#rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
-  <a id="rdif" href="#rdif" onclick="fs_toggle('rdif');">difinoj</a>
-</div>
+    <div id="rv_sets">
 
 <fieldset id="fs_rtrd">
   <button accesskey="t" 
@@ -304,6 +297,20 @@ prilabori:
   <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
   <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">&#x2991;&nbsp;&#x2992;</button>
 </fieldset>
+<div id="fs_toggle">
+  <a class="aktiva" id="rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
+  <a id="rref" onclick="fs_toggle('rref');">referencoj</a>
+  <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
+  <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
+  <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
+</div>
+
+</div>
+    </div>
+  </div>
+</div>
+
+<p>
   
 <fieldset>
   <legend>Redakto:</legend>
@@ -321,6 +328,7 @@ prilabori:
 </fieldset>
 
   <input type="hidden" name=".cgifields" value="cx"  />
+</p>  
 </form>
 
 <formname="n" id="n">
