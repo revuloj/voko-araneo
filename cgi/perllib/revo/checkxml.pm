@@ -100,4 +100,83 @@ sub xml_context {
     return ('', 0, 0);
 }
 
+sub check_art_mrk {
+    my ($dbh,$xml_dir,@refs) = @_;
+    my @ref_err;
+
+    my $sth = $dbh->prepare(
+        "SELECT count(*) FROM art WHERE art_amrk = ?");
+    my $sth2 = $dbh->prepare(
+        "SELECT drv_mrk FROM drv WHERE drv_mrk = ? ".
+        "UNION SELECT snc_mrk FROM snc WHERE snc_mrk = ? ".
+        "UNION SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
+    
+    for my ($art,$pkt,$rest) (@refs) {
+        my $mrk = "$art$pkt$rest";
+
+        # ĉu la referencita artikolo ekzistas
+        $sth->execute($art);
+        my ($art_ekzistas) = $sth->fetchrow_array();
+
+        if (!$art_ekzistas) {
+            #      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
+            push @ref_err, "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.\n";
+            #      $ne_konservu = 7;
+
+        # ĉu la markoj ne la celata artikolo ekzistas
+        } elsif ($pkt) {
+
+            $sth2->execute($mrk, $mrk, $mrk);
+            my ($mrk_ekzistas) = $sth2->fetchrow_array();
+
+            # se la marko ne celas konatan drv, snc, rim
+            # eble ĝi referencas subsnc - ni ne havas en la datumbazo,
+            # do ni devas malfermi la XML por rigardi...
+            # FARENDA: estonte ni havu ĉiujn ref-cel/mrk en la datumbazo
+            # por eviti malfermi nombron da XML-dosieroj sur la servilo!
+            if (! $mrk_ekzistas) {
+                #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
+                # eble temas pri marko de subsenco?
+                open IN, "<", "$xml_dir";
+                my $celxml = join '', <IN>;
+                close IN;
+
+                if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
+                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \""
+                    .a({href=>"?art=$art"}, "$art.xml")."\".\n";
+        #          $ne_konservu = 8;
+                }
+            }
+        }
+    }
+    $sth->finish;
+    $sth2->finish;
+}
+
+check_redaktanto {
+    my ($dbh,$redaktanto) = @_;
+
+    if ($redaktanto) {
+        # cxu iu redaktanto havas tiun retadreson? Kiu?
+        my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+        $sth->execute($redaktanto);
+        my ($permeso, $red_id) = $sth->fetchrow_array();
+        $sth->finish;
+
+        # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
+        # Kiel nomigxas la redaktanto?
+        my $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+        $sth->execute($red_id);
+        my ($red_nomo) = $sth->fetchrow_array();
+        #  print "red_nomo=$red_nomo\n";
+        $sth->finish;
+
+        return ($permeso, $red_nomo);
+    }
+
+    return 0;
+}
+
+
+
 1;

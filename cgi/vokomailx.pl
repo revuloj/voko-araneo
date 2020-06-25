@@ -36,12 +36,7 @@ my $debug = 0;
 my $homedir    = "/var/www/web277";
 my $htmldir    = "$homedir/html";
 my $revo_base  = "$homedir/html/revo";
-my $xml_dir    =  "$revo_bazo/xml";
-
-# FARENDA: pli bone kontrolu tion per JS en la retumilo!
-my $lng_xml    = "$revo_base/cfg/lingvoj.xml";
-my $fak_xml    = "$revo_base/cfg/fakoj.xml";
-my $stl_xml    = "$revo_base/cfg/stiloj.xml";
+my $xml_dir    =  "$revo_base/xml";
 
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
@@ -138,10 +133,6 @@ my $dbh = revodb::connect();
 print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
 if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
 
-print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Anta&#365;rigardo</b></span></p>
-EOD
 #  if ($debug) {
 #    print pre('open xalan');
 #    autoEscape(1);
@@ -158,12 +149,6 @@ EOD
 	print HTML $html;
     close HTML;
   }
-
-  $html =~ s#href="../stl/#href="/revo/stl/#smg;
-  $html =~ s#src="../smb/#src="/revo/smb/#smg;
-  $html =~ s#src="../bld/#src="/revo/bld/#smg;
-  $html =~ s#<span class="redakto">.*$##sm;
-  $html =~ s#href="(?!http://)([a-z])#href="/revo/art/\1#smg;
 
   print $html;
 #  print pre('close xalan') if $debug;
@@ -206,34 +191,27 @@ EOD
     }
   }
 
-  my $sth = $dbh->prepare("SELECT count(*) FROM art WHERE art_amrk = ?");
-  my $sth2 = $dbh->prepare("SELECT drv_mrk FROM drv WHERE drv_mrk = ? union SELECT snc_mrk FROM snc WHERE snc_mrk = ? union SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
-  while ($xml2 =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
-    my ($art, $mrk) = ($1, "$1$2$3");
-    $sth->execute($art);
-    my ($art_ekzistas) = $sth->fetchrow_array();
-    if (!$art_ekzistas) {
-#      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
-      print "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.<br>\n";
-#      $ne_konservu = 7;
-    } elsif ($2) {
-      $sth2->execute($mrk, $mrk, $mrk);
-      my ($mrk_ekzistas) = $sth2->fetchrow_array();
-      if (!$mrk_ekzistas) {
-#        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
-        # eble temas pri marko de subsenco?
-        open IN, "<", "$homedir/html/revo/xml/$art.xml";
-        my $celxml = join '', <IN>;
-        close IN;
-        if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
-          print "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \"".a({href=>"?art=$art"}, "$art.xml")."\".<br>\n";
-#          $ne_konservu = 8;
-        }
-      }
-    }
-  }
-  $sth->finish;
+  # FARENDA:
+  # la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
+  # en la datumbazo...
+  #
+  # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
 
+  my @refs;
+  my @ref_err;
+  while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
+    my ($art,$p,$rest) = ($1,$2,$3);
+    push ($art,$p,$rest), @refs;
+  }
+
+  if (@refs) {
+    @ref_err = check_ref_cel($dbh,$xml_dir,@refs); 
+  }
+
+ 
+  # FARENDA: fakte kun la transiro al Git ni povas toleri
+  # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
+  # kontroli processmail.pl antaŭ forigi tie ĉi
   my $flag = 0;
   $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
   $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
@@ -250,12 +228,15 @@ EOD
   if ($flag) {
     print "Esperantaj signoj en ŝanĝoteksto malunikoditaj.<br>\n";
   }
+
   if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
     print "Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo".br."\n";
     $ne_konservu = 3;
+
   } elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
     print "Eraro: '--' estas malpermesita en komento: $sxangxo".br."\n";
     $ne_konservu = 3;
+
   } elsif (!param('nova')) {
     if ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
       print "Ŝanĝoteksto en ordo: $sxangxo".br."\n";
@@ -264,23 +245,11 @@ EOD
       $ne_konservu = 4;
     }
   }
-print <<'EOD';
-</div><br>
-EOD
 }
 
-if ($redaktanto) {
-  # cxu iu redaktanto havas tiun retadreson? Kiu?
-  my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-  $sth->execute($redaktanto);
-  my ($permeso, $red_id) = $sth->fetchrow_array();
-  $sth->finish;
-  # Kiel nomigxas la redaktanto?
-  my $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-  $sth->execute($red_id);
-  my ($red_nomo) = $sth->fetchrow_array();
-#  print "red_nomo=$red_nomo\n";
-  $sth->finish;
+
+# ĉu la redaktanto, se donita estas registrita?
+check_redaktanto($dbh,$redaktanto);...
 
   if (!$permeso) {
     $ne_konservu = 2;

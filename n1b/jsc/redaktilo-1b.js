@@ -463,8 +463,8 @@ function rantaurigardo() {
   //...
 }
 
-function rknservo() {
-  alert("kons");
+function rkonservo() {
+  alert("konservo");
 }
 
 function create_new_art() {
