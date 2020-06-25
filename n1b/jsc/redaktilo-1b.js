@@ -239,19 +239,22 @@ function insertTags(tagOpen, tagClose, sampleText) {
      var txtarea = get_ta();
      var selText, isSample=false;
    
-     if (document.selection  && document.selection.createRange) { // IE/Opera
+     if (document.selection && document.selection.createRange) { // IE/Opera
        //save window scroll position
        if (document.documentElement && document.documentElement.scrollTop)
          var winScroll = document.documentElement.scrollTop
        else if (document.body)
          var winScroll = document.body.scrollTop;
+
        //get current selection  
        txtarea.focus();
        var range = document.selection.createRange();
        selText = range.text;
+
        //insert tags
        checkSelectedText();
        range.text = tagOpen + selText + tagClose;
+
        //mark sample text as selected
        if (isSample && range.moveStart) {
          if (window.opera)
@@ -260,11 +263,12 @@ function insertTags(tagOpen, tagClose, sampleText) {
        range.moveEnd('character', - tagClose.length); 
          }
          range.select();   
-         //restore window scroll position
-         if (document.documentElement && document.documentElement.scrollTop)
-       document.documentElement.scrollTop = winScroll
-         else if (document.body)
-       document.body.scrollTop = winScroll;
+
+       //restore window scroll position
+      if (document.documentElement && document.documentElement.scrollTop)
+          document.documentElement.scrollTop = winScroll
+      else if (document.body)
+        document.body.scrollTop = winScroll;
    
      } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
    
@@ -272,14 +276,17 @@ function insertTags(tagOpen, tagClose, sampleText) {
        var textScroll = txtarea.scrollTop;
        //get current selection
        txtarea.focus();
+
        var startPos = txtarea.selectionStart;
        var endPos = txtarea.selectionEnd;
        selText = txtarea.value.substring(startPos, endPos);
+
        //insert tags
        checkSelectedText();
        txtarea.value = txtarea.value.substring(0, startPos)
                + tagOpen + selText + tagClose
                + txtarea.value.substring(endPos, txtarea.value.length);
+
        //set new selection
        if (isSample) {
          txtarea.selectionStart = startPos + tagOpen.length;
@@ -288,6 +295,7 @@ function insertTags(tagOpen, tagClose, sampleText) {
          txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
          txtarea.selectionEnd = txtarea.selectionStart;
        }
+
        //restore textarea scroll position
        txtarea.scrollTop = textScroll;
 } 
@@ -308,7 +316,7 @@ function lines(str){try {return((str.match(/[^\n]*\n[^\n]*/gi).length));} catch(
 function nextTag(tag, dir) {
      var txtarea = get_ta();
      if (document.selection  && document.selection.createRange) { // IE/Opera
-       alert("tio ankoraux ne funkcias.");
+       alert("tio ankoraŭ ne funkcias.");
      } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
        var startPos = txtarea.selectionStart;
        var t;
@@ -375,7 +383,32 @@ function fs_toggle(id) {
   }
 }
 
-function kontrolu_lng(list,regex) {
+function listigu_erarojn(err) {
+  var el = document.getElementById("reraroj");
+  var elch = el.children;
+  var ul;
+  if (! elch.length) {
+    ul = document.createElement("ul");                
+    el.appendChild(ul);
+  } else {
+    ul = elch[0];
+  };
+  for (e of err) {
+    var li = document.createElement("li");           
+    var text = document.createTextNode(e);       
+    li.appendChild(text);                        
+    ul.appendChild(li);       
+  }
+}
+
+function forigu_erarojn() {
+  var el = document.getElementById("reraroj");
+  for (ch of el.children) {
+    el.removeChild(ch);
+  }
+}
+
+function kontrolu_kodojn(list,regex) {
   var xml = document.getElementById("rxmltxt").value;
   var m; var invalid = [];
   
@@ -388,10 +421,22 @@ function kontrolu_lng(list,regex) {
   return invalid;
 }
 
+function add_err_msg(msg, matches) {
+  var errors = [];
+
+  for (m of matches) {
+    var m = msg+m[1];
+    errors.push(m)
+  }
+  if (errors.length)
+    listigu_erarojn(errors);
+}
+
 function rantaurigardo() {
-  var invalid = kontrolu_kodojn(c_lingvoj,re_lng);
-  invalid = kontrolu_kodojn(c_fakoj,re_fak);
-  invalid = kontrolu_kodojn(c_stiloj,re_stl);
+  forigu_erarojn();
+  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn(c_lingvoj,re_lng));
+  add_err_msg("Nekonata fako: ",kontrolu_kodojn(c_fakoj,re_fak));
+  add_err_msg("Nekonata stilo: ",kontrolu_kodojn(c_stiloj,re_stl));
  // kontrolu_fak();
   //kontrolu_stl();
   //...
