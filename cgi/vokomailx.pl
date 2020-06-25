@@ -30,11 +30,18 @@ use revodb;
 
 $| = 1;
 
+my $debug = 0;
+
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
 my $homedir    = "/var/www/web277";
 my $htmldir    = "$homedir/html";
 my $revo_base  = "$homedir/html/revo";
 my $xml_dir    =  "$revo_bazo/xml";
+
+# FARENDA: pli bone kontrolu tion per JS en la retumilo!
+my $lng_xml    = "$revo_base/cfg/lingvoj.xml";
+my $fak_xml    = "$revo_base/cfg/fakoj.xml";
+my $stl_xml    = "$revo_base/cfg/stiloj.xml";
 
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
@@ -42,58 +49,46 @@ $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
 
 my $enc = "utf-8";
-
 my $debugmsg;
+
+## parametroj...
 my $art = param('art');
+my $xmlTxt = param('xmlTxt');
+my $redaktanto = param('redaktanto');
+my $mrk = param('mrk');
+my $sxangxo = Encode::decode($enc, param('sxangxo'));
+$debugmsg .= "sxangxo=$sxangxo" if $debug;
+
 #$debugmsg .= "art = $art\n";
 my $xml;
-my $xmlTxt = param('xmlTxt');
+
 if ($xmlTxt) {
+  # normigu kodigon
   $xmlTxt = Encode::decode($enc, $xmlTxt);
   $xmlTxt =~ s/\r\n/\n/g;
-  $debugmsg .= "vor wrap -> $xmlTxt\n <- end wrap\n";
+  $debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
+
+  # trovu la identigilon de la artikolo
   my $id;
   if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
     $debugmsg .= "ID: $1-\n";
     $id = $1;
   }
+
+  # rompu tro longajn liniojn
   $xmlTxt = revo::wrap::wrap($xmlTxt);
   $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
 #  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
 }
-my $xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
-#$xml2 = Encode::decode($enc, $xml2);
-my $redaktanto = param('redaktanto');
-my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
 
-#$debugmsg .= "xmlTxt = $xmlTxt\n";
+# kodigu ne-askiajn signojn per literunuoj...
+$xml = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 
-if ($xml2) {
-  $xml = $xmlTxt;
-#  $debugmsg .= "1 xml=\n$xml" if $debug;
-} elsif (param('button') eq 'kreu') {
-  $xml = <<"EOD";
-
-EOD
-  $xml2 = revo::encode::encode2($xml, 20);
-} elsif ($art) {
-  open IN, "<", "$homedir/html/revo/xml/$art.xml" or die "open";
-  $xml = join '', <IN>;
-  close IN;
-
-  $xml = revo::decode::rvdecode($xml);
-  $xml = Encode::decode($enc, $xml);
-}
-
-my $sxangxo = Encode::decode($enc, param('sxangxo'));
-$debugmsg .= "sxangxo=$sxangxo" if $debug;
-
-my $mrk = param('mrk');
+## kontrolu, ĉu la XML havas ĝustan sintakson
 my ($pos, $line, $lastline) = (0, 0, 1);
 my ($prelines, $postlines);
-
 my ($checklng, $checkxml, $errline, $errchar);
-($checkxml, $errline, $errchar) = checkxml($xml2,$xml_dir) if $xml2;
+($checkxml, $errline, $errchar) = revo::checkxml::scheckxml($xml,$xml_dir) if $xml2;
 #$debugmsg .= "errline = $errline\n";
 
 my $ne_konservu;
@@ -118,54 +113,10 @@ if ($errline) {
     my @pre = Text::Tabs::expand(@prelines);
     $pos = length(join "\n", @pre);
   }
+
 } else {
-  my %lng;
-  open IN, "<$revo_base/cfg/lingvoj.xml" or die "ne povas malfermi lingvoj.xml";
-  while (<IN>) {
-    if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
-#      $debugmsg .= "lng $1 -> $2\n";
-      $lng{$1} = 1;
-    }
-  }
-  close IN;
-
-  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)">/smg) {
-    if (!exists($lng{$2})) {
-      $checklng = "Nekonata lingvo $2.";
-      $ne_konservu = 10;
-#      $debugmsg .= "lng = $2\n";
-      my @prelines = split "\n", "$`$1$2";
-      $postlines = split "\n", $';
-
-      my @pre = Text::Tabs::expand(@prelines);
-      $pos = length(join "\n", @pre);
-      $prelines = $#prelines;
-      $line = $prelines - 20;
-      $lastline = $prelines + $postlines + 20 - 25;
-      last;
-    }
-  }
-
-  if (!$pos and $xml =~ m/<(snc|drv)( mrk="$mrk".*?)(\n?\s*<\/\1>)/smg) {
-    my @prelines = split "\n", "$`$1$2";
-    $postlines = split "\n", "$3$'";
-
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
-    $prelines = $#prelines;
-#    $debugmsg .= "prelines = $prelines\n";
-
-    $pos++;
-    $line = $prelines - 20;
-    $lastline = $prelines + $postlines + 20 - 25;
-  }
-
+  ($checklng, $errline, $errchar) = revo::checkxml::checklng($xml,$lng_xml) if $xml;
 }
-$line = 0 if $line < 0;
-$line = $lastline if $line > $lastline;
-$lastline = 1 unless $lastline;
-#$debugmsg .= "line = $line\n";
-
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
@@ -178,49 +129,6 @@ print header(-charset=>'utf-8',
 			           ]
 );
 
-if ($art) {
-  print h1("Redakti ".a({href=>"/revo/art/$art.html"}, $art));
-}
-
-if ($debug and $debugmsg) {
-  autoEscape(1);
-#  $debugmsg .= "4 xml=\n$xml";
-  print pre(escapeHTML($debugmsg));
-  autoEscape(0);
-}
-
-print <<'EOD' if 0;
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Provversio</b></span></p>
-<p>Momente tiu pa&#x011D;o estas nur por elprovi</p>
-<p><i>Viaj &#349;an&#x011D;oj momente estas sendataj al vi kaj al la a&#x016d;toro (sendepende de la subaj butonoj) !</i></p>
-</div><br>
-EOD
-
-my (%fak, %stl);
-if ($art) {
-  %fak = ('' => '');
-  open IN, "<$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
-  while (<IN>) {
-    if (/<fako kodo="([^"]+)"[^>]*>([^<]+)<\/fako>/i) {
-#      $debugmsg .= "fak $1 -> $2\n";
-#      print "fak $1 $2<br>\n";
-      $fak{$1} = Encode::decode($enc, "$1-$2");
-    }
-  }
-  close IN;
-
-  %stl = ('' => '');
-  open IN, "<$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
-  while (<IN>) {
-    if (/<stilo kodo="([^"]+)"[^>]*>([^<]+)<\/stilo>/i) {
-#      $debugmsg .= "stl $1 -> $2\n";
-#      print "stl $1 $2<br>\n";
-      $stl{$1} = Encode::decode($enc, "$1-$2");
-    }
-  }
-  close IN;
-}
 
 # Connect to the database.
 my $dbh = revodb::connect();
@@ -326,21 +234,10 @@ EOD
   }
   $sth->finish;
 
-  while ($xml2 =~ /<uzo tip="fak">(.*?)<\/uzo>/gi) {
-    my $fako = $1;
-    if (! exists($fak{$fako})) {
-      print "Fako $fako estas nekonata.<br>\n";
-      $ne_konservu = 6;
-    }
-  }
-
-  while ($xml2 =~ /<(drv|snc) mrk="(.*?)">/gi) {
-    my $mrk = $2;
-    if ($mrk !~ /^$art\.[^.0]*0/) {
-      print "La marko \"$mrk\" ne komenciĝas per \"$art.\" a&#365; poste ne havas 0.<br>\n";
-      $ne_konservu = 5;
-    }
-  }
+  # FARENDA: pli bone faru rekte en JS!
+  checkfak($xml,$fak_xml);
+  checkstl($xml,$stl_xml);
+  checkmrk($xml);
 
   my $flag = 0;
   $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
