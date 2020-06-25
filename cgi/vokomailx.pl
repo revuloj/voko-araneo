@@ -234,11 +234,6 @@ EOD
   }
   $sth->finish;
 
-  # FARENDA: pli bone faru rekte en JS!
-  checkfak($xml,$fak_xml);
-  checkstl($xml,$stl_xml);
-  checkmrk($xml);
-
   my $flag = 0;
   $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
   $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;

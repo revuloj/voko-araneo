@@ -1,6 +1,8 @@
 var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"(.*?)"\s*>/g; 
 var re_fak = /<uzo\s+tip\s*=\s*"fak"\s*>(.*?)</g; 
 var re_stl = /<uzo\s+tip\s*=\s*"stl"\s*>(.*?)</g; 
+var re_mrk = /<(drv|snc) mrk="(.*?)">/g;
+
 
 function str_repeat(rStr, rNum) {
     var nStr="";
@@ -408,6 +410,17 @@ function forigu_erarojn() {
   }
 }
 
+function add_err_msg(msg, matches) {
+  var errors = [];
+
+  for (m of matches) {
+    var m = msg+m[1];
+    errors.push(m)
+  }
+  if (errors.length)
+    listigu_erarojn(errors);
+}
+
 function kontrolu_kodojn(list,regex) {
   var xml = document.getElementById("rxmltxt").value;
   var m; var invalid = [];
@@ -421,19 +434,27 @@ function kontrolu_kodojn(list,regex) {
   return invalid;
 }
 
-function add_err_msg(msg, matches) {
+function kontrolu_mrk(art) {
+  var xml = document.getElementById("rxmltxt").value;
+  var m; 
   var errors = [];
-
-  for (m of matches) {
-    var m = msg+m[1];
-    errors.push(m)
+  
+  while (m = re_mrk.exec(xml)) {
+    var el = m[1];
+    var mrk = m[2];
+    if ( mrk.indexOf(art+'.') != 0 ) {
+      errors.push("La marko \"" + mrk + "\" (" + el + ") ne komenciĝas je la dosieronomo (" + art + ".).")
+    } else if ( mrk.indexOf('0',art.length) < 0 ) {
+      errors.push("La marko \"" + mrk + "\" (" + el + ") ne enhavas \"0\" (por tildo).")
+    }
   }
   if (errors.length)
-    listigu_erarojn(errors);
+    listigu_erarojn(errors); 
 }
 
 function rantaurigardo() {
   forigu_erarojn();
+  kontrolu_mrk("test");
   add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn(c_lingvoj,re_lng));
   add_err_msg("Nekonata fako: ",kontrolu_kodojn(c_fakoj,re_fak));
   add_err_msg("Nekonata stilo: ",kontrolu_kodojn(c_stiloj,re_stl));
