@@ -3,7 +3,8 @@
 #
 # redaktu.pl
 # 
-# 2008-10-30 Wieland Pusch
+# 2008 Wieland Pusch
+# 2020 Wolfram Diestel
 #
 
 use strict;
@@ -30,9 +31,10 @@ use revodb;
 $| = 1;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
-my $homedir = "/var/www/web277";
+my $homedir    = "/var/www/web277";
 my $htmldir    = "$homedir/html";
-my $revo_base    = "$homedir/html/revo";
+my $revo_base  = "$homedir/html/revo";
+my $xml_dir    =  "$revo_bazo/xml";
 
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
@@ -40,20 +42,6 @@ $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
 
 my $enc = "utf-8";
-
-my @cookies;
-my $konsento = substr(cookie(-name=>'revo-konsento'),0,3) eq 'jes';
-
-# FARENDA: ni ne plu uzu kuketojn ĉe Ajax-bazita redaktado, sed sekurigu tion nur en la krozilo
-# de la uzanto.
-if ($konsento) {
-    push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto'), -path => '/cgi-bin/') if param('redaktanto');
-    push @cookies, cookie(-name=>'trdlng',     -value => param('trdlng'), -path => '/cgi-bin/')     if param('trdlng');
-    push @cookies, cookie(-name=>'klrtip',     -value => param('klrtip'), -path => '/cgi-bin/')     if param('klrtip');
-    push @cookies, cookie(-name=>'reftip',     -value => param('reftip'), -path => '/cgi-bin/')     if param('reftip');
-    push @cookies, cookie(-name=>'sxangxo',    -value => param('sxangxo'), -path => '/cgi-bin/')    if param('sxangxo');
-    push @cookies, cookie(-name=>'cx',         -value => param('cx') || 0 , -path => '/cgi-bin/');
-}
 
 my $debugmsg;
 my $art = param('art');
@@ -75,7 +63,7 @@ if ($xmlTxt) {
 }
 my $xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 #$xml2 = Encode::decode($enc, $xml2);
-my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
+my $redaktanto = param('redaktanto');
 my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
 
 #$debugmsg .= "xmlTxt = $xmlTxt\n";
@@ -105,7 +93,7 @@ my ($pos, $line, $lastline) = (0, 0, 1);
 my ($prelines, $postlines);
 
 my ($checklng, $checkxml, $errline, $errchar);
-($checkxml, $errline, $errchar) = checkxml($xml2) if $xml2;
+($checkxml, $errline, $errchar) = checkxml($xml2,$xml_dir) if $xml2;
 #$debugmsg .= "errline = $errline\n";
 
 my $ne_konservu;
@@ -181,8 +169,7 @@ $lastline = 1 unless $lastline;
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
-             -pragma => 'no-cache', '-cache-control' =>  'no-cache',
-             -cookie=>\@cookies),
+             -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
       start_html(-title=>"redakti $art",
                  -lang=>'eo', #'de',
 		             -encoding => 'UTF-8',

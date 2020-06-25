@@ -332,8 +332,27 @@ function nextTag(tag, dir) {
      }
 }
 
+// aliras helpo-paĝon
 function helpo_pagho(url) {
   window.open('https://revuloj.github.io/temoj/'+url);
+}
+
+// memoras valorojn de kelkaj kampoj en la loka memoro de la retumilo
+function store_preferences() {
+  var prefs = {};
+  for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
+    prefs[key] = $("#"+key).val();
+  }
+  window.localStorage.setItem("redaktilo_preferoj",JSON.stringify(prefs));  
+}
+
+// reprenas memorigitajn valorojn de kelkaj kampoj el la loka memoro de la retumilo
+function restore_preferences() {
+  var str = window.localStorage.getItem("redaktilo_preferoj");
+  var prefs = (str? JSON.parse(str) : null);
+  for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
+    $("#"+key).val(prefs[key]);
+  }
 }
 
 function fs_toggle(id) {
@@ -397,9 +416,13 @@ function sf(pos, line, lastline) {
        txtarea.scrollTop = scrollTop;
      }
    
-     checkCookieConsent();
+    // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
+    //checkCookieConsent();
+    restore_preferences();
 }
-   
+
+/*     // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
+
 function checkCookieConsent() {
        var cookies = document.cookie;
        var found = cookies.indexOf('revo-konsento=jes');
@@ -416,3 +439,4 @@ function setCookieConsent() {
        document.cookie = 'revo-konsento=jes+' + CookieDate.toISOString() + '; expires=' + ExpireDate.toUTCString() + '; path=/;';
        document.getElementById('kuketoaverto').style.display = 'none'; 
 }    
+*/
