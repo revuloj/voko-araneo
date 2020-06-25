@@ -350,6 +350,35 @@ function fs_toggle(id) {
     document.getElementById(fs_id).classList.remove('collapsed');
   }
 }
+
+function create_new_art() {
+  var art = document.getElementById("rart").val;
+  var ta = document.getElementById("rxmltxt");
+  ta.value = 
+      '<?xml version="1.0"?>\n'
+    + '<!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">\n'
+    + '<vortaro>\n'
+    + '<art mrk="\$Id\$">\n'
+    + '<kap>\n'
+    + '    <rad>' + art + '</rad>/o <fnt><bib>PIV1</bib></fnt>\n'
+    + '</kap>\n'
+    + '<drv mrk="' + art + '.0o">\n'
+    + '  <kap><tld/>o</kap>\n'
+    + '  <snc mrk="' + art + '.0o.SNC">\n'
+    + '    <uzo tip="fak"></uzo>\n'
+    + '    <dif>\n'
+    + '      <tld/>o estas:\n'
+    + '      <ekz>\n'
+    + '        ...\n'
+    + '        <fnt><bib></bib>, <lok></lok></fnt>\n'
+    + '      </ekz>\n'
+    + '    </dif>\n'
+    + '  </snc>\n'
+    + '  <trd lng=""></trd>\n'
+    + '</drv>\n'
+    + '</art>\n'
+    + '</vortaro>\n';
+}
    
 function sf(pos, line, lastline) {
      document.f.xmlTxt.focus();

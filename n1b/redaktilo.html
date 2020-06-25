@@ -44,18 +44,8 @@
     <div id="rv_area">
       <input type="hidden" name="art" value="pilk"  />
       <input type="hidden" name="mrk" value=""  />
-      <textarea id="rxmltxt" name="xmlTxt" rows="25" cols="80" onkeypress="return klavo(event)" id="xmlTxt"><?xml version="1.0"?>      
-      <!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
-
-      <vortaro>
-      <art mrk="$Id: pilk.xml,v 1.33 2017/01/10 15:10:14 revo Exp $">
-      <kap>
-        <ofc>*</ofc>
-        <rad>pilk</rad>/o <fnt><bib>PV</bib></fnt>
-      </kap>
-      ...
-
-      </vortaro>
+      <textarea id="rxmltxt" name="xmlTxt" rows="25" cols="80" 
+        onkeypress="return klavo(event)" id="xmlTxt">    
       </textarea>
     </div>
 <!-- buton-grupoj por redaktado -->
@@ -359,8 +349,8 @@
 <fieldset>
   <legend>Aldono:</legend>
   <label for="art">Kreu novan artikolon:</label><br/>
-  <input type="text" name="art" value="pilk" size="20" maxlength="20" />
-  <input type="submit" name="button" value="kreu" />
+  <input type="text" id="rart" name="art" value="pilk" size="20" maxlength="20" />
+  <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
 </fieldset>  
 
 </form>
