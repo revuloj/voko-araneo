@@ -10,7 +10,6 @@
   <link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
   <link rel="stylesheet" href="stl/redaktilo-1b.css">
 
-  <script src="jsc/redaktilo-1b.js"></script>
 
   <script
   src="https://code.jquery.com/jquery-3.5.1.min.js"
@@ -18,6 +17,7 @@
         crossorigin="anonymous"></script>
 
   <script src="jsc/redaktilo-jq-1b.js"></script>
+  <script src="jsc/redaktilo-1b.js"></script>
 
 </head>
 <body onload="sf(0, 0, 1)">
@@ -343,8 +343,8 @@
   <input type="text" name="redaktanto" size="70" maxlength="80" placeholder="Via registrita retadreso" />
   </p>  
   <p>
-  <input type="submit" name="button" value="antaŭrigardu" />
-  <input type="submit" name="button" value="konservu" />
+  <input id="rrigardo" type="button" name="antaurigardo" value="antaŭrigardu" onclick="rantaurigardo();"/>
+  <input id="rkonservu" type="button" name="konservu" value="konservu" onclick="rkonservo();" />
   </p>
 </fieldset>
 

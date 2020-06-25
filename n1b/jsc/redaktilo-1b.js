@@ -1,4 +1,6 @@
-
+var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"(.*?)"\s*>/g; 
+var re_fak = /<uzo\s+tip\s*=\s*"fak"\s*>(.*?)</g; 
+var re_stl = /<uzo\s+tip\s*=\s*"stl"\s*>(.*?)</g; 
 
 function str_repeat(rStr, rNum) {
     var nStr="";
@@ -373,6 +375,32 @@ function fs_toggle(id) {
   }
 }
 
+function kontrolu_lng(list,regex) {
+  var xml = document.getElementById("rxmltxt").value;
+  var m; var invalid = [];
+  
+  while (m = regex.exec(xml)) {
+    if ( list.indexOf(m[1])<0 ) {
+      invalid.push(m);
+      console.error("Nevalida kodo \""+m[1]+"\" ĉe: "+m.index);
+    }
+  }
+  return invalid;
+}
+
+function rantaurigardo() {
+  var invalid = kontrolu_kodojn(c_lingvoj,re_lng);
+  invalid = kontrolu_kodojn(c_fakoj,re_fak);
+  invalid = kontrolu_kodojn(c_stiloj,re_stl);
+ // kontrolu_fak();
+  //kontrolu_stl();
+  //...
+}
+
+function rknservo() {
+  alert("kons");
+}
+
 function create_new_art() {
   var art = document.getElementById("rart").val;
   var ta = document.getElementById("rxmltxt");
@@ -422,6 +450,7 @@ function sf(pos, line, lastline) {
     // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
     //checkCookieConsent();
     restore_preferences();
+    //test: antaurigardo();
 }
 
 /*     // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
