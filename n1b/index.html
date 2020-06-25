@@ -77,12 +77,46 @@
                         window.open(href);
                     } else if (trg == "indekso") {
                         if (href.startsWith('../')) href = '/revo/' + href.substr(3);
-                        $('#navigado').load(href+' table');                        
+                        $('#navigado').load(href+' table');  
+                    } else if (href.startsWith('/cgi-bin/vokomail')) {
+                        var art = href.substring(href.search('art=')+4);
+                        $('#s_artikolo').load('/redaktilo.html',
+                            function() { load_xml(art) });
                     } else {                        
                         if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/art/'+href;
                         $('#s_artikolo').load(href); //+' body>*');
                     }
                 }
+            }
+
+            function load_xml(art) {
+                $("body").css("cursor", "progress");
+                $.ajaxSetup({
+                    converters: {
+                        "* text": window.String, 
+                        "text html": true, 
+                        "text json": jQuery.parseJSON, 
+                        //"text xml": jQuery.parseXML
+                        "text xml": window.String
+                    }
+                });
+                $.get('/revo/xml/'+art+'.xml','text')
+                    .done(function(data) {
+                            $("#rxmltxt").val(data);
+                    })
+                    .fail (function(xhr, textStatus, errorThrown) {
+                        console.error(xhr.status + " " + xhr.statusText);                
+                        if (xhr.status == 404) {
+                            var msg = "Pardonu, la dosiero ne troviĝis sur la servilo: ";
+                            alert( msg );
+                        } else {
+                            var msg = "Pardonu, okazis netandita eraro: ";
+                            alert( msg + xhr.status + " " + xhr.statusText + xhr.responseText);
+                        }
+                    })
+                    .always(function() {
+                        $("body").css("cursor", "default");
+                    })
             }
 
             function href_external(href) {
