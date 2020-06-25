@@ -10,7 +10,7 @@ sub wrap {
 
   my $separator = "\n";
   my $separator2 = undef;
-  my $columns = 72;  # <= screen width
+  my $columns = 100;  # <= lini-longeco...
 
   my $ll = $columns;
   my $lead = "";
@@ -32,7 +32,7 @@ sub wrap {
       $remainder = $2;
 #      print "2lead=$lead. $1\nremainder=$2.\n";
     } else {
-      die "This shouldn't happen";
+      die "Ho, tio ne devis okazi!";
     }
     $nl = $separator;
   }
