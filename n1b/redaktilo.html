@@ -3,7 +3,7 @@
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="eo" xml:lang="eo">
 <head>
-  <title>Redakti artikolon ("pilk")</title>
+  <title>Redakti artikolon ("XXXX")</title>
   <meta http-equiv="Cache-Control" content="no-cache">
   <meta charset="utf-8">
   
@@ -15,7 +15,7 @@
 </head>
 <body onload="sf(0, 0, 1)">
 
-<h1>Redakti <a href="/revo/art/pilk.html">pilk</a></h1>
+<h1>Redakti <a href="/revo/art/XXX.html">XXXX</a></h1>
 
 <p class="rhelpo">
   ► <a target="_new" href="https://revuloj.github.io/respondoj.html">Informoj por redaktantoj.</a>
@@ -42,7 +42,7 @@
       </label>
     </div>
     <div id="rv_area">
-      <input type="hidden" name="art" value="pilk"  />
+      <input type="hidden" name="art" value="XXX"  />
       <input type="hidden" name="mrk" value=""  />
       <textarea id="rxmltxt" name="xmlTxt" rows="25" cols="80" 
         onkeypress="return klavo(event)" id="xmlTxt">    
@@ -297,11 +297,11 @@
   
 <fieldset id="fs_rdif" class="collapsed">
   <button
-    onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
+    onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
     title="Nova derivaĵo">drv</button>
 |
   <button
-    onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;pilk.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
+    onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
     title="Nova senco">snc</button>  
 |
   <button
@@ -330,10 +330,10 @@
   <legend>Redakto:</legend>
   <p>
   <label for="sxangxo">Ŝanĝo:</label><br/>
-  <input type="text" name="sxangxo" value="kor. ref-cel" size="70" maxlength="80" title="Klarigu la ŝanĝon ĉi tie." />
+  <input type="text" name="sxangxo" size="70" maxlength="255" placholder="Via ŝanĝo en la artikolo" />
   <br/>
   <label for="redaktanto">Retpoŝtadreso:</label><br/>
-  <input type="text" name="redaktanto" value="diestel@steloj.de" size="70" maxlength="80" title="Skribu vian registritan retadreson ĉi tie." />
+  <input type="text" name="redaktanto" size="70" maxlength="80" placeholder="Via registrita retadreso" />
   </p>  
   <p>
   <input type="submit" name="button" value="antaŭrigardu" />
@@ -349,7 +349,7 @@
 <fieldset>
   <legend>Aldono:</legend>
   <label for="art">Kreu novan artikolon:</label><br/>
-  <input type="text" id="rart" name="art" value="pilk" size="20" maxlength="20" />
+  <input type="text" id="rart" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
   <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
 </fieldset>  
 
