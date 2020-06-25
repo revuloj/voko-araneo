@@ -1,4 +1,5 @@
 
+
 function str_repeat(rStr, rNum) {
     var nStr="";
     for (var x=1;x<=rNum;x++) {nStr+=rStr;}
@@ -341,7 +342,7 @@ function helpo_pagho(url) {
 function store_preferences() {
   var prefs = {};
   for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
-    prefs[key] = $("#"+key).val();
+    prefs[key] = document.getElementById(key).value;
   }
   window.localStorage.setItem("redaktilo_preferoj",JSON.stringify(prefs));  
 }
@@ -350,8 +351,10 @@ function store_preferences() {
 function restore_preferences() {
   var str = window.localStorage.getItem("redaktilo_preferoj");
   var prefs = (str? JSON.parse(str) : null);
-  for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
-    $("#"+key).val(prefs[key]);
+  if (prefs) {
+    for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
+      document.getElementById(key).value = prefs[key];
+    }
   }
 }
 
