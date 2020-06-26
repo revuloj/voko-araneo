@@ -111,7 +111,8 @@ sub check_art_mrk {
         "UNION SELECT snc_mrk FROM snc WHERE snc_mrk = ? ".
         "UNION SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
     
-    for my ($art,$pkt,$rest) (@refs) {
+    for my $ref (@refs) {
+        my ($art,$pkt,$rest)= (@$ref);
         my $mrk = "$art$pkt$rest";
 
         # ĉu la referencita artikolo ekzistas
@@ -153,7 +154,7 @@ sub check_art_mrk {
     $sth2->finish;
 }
 
-check_redaktanto {
+sub check_redaktanto {
     my ($dbh,$redaktanto) = @_;
 
     if ($redaktanto) {
@@ -176,7 +177,5 @@ check_redaktanto {
 
     return 0;
 }
-
-
 
 1;
