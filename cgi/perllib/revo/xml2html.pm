@@ -14,7 +14,17 @@ package revo::xml2html;
 use CGI qw(:standard);  # por trovi erarojn (escapeHTML)
 use Encode;
 
+$debug = 0;
+
 ######################################################################
+
+# ni uzas novan "konvx" por vokomailx por ne detrui vokomail.pl, kiu plu uzas "konv"
+sub konvx {
+  my ($dbh, $xml, $html, $err, $xml_dir) = @_;
+  chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+  return konv($dbh, $xml, $html, $err, $debug);
+}
+
 sub konv {
   my ($dbh, $xml, $html, $err, $debug) = @_;
 
