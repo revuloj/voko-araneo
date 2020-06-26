@@ -79,50 +79,15 @@ if ($xmlTxt) {
 # kodigu ne-askiajn signojn per literunuoj...
 $xml = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 
-## kontrolu, ĉu la XML havas ĝustan sintakson
-my ($pos, $line, $lastline) = (0, 0, 1);
-my ($prelines, $postlines);
-my ($checklng, $checkxml, $errline, $errchar);
-($checkxml, $errline, $errchar) = revo::checkxml::scheckxml($xml,$xml_dir) if $xml2;
-#$debugmsg .= "errline = $errline\n";
-
-my $ne_konservu;
-
-if ($errline) {
-  $errline--;
-  $errchar--;
-  if ($xml =~ m/^([^\n]*\n){$errline}[^\n]{$errchar}/smg) {
-    my @prelines = split "\n", $&;
-    $postlines = split "\n", $';
-
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
-    $prelines = $#prelines;
-
-    $line = $prelines - 10;
-    $lastline = $prelines + $postlines + 30 - 25;
-  } else {
-#    $debugmsg .= "Ne trovis linio/pos $errline/$errchar\n";
-    $line = $lastline = 100;
-    my @prelines = split "\n", $xml;
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
-  }
-
-} else {
-  ($checklng, $errline, $errchar) = revo::checkxml::checklng($xml,$lng_xml) if $xml;
-}
-
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
-      start_html(-title=>"redakti $art",
-                 -lang=>'eo', #'de',
-		             -encoding => 'UTF-8',
-		             -head => [ 
-                   '<meta http-equiv="Cache-Control" content="no-cache">'
-			           ]
-);
+      start_html();
+
+## kontrolu, ĉu la XML havas ĝustan sintakson
+my $xmlerr = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+
+my $ne_konservu = ($err ne '');
 
 
 # Connect to the database.
@@ -142,7 +107,7 @@ if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') 
   chdir($revo_base."/xml") or die "chdir";
   
   my ($html, $err);
-  revo::xml2html::konv($dbh, \$xml2, \$html, \$err, $debug);
+  revo::xml2html::konv($dbh, \$xml, \$html, \$err, $debug);
 #  $html = Encode::decode($enc, $html);
   if ($html and $debug) {
     open HTML, ">:utf8", "../art2/$art.html" or die "open write html";
@@ -164,33 +129,6 @@ print <<'EOD';
 EOD
   print $checkxml.br."\n";
 
-  print $checklng.br.br."\n" if $checklng;
-
-  { my $x = $xml2;		# cxu cxio trd havas lng aux estas en trdgrp kun lng?
-    autoEscape(1);
-#    print pre(escapeHTML("x=$x\n"));
-    $x =~ s/<trdgrp\s+lng\s*=.*?<\/trdgrp>\s*//smig;	# forigo de bonaj trdgrpoj
-    $x =~ s/<trd\s+lng\s*=.*?<\/trd>\s*//smig;		    # forigo de bonaj trdoj
-#    print pre(escapeHTML("x=$x\n"));
-	if ($x =~ /(<trd.*?<\/trd>)/) {					# se restas trd, estas malbona
-	  print escapeHTML("Traduko $1")." ne havas lingvon.<br>\n";
-      $ne_konservu = 11;
-	}
-    autoEscape(0);
-  }
-  
-  while ($xml2 =~ /<ref([^g>][^>]*)>/gi) {
-    my $ref = $1;
-#    print "ref = $ref<br>\n" if $debug;
-    if ($ref !~ /cel\s*=\s*"([^"]+?)"/i) {
-      autoEscape(1);
-      print escapeHTML("Referenco <ref$ref>")." ne havas cel a&#365; la celo estas malplena.<br>\n";
-      autoEscape(0);
-#      print "ref = $ref<br>\n";
-#      $ne_konservu = 9;
-    }
-  }
-
   # FARENDA:
   # la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
   # en la datumbazo...
@@ -201,7 +139,7 @@ EOD
   my @ref_err;
   while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
     my ($art,$p,$rest) = ($1,$2,$3);
-    push ($art,$p,$rest), @refs;
+    push @refs, [$art,$p,$rest];
   }
 
   if (@refs) {
