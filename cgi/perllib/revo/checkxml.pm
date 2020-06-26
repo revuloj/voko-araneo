@@ -68,7 +68,6 @@ sub rxp_cmd {
     return $err;
 }
 
-
 sub check_art_mrk {
     my ($dbh,$xml_dir,@refs) = @_;
     my @ref_err;
@@ -121,30 +120,6 @@ sub check_art_mrk {
     }
     $sth->finish;
     $sth2->finish;
-}
-
-sub check_redaktanto {
-    my ($dbh,$redaktanto) = @_;
-
-    if ($redaktanto) {
-        # ĉu iu redaktanto havas tiun retadreson? Kiu?
-        my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-        $sth->execute($redaktanto);
-        my ($permeso, $red_id) = $sth->fetchrow_array();
-        $sth->finish;
-
-        # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
-        # Kiel nomigxas la redaktanto?
-        $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-        $sth->execute($red_id);
-        my ($red_nomo) = $sth->fetchrow_array();
-        #  print "red_nomo=$red_nomo\n";
-        $sth->finish;
-
-        return ($permeso, $red_nomo);
-    }
-
-    return 0;
 }
 
 1;
