@@ -38,6 +38,8 @@ my $htmldir    = "$homedir/html";
 my $revo_base  = "$homedir/html/revo";
 my $xml_dir    =  "$revo_base/xml";
 
+my $revuloj_url = "https://revuloj.github.io/respondoj.html";
+
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
@@ -54,87 +56,47 @@ my $mrk = param('mrk');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 $debugmsg .= "sxangxo=$sxangxo" if $debug;
 
-#$debugmsg .= "art = $art\n";
-my $xml;
-
-if ($xmlTxt) {
-  # normigu kodigon
-  $xmlTxt = Encode::decode($enc, $xmlTxt);
-  $xmlTxt =~ s/\r\n/\n/g;
-  $debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
-
-  # trovu la identigilon de la artikolo
-  my $id;
-  if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
-    $debugmsg .= "ID: $1-\n";
-    $id = $1;
-  }
-
-  # rompu tro longajn liniojn
-  $xmlTxt = revo::wrap::wrap($xmlTxt);
-  $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
-#  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
-}
-
-# kodigu ne-askiajn signojn per literunuoj...
-$xml = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
-
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
       start_html();
 
-## kontrolu, ĉu la XML havas ĝustan sintakson
-my $xmlerr = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
-
-my $ne_konservu = ($err ne '');
-
-
-# Connect to the database.
+# Konektiĝu al la datumbazo...
+# ni bezonos gin por kontroli redaktanton kaj referencojn
+# konv2 uzas la datumbazo por enŝovi tezaŭro-referencojn
 my $dbh = revodb::connect();
 
-#print pre('dbconnect'." size=".length($xml2)) if $debug;
+# ĉu la redaktanto, se donita estas registrita?
+my ($permeso,$red_nomo) = check_redaktanto($dbh,$redaktanto);
 
-print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
-if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
-
-#  if ($debug) {
-#    print pre('open xalan');
-#    autoEscape(1);
-#    print pre(escapeHTML("xml2=\n$xml2"));
-#    autoEscape(0);
-#  }
-  chdir($revo_base."/xml") or die "chdir";
+if (!$permeso) {
   
-  my ($html, $err);
-  revo::xml2html::konv($dbh, \$xml, \$html, \$err, $debug);
-#  $html = Encode::decode($enc, $html);
-  if ($html and $debug) {
-    open HTML, ">:utf8", "../art2/$art.html" or die "open write html";
-	print HTML $html;
-    close HTML;
-  }
+  print "<div id=\"red_err\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto!".
+        "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
+        "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>"
+}
 
-  print $html;
-#  print pre('close xalan') if $debug;
+#$debugmsg .= "art = $art\n";
+my $xml normigu_xml($xmlTxt);
 
-print <<'EOD';
-</div><br>
-EOD
+## kontrolu, ĉu la XML havas ĝustan sintakson
+my $xmlerr = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+print "<div id=\"xml_err\">\n$xmlerr\n</div>";
+
+# konvrtu XML al HTML por la antaŭrigardo...
+my ($html, $err);
+revo::xml2html::konv2($dbh, \$xml, \$html, \$err, $xml_dir);
+
+print "<div id=\"html_rigardo\">\n$html\n<div>\n";
 
 
-print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
-EOD
-  print $checkxml.br."\n";
+# FARENDA:
+# la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
+# en la datumbazo...
+#
+# krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
 
-  # FARENDA:
-  # la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
-  # en la datumbazo...
-  #
-  # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
-
+if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
   my @refs;
   my @ref_err;
   while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
@@ -146,72 +108,55 @@ EOD
     @ref_err = check_ref_cel($dbh,$xml_dir,@refs); 
   }
 
- 
-  # FARENDA: fakte kun la transiro al Git ni povas toleri
-  # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
-  # kontroli processmail.pl antaŭ forigi tie ĉi
-  my $flag = 0;
-  $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0134}/Jx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0125}/hx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0124}/Hx/g || $flag;
-  $flag = $sxangxo =~ s/\x{016D}/ux/g || $flag;
-  $flag = $sxangxo =~ s/\x{016C}/Ux/g || $flag;
-  $flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
-  $flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
-  $flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
-  $flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
-  if ($flag) {
-    print "Esperantaj signoj en ŝanĝoteksto malunikoditaj.<br>\n";
-  }
+  print "<div id=\"ref_err\">\n$xmlerr\n</div>";
+}
 
-  if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
-    print "Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo".br."\n";
-    $ne_konservu = 3;
+# FARENDA: fakte kun la transiro al Git ni povas toleri
+# ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
+# kontroli processmail.pl antaŭ forigi tie ĉi
+my $flag = 0;
+my $sxg_err;
+$flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
+$flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
+$flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
+$flag = $sxangxo =~ s/\x{0134}/Jx/g || $flag;
+$flag = $sxangxo =~ s/\x{0125}/hx/g || $flag;
+$flag = $sxangxo =~ s/\x{0124}/Hx/g || $flag;
+$flag = $sxangxo =~ s/\x{016D}/ux/g || $flag;
+$flag = $sxangxo =~ s/\x{016C}/Ux/g || $flag;
+$flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
+$flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
+$flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
+$flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
+### if ($flag) {
+###   $sxg_err =  "Esperantaj signoj en ŝanĝoteksto malunikoditaj.\n";
+### }
 
-  } elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
-    print "Eraro: '--' estas malpermesita en komento: $sxangxo".br."\n";
-    $ne_konservu = 3;
+if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
+  $sxg_err="Eraro: La ŝanĝoteksto enhavu ne-askiajn signojn: $sxangxo\n";
 
-  } elsif (!param('nova')) {
-    if ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
-      print "Ŝanĝoteksto en ordo: $sxangxo".br."\n";
-    } else {
-      print "Eraro: ŝanĝoteksto mankas: $sxangxo".br."\n";
-      $ne_konservu = 4;
-    }
+} elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
+  $sxg_err="Eraro: '--' estas malpermesita en komento: $sxangxo\n";
+
+} elsif (!param('nova')) {
+  unless ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
+    $sxg_err="Eraro: ŝanĝoteksto mankas: $sxangxo\n";
   }
 }
 
+if ($sxg_err) {
+  print "<div id=\"sxg_err\">\n$xmlerr\n</div>";
+}
 
-# ĉu la redaktanto, se donita estas registrita?
-check_redaktanto($dbh,$redaktanto);...
+# ĉu ni sendu la ŝanĝojn?
+if (param('button') eq 'konservu') {
 
-  if (!$permeso) {
-    $ne_konservu = 2;
+  # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
+  unless ($redaktanto && $permeso && !$xml_err && !ref_err && !$sxg_err) {
+    print "<div id=\"malkonfirmo\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
+      "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
+  } else {
 
-    print <<"EOD";
-<div class="averto">
-Vi ($redaktanto) ne estas registrita kiel redaktanto !<br>
-Legu <a href="http://www.reta-vortaro.de/revo/dok/redinfo.html">&#265;i tie</a> kaj 
-  <a href="http://www.reta-vortaro.de/revo/dok/revoserv.html">&#265;i tie</a> kiel registri&#285;i.<br>
-Sen tio viaj &#349;an&#285;oj ne estos konservitaj !
-</div><br>
-EOD
-  }
-
-  if (param('button') eq 'konservu') {
-    print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
-EOD
-    print "Konservo</b></span></p>\n";
-    # $xml2
-    if ($ne_konservu) {
-      print "ne konservita";
-    } else {
       my $from    = 'noreply@retavortaro.de';
       my $name    = "\"Revo redaktu.pl $redaktanto\"";
       my (@to, $sxangxo2);
@@ -243,71 +188,64 @@ EOD
         print "ne sendita, elektu adreson sube";
       }
     }
-    print <<'EOD';
-</div><br>
-EOD
+
+    print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
   }
 }
 
 $dbh->disconnect() if $dbh;
 
-# por ke la formulara ne konvertas &lt; al < ktp.
-$xml =~ s/&lt;/&amp;lt;/g;
-$xml =~ s/&gt;/&amp;gt;/g;
-
-#$xml = Encode::encode($enc, $xml) if $xml2;
-if (param('xmlTxt')) {
-  param(-name=>'xmlTxt', -value => $xml);
-}
-param(-name=>'sxangxo', -value => $sxangxo);
-
-print start_form(-id => "f", -name => "f");
-
-my @fakoj = sort keys %fak;
-my @stiloj = sort keys %stl;
-#print 
-#      "&nbsp;".textarea(-id    => 'xmlTxt', -name    => 'xmlTxt',
-#               -rows    => 25,
-#               -columns => 80,
-#	           -default => $xml,
-#               -onkeypress => "return klavo(event)",
-#      ) if $art;
-#if (param('nova') or param('button') eq 'kreu') {
-#  print hidden(-name=>'nova', -default=>1);
-#} else {
-#  print br."\n&nbsp;&#348;an&#285;o: ".textfield(
-#       -name => 'sxangxo',
-#       -value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
-#       -title => "Klarigu la ŝanĝon ĉi tie.",
-#       -size => 70,
-#       -maxlength => 80);
-#}
-#print br."\n&nbsp;Retpo&#349;ta adreso:".textfield(-name=>'redaktanto',
-#                    -size      => 70,
-#                    -maxlength => 80,
-#                    -title     => "Skribu vian registritan retadreson ĉi tie.",
-#                    -value     => (cookie(-name=>'redaktanto') || 'via retadreso')
-#      ),
-#      br."\n",
-#      submit(-name => 'button', -label => 'antaŭrigardu'),
-#      submit(-name => 'button', -label => 'konservu') if $art;
-#print checkbox(-name    => 'sendu_al_revo',
-#               -checked => 1,
-#               -value   => '1',
-#               -label   => 'sendu al ReVo') if $art and $debug and 0;
-#print end_form if $art;
-
-#print start_form(-id => "n", -name => "n");
-#print "&nbsp;Preparu novan artikolon: ".textfield(-name=>'art', -size=>20, -maxlength=>20)."&nbsp;";
-#print submit(-name => 'button', -label => 'kreu')."&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/revoserv.html'}, "[helpo]")."\n";
-#print end_form;
-
-#print p('<!-- svn versio: $Id: vokomail.pl 1142 2018-02-10 12:48:25Z wdiestel $'.br.
-#	'hg versio: $HgId: vokomail.pl 62:d81c22cbe76e 2010/04/21 17:24:51 Wieland $ -->');
-
 print end_html();
 
+#######################################################################################
 
-### checkxml: kontrolas la sintakson de XML kaj redonas erarojn okaze de nevalida sintakson
-### 
+sub check_redaktanto {
+    my ($dbh,$redaktanto) = @_;
 
+    if ($redaktanto) {
+        # ĉu iu redaktanto havas tiun retadreson? Kiu?
+        my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+        $sth->execute($redaktanto);
+        my ($permeso, $red_id) = $sth->fetchrow_array();
+        $sth->finish;
+
+        # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
+        # Kiel nomigxas la redaktanto?
+        $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+        $sth->execute($red_id);
+        my ($red_nomo) = $sth->fetchrow_array();
+        #  print "red_nomo=$red_nomo\n";
+        $sth->finish;
+
+        return ($permeso, $red_nomo);
+    }
+
+    return (0,'');
+}
+
+
+sub normigu_xml {
+  my $xmlTxt = shift;
+
+  if ($xmlTxt) {
+    # normigu kodigon
+    $xmlTxt = Encode::decode($enc, $xmlTxt);
+    $xmlTxt =~ s/\r\n/\n/g;
+    $debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
+
+    # trovu la identigilon de la artikolo,
+    # se ĝi rompiĝos ni devos restarigi gin malsupre...
+    my $id;
+    if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
+      $debugmsg .= "ID: $1-\n";
+      $id = $1;
+    }
+
+    # rompu tro longajn liniojn kaj restarigu $Id...
+    $xmlTxt = revo::wrap::wrap($xmlTxt);
+    $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
+  }
+
+  # kodigu ne-askiajn signojn per literunuoj...
+  return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+}
