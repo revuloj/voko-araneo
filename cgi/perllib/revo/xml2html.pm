@@ -14,7 +14,7 @@ package revo::xml2html;
 use CGI qw(:standard);  # por trovi erarojn (escapeHTML)
 use Encode;
 
-$debug = 0;
+my $debug = 0;
 
 ######################################################################
 
