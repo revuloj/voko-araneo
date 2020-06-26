@@ -36,9 +36,12 @@ my $debug = 0;
 my $homedir    = "/var/www/web277";
 my $htmldir    = "$homedir/html";
 my $revo_base  = "$homedir/html/revo";
-my $xml_dir    =  "$revo_base/xml";
+my $xml_dir    = "$revo_base/xml";
 
-my $revuloj_url = "https://revuloj.github.io/respondoj.html";
+my $revuloj_url = 'https://revuloj.github.io/respondoj.html';
+my $mail_cmd    = '/usr/sbin/sendmail -t';
+my $mail_from   = 'noreply@retavortaro.de';
+my $mail_to     = 'revo@retavortaro.de';
 
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
@@ -63,29 +66,35 @@ print header(-charset=>'utf-8',
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
-# konv2 uzas la datumbazo por enŝovi tezaŭro-referencojn
+# konvx uzas la datumbazo por enŝovi tezaŭro-referencojn
 my $dbh = revodb::connect();
 
 # ĉu la redaktanto, se donita estas registrita?
-my ($permeso,$red_nomo) = check_redaktanto($dbh,$redaktanto);
+my $permeso = 0;
 
-if (!$permeso) {
-  
-  print "<div id=\"red_err\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto!".
-        "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
-        "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>"
+unless ($redaktanto) {
+  print "<div id=\"red_err\">Averto: Por sendi vian redakton, vi devas ankoraŭ doni vian retadreson, ".
+        "kun kiu vi registriĝis kiel redaktanto.</div>";
+} else {
+  $permeso = check_redaktanto($dbh,$redaktanto);
+
+  if (!$permeso) {    
+    print "<div id=\"red_err\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
+          "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
+          "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>"
+  }
 }
 
 #$debugmsg .= "art = $art\n";
-my $xml normigu_xml($xmlTxt);
+my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
-my $xmlerr = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
-print "<div id=\"xml_err\">\n$xmlerr\n</div>";
+my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+print "<div id=\"xml_err\">\n$xml_err\n</div>";
 
 # konvrtu XML al HTML por la antaŭrigardo...
 my ($html, $err);
-revo::xml2html::konv2($dbh, \$xml, \$html, \$err, $xml_dir);
+revo::xml2html::konvx($dbh, \$xml, \$html, \$err, $xml_dir);
 
 print "<div id=\"html_rigardo\">\n$html\n<div>\n";
 
@@ -95,10 +104,10 @@ print "<div id=\"html_rigardo\">\n$html\n<div>\n";
 # en la datumbazo...
 #
 # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
+my @ref_err;
 
 if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
   my @refs;
-  my @ref_err;
   while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
     my ($art,$p,$rest) = ($1,$2,$3);
     push @refs, [$art,$p,$rest];
@@ -108,7 +117,7 @@ if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la X
     @ref_err = check_ref_cel($dbh,$xml_dir,@refs); 
   }
 
-  print "<div id=\"ref_err\">\n$xmlerr\n</div>";
+  print "<div id=\"ref_err\">\n".join("\n",@ref_err)."\n</div>";
 }
 
 # FARENDA: fakte kun la transiro al Git ni povas toleri
@@ -145,50 +154,18 @@ if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) {
 }
 
 if ($sxg_err) {
-  print "<div id=\"sxg_err\">\n$xmlerr\n</div>";
+  print "<div id=\"sxg_err\">\n$sxg_err\n</div>";
 }
 
 # ĉu ni sendu la ŝanĝojn?
 if (param('button') eq 'konservu') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
-  unless ($redaktanto && $permeso && !$xml_err && !ref_err && !$sxg_err) {
+  unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
     print "<div id=\"malkonfirmo\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
   } else {
-
-      my $from    = 'noreply@retavortaro.de';
-      my $name    = "\"Revo redaktu.pl $redaktanto\"";
-      my (@to, $sxangxo2);
-      push @to, $redaktanto; # if param('sendu_al_tio');
-      push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
-#      push @to, 'wieland@wielandpusch.de'; # if param('sendu_al_admin');  # revodb::mail_to
-      if (param('nova')) {
-        $sxangxo2 = "aldono: $art";
-      } else {
-        $sxangxo2 = "redakto: $sxangxo";
-      }
-      if (my $to = join(', ', @to)) {
-        my $subject = "Revo redaktu.pl $art";
-
-    my $header = [
-      To => $to,
-      From => "$name <$from>",
-      "Reply-To" => $redaktanto,
-      Subject => $subject,
-      X-retadreso: $ENV{REMOTE_ADDR}
-    ];
-    retposhto::sendu(
-      \%mail,
-      "$sxangxo2\n\n$xml2");
-
-        print "sendita al $to";
-			
-      } else {
-        print "ne sendita, elektu adreson sube";
-      }
-    }
-
+    send_xml($redaktanto,$art,$sxangxo,\$xml);
     print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
   }
 }
@@ -200,27 +177,27 @@ print end_html();
 #######################################################################################
 
 sub check_redaktanto {
-    my ($dbh,$redaktanto) = @_;
+  my ($dbh,$redaktanto) = @_;
+  my ($permeso, $red_id);
 
-    if ($redaktanto) {
-        # ĉu iu redaktanto havas tiun retadreson? Kiu?
-        my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-        $sth->execute($redaktanto);
-        my ($permeso, $red_id) = $sth->fetchrow_array();
-        $sth->finish;
+  if ($redaktanto) {
+      # ĉu iu redaktanto havas tiun retadreson? Kiu?
+      my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+      $sth->execute($redaktanto);
+      ($permeso, $red_id) = $sth->fetchrow_array();
+      $sth->finish;
 
-        # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
-        # Kiel nomigxas la redaktanto?
-        $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-        $sth->execute($red_id);
-        my ($red_nomo) = $sth->fetchrow_array();
-        #  print "red_nomo=$red_nomo\n";
-        $sth->finish;
+      # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
+      # Kiel nomigxas la redaktanto?
+      #$sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+      #$sth->execute($red_id);
+      #my ($red_nomo) = $sth->fetchrow_array();
+      ##  print "red_nomo=$red_nomo\n";
+      #$sth->finish;
 
-        return ($permeso, $red_nomo);
-    }
+  }
 
-    return (0,'');
+  return $permeso;
 }
 
 
@@ -249,3 +226,40 @@ sub normigu_xml {
   # kodigu ne-askiajn signojn per literunuoj...
   return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 }
+
+sub send_xml {
+  my ($redaktanto,$art,$sxangxo,$xml) = @_;
+
+  my $name    = "\"Revo redaktu.pl $redaktanto\"";
+  my (@to, $red_cmd);
+  push @to, $redaktanto; 
+  push @to, $mail_to; 
+
+  # unua linio de retpoŝto
+  if (param('nova')) {
+    $red_cmd = "aldono: $art";
+  } else {
+    $red_cmd = "redakto: $sxangxo";
+  }
+
+  my $to = join(', ', @to);
+  my $subject = "Revo redaktu.pl $art";
+  my $smlog = "sendmail.log";
+
+  # konektiĝu al retpoŝtservo
+  open SENDMAIL, "| $mail_cmd 2>&1 >$smlog" 
+    or print LOG "Ne povas voki $mail_cmd\n";
+  print SENDMAIL <<END_OF_MAIL;
+From: $name <$mail_from>
+To: $to
+Reply-To: $redaktanto
+Subject: $subject
+X-retadreso: $ENV{REMOTE_ADDR}
+
+$red_cmd
+
+$$xml
+END_OF_MAIL
+
+  close SENDMAIL;
+}        
