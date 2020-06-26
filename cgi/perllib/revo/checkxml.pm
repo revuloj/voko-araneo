@@ -17,7 +17,7 @@ use IPC::Open3;
 
 package revo::checkxml;
 
-$rxp_cmd_line = 'rxp -Vs >/dev/null';
+my $rxp_cmd_line = 'rxp -Vs >/dev/null';
 
 sub check_xml {
     my ($teksto, $xml_dir) = @_;
@@ -31,7 +31,7 @@ sub rxp_cmd {
                     $rxp_cmd_line);
     print CHLD_IN $teksto;
     close CHLD_IN;
-    $err = join('', <CHLD_ERR>);
+    my $err = join('', <CHLD_ERR>);
     close CHLD_ERR;
     close CHLD_OUT;
 
