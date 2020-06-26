@@ -1,8 +1,12 @@
-var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"(.*?)"\s*>/g; 
-var re_fak = /<uzo\s+tip\s*=\s*"fak"\s*>(.*?)</g; 
-var re_stl = /<uzo\s+tip\s*=\s*"stl"\s*>(.*?)</g; 
-var re_mrk = /<(drv|snc) mrk="(.*?)">/g;
+var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"([^]*?)"\s*>/mg; 
+var re_fak = /<uzo\s+tip\s*=\s*"fak"\s*>([^]*?)</mg; 
+var re_stl = /<uzo\s+tip\s*=\s*"stl"\s*>([^]*?)</mg; 
+var re_mrk = /<(drv|snc) mrk="([^]*?)">/mg;
 
+var re_trdgrp = /<trdgrp\s+lng\s*=\s*"[^"]+"\s*>[^]*?<\/trdgrp/mg;	
+var re_trd = /<trd\s+lng\s*=\s*"[^"]+"\s*>[^]*?<\/trd/mg;	
+var re_ref = /<ref([^g>]*)>([^]*?)<\/ref/mg;
+var re_refcel = /cel\s*=\s*"([^"]+?)"/m;
 
 function str_repeat(rStr, rNum) {
     var nStr="";
@@ -452,9 +456,41 @@ function kontrolu_mrk(art) {
     listigu_erarojn(errors); 
 }
 
+// trovu tradukojn sen lingvo
+function kontrolu_trd() {
+  var xml = document.getElementById("rxmltxt").value;
+  var m; re_t2 = /(<trd.*?<\/trd>)/g;
+  var errors = [];
+  
+  // forigu bonajn trdgrp kaj trd FARENDA: tio ne trovas <trd lng="..."> ene de trdgrp!
+  var x = xml.replace(re_trdgrp,'').replace(re_trd,'');
+  while (m = re_t2.exec(x)) {
+    errors.push("Traduko sen lingvo: "+m[1]);
+  }
+
+  if (errors.length)
+    listigu_erarojn(errors); 
+}
+
+function kontrolu_ref() {
+  var xml = document.getElementById("rxmltxt").value;
+  var m; 
+  var errors = [];
+  
+  while (m = re_ref.exec(xml)) {
+    var ref = m[1];
+    if (ref.search(re_refcel) < 0)
+      errors.push("Mankas celo en referenco <ref" + ref + ">"+ m[2] +"</ref>.");
+  }
+  if (errors.length)
+    listigu_erarojn(errors); 
+}
+
 function rantaurigardo() {
   forigu_erarojn();
   kontrolu_mrk("test");
+  kontrolu_trd();
+  kontrolu_ref();
   add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn(c_lingvoj,re_lng));
   add_err_msg("Nekonata fako: ",kontrolu_kodojn(c_fakoj,re_fak));
   add_err_msg("Nekonata stilo: ",kontrolu_kodojn(c_stiloj,re_stl));
