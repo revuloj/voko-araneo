@@ -53,10 +53,10 @@ my $debugmsg;
 my $art = param('art');
 my $xmlTxt = param('xmlTxt');
 my $redaktanto = param('redaktanto');
-my $mrk = param('mrk');
+#my $mrk = param('mrk');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 $debugmsg .= "sxangxo=$sxangxo" if $debug;
-my $command = param('button');
+my $command = param('command');
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',

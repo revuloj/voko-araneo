@@ -212,122 +212,122 @@ function insertTags2(tagOpen, tagAttr, tagEndOpen, tagClose, sampleText) {
 }
    
 function indent(offset) {
-     var txtarea = get_ta();
-     var selText, isSample=false;
-   
-     if (document.selection  && document.selection.createRange) { // IE/Opera
-       alert("tio ankoraux ne funkcias.");
-     } else if (txtarea.selectionStart || txtarea.selectionStart==0) { // Mozilla
-   
-       //save textarea scroll position
-       var textScroll = txtarea.scrollTop;
-       //get current selection
-       txtarea.focus();
-       var startPos = txtarea.selectionStart;
-       if (startPos > 0) {
-         startPos--;
-       }
-       var endPos = txtarea.selectionEnd;
-       if (endPos > 0) {
-         endPos--;
-       }
-       selText = txtarea.value.substring(startPos, endPos);
-       if (selText=="") {
-         alert("Marku kion vi volas en-/elsxovi.");
-       } else {
-         var nt;
-         if (offset == 2)
-           nt = selText.replace(/\n/g, "\n  ");
-         else 
-           nt = selText.replace(/\n  /g, "\n");
-         txtarea.value = txtarea.value.substring(0, startPos)
-               + nt
-               + txtarea.value.substring(endPos, txtarea.value.length);
-         txtarea.selectionStart = startPos+1;
-         txtarea.selectionEnd = startPos + nt.length+1;
-   
-         //restore textarea scroll position
-         txtarea.scrollTop = textScroll;
-       }
-     } 
+  var txtarea = get_ta();
+  var selText, isSample=false;
+
+  if (document.selection  && document.selection.createRange) { // IE/Opera
+    alert("tio ankoraux ne funkcias.");
+  } else if (txtarea.selectionStart || txtarea.selectionStart==0) { // Mozilla
+
+    //save textarea scroll position
+    var textScroll = txtarea.scrollTop;
+    //get current selection
+    txtarea.focus();
+    var startPos = txtarea.selectionStart;
+    if (startPos > 0) {
+      startPos--;
+    }
+    var endPos = txtarea.selectionEnd;
+    if (endPos > 0) {
+      endPos--;
+    }
+    selText = txtarea.value.substring(startPos, endPos);
+    if (selText=="") {
+      alert("Marku kion vi volas en-/elsxovi.");
+    } else {
+      var nt;
+      if (offset == 2)
+        nt = selText.replace(/\n/g, "\n  ");
+      else 
+        nt = selText.replace(/\n  /g, "\n");
+      txtarea.value = txtarea.value.substring(0, startPos)
+            + nt
+            + txtarea.value.substring(endPos, txtarea.value.length);
+      txtarea.selectionStart = startPos+1;
+      txtarea.selectionEnd = startPos + nt.length+1;
+
+      //restore textarea scroll position
+      txtarea.scrollTop = textScroll;
+    }
+  } 
 }
    
    // apply tagOpen/tagClose to selection in textarea,
    // use sampleText instead of selection if there is none
 function insertTags(tagOpen, tagClose, sampleText) {
-     var txtarea = get_ta();
-     var selText, isSample=false;
-   
-     if (document.selection && document.selection.createRange) { // IE/Opera
-       //save window scroll position
-       if (document.documentElement && document.documentElement.scrollTop)
-         var winScroll = document.documentElement.scrollTop
-       else if (document.body)
-         var winScroll = document.body.scrollTop;
+  var txtarea = get_ta();
+  var selText, isSample=false;
 
-       //get current selection  
-       txtarea.focus();
-       var range = document.selection.createRange();
-       selText = range.text;
+  if (document.selection && document.selection.createRange) { // IE/Opera
+    //save window scroll position
+    if (document.documentElement && document.documentElement.scrollTop)
+      var winScroll = document.documentElement.scrollTop
+    else if (document.body)
+      var winScroll = document.body.scrollTop;
 
-       //insert tags
-       checkSelectedText();
-       range.text = tagOpen + selText + tagClose;
+    //get current selection  
+    txtarea.focus();
+    var range = document.selection.createRange();
+    selText = range.text;
 
-       //mark sample text as selected
-       if (isSample && range.moveStart) {
-         if (window.opera)
-       tagClose = tagClose.replace(/\n/g,'');
-       range.moveStart('character', - tagClose.length - selText.length); 
-       range.moveEnd('character', - tagClose.length); 
-         }
-         range.select();   
+    //insert tags
+    checkSelectedText();
+    range.text = tagOpen + selText + tagClose;
 
-       //restore window scroll position
-      if (document.documentElement && document.documentElement.scrollTop)
-          document.documentElement.scrollTop = winScroll
-      else if (document.body)
-        document.body.scrollTop = winScroll;
-   
-     } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
-   
-       //save textarea scroll position
-       var textScroll = txtarea.scrollTop;
-       //get current selection
-       txtarea.focus();
+    //mark sample text as selected
+    if (isSample && range.moveStart) {
+      if (window.opera)
+    tagClose = tagClose.replace(/\n/g,'');
+    range.moveStart('character', - tagClose.length - selText.length); 
+    range.moveEnd('character', - tagClose.length); 
+      }
+      range.select();   
 
-       var startPos = txtarea.selectionStart;
-       var endPos = txtarea.selectionEnd;
-       selText = txtarea.value.substring(startPos, endPos);
+    //restore window scroll position
+  if (document.documentElement && document.documentElement.scrollTop)
+      document.documentElement.scrollTop = winScroll
+  else if (document.body)
+    document.body.scrollTop = winScroll;
 
-       //insert tags
-       checkSelectedText();
-       txtarea.value = txtarea.value.substring(0, startPos)
-               + tagOpen + selText + tagClose
-               + txtarea.value.substring(endPos, txtarea.value.length);
+  } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
 
-       //set new selection
-       if (isSample) {
-         txtarea.selectionStart = startPos + tagOpen.length;
-         txtarea.selectionEnd = startPos + tagOpen.length + selText.length;
-       } else {
-         txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
-         txtarea.selectionEnd = txtarea.selectionStart;
-       }
+    //save textarea scroll position
+    var textScroll = txtarea.scrollTop;
+    //get current selection
+    txtarea.focus();
 
-       //restore textarea scroll position
-       txtarea.scrollTop = textScroll;
+    var startPos = txtarea.selectionStart;
+    var endPos = txtarea.selectionEnd;
+    selText = txtarea.value.substring(startPos, endPos);
+
+    //insert tags
+    checkSelectedText();
+    txtarea.value = txtarea.value.substring(0, startPos)
+            + tagOpen + selText + tagClose
+            + txtarea.value.substring(endPos, txtarea.value.length);
+
+    //set new selection
+    if (isSample) {
+      txtarea.selectionStart = startPos + tagOpen.length;
+      txtarea.selectionEnd = startPos + tagOpen.length + selText.length;
+    } else {
+      txtarea.selectionStart = startPos + tagOpen.length + selText.length + tagClose.length;
+      txtarea.selectionEnd = txtarea.selectionStart;
+    }
+
+    //restore textarea scroll position
+    txtarea.scrollTop = textScroll;
 } 
    
 function checkSelectedText(){
-       if (!selText) {
-         selText = sampleText;
-         isSample = true;
-       } else if (selText.charAt(selText.length - 1) == ' ') { //exclude ending space char
-         selText = selText.substring(0, selText.length - 1);
-         tagClose += ' '
-       } 
-     }
+    if (!selText) {
+      selText = sampleText;
+      isSample = true;
+    } else if (selText.charAt(selText.length - 1) == ' ') { //exclude ending space char
+      selText = selText.substring(0, selText.length - 1);
+      tagClose += ' '
+    } 
+  }
 }
    
 function lines(str){try {return((str.match(/[^\n]*\n[^\n]*/gi).length));} catch(e) {return 0;}}
@@ -506,20 +506,21 @@ function kontrolu_ref() {
 }
 
 function rantaurigardo() {
+  vokomailx("rigardo");
   forigu_erarojn();
   kontrolu_mrk("test");
   kontrolu_trd();
   kontrolu_ref();
   add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvo",re_lng));
   add_err_msg("Nekonata fako: ",kontrolu_kodojn("fako",re_fak));
-  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
+  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stilo",re_stl));
  // kontrolu_fak();
   //kontrolu_stl();
   //...
 }
 
 function rkonservo() {
-  alert("konservo");
+  vokomailx("konservo");
 }
 
 function create_new_art() {
@@ -551,27 +552,51 @@ function create_new_art() {
     + '</vortaro>\n';
 }
    
-function sf(pos, line, lastline) {
-     document.f.xmlTxt.focus();
-     var txtarea = get_ta();
-     if (document.selection  && document.selection.createRange) { // IE/Opera
-       var range = document.selection.createRange();
-       range.moveEnd('character', pos); 
-       range.moveStart('character', pos); 
-       range.select();
-       range.scrollIntoView(true);
-     } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
-       txtarea.selectionStart = pos;
-       txtarea.selectionEnd = txtarea.selectionStart;
-       var scrollTop = txtarea.scrollHeight * line / lastline;
-   //    alert("scrollTop="+scrollTop);
-       txtarea.scrollTop = scrollTop;
-     }
-   
-    // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
-    //checkCookieConsent();
-    restore_preferences();
-    //test: antaurigardo();
+function vokomailx(command) {
+  var request = new XMLHttpRequest();
+  var url = '/cgi-bin/vokomailx.pl';
+
+  var data = {
+    xmlTxt: document.getElementById("rxmltxt").value,
+    art: document.getElementsByName("art")[0].value,
+    redaktanto: document.getElementsByName("redaktanto")[0].value,
+    sxangxo: document.getElementsByName("sxangxo")[0].value,
+    command: command
+  }
+
+  request.open('POST', url , true);
+  
+  request.onload = function() {
+    if (this.status >= 200 && this.status < 400) {
+      // Success!
+      parser = new DOMParser();
+      doc = parser.parseFromString(this.response,"text/html");
+
+      for (div of doc.getElementsByTagName("div")) {
+        console.log("div id=" + div.id);
+      }
+
+      /*
+      for (e of doc.getElementsByTagName(xmlTag)) {
+          var c = e.attributes["kodo"];
+          //console.log(c);
+          codes.push(c.value);
+      } 
+*/
+
+    } else {
+      // post konektiĝo okazis eraro
+      console.error('Eraro dum ŝargo de ' + url);       
+    }
+  };
+  
+  request.onerror = function() {
+    // konekteraro
+    console.error('Eraro dum konektiĝo por ' + url);
+  };
+  
+  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  request.send(data);
 }
 
 function load_codes(xmlTag) {
@@ -595,7 +620,7 @@ function load_codes(xmlTag) {
 
       revo_codes[xmlTag] = codes;
     } else {
-      // post koneektiĝo okazis eraro
+      // post konektiĝo okazis eraro
       console.error('Eraro dum ŝargo de '+fileUrl);       
     }
   };
@@ -616,7 +641,27 @@ function ready(fn) {
   }
 }
 
+function sf(pos, line, lastline) {
+  document.f.xmlTxt.focus();
+  var txtarea = get_ta();
+  if (document.selection  && document.selection.createRange) { // IE/Opera
+    var range = document.selection.createRange();
+    range.moveEnd('character', pos); 
+    range.moveStart('character', pos); 
+    range.select();
+    range.scrollIntoView(true);
+  } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
+    txtarea.selectionStart = pos;
+    txtarea.selectionEnd = txtarea.selectionStart;
+    var scrollTop = txtarea.scrollHeight * line / lastline;
+//    alert("scrollTop="+scrollTop);
+    txtarea.scrollTop = scrollTop;
+  }
+}
+
 ready(function() { 
+  sf(0, 0, 1);
+  restore_preferences();
   load_codes("lingvo");
   load_codes("fako");
   load_codes("stilo");
