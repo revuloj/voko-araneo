@@ -1,14 +1,8 @@
+
 var revo_codes = {
-  url:
-  {
-      lingvo: '/revo/cfg/lingvoj.xml',
-      fako: '/revo/cfg/fakoj.xml',
-      stilo: '/revo/cfg/stiloj.xml'
-  }
-  // ni plenigos tion per listoj
-  // lingvo: [...]
-  // fako: [...]
-  // stilo: [...]
+  lingvoj: new Codelist('lingvo', '/revo/cfg/lingvoj.xml'),
+  fakoj: new Codelist('fako','/revo/cfg/fakoj.xml'),
+  stiloj: new Codelist('stilo','/revo/cfg/stiloj.xml')
 }
 
 var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"([^]*?)"\s*>/mg; 
@@ -20,6 +14,62 @@ var re_trdgrp = /<trdgrp\s+lng\s*=\s*"[^"]+"\s*>[^]*?<\/trdgrp/mg;
 var re_trd = /<trd\s+lng\s*=\s*"[^"]+"\s*>[^]*?<\/trd/mg;	
 var re_ref = /<ref([^g>]*)>([^]*?)<\/ref/mg;
 var re_refcel = /cel\s*=\s*"([^"]+?)"/m;
+
+
+function Codelist(xmlTag,url) {
+  this.url = url;
+  this.xmlTag = xmlTag;
+  this.codes = {};
+
+  this.fill = function(selection) {
+    var sel = document.getElementById(selection);
+  
+    for (item in this.codes) {
+      var opt = createTElement("option",item + ' - ' + this.codes[item]);
+      addAttribute(opt,"value",item);
+      sel.appendChild(opt);
+    }
+  };
+
+  this.load = function(selection) {
+    var request = new XMLHttpRequest();
+    var self = this;
+    var codes = {};
+  
+    request.open('GET', this.url, true);
+    
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // Success!
+        parser = new DOMParser();
+        doc = parser.parseFromString(this.response,"text/xml");
+  
+        for (e of doc.getElementsByTagName(self.xmlTag)) {
+            var c = e.attributes["kodo"];
+            //console.log(c);
+            codes[c.value] = e.textContent;
+        } 
+        self.codes = codes;
+
+        if (selection) {
+          self.fill.call(self,selection);
+        } 
+      } else {
+        // post konektiĝo okazis eraro
+        console.error('Eraro dum ŝargo de '+fileUrl);       
+      }
+    };
+    
+    request.onerror = function() {
+      // konekteraro
+      console.error('Eraro dum konektiĝo por '+fileUrl);
+    };
+    
+    request.send();
+  };
+  
+}
+
 
 function str_repeat(rStr, rNum) {
     var nStr="";
@@ -402,6 +452,18 @@ function fs_toggle(id) {
   }
 }
 
+function createTElement(name,text) {
+  var el = document.createElement(name);
+  var tx= document.createTextNode(text);
+  el.appendChild(tx); return el;
+}
+
+function addAttribute(node,name,value) {
+  var att = document.createAttribute(name);
+  att.value = value;
+  node.setAttributeNode(att);    
+}
+
 function listigu_erarojn(err) {
   var el = document.getElementById("reraroj");
   var elch = el.children;
@@ -413,9 +475,7 @@ function listigu_erarojn(err) {
     ul = elch[0];
   };
   for (e of err) {
-    var li = document.createElement("li");           
-    var text = document.createTextNode(e);       
-    li.appendChild(text);                        
+    var li = createTElement("li",e);               
     ul.appendChild(li);       
   }
 }
@@ -443,13 +503,13 @@ function kontrolu_kodojn(clist,regex) {
   var m; var invalid = [];
   var list = revo_codes[clist];
 
-  if (! list.length) {
+  if (! list || Object.keys(list).length === 0) {
     console.error("Kodlisto " + clist + "estas malplena, ni ne povas kontroli tion!");
     return;
   }
   
   while (m = regex.exec(xml)) {
-    if ( list.indexOf(m[1])<0 ) {
+    if ( list(m[1]) ) {
       invalid.push(m);
       console.error("Nevalida kodo \""+m[1]+"\" ĉe: "+m.index);
     }
@@ -598,39 +658,7 @@ function vokomailx(command) {
   request.send(data);
 }
 
-function load_codes(xmlTag) {
-  var codes = [];
-  var request = new XMLHttpRequest();
-  var fileUrl = revo_codes.url[xmlTag];
 
-  request.open('GET', fileUrl, true);
-  
-  request.onload = function() {
-    if (this.status >= 200 && this.status < 400) {
-      // Success!
-      parser = new DOMParser();
-      doc = parser.parseFromString(this.response,"text/xml");
-
-      for (e of doc.getElementsByTagName(xmlTag)) {
-          var c = e.attributes["kodo"];
-          //console.log(c);
-          codes.push(c.value);
-      } 
-
-      revo_codes[xmlTag] = codes;
-    } else {
-      // post konektiĝo okazis eraro
-      console.error('Eraro dum ŝargo de '+fileUrl);       
-    }
-  };
-  
-  request.onerror = function() {
-    // konekteraro
-    console.error('Eraro dum konektiĝo por '+fileUrl);
-  };
-  
-  request.send();
-}
 
 function ready(fn) {
   if (document.readyState != 'loading'){
@@ -661,7 +689,7 @@ function sf(pos, line, lastline) {
 ready(function() { 
   sf(0, 0, 1);
   restore_preferences();
-  load_codes("lingvo");
-  load_codes("fako");
-  load_codes("stilo");
+  revo_codes.lingvoj.load();
+  revo_codes.fakoj.load("rsfak");
+  revo_codes.stiloj.load("rsstl");
 })

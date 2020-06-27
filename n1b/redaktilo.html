@@ -23,339 +23,251 @@
 
 <form name="f" id="f">
 
-<div id="rteksto">
-  <div id="ajxb">
+<div id="redaktilo">
+  <div id="navigado">
     <button
       onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
     <br />
     <button
       onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
+    <button
+       onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
+    <button
+       onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
+    <label>
+      <input type="checkbox" name="cx" value="1" accesskey="x" 
+        onclick="document.f.xmlTxt.focus()" />c<u>x</u> = ĉ ..
+    </label>
+    <div class="filler"></div>
+    <div id="rtabs" class="tabs">
+      <a class="aktiva" id="rtab_xml" onclick="tab_toggle('rxmltxt');">redakti</a>
+      <a id="rtab_rigardo" onclick="tab_toggle('rrigardo'); rantaurigardo()">antaŭrigardo</a>
+    </div>      
   </div>
-  <div id="rvteksto">
-    <div id="rv_btn">
-      <button
-        onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button><button
-        onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
-      <label>
-        <input type="checkbox" name="cx" value="1" accesskey="x" 
-          onclick="document.f.xmlTxt.focus()" />anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux
-      </label>
-    </div>
-    <div id="rv_area">
-      <input type="hidden" name="art" value="XXX"  />
-      <input type="hidden" name="mrk" value=""  />
-      <textarea id="rxmltxt" name="xmlTxt" rows="25" cols="80" 
+
+  <div id="tabulo">
+    <div id="dxmltxt">
+      <textarea id="rxmltxt" name="xmlTxt" cols="100" 
         onkeypress="return klavo(event)" id="xmlTxt">    
       </textarea>
+      <input type="hidden" name="art" value="XXX" />
     </div>
+    <div id="drigardo">      
+    </div>  
+  </div>
+
 <!-- buton-grupoj por redaktado -->
-    <div id="rv_sets">
+  <div id="rv_sets">
 
-<fieldset id="fs_rtrd">
-  <input id="trdlng"
-    type="text" 
-    name="trdlng"  
-    placeholder="lng"
-    size="2" 
-    maxlength="3" 
-    title="Lingvokodo por tradukoj." />
-  <button accesskey="t" 
-    onclick="insertTags2(&#39;<trd lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false" 
-    title="Unuopa traduko"><u>t</u>rd lng</button> 
-  <button
-    onclick="var i=str_indent();insertTags2(&#39;<trdgrp lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\n&#39;+i+&#39;  <trd></trd>\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false" 
-    title="Grupon de tradukoj">trdgrp lng</button> 
-|
-  <button
-    onclick="insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false"
-    title="Traduko ene de grupo (sen lingvo)">trd</button> 
-|    
-  <button
-    onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false" 
-    title="Klarigo sen tipo">klr</button> 
-|    
-<select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="klrtip">
-  <option value=""></option>
-  <option value="ind">ind-ekso</option>
-  <option selected="selected" value="amb">amb-aŭ</option>
-</select>
-<button
-    onclick="insertTags2(&#39;<klr tip=\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false"
-    title="Klarigo kun tipo">klr tip</button> 
-| 
-  <button
-    onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
-    title="Indeksita parto de traduko">ind</button> 
-|
-  <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
-  <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">&#x2991;&nbsp;&#x2992;</button>
-</fieldset>
-
-
-<fieldset id="fs_rref" class="collapsed">
-  <select name="reftip"  
-      title="Elektu tipon de referenco." id="reftip">
-      <option selected="selected" value=""></option>
-      <option value="vid">vid-u</option>
-      <option value="hom">hom-onima</option>
-      <option value="dif">dif-ina</option>
-      <option value="sin">sin-onimo</option>
-      <option value="ant">ant-onimo</option>
-      <option value="super">super-nocio</option>
-      <option value="sub">sub-nocio</option>
-      <option value="prt">part-o</option>
-      <option value="malprt">malpart-o</option>
-      <option value="ekz">ekz-emplo</option>
+    <fieldset id="fs_rtrd">
+      <input id="trdlng"
+        type="text" 
+        name="trdlng"  
+        placeholder="lng"
+        size="2" 
+        maxlength="3" 
+        title="Lingvokodo por tradukoj." />
+      <button accesskey="t" 
+        onclick="insertTags2(&#39;<trd lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false" 
+        title="Unuopa traduko"><u>t</u>rd lng</button> 
+      <button
+        onclick="var i=str_indent();insertTags2(&#39;<trdgrp lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\n&#39;+i+&#39;  <trd></trd>\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false" 
+        title="Grupon de tradukoj">trdgrp lng</button> 
+    |
+      <button
+        onclick="insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false"
+        title="Traduko ene de grupo (sen lingvo)">trd</button> 
+    |    
+      <button
+        onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false" 
+        title="Klarigo sen tipo">klr</button> 
+    |    
+    <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="klrtip">
+      <option value=""></option>
+      <option value="ind">ind-ekso</option>
+      <option selected="selected" value="amb">amb-aŭ</option>
     </select>
     <button
-    onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
-    title="Unuopa referenco">ref tip</button>
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<refgrp tip=\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\&#34;>\n&#39;+i+&#39;  <ref cel=\&#34;\&#34;>&#39;,&#39;</ref>\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false" 
-    title="Grupo de refencoj">refgrp tip</button> 
-|    
-  <button
-    onclick="insertTags(&#39;<ref cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
-    title="Referenco ene de grupo (sen tipo).">ref</button>
-|
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
-    title="Rimarko">rim</button>
-|
-  <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
-  <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">&#x2991;&nbsp;&#x2992;</button>
-</fieldset>
+        onclick="insertTags2(&#39;<klr tip=\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false"
+        title="Klarigo kun tipo">klr tip</button> 
+    | 
+      <button
+        onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
+        title="Indeksita parto de traduko">ind</button> 
+    |
+      <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">&#x2991;&nbsp;&#x2992;</button>
+    </fieldset>
 
+    <fieldset id="fs_rref" class="collapsed">
+      <select name="reftip"  
+          title="Elektu tipon de referenco." id="reftip">
+          <option selected="selected" value=""></option>
+          <option value="vid">vid-u</option>
+          <option value="hom">hom-onima</option>
+          <option value="dif">dif-ina</option>
+          <option value="sin">sin-onimo</option>
+          <option value="ant">ant-onimo</option>
+          <option value="super">super-nocio</option>
+          <option value="sub">sub-nocio</option>
+          <option value="prt">part-o</option>
+          <option value="malprt">malpart-o</option>
+          <option value="ekz">ekz-emplo</option>
+        </select>
+        <button
+        onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+        title="Unuopa referenco">ref tip</button>
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<refgrp tip=\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\&#34;>\n&#39;+i+&#39;  <ref cel=\&#34;\&#34;>&#39;,&#39;</ref>\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false" 
+        title="Grupo de refencoj">refgrp tip</button> 
+    |    
+      <button
+        onclick="insertTags(&#39;<ref cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+        title="Referenco ene de grupo (sen tipo).">ref</button>
+    |
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
+        title="Rimarko">rim</button>
+    |
+      <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">&#x2991;&nbsp;&#x2992;</button>
+    </fieldset>
 
-<fieldset id="fs_rind" class="collapsed">
-    <select name="ofc"  title="Elektu indikon pri oficialeco" id="ofc">
-    <option selected="selected" value=""></option>
-    <option value="*">*</option>
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-  </select>
-  <button
-    onclick="insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false" 
-    title="Indiko pri oficialeco">ofc</button>
-|  
-    <select name="gra"  title="Elektu indikon pri gramatiko." id="gra">
-    <option selected="selected" value=""></option>
-    <option value="<vspec>tr</vspec>">tr</option>
-    <option value="<vspec>ntr</vspec>">ntr</option>
-    <option value="<vspec>x</vspec>">tr/ntr</option>
-    <option value="<vspec>abs.</vspec>">abs.</option>
-    <option value="<vspec>determinilo</vspec>">determinilo</option>
-    <option value="<vspec>ekkrio</vspec>">ekkrio</option>
-    <option value="<vspec>sonimito</vspec>">sonimito</option>
-    <option value="<vspec>konjunkcio</vspec>">konjunkcio</option>
-    <option value="<vspec>subordigilo</vspec>">subordigilo</option>
-    <option value="neoficiala <vspec>prefikso</vspec>">prefikso</option>
-    <option value="neoficiala <vspec>sufikso</vspec>">sufikso</option>
-    <option value="<vspec>prepozicio</vspec>">prepozicio</option>                            
-    <option value="<vspec>pronomo</vspec>">pronomo</option>                            
-  </select>
-  <button
-    onclick="insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false"
-    title="Indikon pri gramatiko">gra</button>
-|
-  <select name="uzofak"  title="Elektu fakon" id="uzofak">
-    <option selected="selected" value=""></option>
-    <option value="AGR">AGR-agrokulturo</option>
-    <option value="ANA">ANA-homa anatomio, histologio</option>
-    <option value="ARKE">ARKE-arkeologio</option>
-    <option value="ARKI">ARKI-arkitekturo</option>
-    <option value="AST">AST-astronomio</option>
-    <option value="AUT">AUT-aŭtomobiloj</option>
-    <option value="AVI">AVI-aviado</option>
-    <option value="BAK">BAK-bakteriologio, virusologio</option>
-    <option value="BELA">BELA-belartoj</option>
-    <option value="BELE">BELE-beletro</option>
-    <option value="BIB">BIB-biblio</option>
-    <option value="BIO">BIO-biologio, biontologio</option>
-    <option value="BOT">BOT-botaniko</option>
-    <option value="BUD">BUD-budhismo</option>
-    <option value="EKOL">EKOL-ekologio</option>
-    <option value="EKON">EKON-ekonomiko, financo, komerco</option>
-    <option value="ELE">ELE-elektro</option>
-    <option value="ELET">ELET-elektrotekniko</option>
-    <option value="ESP">ESP-esperantismo</option>
-    <option value="FER">FER-fervojoj</option>
-    <option value="FIL">FIL-filozofio</option>
-    <option value="FIZ">FIZ-fiziko</option>
-    <option value="FIZL">FIZL-fiziologio</option>
-    <option value="FON">FON-fonetiko</option>
-    <option value="FOT">FOT-fotografio, optiko</option>
-    <option value="GEN">GEN-genealogio</option>
-    <option value="GEOD">GEOD-geodezio, topografio</option>
-    <option value="GEOG">GEOG-geografio</option>
-    <option value="GEOL">GEOL-geologio</option>
-    <option value="GRA">GRA-gramatiko</option>
-    <option value="HER">HER-heraldiko</option>
-    <option value="HIN">HIN-hinduismo</option>
-    <option value="HIS">HIS-historio</option>
-    <option value="HOR">HOR-hortikulturo, arbokulturo, silvikulturo</option>
-    <option value="ISL">ISL-islamo</option>
-    <option value="JUR">JUR-juro</option>
-    <option value="KAL">KAL-kalendaro, tempomezurado</option>
-    <option value="KAT">KAT-katolikismo</option>
-    <option value="KEM">KEM-kemio, biokemio</option>
-    <option value="KIN">KIN-kinoarto</option>
-    <option value="KIR">KIR-kirurgio</option>
-    <option value="KOMP">KOMP-komputiko</option>
-    <option value="KON">KON-konstrutekniko</option>
-    <option value="KRI">KRI-kristanismo</option>
-    <option value="KUI">KUI-kuirarto</option>
-    <option value="LIN">LIN-lingvistiko, filologio</option>
-    <option value="MAH">MAH-materialismo historia</option>
-    <option value="MAR">MAR-maraferoj</option>
-    <option value="MAS">MAS-maŝinoj, mekaniko</option>
-    <option value="MAT">MAT-matematiko</option>
-    <option value="MED">MED-medicino, farmacio</option>
-    <option value="MET">MET-meteologio</option>
-    <option value="MIL">MIL-militaferoj</option>
-    <option value="MIN">MIN-mineralogio</option>
-    <option value="MIT">MIT-mitologio</option>
-    <option value="MUZ">MUZ-muziko</option>
-    <option value="NOM">NOM-nomoj</option>
-    <option value="PAL">PAL-paleontologio</option>
-    <option value="PED">PED-pedagogio</option>
-    <option value="PERS">PERS-personoj</option>
-    <option value="POE">POE-poetiko, poezio</option>
-    <option value="POL">POL-politiko, sociologio, administrado</option>
-    <option value="POSX">POSX-poŝto</option>
-    <option value="PRA">PRA-prahistorio</option>
-    <option value="PSI">PSI-psikologio, psikiatrio</option>
-    <option value="RAD">RAD-radiofonio</option>
-    <option value="REL">REL-religioj</option>
-    <option value="RET">RET-retoj, Interreto</option>
-    <option value="SCI">SCI-sciencoj</option>
-    <option value="SHI">SHI-ŝipkonstruado, navigado</option>
-    <option value="SPO">SPO-sporto, ludoj</option>
-    <option value="TEA">TEA-teatro</option>
-    <option value="TEK">TEK-teknikoj</option>
-    <option value="TEKS">TEKS-teksindustrio, vestoj</option>
-    <option value="TEL">TEL-telekomunikoj</option>
-    <option value="TIP">TIP-presarto, libroj</option>
-    <option value="TRA">TRA-trafiko</option>
-    <option value="ZOO">ZOO-zoologio</option>
-  </select>
-  <button
-   onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
-   title="Fako (elektu)">uzo fak</button>
-|  
-   <select name="uzostl"  title="Elektu uzostilon." id="uzostl">
-    <option selected="selected" value=""></option>
-    <option value="ARK">ARK-arkaismo</option>
-    <option value="EVI">EVI-evitinde</option>
-    <option value="FIG">FIG-figure</option>
-    <option value="FRAZ">FRAZ-frazaĵo</option>
-    <option value="KOMUNE">KOMUNE-komune</option>
-    <option value="NEO">NEO-neologismo</option>
-    <option value="POE">POE-poezie</option>
-    <option value="RAR">RAR-malofte</option>
-    <option value="VULG">VULG-vulgare</option>
-  </select>
-  <button
-    onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
-    title="Stilo (elektu)">uzo stl</button>
-|  
-  <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
-  <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">&#x2991;&nbsp;&#x2992;</button>
-</fieldset>
-  
-<fieldset id="fs_rekz" class="collapsed">
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
-    title="Ekzemplo">ekz</button>
-|
-  <button
-    onclick="insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false" 
-    title="Tildo (anstataŭas la radikon)">tld</button>
-|
-  <button
-    onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;[&#x2026;]&#39;);return false" 
-    title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
-|
-  <button
-  onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
-  title="Tradukata parto de ekzemplo">ind</button> 
-|
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
-    title="Fonto (kun kelkaj informoj).">fnt</button>
-|
-  <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
-  <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">&#x2991;&nbsp;&#x2992;</button>
-</fieldset>
-  
-<fieldset id="fs_rdif" class="collapsed">
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
-    title="Nova derivaĵo">drv</button>
-|
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
-    title="Nova senco">snc</button>  
-|
-  <button
-    onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
-    title="Difino">dif</button>
-|
-  <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
-  <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">&#x2991;&nbsp;&#x2992;</button>
-</fieldset>
-<div id="fs_toggle">
-  <a class="aktiva" id="rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
-  <a id="rref" onclick="fs_toggle('rref');">referencoj</a>
-  <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
-  <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
-  <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
-</div>
+    <fieldset id="fs_rind" class="collapsed">
+        <select name="ofc" title="Elektu indikon pri oficialeco" id="ofc">
+        <option selected="selected" value=""></option>
+        <option value="*">*</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+      </select>
+      <button
+        onclick="insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+        title="Indiko pri oficialeco">ofc</button>
+    |  
+        <select name="gra" title="Elektu indikon pri gramatiko." id="gra">
+        <option selected="selected" value=""></option>
+        <option value="<vspec>tr</vspec>">tr</option>
+        <option value="<vspec>ntr</vspec>">ntr</option>
+        <option value="<vspec>x</vspec>">tr/ntr</option>
+        <option value="<vspec>abs.</vspec>">abs.</option>
+        <option value="<vspec>determinilo</vspec>">determinilo</option>
+        <option value="<vspec>ekkrio</vspec>">ekkrio</option>
+        <option value="<vspec>sonimito</vspec>">sonimito</option>
+        <option value="<vspec>konjunkcio</vspec>">konjunkcio</option>
+        <option value="<vspec>subordigilo</vspec>">subordigilo</option>
+        <option value="neoficiala <vspec>prefikso</vspec>">prefikso</option>
+        <option value="neoficiala <vspec>sufikso</vspec>">sufikso</option>
+        <option value="<vspec>prepozicio</vspec>">prepozicio</option>                            
+        <option value="<vspec>pronomo</vspec>">pronomo</option>                            
+      </select>
+      <button
+        onclick="insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false"
+        title="Indikon pri gramatiko">gra</button>
+    |
+      <select id="rsfak" name="uzofak" title="Elektu fakon" id="uzofak">
+        <option selected="selected" value=""></option>
+        <!-- plenigo per JS! -->
+      </select>
+      <button
+      onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+      title="Fako (elektu)">uzo fak</button>
+    |  
+      <select id="rsstl" name="uzostl"  title="Elektu uzostilon." id="uzostl">
+        <option selected="selected" value=""></option>
+        <!-- plenigo per JS! -->
+      </select>
+      <button
+        onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+        title="Stilo (elektu)">uzo stl</button>
+    |  
+      <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">&#x2991;&nbsp;&#x2992;</button>
+    </fieldset>
+      
+    <fieldset id="fs_rekz" class="collapsed">
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
+        title="Ekzemplo">ekz</button>
+    |
+      <button
+        onclick="insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+        title="Tildo (anstataŭas la radikon)">tld</button>
+    |
+      <button
+        onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;[&#x2026;]&#39;);return false" 
+        title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
+    |
+      <button
+      onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
+      title="Tradukata parto de ekzemplo">ind</button> 
+    |
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
+        title="Fonto (kun kelkaj informoj).">fnt</button>
+    |
+      <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">&#x2991;&nbsp;&#x2992;</button>
+    </fieldset>
+      
+    <fieldset id="fs_rdif" class="collapsed">
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
+        title="Nova derivaĵo">drv</button>
+    |
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
+        title="Nova senco">snc</button>  
+    |
+      <button
+        onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
+        title="Difino">dif</button>
+    |
+      <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">&#x2991;&nbsp;&#x2992;</button>
+    </fieldset>
 
-</div>
+    <fieldset id="fs_rnov" class="collapsed">
+      <label for="art">Nova artikolo:</label><br/>
+      <input type="text" id="rart" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
+      <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
+    </fieldset>  
+    
+    <div id="fs_toggle">
+      <a class="aktiva" id="rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
+      <a id="rref" onclick="fs_toggle('rref');">referencoj</a>
+      <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
+      <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
+      <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
+      <a id="rnov" onclick="fs_toggle('rnov');">nova</a>
     </div>
   </div>
-</div>
 
-<p>
-
-<div id="reraroj">
-</div>
+  <div id="reraroj">
+  </div>
   
-<fieldset>
-  <legend>Redakto:</legend>
-  <p>
-  <label for="sxangxo">Ŝanĝo:</label><br/>
-  <input type="text" name="sxangxo" size="70" maxlength="255" placholder="Via ŝanĝo en la artikolo" />
-  <br/>
-  <label for="redaktanto">Retpoŝtadreso:</label><br/>
-  <input type="text" name="redaktanto" size="70" maxlength="80" placeholder="Via registrita retadreso" />
-  </p>  
-  <p>
-  <input id="rrigardo" type="button" name="antaurigardo" value="antaŭrigardu" onclick="rantaurigardo();"/>
-  <input id="rkonservu" type="button" name="konservu" value="konservu" onclick="rkonservo();" />
-  </p>
-</fieldset>
-
-  <input type="hidden" name=".cgifields" value="cx"  />
-</p>  
-</form>
-
-<formname="n" id="n">
-<fieldset>
-  <legend>Aldono:</legend>
-  <label for="art">Kreu novan artikolon:</label><br/>
-  <input type="text" id="rart" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
-  <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
-</fieldset>  
-
+  <div id="rkonservo">
+    <fieldset>
+      <legend>Redakto:</legend>
+      <p>
+      <label for="sxangxo">Ŝanĝo:</label><br/>
+      <input type="text" name="sxangxo" size="70" maxlength="255" placholder="Via ŝanĝo en la artikolo" />
+      <br/>
+      <label for="redaktanto">Retpoŝtadreso:</label><br/>
+      <input type="text" name="redaktanto" size="70" maxlength="80" placeholder="Via registrita retadreso" />
+      </p>  
+      <p>
+      <input id="rkonservu" type="button" name="konservu" value="konservu" onclick="rkonservo();" />
+      </p>
+    </fieldset>
+  </div>
+</div>  
 </form>
 
 <h2>klarigoj</h2>
