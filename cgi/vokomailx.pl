@@ -1,21 +1,19 @@
 #!/usr/bin/perl
 
-#
-# redaktu.pl
-# 
 # 2008 Wieland Pusch
 # 2020 Wolfram Diestel
-#
+
 
 use strict;
 use utf8;
 
-use CGI qw(:standard *table);
+#use CGI qw(:standard *table);
+use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use DBI();
-use Encode;
-use Text::Tabs;
-use POSIX qw(strftime);
+#use Encode;
+#use Text::Tabs;
+#use POSIX qw(strftime);
 
 # propraj perl moduloj estas en:
 use lib("/var/www/web277/files/perllib");
@@ -58,11 +56,22 @@ my $redaktanto = param('redaktanto');
 my $mrk = param('mrk');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 $debugmsg .= "sxangxo=$sxangxo" if $debug;
+my $command = param('button');
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
-      start_html();
+      start_html(
+             -lang=>'eo', 
+             -title=>'vokomailx',
+		         -encoding => 'UTF-8');
+
+# ne faru ion ajn, se mankas la XML-teksto...
+# aŭ valida buton-komando
+unless ($xmlTxt && ($command eq 'rigardo' || $command eq 'konservo')) {
+  print end_html();
+  exit;
+}    
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
@@ -81,7 +90,7 @@ unless ($redaktanto) {
   if (!$permeso) {    
     print "<div id=\"red_err\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
           "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
-          "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>"
+          "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>";
   }
 }
 
@@ -158,7 +167,7 @@ if ($sxg_err) {
 }
 
 # ĉu ni sendu la ŝanĝojn?
-if (param('button') eq 'konservu') {
+if ($command eq 'konservo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
