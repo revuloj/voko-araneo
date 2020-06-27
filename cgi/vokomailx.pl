@@ -28,7 +28,7 @@ use revodb;
 
 $| = 1;
 
-my $debug = 0;
+my $debug = 1;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
 my $homedir    = "/var/www/web277";
@@ -101,9 +101,9 @@ my $xml=normigu_xml($xmlTxt);
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
 print "<div id=\"xml_err\">\n$xml_err\n</div>";
 
-# konvrtu XML al HTML por la antaŭrigardo...
+# konvertu XML al HTML por la antaŭrigardo...
 my ($html, $err);
-revo::xml2html::konvx($dbh, \$xml, \$html, \$err, $xml_dir);
+konvx($dbh, \$xml, \$html, \$err, $xml_dir);
 
 print "<div id=\"html_rigardo\">\n$html\n<div>\n";
 
@@ -174,8 +174,12 @@ if ($command eq 'konservo') {
     print "<div id=\"malkonfirmo\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
   } else {
-    send_xml($redaktanto,$art,$sxangxo,\$xml);
-    print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
+    if (send_xml($redaktanto,$art,$sxangxo,\$xml)) {
+      print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
+    } else {
+      print "<div id=\"malkonfirmo\">Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
+        "al la redaktoservo. Bv. reprovi poste aŭ sendi la ŝanĝon per ordinara retpoŝto kaj averti administranton.</div>\n";
+    }
   }
 }
 
@@ -209,7 +213,6 @@ sub check_redaktanto {
   return $permeso;
 }
 
-
 sub normigu_xml {
   my $xmlTxt = shift;
 
@@ -236,6 +239,13 @@ sub normigu_xml {
   return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
 }
 
+# ni uzas novan "konvx" por vokomailx por ne detrui vokomail.pl, kiu plu uzas "konv"
+sub konvx {
+  my ($dbh, $xml, $html, $err, $xml_dir) = @_;
+  chdir($xml_dir) or die "Mi ne povas atingi dosierujon ".$xml_dir;
+  return revo::xml2html::konv($dbh, $xml, $html, $err, $debug);
+}
+
 sub send_xml {
   my ($redaktanto,$art,$sxangxo,$xml) = @_;
 
@@ -256,8 +266,10 @@ sub send_xml {
   my $smlog = "sendmail.log";
 
   # konektiĝu al retpoŝtservo
-  open SENDMAIL, "| $mail_cmd 2>&1 >$smlog" 
-    or print LOG "Ne povas voki $mail_cmd\n";
+  unless (open SENDMAIL, "| $mail_cmd 2>&1 >$smlog") {
+    print LOG "Ne povas voki $mail_cmd\n";
+    return 0;
+  } 
   print SENDMAIL <<END_OF_MAIL;
 From: $name <$mail_from>
 To: $to
@@ -271,4 +283,4 @@ $$xml
 END_OF_MAIL
 
   close SENDMAIL;
-}        
+}
