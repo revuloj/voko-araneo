@@ -1,3 +1,16 @@
+var revo_codes = {
+  url:
+  {
+      lingvo: '/revo/cfg/lingvoj.xml',
+      fako: '/revo/cfg/fakoj.xml',
+      stilo: '/revo/cfg/stiloj.xml'
+  }
+  // ni plenigos tion per listoj
+  // lingvo: [...]
+  // fako: [...]
+  // stilo: [...]
+}
+
 var re_lng = /<(?:trd|trdgrp)\s+lng\s*=\s*"([^]*?)"\s*>/mg; 
 var re_fak = /<uzo\s+tip\s*=\s*"fak"\s*>([^]*?)</mg; 
 var re_stl = /<uzo\s+tip\s*=\s*"stl"\s*>([^]*?)</mg; 
@@ -425,9 +438,15 @@ function add_err_msg(msg, matches) {
     listigu_erarojn(errors);
 }
 
-function kontrolu_kodojn(list,regex) {
+function kontrolu_kodojn(clist,regex) {
   var xml = document.getElementById("rxmltxt").value;
   var m; var invalid = [];
+  var list = revo_codes[clist];
+
+  if (! list.length) {
+    console.error("Kodlisto " + clist + "estas malplena, ni ne povas kontroli tion!");
+    return;
+  }
   
   while (m = regex.exec(xml)) {
     if ( list.indexOf(m[1])<0 ) {
@@ -491,9 +510,9 @@ function rantaurigardo() {
   kontrolu_mrk("test");
   kontrolu_trd();
   kontrolu_ref();
-  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn(c_lingvoj,re_lng));
-  add_err_msg("Nekonata fako: ",kontrolu_kodojn(c_fakoj,re_fak));
-  add_err_msg("Nekonata stilo: ",kontrolu_kodojn(c_stiloj,re_stl));
+  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvo",re_lng));
+  add_err_msg("Nekonata fako: ",kontrolu_kodojn("fako",re_fak));
+  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
  // kontrolu_fak();
   //kontrolu_stl();
   //...
@@ -555,22 +574,50 @@ function sf(pos, line, lastline) {
     //test: antaurigardo();
 }
 
-/*     // ni komplete forigos kuketojn kaj uzu lokan memoron!!!
+function load_codes(xmlTag) {
+  var codes = [];
+  var request = new XMLHttpRequest();
+  var fileUrl = revo_codes.url[xmlTag];
 
-function checkCookieConsent() {
-       var cookies = document.cookie;
-       var found = cookies.indexOf('revo-konsento=jes');
-       if (found >= 0) {
-       document.getElementById('kuketoaverto').style.display = 'none'; 
-       } else {
-       document.getElementById('kuketoaverto').style.display = 'block'; 
-       }
+  request.open('GET', fileUrl, true);
+  
+  request.onload = function() {
+    if (this.status >= 200 && this.status < 400) {
+      // Success!
+      parser = new DOMParser();
+      doc = parser.parseFromString(this.response,"text/xml");
+
+      for (e of doc.getElementsByTagName(xmlTag)) {
+          var c = e.attributes["kodo"];
+          //console.log(c);
+          codes.push(c.value);
+      } 
+
+      revo_codes[xmlTag] = codes;
+    } else {
+      // post koneektiĝo okazis eraro
+      console.error('Eraro dum ŝargo de '+fileUrl);       
+    }
+  };
+  
+  request.onerror = function() {
+    // konekteraro
+    console.error('Eraro dum konektiĝo por '+fileUrl);
+  };
+  
+  request.send();
 }
-   
-function setCookieConsent() {
-       var CookieDate = new Date;
-       var ExpireDate = new Date; ExpireDate.setFullYear(CookieDate.getFullYear() + 50);
-       document.cookie = 'revo-konsento=jes+' + CookieDate.toISOString() + '; expires=' + ExpireDate.toUTCString() + '; path=/;';
-       document.getElementById('kuketoaverto').style.display = 'none'; 
-}    
-*/
+
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(function() { 
+  load_codes("lingvo");
+  load_codes("fako");
+  load_codes("stilo");
+})
