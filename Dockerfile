@@ -93,17 +93,21 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* voko-grundo-master/dtd/* \
+  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
+     voko-grundo-master/cfg/* voko-grundo-master/dtd/* \
   && rm master.zip \
-  && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/ \
+  && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/revo/ \
+  && mv voko-grundo-master/cfg /usr/local/apache2/htdocs/revo/ \
+  && mv voko-grundo-master/dtd /usr/local/apache2/htdocs/revo/ \
   && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && mkdir /usr/local/apache2/htdocs/revo/xml \
-  && cp -r /usr/local/apache2/htdocs/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
   && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
   && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
   && chown -R ${DAEMON_UID} /var/www/web277/html/revo
+
+#   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
 COPY sxangxoj.rdf /var/www/web277/html/
 RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
