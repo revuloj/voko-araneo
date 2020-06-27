@@ -47,7 +47,6 @@ $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
 
 my $enc = "utf-8";
-my $debugmsg;
 
 ## parametroj...
 my $art = param('art');
@@ -55,7 +54,6 @@ my $xmlTxt = param('xmlTxt');
 my $redaktanto = param('redaktanto');
 #my $mrk = param('mrk');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
-$debugmsg .= "sxangxo=$sxangxo" if $debug;
 my $command = param('command');
 
 binmode STDOUT, ":utf8";
@@ -65,6 +63,16 @@ print header(-charset=>'utf-8',
              -lang=>'eo', 
              -title=>'vokomailx',
 		         -encoding => 'UTF-8');
+
+if ($debug) {
+  print "<div id=\"params\">";
+  print "art: $art\n";
+  print "redaktanto: $redaktanto\n";
+  print "sxangxo: $sxangxo\n";
+  print "command: $command\n";
+  print "xml: ".length($xmlTxt)."\n";
+  print "</div>";
+}
 
 # ne faru ion ajn, se mankas la XML-teksto...
 # aŭ valida buton-komando
@@ -94,7 +102,6 @@ unless ($redaktanto) {
   }
 }
 
-#$debugmsg .= "art = $art\n";
 my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
@@ -220,13 +227,13 @@ sub normigu_xml {
     # normigu kodigon
     $xmlTxt = Encode::decode($enc, $xmlTxt);
     $xmlTxt =~ s/\r\n/\n/g;
-    $debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
+    #$debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
 
     # trovu la identigilon de la artikolo,
     # se ĝi rompiĝos ni devos restarigi gin malsupre...
     my $id;
     if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
-      $debugmsg .= "ID: $1-\n";
+      #$debugmsg .= "ID: $1-\n";
       $id = $1;
     }
 

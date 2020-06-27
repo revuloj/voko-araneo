@@ -555,14 +555,13 @@ function create_new_art() {
 function vokomailx(command) {
   var request = new XMLHttpRequest();
   var url = '/cgi-bin/vokomailx.pl';
+  var data = new FormData();
 
-  var data = {
-    xmlTxt: document.getElementById("rxmltxt").value,
-    art: document.getElementsByName("art")[0].value,
-    redaktanto: document.getElementsByName("redaktanto")[0].value,
-    sxangxo: document.getElementsByName("sxangxo")[0].value,
-    command: command
-  }
+  data.append("xmlTxt",document.getElementById("rxmltxt").value);
+  data.append("art", document.getElementsByName("art")[0].value);
+  data.append("redaktanto", document.getElementsByName("redaktanto")[0].value);
+  data.append("sxangxo", document.getElementsByName("sxangxo")[0].value);
+  data.append("command", command);
 
   request.open('POST', url , true);
   
@@ -595,7 +594,7 @@ function vokomailx(command) {
     console.error('Eraro dum konektiĝo por ' + url);
   };
   
-  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  //request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
   request.send(data);
 }
 

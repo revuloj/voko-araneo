@@ -114,6 +114,8 @@ RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
+COPY n1b/ /usr/local/apache2/htdocs/revo/
+
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...
 # oni povas kunmeti COPY+ADD kaj ambaŭ RUN per redukti tavolojn
