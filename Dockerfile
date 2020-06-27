@@ -93,10 +93,11 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
+  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* voko-grundo-master/dtd/* \
   && rm master.zip \
   && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/ \
   && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && mkdir /usr/local/apache2/htdocs/revo/xml \
   && cp -r /usr/local/apache2/htdocs/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
   && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
