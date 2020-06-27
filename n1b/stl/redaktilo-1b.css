@@ -2,18 +2,24 @@ H1 {
     font-family: monospace;
 }
 
-#rteksto {
-    display: flex;
-}
-
-#ajxb {
-    flex-grow: 0;
-}
-
-#rvteksto {
-    flex-grow: 1;
+#redaktilo {
     display: flex;
     flex-direction: column;
+}
+
+#navigado {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+#navigado div {
+    margin-bottom: 0;
+}
+
+#navigado .filler {
+    width: 2em;
+    flex-grow: 3;
 }
 
 textarea {
@@ -49,13 +55,13 @@ fieldset legend {
     background-color: palegoldenrod;
 }
 
-#fs_toggle {
+.tabs {
     margin-left: 0.5em;
     margin-top: 0em;
     margin-bottom: 1em;
 }   
 
-#fs_toggle a {
+.tabs a {
     padding: 0.5em;
     /*background-color: palegoldenrod; */
     font-family: monospace;
@@ -64,7 +70,7 @@ fieldset legend {
     text-decoration: none;
 }
  
-#fs_toggle a.aktiva {
+.tabs a.aktiva {
    font-weight: bold;
    color: black;
    text-transform: uppercase;

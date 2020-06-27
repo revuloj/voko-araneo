@@ -27,32 +27,33 @@
   <div id="navigado">
     <button
       onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
-    <br />
     <button
       onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
     <button
        onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
     <button
        onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
-    <label>
-      <input type="checkbox" name="cx" value="1" accesskey="x" 
-        onclick="document.f.xmlTxt.focus()" />c<u>x</u> = ĉ ..
-    </label>
+    <div>
+      <label>
+        &nbsp;<input type="checkbox" name="cx" value="1" accesskey="x" 
+          onclick="document.f.xmlTxt.focus()" /> c<u>x</u> = ĉ ..
+      </label>
+    </div>
     <div class="filler"></div>
     <div id="rtabs" class="tabs">
-      <a class="aktiva" id="rtab_xml" onclick="tab_toggle('rxmltxt');">redakti</a>
-      <a id="rtab_rigardo" onclick="tab_toggle('rrigardo'); rantaurigardo()">antaŭrigardo</a>
+      <a class="aktiva" id="txmltxt" onclick="tab_toggle('txmltxt');">redakti</a>
+      <a id="trigardo" onclick="tab_toggle('trigardo'); rantaurigardo()">antaŭrigardo</a>
     </div>      
   </div>
 
   <div id="tabulo">
-    <div id="dxmltxt">
+    <div id="tab_txmltxt">
       <textarea id="rxmltxt" name="xmlTxt" cols="100" 
         onkeypress="return klavo(event)" id="xmlTxt">    
       </textarea>
       <input type="hidden" name="art" value="XXX" />
     </div>
-    <div id="drigardo">      
+    <div id="tab_trigardo">      
     </div>  
   </div>
 
@@ -234,17 +235,18 @@
     </fieldset>
 
     <fieldset id="fs_rnov" class="collapsed">
-      <label for="art">Nova artikolo:</label><br/>
+      <label for="art">Nova artikolo:</label>
       <input type="text" id="rart" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
       <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
     </fieldset>  
     
-    <div id="fs_toggle">
+    <div id="fs_toggle" class="tabs">
       <a class="aktiva" id="rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
       <a id="rref" onclick="fs_toggle('rref');">referencoj</a>
       <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
       <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
       <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
+      <a id="rchiuj" onclick="fs_toggle_chiuj();">ĉiuj</a>
       <a id="rnov" onclick="fs_toggle('rnov');">nova</a>
     </div>
   </div>
