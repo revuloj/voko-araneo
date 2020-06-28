@@ -507,13 +507,6 @@ function listigu_erarojn(err) {
   }
 }
 
-function forigu_erarojn() {
-  var el = document.getElementById("reraroj");
-  for (ch of el.children) {
-    el.removeChild(ch);
-  }
-}
-
 function add_err_msg(msg, matches) {
   var errors = [];
 
@@ -593,8 +586,8 @@ function kontrolu_ref() {
 }
 
 function rantaurigardo() {
+  document.getElementById("reraroj").textContent='';
   vokomailx("rigardo");
-  forigu_erarojn();
   kontrolu_mrk("test");
   kontrolu_trd();
   kontrolu_ref();
@@ -661,25 +654,17 @@ function vokomailx(command) {
       var err_list = document.getElementById("reraroj");
       var rigardo = document.getElementById("tab_trigardo");
 
-      for (div of doc.getElementsByTagName("div")) {
+      for (div of doc.getElementsByClassName("eraroj")) {
         // debugging...
         console.log("div id=" + div.id);
-
-        if (div.classList.contains("eraroj")) {
-          err_list.appendChild(div);
-        } else if (div.id == "html_rigardo") {
-          rigardo.textContent = '';
-          rigardo.appendChild(div);
-        }
+        err_list.appendChild(div);
       }
 
-      /*
-      for (e of doc.getElementsByTagName(xmlTag)) {
-          var c = e.attributes["kodo"];
-          //console.log(c);
-          codes.push(c.value);
-      } 
-*/
+      var html = doc.getElementById("html_rigardo")
+      var pied = html.querySelector("span.redakto");
+      if (pied) html.removeChild(pied);
+      rigardo.textContent = '';
+      rigardo.appendChild(html);
 
     } else {
       // post konektiĝo okazis eraro
@@ -695,8 +680,6 @@ function vokomailx(command) {
   //request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
   request.send(data);
 }
-
-
 
 function ready(fn) {
   if (document.readyState != 'loading'){

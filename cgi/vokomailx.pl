@@ -112,7 +112,7 @@ print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>";
 my ($html, $err);
 konvx($dbh, \$xml, \$html, \$err, $xml_dir);
 
-print "<div id=\"html_rigardo\">\n$html\n<div>\n";
+print "<div id=\"html_rigardo\">\n$html\n</div>\n";
 
 
 # FARENDA:
@@ -165,7 +165,7 @@ if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) {
 
 } elsif (!param('nova')) {
   unless ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
-    $sxg_err="Eraro: ŝanĝoteksto mankas: $sxangxo\n";
+    $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
   }
 }
 
@@ -250,7 +250,12 @@ sub normigu_xml {
 sub konvx {
   my ($dbh, $xml, $html, $err, $xml_dir) = @_;
   chdir($xml_dir) or die "Mi ne povas atingi dosierujon ".$xml_dir;
-  return revo::xml2html::konv($dbh, $xml, $html, $err, $debug);
+  my $htm2;
+  if (revo::xml2html::konv($dbh, $xml, \$htm2, $err, $debug)) {
+    $htm2 =~ m/<body>(.*)<\/body>/s;
+    $$html = $1;
+    return 1;
+  }
 }
 
 sub send_xml {
