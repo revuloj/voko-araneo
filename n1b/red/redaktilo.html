@@ -7,10 +7,10 @@
   <meta http-equiv="Cache-Control" content="no-cache">
   <meta charset="utf-8">
   
-  <link rel="stylesheet" type="text/css" href="/revo/stl/artikolo.css" />
-  <link rel="stylesheet" href="stl/redaktilo-1b.css">
+  <link rel="stylesheet" type="text/css" href="../stl/artikolo.css" />
+  <link rel="stylesheet" href="../stl/redaktilo-1b.css">
 
-  <script src="jsc/redaktilo-1b.js"></script>
+  <script src="../jsc/redaktilo-1b.js"></script>
 
 </head>
 <body>
@@ -47,14 +47,14 @@
   </div>
 
   <div id="tabulo">
+
+    <div id="tab_trigardo" class="hidden">      
+    </div>  
+    
     <div id="tab_txmltxt">
       <textarea id="rxmltxt" name="xmlTxt" cols="100" 
         onkeypress="return klavo(event)" id="xmlTxt"></textarea>
       <input type="hidden" name="art" value="XXX" />
-    </div>
-    <div id="tab_trigardo" class="hidden">      
-    </div>  
-  </div>
 
 <!-- buton-grupoj por redaktado -->
   <div id="rv_sets">
@@ -254,6 +254,9 @@
       <a id="rnov" onclick="fs_toggle('rnov');">nova</a>
     </div>
   </div>
+      
+ </div> <!-- tab_txmltxt -->
+</div> <!-- tabuloj -->
 
   <div id="reraroj">
   </div>

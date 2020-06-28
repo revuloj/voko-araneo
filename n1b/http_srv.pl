@@ -15,11 +15,13 @@ revo_url('http://retavortaro.de').
 
 user:file_search_path(stl,'./stl').
 user:file_search_path(jsc,'./jsc').
+user:file_search_path(red,'./red').
 %http:location(stl,root(stl),[]).
 
 :- http_handler('/', http_reply_from_files('.', []), [id(root)]).       
 :- http_handler('/index.html', http_reply_file('./index.html', []), [id(index)]).       
-:- http_handler('/redaktilo.html', http_reply_file('./redaktilo.html', []), [id(redaktilo), priority(200)]).       
+%:- http_handler('/redaktilo.html', http_reply_file('./redaktilo.html', []), [id(redaktilo), priority(200)]).       
+:- http_handler(root(red), serve_files_in_directory(red), [prefix, id(red), priority(100)]).       
 :- http_handler(root(stl), serve_files_in_directory(stl), [prefix, id(stl), priority(100)]).       
 :- http_handler(root(jsc), serve_files_in_directory(jsc), [prefix, id(jsc), priority(100)]).       
 :- http_handler(root(revo), revo_proxy, [prefix, id(revo), priority(100)]).
