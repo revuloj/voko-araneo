@@ -26,6 +26,10 @@ H1 {
     flex-grow: 3;
 }
 
+#r_nav_btn {
+    display: flex;
+}
+
 #tab_rigardo {
     margin: 0.5em;
     border: 2px solid goldenrod;
@@ -59,7 +63,7 @@ fieldset {
 }
 
 .collapsed {
-    display: none;
+    display: none !important;
     /*position: absolute;
     top: -1000em;
     left: -1000em;*/

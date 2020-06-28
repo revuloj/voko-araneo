@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<h1>Redakti <a href="/revo/art/XXX.html">XXXX</a></h1>
+<h1>Redakti <a id="r_art_titolo" href="/revo/art/XXX.html">XXXX</a></h1>
 
 <p class="rhelpo">
   ► <a target="_new" href="https://revuloj.github.io/respondoj.html">Informoj por redaktantoj.</a>
@@ -25,15 +25,15 @@
 
 <div id="redaktilo">
   <div id="navigado">
-    <button
-      onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
-    <button
-      onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
-    <button
-       onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
-    <button
-       onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
-    <div>
+    <div id="r_nav_btn">
+      <button
+        onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
+      <button
+        onclick="nextTag(&#39;<drv&#39,1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
+      <button
+        onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
+      <button
+        onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
       <label>
         &nbsp;<input type="checkbox" name="cx" value="1" accesskey="x" 
           onclick="document.f.xmlTxt.focus()" /> c<u>x</u> = ĉ ..
@@ -54,7 +54,7 @@
     <div id="tab_txmltxt">
       <textarea id="rxmltxt" name="xmlTxt" cols="100" 
         onkeypress="return klavo(event)" id="xmlTxt"></textarea>
-      <input type="hidden" name="art" value="XXX" />
+      <input id="r_art" type="hidden" name="art" value="XXX" />
 
 <!-- buton-grupoj por redaktado -->
   <div id="rv_sets">
@@ -240,7 +240,7 @@
 
     <fieldset id="fs_rnov" class="collapsed">
       <label for="art">Nova artikolo:</label>
-      <input type="text" id="rart" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
+      <input type="text" id="r_nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
       <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
     </fieldset>  
     

@@ -450,6 +450,13 @@ function tab_toggle(id) {
     tab_id = 'tab_'+el.id;
     document.getElementById(tab_id).classList.remove('collapsed');
   }
+  // ni ankaŭ devas kaŝi la butonojn super la reakto-tabulo por la antaŭrigardo...
+  if (id == "txmltxt") {
+    document.getElementById("r_nav_btn").classList.remove('collapsed');
+  } else {
+    document.getElementById("r_nav_btn").classList.add('collapsed');
+  }
+
 }
 
 function fs_toggle(id) {
@@ -529,7 +536,7 @@ function kontrolu_kodojn(clist,regex) {
   }
   
   while (m = regex.exec(xml)) {
-    if ( ! list.codes[m[1]] ) {
+    if ( m[1] && !list.codes[m[1]] ) {
       invalid.push(m);
       console.error("Nevalida kodo \""+m[1]+"\" ĉe: "+m.index);
     }
@@ -587,13 +594,20 @@ function kontrolu_ref() {
 
 function rantaurigardo() {
   document.getElementById("reraroj").textContent='';
-  vokomailx("rigardo");
-  kontrolu_mrk("test");
-  kontrolu_trd();
-  kontrolu_ref();
-  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvoj",re_lng));
-  add_err_msg("Nekonata fako: ",kontrolu_kodojn("fakoj",re_fak));
-  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
+  var art = document.getElementById("r_art").value;
+  var xml = document.getElementById("rxmltxt").value;
+
+  if (xml.startsWith("<?xml")) {
+    vokomailx("rigardo",art,xml);
+    kontrolu_mrk(art);
+    kontrolu_trd();
+    kontrolu_ref();
+    add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvoj",re_lng));
+    add_err_msg("Nekonata fako: ",kontrolu_kodojn("fakoj",re_fak));
+    add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
+  } else {
+    listigu_erarojn(["Averto: Artikolo devas komenciĝi je <?xml !"]);
+  }
  // kontrolu_fak();
   //kontrolu_stl();
   //...
@@ -604,8 +618,10 @@ function rkonservo() {
 }
 
 function create_new_art() {
-  var art = document.getElementById("rart").val;
+  var art = document.getElementById("r_nova_art").value;
   var ta = document.getElementById("rxmltxt");
+  document.getElementById("r_art").value = art;
+  document.getElementById("r_art_titolo").textContent = art;
   ta.value = 
       '<?xml version="1.0"?>\n'
     + '<!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">\n'
@@ -632,13 +648,13 @@ function create_new_art() {
     + '</vortaro>\n';
 }
    
-function vokomailx(command) {
+function vokomailx(command,art,xml) {
   var request = new XMLHttpRequest();
   var url = '/cgi-bin/vokomailx.pl';
   var data = new FormData();
 
-  data.append("xmlTxt",document.getElementById("rxmltxt").value);
-  data.append("art", document.getElementsByName("art")[0].value);
+  data.append("xmlTxt", xml);
+  data.append("art", art);
   data.append("redaktanto", document.getElementsByName("redaktanto")[0].value);
   data.append("sxangxo", document.getElementsByName("sxangxo")[0].value);
   data.append("command", command);
