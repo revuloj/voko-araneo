@@ -655,11 +655,22 @@ function vokomailx(command) {
   request.onload = function() {
     if (this.status >= 200 && this.status < 400) {
       // Success!
-      parser = new DOMParser();
-      doc = parser.parseFromString(this.response,"text/html");
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(this.response,"text/html");
+
+      var err_list = document.getElementById("reraroj");
+      var rigardo = document.getElementById("tab_trigardo");
 
       for (div of doc.getElementsByTagName("div")) {
+        // debugging...
         console.log("div id=" + div.id);
+
+        if (div.classList.contains("eraroj")) {
+          err_list.appendChild(div);
+        } else if (div.id == "html_rigardo") {
+          rigardo.textContent = '';
+          rigardo.appendChild(div);
+        }
       }
 
       /*

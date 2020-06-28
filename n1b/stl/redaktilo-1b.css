@@ -43,7 +43,7 @@ fieldset {
     background-color: palegoldenrod;
 }
 
-fieldset.collapsed {
+.collapsed {
     display: none;
     /*position: absolute;
     top: -1000em;
@@ -91,11 +91,13 @@ span.right {
     font-weight: bold;
     color: black;
 }
+
 h2 {
     background-color: palegoldenrod;
     border: 2px solid palegoldenrod;
     margin-bottom: 0;
 }
+
 .averto {
     margin-top: 0;
     border: 2px solid palegoldenrod;
@@ -141,9 +143,3 @@ input {
     text-align: center
 }
 
-.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
-    background-color: #c0c090; margin: 0; display: none;
-    border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
-        }
-.kuketoaverto P { text-align:center }
-.kuketoaverto FORM { text-align:center }

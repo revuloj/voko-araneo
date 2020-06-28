@@ -90,13 +90,13 @@ my $dbh = revodb::connect();
 my $permeso = 0;
 
 unless ($redaktanto) {
-  print "<div id=\"red_err\">Averto: Por sendi vian redakton, vi devas ankoraŭ doni vian retadreson, ".
+  print "<div id=\"red_err\" class=\"eraroj\">Averto: Por sendi vian redakton, vi devas ankoraŭ doni vian retadreson, ".
         "kun kiu vi registriĝis kiel redaktanto.</div>";
 } else {
   $permeso = check_redaktanto($dbh,$redaktanto);
 
   if (!$permeso) {    
-    print "<div id=\"red_err\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
+    print "<div id=\"red_err\" class=\"eraroj\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
           "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
           "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>";
   }
@@ -106,7 +106,7 @@ my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
-print "<div id=\"xml_err\">\n$xml_err\n</div>";
+print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>";
 
 # konvertu XML al HTML por la antaŭrigardo...
 my ($html, $err);
@@ -133,7 +133,7 @@ if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la X
     @ref_err = check_ref_cel($dbh,$xml_dir,@refs); 
   }
 
-  print "<div id=\"ref_err\">\n".join("\n",@ref_err)."\n</div>";
+  print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>";
 }
 
 # FARENDA: fakte kun la transiro al Git ni povas toleri
@@ -170,7 +170,7 @@ if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) {
 }
 
 if ($sxg_err) {
-  print "<div id=\"sxg_err\">\n$sxg_err\n</div>";
+  print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>";
 }
 
 # ĉu ni sendu la ŝanĝojn?
@@ -178,13 +178,13 @@ if ($command eq 'konservo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
-    print "<div id=\"malkonfirmo\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
+    print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
   } else {
     if (send_xml($redaktanto,$art,$sxangxo,\$xml)) {
       print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
     } else {
-      print "<div id=\"malkonfirmo\">Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
+      print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
         "al la redaktoservo. Bv. reprovi poste aŭ sendi la ŝanĝon per ordinara retpoŝto kaj averti administranton.</div>\n";
     }
   }
