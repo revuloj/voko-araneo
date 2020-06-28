@@ -437,6 +437,21 @@ function restore_preferences() {
   }
 }
 
+function tab_toggle(id) {
+  var el = document.getElementById(id);
+  var tab_id;
+  if (! el.classList.contains('aktiva')) {
+    for (ch of el.parentElement.children) {
+      ch.classList.remove('aktiva')
+      tab_id = 'tab_'+ch.id;
+      document.getElementById(tab_id).classList.add('collapsed');
+    }
+    el.classList.add('aktiva');
+    tab_id = 'tab_'+el.id;
+    document.getElementById(tab_id).classList.remove('collapsed');
+  }
+}
+
 function fs_toggle(id) {
   var el = document.getElementById(id);
   var fs_id;
@@ -444,11 +459,23 @@ function fs_toggle(id) {
     for (ch of el.parentElement.children) {
       ch.classList.remove('aktiva')
       fs_id = 'fs_'+ch.id;
-      document.getElementById(fs_id).classList.add('collapsed');
+
+      // fermu ĉiujn videblajn tabuletojn
+      if (id != "rchiuj" && ch.id != "rchiuj") {
+        document.getElementById(fs_id).classList.add('collapsed');
+      
+      } else { // malfermu ĉiujn krom "novaj"
+        if ( ch.id == "rnov" )
+          document.getElementById(fs_id).classList.add('collapsed');
+        else if ( ch.id != "rchiuj")
+          document.getElementById(fs_id).classList.remove('collapsed');
+      }
     }
     el.classList.add('aktiva');
-    fs_id = 'fs_'+el.id;
-    document.getElementById(fs_id).classList.remove('collapsed');
+    if ( id != "rchiuj" ) {
+      fs_id = 'fs_' + id;
+      document.getElementById(fs_id).classList.remove('collapsed');
+    }
   }
 }
 
@@ -503,13 +530,13 @@ function kontrolu_kodojn(clist,regex) {
   var m; var invalid = [];
   var list = revo_codes[clist];
 
-  if (! list || Object.keys(list).length === 0) {
-    console.error("Kodlisto " + clist + "estas malplena, ni ne povas kontroli tion!");
+  if (! list ) {
+    console.error("Kodlisto \"" + clist + "\" estas malplena, ni ne povas kontroli ilin!");
     return;
   }
   
   while (m = regex.exec(xml)) {
-    if ( list(m[1]) ) {
+    if ( ! list.codes[m[1]] ) {
       invalid.push(m);
       console.error("Nevalida kodo \""+m[1]+"\" ĉe: "+m.index);
     }
@@ -571,9 +598,9 @@ function rantaurigardo() {
   kontrolu_mrk("test");
   kontrolu_trd();
   kontrolu_ref();
-  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvo",re_lng));
-  add_err_msg("Nekonata fako: ",kontrolu_kodojn("fako",re_fak));
-  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stilo",re_stl));
+  add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvoj",re_lng));
+  add_err_msg("Nekonata fako: ",kontrolu_kodojn("fakoj",re_fak));
+  add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
  // kontrolu_fak();
   //kontrolu_stl();
   //...

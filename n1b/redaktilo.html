@@ -95,9 +95,10 @@
       <button
         onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
         title="Indeksita parto de traduko">ind</button> 
-    |
+    <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">&#x2991;&nbsp;&#x2992;</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">❬❭</button>
+    </span>
     </fieldset>
 
     <fieldset id="fs_rref" class="collapsed">
@@ -129,9 +130,10 @@
       <button
         onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
         title="Rimarko">rim</button>
-    |
+    <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">&#x2991;&nbsp;&#x2992;</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">❬❭</button>
+    </span>
     </fieldset>
 
     <fieldset id="fs_rind" class="collapsed">
@@ -187,9 +189,10 @@
       <button
         onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
         title="Stilo (elektu)">uzo stl</button>
-    |  
+    <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">&#x2991;&nbsp;&#x2992;</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">❬❭</button>
+    </span>
     </fieldset>
       
     <fieldset id="fs_rekz" class="collapsed">
@@ -212,9 +215,10 @@
       <button
         onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
-    |
+    <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">&#x2991;&nbsp;&#x2992;</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">❬❭</button>
+    </span>
     </fieldset>
       
     <fieldset id="fs_rdif" class="collapsed">
@@ -229,9 +233,10 @@
       <button
         onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
         title="Difino">dif</button>
-    |
+    <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">&#x2991;&nbsp;&#x2992;</button>
+      <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">❬❭</button>
+    </span>
     </fieldset>
 
     <fieldset id="fs_rnov" class="collapsed">
@@ -246,7 +251,7 @@
       <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
       <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
       <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
-      <a id="rchiuj" onclick="fs_toggle_chiuj();">ĉiuj</a>
+      <a id="rchiuj" onclick="fs_toggle('rchiuj');">ĉiuj</a>
       <a id="rnov" onclick="fs_toggle('rnov');">nova</a>
     </div>
   </div>
@@ -274,7 +279,6 @@
 
 <h2>klarigoj</h2>
 <ul class="averto">
-<li>Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.</li>
 <li>klavo kontrolo-Z malfaras la lastan &#349;an&#285;on</li>
 <li>klavo kontrolo-Y refaras la lastan &#349;an&#285;on</li>
 <li>klavo kontrolo-F ebligas ser&#265;i<br>
