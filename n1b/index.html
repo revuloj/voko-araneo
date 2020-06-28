@@ -75,7 +75,7 @@
                         $('#navigado').load(href+' table');  
                     } else if (href.startsWith('/cgi-bin/vokomail')) {
                         var art = href.substring(href.search('art=')+4);
-                        $('#s_artikolo').load('/redaktilo.html',
+                        $('#s_artikolo').load('/revo/red/redaktilo.html',
                             function() { load_xml(art) });
                     } else {                        
                         if (href[0] != '/' && ! href.startsWith('http')) href = '/revo/art/'+href;
