@@ -34,6 +34,10 @@ my $homedir = "/var/www/web277";
 my $htmldir    = "$homedir/html";
 my $revo_base    = "$homedir/html/revo";
 
+my $mail_cmd    = '/usr/sbin/sendmail -t';
+my $mail_from   = 'noreply@retavortaro.de';
+my $mail_to     = 'revo@retavortaro.de';
+
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
@@ -874,65 +878,26 @@ EOD
     if ($ne_konservu) {
       print "ne konservita";
     } else {
-      my $from    = 'noreply@retavortaro.de';
-      my $name    = "\"Revo redaktu.pl $redaktanto\"";
-      my (@to, $sxangxo2);
-      push @to, $redaktanto; # if param('sendu_al_tio');
-      push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
-#      push @to, 'wieland@wielandpusch.de'; # if param('sendu_al_admin');  # revodb::mail_to
-      if (param('nova')) {
-        $sxangxo2 = "aldono: $art";
-      } else {
-        $sxangxo2 = "redakto: $sxangxo";
-      }
-      if (my $to = join(', ', @to)) {
-        my $subject = "Revo redaktu.pl $art";
 
-    my $header = [
-      To => $to,
-      From => "$name <$from>",
-      "Reply-To" => $redaktanto,
-      Subject => $subject,
-      X-retadreso: $ENV{REMOTE_ADDR}
-    ];
-    retposhto::sendu(
-      \%mail,
-      "$sxangxo2\n\n$xml2");
-
-##      my $smlog = "sendmail.log";
-##        open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
-##        print SENDMAIL <<End_of_Mail;
-##From: $name <$from>
-##To: $to
-##Reply-To: $redaktanto
-##Subject: $subject
-##X-retadreso: $ENV{REMOTE_ADDR}
-##
-##$sxangxo2
-##
-##$xml2
-##End_of_Mail
-##
-##        close SENDMAIL;
-
-        print "sendita al $to";
-		
+        if (send_xml($redaktanto,$art,$sxangxo,\$xml2)) {
+          print "<p>Bone: Ni sendis vian ŝanĝon al la redaktoservo.</p>\n";
+        } else {
+          print "<p>Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
+            "al la redaktoservo. Bv. reprovi poste aŭ sendi la ŝanĝon per ordinara retpoŝto kaj averti administranton.</p>\n";
+        }
+    } # ...konservu
 ##	if (-s $smlog) {
 ##		  open L, "<", $smlog;
 ##		  my $ltxt = join "", <L>;
 ##		  close L;
 ##		  print pre("sendmail.log: $ltxt");
 ##	}
-	
-      } else {
-        print "ne sendita, elektu adreson sube";
-      }
-    }
+
     print <<'EOD';
 </div><br>
 EOD
-  }
-}
+  } # .. param konservu
+} # ..redaktanto
 
 $dbh->disconnect() if $dbh;
 
@@ -1253,5 +1218,44 @@ sub xml_context {
     }
 
     return ('', 0, 0);
+}
+
+sub send_xml {
+  my ($redaktanto,$art,$sxangxo,$xml) = @_;
+
+  my $name    = "\"Revo redaktu.pl $redaktanto\"";
+  my (@to, $red_cmd);
+  push @to, $redaktanto; 
+  push @to, $mail_to; 
+
+  # unua linio de retpoŝto
+  if (param('nova')) {
+    $red_cmd = "aldono: $art";
+  } else {
+    $red_cmd = "redakto: $sxangxo";
+  }
+
+  my $to = join(', ', @to);
+  my $subject = "Revo redaktu.pl $art";
+  my $smlog = "sendmail.log";
+
+  # konektiĝu al retpoŝtservo
+  unless (open SENDMAIL, "| $mail_cmd 2>&1 >$smlog") {
+    print LOG "Ne povas voki $mail_cmd\n";
+    return 0;
+  } 
+  print SENDMAIL <<END_OF_MAIL;
+From: $name <$mail_from>
+To: $to
+Reply-To: $redaktanto
+Subject: $subject
+X-retadreso: $ENV{REMOTE_ADDR}
+
+$red_cmd
+
+$$xml
+END_OF_MAIL
+
+  close SENDMAIL;
 }
 
