@@ -6,36 +6,36 @@ H1 {
     font-family: monospace;
 }
 
-#redaktilo {
+#r:redaktilo {
     display: flex;
     flex-direction: column;
 }
 
-#navigado {
+#r:navigado {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
 }
 
-#navigado div {
+#r:navigado div {
     margin-bottom: 0;
 }
 
-#navigado .filler {
+#r:navigado .filler {
     width: 2em;
     flex-grow: 3;
 }
 
-#r_nav_btn {
+#r:nav_btn {
     display: flex;
 }
 
-#tab_rigardo {
+#r:tab_rigardo {
     margin: 0.5em;
     border: 2px solid goldenrod;
 }
 
-#reraroj {
+#r:eraroj {
     margin: 0.5em;
     padding: 0.3em;
     border: 2px solid orangered;

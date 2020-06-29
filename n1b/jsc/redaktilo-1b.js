@@ -446,15 +446,15 @@ function tab_toggle(id) {
   if (! el.classList.contains('aktiva')) {
     for (ch of el.parentElement.children) {
       ch.classList.remove('aktiva')
-      tab_id = 'tab_'+ch.id;
+      tab_id = 'r:tab_'+ch.id.substring(2);
       document.getElementById(tab_id).classList.add('collapsed');
     }
     el.classList.add('aktiva');
-    tab_id = 'tab_'+el.id;
+    tab_id = 'r:tab_'+el.id.substring(2);
     document.getElementById(tab_id).classList.remove('collapsed');
   }
   // ni ankaŭ devas kaŝi la butonojn super la reakto-tabulo por la antaŭrigardo...
-  if (id == "txmltxt") {
+  if (id == "r:txmltxt") {
     document.getElementById("r:nav_btn").classList.remove('collapsed');
   } else {
     document.getElementById("r:nav_btn").classList.add('collapsed');
@@ -468,22 +468,22 @@ function fs_toggle(id) {
   if (! el.classList.contains('aktiva')) {
     for (ch of el.parentElement.children) {
       ch.classList.remove('aktiva')
-      fs_id = 'fs_'+ch.id;
+      fs_id = 'r:fs_'+ch.id.substring(2);
 
       // fermu ĉiujn videblajn tabuletojn
-      if (id != "rchiuj" && ch.id != "rchiuj") {
+      if (id != "r:chiuj" && ch.id != "r:chiuj") {
         document.getElementById(fs_id).classList.add('collapsed');
       
       } else { // malfermu ĉiujn krom "novaj"
-        if ( ch.id == "rnov" )
+        if ( ch.id == "r:nov" )
           document.getElementById(fs_id).classList.add('collapsed');
-        else if ( ch.id != "rchiuj")
+        else if ( ch.id != "r:chiuj")
           document.getElementById(fs_id).classList.remove('collapsed');
       }
     }
     el.classList.add('aktiva');
-    if ( id != "rchiuj" ) {
-      fs_id = 'fs_' + id;
+    if ( id != "r:chiuj" ) {
+      fs_id = 'r:fs_'+id.substring(2);
       document.getElementById(fs_id).classList.remove('collapsed');
     }
   }
@@ -658,8 +658,8 @@ function vokomailx(command,art,xml) {
 
   data.append("xmlTxt", xml);
   data.append("art", art);
-  data.append("redaktanto", document.getElementsByName("redaktanto")[0].value);
-  data.append("sxangxo", document.getElementsByName("sxangxo")[0].value);
+  data.append("redaktanto", document.getElementById("r:redaktanto")[0].value);
+  data.append("sxangxo", document.getElementById("r:sxangxo")[0].value);
   data.append("command", command);
 
   request.open('POST', url , true);
@@ -730,6 +730,6 @@ ready(function() {
   sf(0, 0, 1);
   restore_preferences();
   revo_codes.lingvoj.load();
-  revo_codes.fakoj.load("rsfak");
-  revo_codes.stiloj.load("rsstl");
+  revo_codes.fakoj.load("r:sfak");
+  revo_codes.stiloj.load("r:sstl");
 })
