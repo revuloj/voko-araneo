@@ -41,7 +41,8 @@ unzip -qo revohtml.zip && rm revohtml.zip
 unzip -qo revoart.zip && rm revoart.zip
 unzip -qo revohst.zip && rm revohst.zip
 
-unzip -qo master.zip revo-fonto-master/cfg/* revo-fonto-master/revo/* \
-  && mv revo-fonto-master/revo/* revo/xml/ \
-  && mv revo-fonto-master/cfg/* revo/cfg/ \
+unzip -qo master.zip \
+  && mv revo-fonto-master/revo revo/xml \
+  && mv revo-fonto-master/cfg revo/cfg \
+  && mv revo-fonto-master/bld revo/bld \
   && rm -rf revo-fonto-master && rm master.zip
