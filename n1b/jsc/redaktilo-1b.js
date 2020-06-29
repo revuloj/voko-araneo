@@ -77,6 +77,7 @@ function str_repeat(rStr, rNum) {
     return nStr;
 } 
    
+/*
 function showhide(id){
      if (document.getElementById){
        obj = document.getElementById(id);
@@ -90,6 +91,7 @@ function showhide(id){
        }
      }
 } 
+
    
 function get_ta() {
      var txtarea;
@@ -102,9 +104,10 @@ function get_ta() {
      }
      return txtarea;
 }
+*/
    
 function str_indent() {
-     var txtarea = get_ta();
+     var txtarea = document.getElementById('r:xmltxt');
      var indent = 0;
      if (document.selection  && document.selection.createRange) { // IE/Opera
        var range = document.selection.createRange();
@@ -161,7 +164,7 @@ function klavo(event) {
      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
    //  alert(key);
      if (key == 13) {
-       var txtarea = get_ta();
+       var txtarea = document.getElementById('r:xmltxt');
        var selText, isSample = false;
    
        if (document.selection  && document.selection.createRange) { // IE/Opera
@@ -208,7 +211,7 @@ function klavo(event) {
        }
    
        if (!document.f.cx.checked) return true;
-       var txtarea = get_ta();
+       var txtarea = document.getElementById('r:xmltxt');
        if (document.selection  && document.selection.createRange) { // IE/Opera
          //save window scroll position
          if (document.documentElement && document.documentElement.scrollTop)
@@ -248,7 +251,7 @@ function klavo(event) {
        }
      } else if (key == 84 || key == 116 || key == 1090 || key == 1058) {   // T or t or kir-t or kir-T
        if (event.altKey) {	// shortcut alt-t  --> trd
-         insertTags2('<trd lng="',document.getElementById('trdlng').value,'">','</trd>','');
+         insertTags2('<trd lng="',document.getElementById('r:trdlng').value,'">','</trd>','');
        }
      }
 }
@@ -262,7 +265,7 @@ function insertTags2(tagOpen, tagAttr, tagEndOpen, tagClose, sampleText) {
 }
    
 function indent(offset) {
-  var txtarea = get_ta();
+  var txtarea = document.getElementById('r:xmltxt');
   var selText, isSample=false;
 
   if (document.selection  && document.selection.createRange) { // IE/Opera
@@ -305,7 +308,7 @@ function indent(offset) {
    // apply tagOpen/tagClose to selection in textarea,
    // use sampleText instead of selection if there is none
 function insertTags(tagOpen, tagClose, sampleText) {
-  var txtarea = get_ta();
+  var txtarea = document.getElementById('r:xmltxt');
   var selText, isSample=false;
 
   if (document.selection && document.selection.createRange) { // IE/Opera
@@ -383,7 +386,7 @@ function checkSelectedText(){
 function lines(str){try {return((str.match(/[^\n]*\n[^\n]*/gi).length));} catch(e) {return 0;}}
    
 function nextTag(tag, dir) {
-     var txtarea = get_ta();
+     var txtarea = document.getElementById('r:xmltxt');
      if (document.selection  && document.selection.createRange) { // IE/Opera
        alert("tio ankoraŭ ne funkcias.");
      } else if (txtarea.selectionStart || txtarea.selectionStart == '0') { // Mozilla
@@ -420,7 +423,7 @@ function helpo_pagho(url) {
 // memoras valorojn de kelkaj kampoj en la loka memoro de la retumilo
 function store_preferences() {
   var prefs = {};
-  for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
+  for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo','r:cx']) {
     prefs[key] = document.getElementById(key).value;
   }
   window.localStorage.setItem("redaktilo_preferoj",JSON.stringify(prefs));  
@@ -431,7 +434,7 @@ function restore_preferences() {
   var str = window.localStorage.getItem("redaktilo_preferoj");
   var prefs = (str? JSON.parse(str) : null);
   if (prefs) {
-    for (key of ['redaktanto','trdlng','klrtip','reftip','sxangxo','cx']) {
+    for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo','r:cx']) {
       document.getElementById(key).value = prefs[key];
     }
   }
@@ -452,9 +455,9 @@ function tab_toggle(id) {
   }
   // ni ankaŭ devas kaŝi la butonojn super la reakto-tabulo por la antaŭrigardo...
   if (id == "txmltxt") {
-    document.getElementById("r_nav_btn").classList.remove('collapsed');
+    document.getElementById("r:nav_btn").classList.remove('collapsed');
   } else {
-    document.getElementById("r_nav_btn").classList.add('collapsed');
+    document.getElementById("r:nav_btn").classList.add('collapsed');
   }
 
 }
@@ -499,7 +502,7 @@ function addAttribute(node,name,value) {
 }
 
 function listigu_erarojn(err) {
-  var el = document.getElementById("reraroj");
+  var el = document.getElementById("r:eraroj");
   var elch = el.children;
   var ul;
   if (! elch.length) {
@@ -526,7 +529,7 @@ function add_err_msg(msg, matches) {
 }
 
 function kontrolu_kodojn(clist,regex) {
-  var xml = document.getElementById("rxmltxt").value;
+  var xml = document.getElementById("r:xmltxt").value;
   var m; var invalid = [];
   var list = revo_codes[clist];
 
@@ -545,7 +548,7 @@ function kontrolu_kodojn(clist,regex) {
 }
 
 function kontrolu_mrk(art) {
-  var xml = document.getElementById("rxmltxt").value;
+  var xml = document.getElementById("r:xmltxt").value;
   var m; 
   var errors = [];
   
@@ -564,7 +567,7 @@ function kontrolu_mrk(art) {
 
 // trovu tradukojn sen lingvo
 function kontrolu_trd() {
-  var xml = document.getElementById("rxmltxt").value;
+  var xml = document.getElementById("r:xmltxt").value;
   var m; re_t2 = /(<trd.*?<\/trd>)/g;
   var errors = [];
   
@@ -579,7 +582,7 @@ function kontrolu_trd() {
 }
 
 function kontrolu_ref() {
-  var xml = document.getElementById("rxmltxt").value;
+  var xml = document.getElementById("r:xmltxt").value;
   var m; 
   var errors = [];
   
@@ -593,9 +596,9 @@ function kontrolu_ref() {
 }
 
 function rantaurigardo() {
-  document.getElementById("reraroj").textContent='';
-  var art = document.getElementById("r_art").value;
-  var xml = document.getElementById("rxmltxt").value;
+  document.getElementById("r:eraroj").textContent='';
+  var art = document.getElementById("r:art").value;
+  var xml = document.getElementById("r:xmltxt").value;
 
   if (xml.startsWith("<?xml")) {
     vokomailx("rigardo",art,xml);
@@ -618,10 +621,10 @@ function rkonservo() {
 }
 
 function create_new_art() {
-  var art = document.getElementById("r_nova_art").value;
-  var ta = document.getElementById("rxmltxt");
-  document.getElementById("r_art").value = art;
-  document.getElementById("r_art_titolo").textContent = art;
+  var art = document.getElementById("r:nova_art").value;
+  var ta = document.getElementById("r:xmltxt");
+  document.getElementById("r:art").value = art;
+  document.getElementById("r:art_titolo").textContent = art;
   ta.value = 
       '<?xml version="1.0"?>\n'
     + '<!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">\n'
@@ -667,8 +670,8 @@ function vokomailx(command,art,xml) {
       var parser = new DOMParser();
       var doc = parser.parseFromString(this.response,"text/html");
 
-      var err_list = document.getElementById("reraroj");
-      var rigardo = document.getElementById("tab_trigardo");
+      var err_list = document.getElementById("r:eraroj");
+      var rigardo = document.getElementById("r:tab_trigardo");
 
       for (div of doc.getElementsByClassName("eraroj")) {
         // debugging...
@@ -707,7 +710,7 @@ function ready(fn) {
 
 function sf(pos, line, lastline) {
   document.f.xmlTxt.focus();
-  var txtarea = get_ta();
+  var txtarea = document.getElementById('r:xmltxt');
   if (document.selection  && document.selection.createRange) { // IE/Opera
     var range = document.selection.createRange();
     range.moveEnd('character', pos); 

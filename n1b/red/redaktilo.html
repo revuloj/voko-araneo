@@ -15,17 +15,17 @@
 </head>
 <body>
 
-<h1>Redakti <a id="r_art_titolo" href="/revo/art/XXX.html">XXXX</a></h1>
+<h1>Redakti <a id="r:art_titolo" href="/revo/art/XXX.html">XXXX</a></h1>
 
 <p class="rhelpo">
   ► <a target="_new" href="https://revuloj.github.io/respondoj.html">Informoj por redaktantoj.</a>
 </p>
 
-<form name="f" id="f">
+<form name="f" id="r:f">
 
-<div id="redaktilo">
-  <div id="navigado">
-    <div id="r_nav_btn">
+<div id="r:redaktilo">
+  <div id="r:navigado">
+    <div id="r:nav_btn">
       <button
         onclick="nextTag(&#39;<drv&#39,-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
       <button
@@ -35,32 +35,32 @@
       <button
         onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
       <label>
-        &nbsp;<input type="checkbox" name="cx" value="1" accesskey="x" 
+        &nbsp;<input type="checkbox" id="r:cx" name="cx" value="1" accesskey="x" 
           onclick="document.f.xmlTxt.focus()" /> c<u>x</u> = ĉ ..
       </label>
     </div>
     <div class="filler"></div>
-    <div id="rtabs" class="tabs">
-      <a class="aktiva" id="txmltxt" onclick="tab_toggle('txmltxt');">redakti</a>
-      <a id="trigardo" onclick="tab_toggle('trigardo'); rantaurigardo()">antaŭrigardo</a>
+    <div id="r:tabs" class="tabs">
+      <a class="aktiva" id="r:txmltxt" onclick="tab_toggle('txmltxt');">redakti</a>
+      <a id="r:trigardo" onclick="tab_toggle('trigardo'); rantaurigardo()">antaŭrigardo</a>
     </div>      
   </div>
 
-  <div id="tabulo">
+  <div id="r:tabulo">
 
-    <div id="tab_trigardo" class="hidden">      
+    <div id="r:tab_trigardo" class="hidden">      
     </div>  
     
-    <div id="tab_txmltxt">
-      <textarea id="rxmltxt" name="xmlTxt" cols="100" 
-        onkeypress="return klavo(event)" id="xmlTxt"></textarea>
-      <input id="r_art" type="hidden" name="art" value="XXX" />
+    <div id="r:tab_txmltxt">
+      <textarea id="r:xmltxt" name="xmlTxt" cols="100" 
+        onkeypress="return klavo(event)"></textarea>
+      <input id="r:art" type="hidden" name="art" value="XXX" />
 
 <!-- buton-grupoj por redaktado -->
-  <div id="rv_sets">
+  <div id="r:v_sets">
 
-    <fieldset id="fs_rtrd">
-      <input id="trdlng"
+    <fieldset id="r:fs_trd">
+      <input id="r:trdlng"
         type="text" 
         name="trdlng"  
         placeholder="lng"
@@ -68,31 +68,31 @@
         maxlength="3" 
         title="Lingvokodo por tradukoj." />
       <button accesskey="t" 
-        onclick="insertTags2(&#39;<trd lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false" 
+        onclick="insertTags2('<trd lng=\&#34;',document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>','</trd>','');return false" 
         title="Unuopa traduko"><u>t</u>rd lng</button> 
       <button
-        onclick="var i=str_indent();insertTags2(&#39;<trdgrp lng=\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\n&#39;+i+&#39;  <trd></trd>\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false" 
+        onclick="var i=str_indent();insertTags2('<trdgrp lng=\&#34;',document.getElementById(&#34;trdlng&#34;).value,'\&#34;>\n'+i+'  <trd>','</trd>,\n'+i+'  <trd></trd>\n'+i+'</trdgrp>','');return false" 
         title="Grupon de tradukoj">trdgrp lng</button> 
     |
       <button
-        onclick="insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false"
+        onclick="insertTags('<trd>','</trd>','');return false"
         title="Traduko ene de grupo (sen lingvo)">trd</button> 
     |    
       <button
-        onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false" 
+        onclick="insertTags('<klr>','</klr>','');return false" 
         title="Klarigo sen tipo">klr</button> 
     |    
-    <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="klrtip">
+    <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="r:klrtip">
       <option value=""></option>
       <option value="ind">ind-ekso</option>
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
     <button
-        onclick="insertTags2(&#39;<klr tip=\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false"
+        onclick="insertTags2('<klr tip=\&#34;',document.getElementById(&#34;klrtip&#34;).value,'\&#34;>','</klr>','');return false"
         title="Klarigo kun tipo">klr tip</button> 
     | 
       <button
-        onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
+        onclick="insertTags('<ind>','</ind>','');return false" 
         title="Indeksita parto de traduko">ind</button> 
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
@@ -100,9 +100,9 @@
     </span>
     </fieldset>
 
-    <fieldset id="fs_rref" class="collapsed">
+    <fieldset id="r:fs_ref" class="collapsed">
       <select name="reftip"  
-          title="Elektu tipon de referenco." id="reftip">
+          title="Elektu tipon de referenco." id="r:reftip">
           <option selected="selected" value=""></option>
           <option value="vid">vid-u</option>
           <option value="hom">hom-onima</option>
@@ -116,18 +116,18 @@
           <option value="ekz">ekz-emplo</option>
         </select>
         <button
-        onclick="insertTags2(&#39;<ref tip=\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\&#34; cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+        onclick="insertTags2('<ref tip=\&#34;',document.getElementById(&#34;reftip&#34;).value,'\&#34; cel=\&#34;\&#34;>','</ref>','');return false" 
         title="Unuopa referenco">ref tip</button>
       <button
-        onclick="var i=str_indent();insertTags(&#39;<refgrp tip=\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\&#34;>\n&#39;+i+&#39;  <ref cel=\&#34;\&#34;>&#39;,&#39;</ref>\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false" 
+        onclick="var i=str_indent();insertTags('<refgrp tip=\&#34;'+document.getElementById(&#34;reftip&#34;).value+'\&#34;>\n'+i+'  <ref cel=\&#34;\&#34;>','</ref>\n'+i+'</refgrp>','');return false" 
         title="Grupo de refencoj">refgrp tip</button> 
     |    
       <button
-        onclick="insertTags(&#39;<ref cel=\&#34;\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false" 
+        onclick="insertTags('<ref cel=\&#34;\&#34;>','</ref>','');return false" 
         title="Referenco ene de grupo (sen tipo).">ref</button>
     |
       <button
-        onclick="var i=str_indent();insertTags(&#39;<rim>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false" 
+        onclick="var i=str_indent();insertTags('<rim>\n'+i+'  ','\n'+i+'</rim>','');return false" 
         title="Rimarko">rim</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
@@ -135,8 +135,8 @@
     </span>
     </fieldset>
 
-    <fieldset id="fs_rind" class="collapsed">
-        <select name="ofc" title="Elektu indikon pri oficialeco" id="ofc">
+    <fieldset id="r:fs_ind" class="collapsed">
+        <select name="ofc" title="Elektu indikon pri oficialeco" id="r:ofc">
         <option selected="selected" value=""></option>
         <option value="*">*</option>
         <option value="1">1</option>
@@ -150,10 +150,10 @@
         <option value="9">9</option>
       </select>
       <button
-        onclick="insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+        onclick="insertTags2('<ofc>',document.getElementById(&#34;ofc&#34;).value,'</ofc>','','');return false" 
         title="Indiko pri oficialeco">ofc</button>
     |  
-        <select name="gra" title="Elektu indikon pri gramatiko." id="gra">
+        <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
         <option selected="selected" value=""></option>
         <option value="<vspec>tr</vspec>">tr</option>
         <option value="<vspec>ntr</vspec>">ntr</option>
@@ -170,10 +170,10 @@
         <option value="<vspec>pronomo</vspec>">pronomo</option>                            
       </select>
       <button
-        onclick="insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false"
+        onclick="insertTags2('<gra>',document.getElementById(&#34;gra&#34;).value,'</gra>','','');return false"
         title="Indikon pri gramatiko">gra</button>
     |
-      <select id="rsfak" name="uzofak" title="Elektu fakon" id="uzofak">
+      <select id="r:sfak" name="uzofak" title="Elektu fakon">
         <option selected="selected" value=""></option>
         <!-- plenigo per JS! -->
       </select>
@@ -181,7 +181,7 @@
       onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
       title="Fako (elektu)">uzo fak</button>
     |  
-      <select id="rsstl" name="uzostl"  title="Elektu uzostilon." id="uzostl">
+      <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
         <option selected="selected" value=""></option>
         <!-- plenigo per JS! -->
       </select>
@@ -194,7 +194,7 @@
     </span>
     </fieldset>
       
-    <fieldset id="fs_rekz" class="collapsed">
+    <fieldset id="r:fs_ekz" class="collapsed">
       <button
         onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
         title="Ekzemplo">ekz</button>
@@ -220,7 +220,7 @@
     </span>
     </fieldset>
       
-    <fieldset id="fs_rdif" class="collapsed">
+    <fieldset id="r:fs_dif" class="collapsed">
       <button
         onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
         title="Nova derivaĵo">drv</button>
@@ -238,30 +238,30 @@
     </span>
     </fieldset>
 
-    <fieldset id="fs_rnov" class="collapsed">
+    <fieldset id="r:fs_nov" class="collapsed">
       <label for="art">Nova artikolo:</label>
-      <input type="text" id="r_nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
+      <input type="text" id="r:nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
       <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
     </fieldset>  
     
-    <div id="fs_toggle" class="tabs">
-      <a class="aktiva" id="rtrd" onclick="fs_toggle('rtrd');">tradukoj</a>
-      <a id="rref" onclick="fs_toggle('rref');">referencoj</a>
-      <a id="rind" onclick="fs_toggle('rind');">indikiloj</a>
-      <a id="rekz" onclick="fs_toggle('rekz');">ekzemploj</a>
-      <a id="rdif" onclick="fs_toggle('rdif');">difinoj</a>
-      <a id="rchiuj" onclick="fs_toggle('rchiuj');">ĉiuj</a>
-      <a id="rnov" onclick="fs_toggle('rnov');">nova</a>
+    <div id="r:fs_toggle" class="tabs">
+      <a class="aktiva" id="r:trd" onclick="fs_toggle('r:trd');">tradukoj</a>
+      <a id="r:ref" onclick="fs_toggle('r:ref');">referencoj</a>
+      <a id="r:ind" onclick="fs_toggle('r:ind');">indikiloj</a>
+      <a id="r:ekz" onclick="fs_toggle('r:ekz');">ekzemploj</a>
+      <a id="r:dif" onclick="fs_toggle('r:dif');">difinoj</a>
+      <a id="r:chiuj" onclick="fs_toggle('r:chiuj');">ĉiuj</a>
+      <a id="r:nov" onclick="fs_toggle('r:nov');">nova</a>
     </div>
   </div>
       
  </div> <!-- tab_txmltxt -->
 </div> <!-- tabuloj -->
 
-  <div id="reraroj">
+  <div id="r:eraroj">
   </div>
   
-  <div id="rkonservo">
+  <div id="r:konservo">
     <fieldset>
       <legend>Redakto:</legend>
       <p>
@@ -272,7 +272,7 @@
       <input type="text" name="redaktanto" size="70" maxlength="80" placeholder="Via registrita retadreso" />
       </p>  
       <p>
-      <input id="rkonservu" type="button" name="konservu" value="konservu" onclick="rkonservo();" />
+      <input id="r:konservu" type="button" name="konservu" value="konservu" onclick="rkonservo();" />
       </p>
     </fieldset>
   </div>
