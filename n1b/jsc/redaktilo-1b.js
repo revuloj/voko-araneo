@@ -700,6 +700,47 @@ function vokomailx(command,art,xml) {
   request.send(data);
 }
 
+function getParamValue(param) {
+  var result = null,
+      tmp = [];
+  location.search.substr(1).split("&")
+      .forEach(function (item) {
+        tmp = item.split("=");
+        if (tmp[0] === param) result = decodeURIComponent(tmp[1]);
+      });
+  return result;
+}
+
+function load_xml() {
+  var art = getParamValue("art");
+  if (art) {
+
+    var url = '/revo/xml/'+art+'.xml';
+    var request = new XMLHttpRequest(); 
+    request.open('GET', url, true);
+    
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // Success!
+        document.getElementById('r:xmltxt').value=this.response;
+        document.getElementById("r:art").value = art;
+        document.getElementById("r:art_titolo").textContent = art;      
+      } else {
+        // post konektiĝo okazis eraro
+        console.error('Eraro dum ŝargo de '+url);       
+      }
+    };
+    
+    request.onerror = function() {
+      // konekteraro
+      console.error('Eraro dum konektiĝo por '+url);
+    };
+    
+    request.send();
+  }
+}
+
+
 function ready(fn) {
   if (document.readyState != 'loading'){
     fn();
@@ -732,4 +773,5 @@ ready(function() {
   revo_codes.lingvoj.load();
   revo_codes.fakoj.load("r:sfak");
   revo_codes.stiloj.load("r:sstl");
+  load_xml(); // se doniĝis ?art=xxx ni fone ŝargas tiun artikolon
 })
