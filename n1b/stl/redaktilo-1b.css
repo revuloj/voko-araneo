@@ -6,36 +6,37 @@ H1 {
     font-family: monospace;
 }
 
-#r:redaktilo {
+#r\:redaktilo {
     display: flex;
     flex-direction: column;
 }
 
-#r:navigado {
+#r\:navigado {    
     display: flex;
-    flex-direction: row;
     align-items: flex-end;
-}
-
-#r:navigado div {
     margin-bottom: 0;
 }
 
-#r:navigado .filler {
+#r\:navigado div {
+    margin-bottom: 0;
+}
+
+
+#r\:navigado .filler {
     width: 2em;
     flex-grow: 3;
 }
 
-#r:nav_btn {
+#r\:nav_btn {
     display: flex;
 }
 
-#r:tab_rigardo {
+#r\:tab_rigardo {
     margin: 0.5em;
     border: 2px solid goldenrod;
 }
 
-#r:eraroj {
+#r\:eraroj {
     margin: 0.5em;
     padding: 0.3em;
     border: 2px solid orangered;

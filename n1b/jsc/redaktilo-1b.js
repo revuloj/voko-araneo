@@ -658,8 +658,8 @@ function vokomailx(command,art,xml) {
 
   data.append("xmlTxt", xml);
   data.append("art", art);
-  data.append("redaktanto", document.getElementById("r:redaktanto")[0].value);
-  data.append("sxangxo", document.getElementById("r:sxangxo")[0].value);
+  data.append("redaktanto", document.getElementById("r:redaktanto").value);
+  data.append("sxangxo", document.getElementById("r:sxangxo").value);
   data.append("command", command);
 
   request.open('POST', url , true);
