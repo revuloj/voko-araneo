@@ -42,7 +42,7 @@
     <div class="filler"></div>
     <div id="r:tabs" class="tabs">
       <a class="aktiva" id="r:txmltxt" onclick="tab_toggle('r:txmltxt');">redakti</a>
-      <a id="r:trigardo" onclick="tab_toggle('r:trigardo'); rantaurigardo()">antaŭrigardo</a>
+      <a id="r:trigardo" class="collapsed" onclick="tab_toggle('r:trigardo'); rantaurigardo()">antaŭrigardo</a>
     </div>      
   </div>
 
@@ -68,10 +68,10 @@
         maxlength="3" 
         title="Lingvokodo por tradukoj." />
       <button accesskey="t" 
-        onclick="insertTags2('<trd lng=\&#34;',document.getElementById(&#34;trdlng&#34;).value,&#39;\&#34;>','</trd>','');return false" 
+        onclick="insertTags2('<trd lng=\&#34;',document.getElementById('r:trdlng').value,'\&#34;>','</trd>','');return false" 
         title="Unuopa traduko"><u>t</u>rd lng</button> 
       <button
-        onclick="var i=str_indent();insertTags2('<trdgrp lng=\&#34;',document.getElementById(&#34;trdlng&#34;).value,'\&#34;>\n'+i+'  <trd>','</trd>,\n'+i+'  <trd></trd>\n'+i+'</trdgrp>','');return false" 
+        onclick="var i=str_indent();insertTags2('<trdgrp lng=\&#34;',document.getElementById('r:trdlng').value,'\&#34;>\n'+i+'  <trd>','</trd>,\n'+i+'  <trd></trd>\n'+i+'</trdgrp>','');return false" 
         title="Grupon de tradukoj">trdgrp lng</button> 
     |
       <button
@@ -88,7 +88,7 @@
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
     <button
-        onclick="insertTags2('<klr tip=\&#34;',document.getElementById(&#34;klrtip&#34;).value,'\&#34;>','</klr>','');return false"
+        onclick="insertTags2('<klr tip=\&#34;',document.getElementById('r:klrtip').value,'\&#34;>','</klr>','');return false"
         title="Klarigo kun tipo">klr tip</button> 
     | 
       <button
@@ -116,10 +116,10 @@
           <option value="ekz">ekz-emplo</option>
         </select>
         <button
-        onclick="insertTags2('<ref tip=\&#34;',document.getElementById(&#34;reftip&#34;).value,'\&#34; cel=\&#34;\&#34;>','</ref>','');return false" 
+        onclick="insertTags2('<ref tip=\&#34;',document.getElementById('r:reftip').value,'\&#34; cel=\&#34;\&#34;>','</ref>','');return false" 
         title="Unuopa referenco">ref tip</button>
       <button
-        onclick="var i=str_indent();insertTags('<refgrp tip=\&#34;'+document.getElementById(&#34;reftip&#34;).value+'\&#34;>\n'+i+'  <ref cel=\&#34;\&#34;>','</ref>\n'+i+'</refgrp>','');return false" 
+        onclick="var i=str_indent();insertTags('<refgrp tip=\&#34;'+document.getElementById('r:reftip').value+'\&#34;>\n'+i+'  <ref cel=\&#34;\&#34;>','</ref>\n'+i+'</refgrp>','');return false" 
         title="Grupo de refencoj">refgrp tip</button> 
     |    
       <button
@@ -150,7 +150,7 @@
         <option value="9">9</option>
       </select>
       <button
-        onclick="insertTags2('<ofc>',document.getElementById(&#34;ofc&#34;).value,'</ofc>','','');return false" 
+        onclick="insertTags2('<ofc>',document.getElementById('r:ofc').value,'</ofc>','','');return false" 
         title="Indiko pri oficialeco">ofc</button>
     |  
         <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
@@ -170,7 +170,7 @@
         <option value="<vspec>pronomo</vspec>">pronomo</option>                            
       </select>
       <button
-        onclick="insertTags2('<gra>',document.getElementById(&#34;gra&#34;).value,'</gra>','','');return false"
+        onclick="insertTags2('<gra>',document.getElementById('r:gra').value,'</gra>','','');return false"
         title="Indikon pri gramatiko">gra</button>
     |
       <select id="r:sfak" name="uzofak" title="Elektu fakon">
@@ -178,7 +178,7 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-      onclick="insertTags2(&#39;<uzo tip=\&#34;fak\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+      onclick="insertTags2('<uzo tip=\&#34;fak\&#34;>',document.getElementById('r:sfak').value,'</uzo>','','');return false"
       title="Fako (elektu)">uzo fak</button>
     |  
       <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
@@ -186,7 +186,7 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-        onclick="insertTags2(&#39;<uzo tip=\&#34;stl\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false"
+        onclick="insertTags2('<uzo tip=\&#34;stl\&#34;>',document.getElementById('r:sstl').value,'</uzo>','','');return false"
         title="Stilo (elektu)">uzo stl</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>

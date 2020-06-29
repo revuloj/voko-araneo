@@ -38,6 +38,7 @@ my $xml_dir    = "$revo_base/xml";
 
 my $revuloj_url = 'https://revuloj.github.io/respondoj.html';
 my $mail_cmd    = '/usr/sbin/sendmail -t';
+my $smlog = "/var/log/sendmail.log"; #"$xml_dir/sendmail.log";
 my $mail_from   = 'noreply@retavortaro.de';
 my $mail_to     = 'revo@retavortaro.de';
 
@@ -275,8 +276,7 @@ sub send_xml {
 
   my $to = join(', ', @to);
   my $subject = "Revo redaktu.pl $art";
-  my $smlog = "sendmail.log";
-
+  
   # konektiĝu al retpoŝtservo
   unless (open SENDMAIL, "| $mail_cmd 2>&1 >$smlog") {
     print LOG "Ne povas voki $mail_cmd\n";

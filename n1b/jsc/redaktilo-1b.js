@@ -617,7 +617,22 @@ function rantaurigardo() {
 }
 
 function rkonservo() {
-  vokomailx("konservo");
+  document.getElementById("r:eraroj").textContent='';
+  var art = document.getElementById("r:art").value;
+  var xml = document.getElementById("r:xmltxt").value;
+
+  if (xml.startsWith("<?xml")) {
+    kontrolu_mrk(art);
+    kontrolu_trd();
+    kontrolu_ref();
+    add_err_msg("Nekonata lingvo-kodo: ",kontrolu_kodojn("lingvoj",re_lng));
+    add_err_msg("Nekonata fako: ",kontrolu_kodojn("fakoj",re_fak));
+    add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
+    if (document.getElementById("r:eraroj").textContent == '')
+      vokomailx("konservo",art,xml);
+  } else {
+    listigu_erarojn(["Averto: Artikolo devas komenciĝi je <?xml !"]);
+  }
 }
 
 function create_new_art() {
@@ -656,10 +671,17 @@ function vokomailx(command,art,xml) {
   var url = '/cgi-bin/vokomailx.pl';
   var data = new FormData();
 
+  var red = document.getElementById("r:redaktanto").value;
+  var sxg = document.getElementById("r:sxangxo").value;
+
+  console.log("vokomailx art:"+art);
+  console.log("vokomailx red:"+red);
+  console.log("vokomailx sxg:"+sxg);
+
   data.append("xmlTxt", xml);
   data.append("art", art);
-  data.append("redaktanto", document.getElementById("r:redaktanto").value);
-  data.append("sxangxo", document.getElementById("r:sxangxo").value);
+  data.append("redaktanto", red);
+  data.append("sxangxo", sxg);
   data.append("command", command);
 
   request.open('POST', url , true);
