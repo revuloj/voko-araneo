@@ -7,7 +7,9 @@ eld=$( curl -s "${api}/repos/revuloj/revo-fonto/releases/latest" | jq -c '.asset
 html_url=$( echo $eld | jq -r 'select(.name|startswith("revohtml_")) | .url' )
 art_url=$(  echo $eld | jq -r 'select(.name|startswith("revoart_"))  | .url' )
 hst_url=$(  echo $eld | jq -r 'select(.name|startswith("revohst_"))  | .url' )
-    
+
+xml_url=https://github.com/revuloj/revo-fonto/archive/master.zip
+
 if [[ ! -z "$html_url" ]]; then    
     echo "revohtml.zip <- ${html_url}"
     curl -L -H "Accept: application/octet-stream" -o revohtml.zip "${html_url}"
@@ -32,6 +34,14 @@ else
     exit 1
 fi
 
+echo "master.zip <- ${xml_url}"
+curl -L -H "Accept: application/zip" -o master.zip "${xml_url}"
+
 unzip -qo revohtml.zip && rm revohtml.zip
 unzip -qo revoart.zip && rm revoart.zip
 unzip -qo revohst.zip && rm revohst.zip
+
+unzip -qo master.zip revo-fonto-master/cfg/* revo-fonto-master/revo/* \
+  && mv revo-fonto-master/revo/* revo/xml/ \
+  && mv revo-fonto-master/cfg/* revo/cfg/ \
+  && rm -rf revo-fonto-master && rm master.zip
