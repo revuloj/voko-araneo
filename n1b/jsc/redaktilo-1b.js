@@ -596,9 +596,12 @@ function kontrolu_ref() {
 }
 
 function rantaurigardo() {
-  document.getElementById("r:eraroj").textContent='';
+  var eraroj = document.getElementById("r:eraroj");
   var art = document.getElementById("r:art").value;
   var xml = document.getElementById("r:xmltxt").value;
+
+  eraroj.textContent='';
+  eraroj.classList.remove("collapsed"); // ĉu nur kiam certe estas eraroj?
 
   if (xml.startsWith("<?xml")) {
     vokomailx("rigardo",art,xml);
@@ -772,7 +775,7 @@ function ready(fn) {
 }
 
 function sf(pos, line, lastline) {
-  document.f.xmlTxt.focus();
+  document.getElementById("r:xmltxt").focus();
   var txtarea = document.getElementById('r:xmltxt');
   if (document.selection  && document.selection.createRange) { // IE/Opera
     var range = document.selection.createRange();
