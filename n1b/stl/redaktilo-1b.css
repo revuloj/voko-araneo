@@ -1,5 +1,12 @@
+HTML {
+    margin: 0;
+    height: 100%;
+}
+
 BODY {
     background-color: lightgoldenrodyellow;
+    height: 100%;
+    margin: 0;
 }
 
 H1 {
@@ -51,8 +58,8 @@ H1 {
 }
 
 textarea {
-    margin: 1px;
-    width: 100%;
+    margin: 1px 0.3em;
+    width: 98%;
     height: 25em;
     min-height: 5em;
 }
