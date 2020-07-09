@@ -32,42 +32,27 @@ function Codelist(xmlTag,url) {
   };
 
   this.load = function(selection) {
-    var request = new XMLHttpRequest();
     var self = this;
     var codes = {};
-  
-    request.open('GET', this.url, true);
-    
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
-        // Success!
-        parser = new DOMParser();
-        doc = parser.parseFromString(this.response,"text/xml");
-  
-        for (e of doc.getElementsByTagName(self.xmlTag)) {
-            var c = e.attributes["kodo"];
-            //console.log(c);
-            codes[c.value] = e.textContent;
-        } 
-        self.codes = codes;
 
-        if (selection) {
-          self.fill.call(self,selection);
-        } 
-      } else {
-        // post konektiĝo okazis eraro
-        console.error('Eraro dum ŝargo de '+fileUrl);       
-      }
-    };
+    HTTPRequest('GET', this.url, {},
+       function() {
+          // Success!
+          parser = new DOMParser();
+          doc = parser.parseFromString(this.response,"text/xml");
     
-    request.onerror = function() {
-      // konekteraro
-      console.error('Eraro dum konektiĝo por '+fileUrl);
-    };
-    
-    request.send();
-  };
-  
+          for (e of doc.getElementsByTagName(self.xmlTag)) {
+              var c = e.attributes["kodo"];
+              //console.log(c);
+              codes[c.value] = e.textContent;
+          } 
+          self.codes = codes;
+
+          if (selection) {
+            self.fill.call(self,selection);
+          } 
+       });
+  };  
 }
 
 
@@ -669,7 +654,7 @@ function create_new_art() {
     + '</vortaro>\n';
 }
 
-function HTTPPost(url,params,onSuccess) {
+function HTTPRequest(method, url, params, onSuccess) {
   var request = new XMLHttpRequest();
   var data = new FormData();
 
@@ -677,7 +662,7 @@ function HTTPPost(url,params,onSuccess) {
     data.append(key,value);
   }
 
-  request.open('POST', url , true);
+  request.open(method, url , true);
   
   request.onload = function() {
     if (this.status >= 200 && this.status < 400) {
@@ -698,7 +683,7 @@ function HTTPPost(url,params,onSuccess) {
 }
 
 function vokohtmlx(xml) {
-  HTTPPost('/cgi-bin/vokohtmlx.pl',
+  HTTPRequest('POST','/cgi-bin/vokohtmlx.pl',
   {
     xmlTxt: xml
   },
@@ -726,7 +711,7 @@ function vokomailx(command,art,xml) {
   // console.log("vokomailx red:"+red);
   // console.log("vokomailx sxg:"+sxg);
 
-  HTTPPost('/cgi-bin/vokomailx.pl',
+  HTTPRequest('POST','/cgi-bin/vokomailx.pl',
     {
       xmlTxt: xml,
       art: art,
@@ -771,28 +756,13 @@ function load_xml() {
   var art = getParamValue("art");
   if (art) {
 
-    var url = '/revo/xml/'+art+'.xml';
-    var request = new XMLHttpRequest(); 
-    request.open('GET', url, true);
-    
-    request.onload = function() {
-      if (this.status >= 200 && this.status < 400) {
+    HTTPRequest('GET','/revo/xml/'+art+'.xml',{},
+     function() {
         // Success!
         document.getElementById('r:xmltxt').value=this.response;
         document.getElementById("r:art").value = art;
         document.getElementById("r:art_titolo").textContent = art;      
-      } else {
-        // post konektiĝo okazis eraro
-        console.error('Eraro dum ŝargo de '+url);       
-      }
-    };
-    
-    request.onerror = function() {
-      // konekteraro
-      console.error('Eraro dum konektiĝo por '+url);
-    };
-    
-    request.send();
+      });
   }
 }
 
