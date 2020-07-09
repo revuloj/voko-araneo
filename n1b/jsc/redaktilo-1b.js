@@ -604,7 +604,7 @@ function rantaurigardo() {
   eraroj.classList.remove("collapsed"); // ĉu nur kiam certe estas eraroj?
 
   if (xml.startsWith("<?xml")) {
-    vokomailx("rigardo",art,xml);
+    vokohtmlx(xml);
     kontrolu_mrk(art);
     kontrolu_trd();
     kontrolu_ref();
@@ -668,32 +668,76 @@ function create_new_art() {
     + '</art>\n'
     + '</vortaro>\n';
 }
-   
-function vokomailx(command,art,xml) {
+
+function HTTPPost(url,params,onSuccess) {
   var request = new XMLHttpRequest();
-  var url = '/cgi-bin/vokomailx.pl';
   var data = new FormData();
 
-  var red = document.getElementById("r:redaktanto").value;
-  var sxg = document.getElementById("r:sxangxo").value;
-
-  console.log("vokomailx art:"+art);
-  console.log("vokomailx red:"+red);
-  console.log("vokomailx sxg:"+sxg);
-
-  data.append("xmlTxt", xml);
-  data.append("art", art);
-  data.append("redaktanto", red);
-  data.append("sxangxo", sxg);
-  data.append("command", command);
+  for (let [key, value] of Object.entries(params)) {
+    data.append(key,value);
+  }
 
   request.open('POST', url , true);
   
   request.onload = function() {
     if (this.status >= 200 && this.status < 400) {
+      onSuccess.call(this,this.response);
+    } else {
+      // post konektiĝo okazis eraro
+      console.error('Eraro dum ŝargo de ' + url);       
+    }
+  };
+  
+  request.onerror = function() {
+    // konekteraro
+    console.error('Eraro dum konektiĝo por ' + url);
+  };
+  
+  //request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  request.send(data);  
+}
+
+function vokohtmlx(xml) {
+  HTTPPost('/cgi-bin/vokohtmlx.pl',
+  {
+    xmlTxt: xml
+  },
+  function (data) {
+    // Success!
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(data,"text/html");
+    var rigardo = document.getElementById("r:tab_trigardo");
+
+    var body = doc.body;
+    var pied = body.querySelector("span.redakto");
+    if (pied) body.removeChild(pied);
+
+    rigardo.textContent = '';
+    rigardo.append(...body.childNodes);
+  });
+}
+   
+function vokomailx(command,art,xml) {
+
+  var red = document.getElementById("r:redaktanto").value;
+  var sxg = document.getElementById("r:sxangxo").value;
+
+  // console.log("vokomailx art:"+art);
+  // console.log("vokomailx red:"+red);
+  // console.log("vokomailx sxg:"+sxg);
+
+  HTTPPost('/cgi-bin/vokomailx.pl',
+    {
+      xmlTxt: xml,
+      art: art,
+      redaktanto: red,
+      sxangxo: sxg,
+      command: command
+    },
+    function (data) {
       // Success!
       var parser = new DOMParser();
-      var doc = parser.parseFromString(this.response,"text/html");
+      var doc = parser.parseFromString(data,"text/html");
 
       var err_list = document.getElementById("r:eraroj");
       var rigardo = document.getElementById("r:tab_trigardo");
@@ -709,20 +753,7 @@ function vokomailx(command,art,xml) {
       if (pied) html.removeChild(pied);
       rigardo.textContent = '';
       rigardo.appendChild(html);
-
-    } else {
-      // post konektiĝo okazis eraro
-      console.error('Eraro dum ŝargo de ' + url);       
-    }
-  };
-  
-  request.onerror = function() {
-    // konekteraro
-    console.error('Eraro dum konektiĝo por ' + url);
-  };
-  
-  //request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-  request.send(data);
+    });
 }
 
 function getParamValue(param) {

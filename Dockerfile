@@ -100,7 +100,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && cp -r voko-grundo-master/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
   && mv voko-grundo-master/dtd /usr/local/apache2/htdocs/revo/ \
   && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
-  && chmod +x /usr/local/apache2/cgi-bin/*.pl && chmod +x /usr/local/apache2/cgi-bin/admin/*.pl \
+  && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
   && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
