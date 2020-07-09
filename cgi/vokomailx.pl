@@ -22,7 +22,6 @@ use lib("/var/www/web277/files/perllib");
 use revo::decode;
 use revo::encode;
 use revo::checkxml;
-use revo::xml2html;
 use revo::wrap;
 use revodb;
 
@@ -84,7 +83,6 @@ unless ($xmlTxt && ($command eq 'rigardo' || $command eq 'konservo')) {
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
-# konvx uzas la datumbazo por enŝovi tezaŭro-referencojn
 my $dbh = revodb::connect();
 
 # ĉu la redaktanto, se donita estas registrita?
@@ -110,11 +108,6 @@ my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
 print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>";
 
 # konvertu XML al HTML por la antaŭrigardo...
-my ($html, $err);
-konvx($dbh, \$xml, \$html, \$err, $xml_dir);
-
-print "<div id=\"html_rigardo\">\n$html\n</div>\n";
-
 
 # FARENDA:
 # la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
@@ -123,7 +116,7 @@ print "<div id=\"html_rigardo\">\n$html\n</div>\n";
 # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
 my @ref_err;
 
-if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
+#if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
   my @refs;
   while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
     my ($art,$p,$rest) = ($1,$2,$3);
@@ -135,7 +128,7 @@ if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la X
   }
 
   print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>";
-}
+#}
 
 # FARENDA: fakte kun la transiro al Git ni povas toleri
 # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
@@ -245,18 +238,6 @@ sub normigu_xml {
 
   # kodigu ne-askiajn signojn per literunuoj...
   return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
-}
-
-# ni uzas novan "konvx" por vokomailx por ne detrui vokomail.pl, kiu plu uzas "konv"
-sub konvx {
-  my ($dbh, $xml, $html, $err, $xml_dir) = @_;
-  chdir($xml_dir) or die "Mi ne povas atingi dosierujon ".$xml_dir;
-  my $htm2;
-  if (revo::xml2html::konv($dbh, $xml, \$htm2, $err, $debug)) {
-    $htm2 =~ m/<body>(.*)<\/body>/s;
-    $$html = $1;
-    return 1;
-  }
 }
 
 sub send_xml {
