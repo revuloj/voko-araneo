@@ -367,6 +367,19 @@ function checkSelectedText(){
     } 
   }
 }
+
+function resetCursor() { 
+  el = document.getElementById('r:xmltxt');
+  if (el.setSelectionRange) { 
+      el.focus(); 
+      el.setSelectionRange(0, 0); 
+  } else if (el.createTextRange) { 
+      var range = el.createTextRange();  
+      range.moveStart('character', 0); 
+      range.select(); 
+  } 
+  el.focus();
+}
    
 function lines(str){try {return((str.match(/[^\n]*\n[^\n]*/gi).length));} catch(e) {return 0;}}
    
@@ -761,7 +774,8 @@ function load_xml() {
         // Success!
         document.getElementById('r:xmltxt').value=this.response;
         document.getElementById("r:art").value = art;
-        document.getElementById("r:art_titolo").textContent = art;      
+        document.getElementById("r:art_titolo").textContent = art; 
+        resetCursor();     
       });
   }
 }
