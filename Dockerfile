@@ -49,34 +49,16 @@ RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi l
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
-COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
-COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 
-# mankas "rxp" pro Alpine. Vd.:
+# aldonu memkompilitan "rxp" de Alpine. Vd.:
 # http://www.cogsci.ed.ac.uk/~richard/rxp.html
 # http://www.inf.ed.ac.uk/research/isdd/admin/package?view=1&id=145
 # https://packages.debian.org/source/jessie/rxp
 #
 # alternative oni povus uzi https://pkgs.alpinelinux.org/package/edge/testing/x86/xerces-c
 
-#    && install "shadow"... && usermod -u ${DAEMON_UID} daemon
-    
-#lighttpd perl perl-lwp-protocol-https perl-dbd-pg perl-dbd-mysql perl-dbd-sqlite 
-# perl-cgi-psgi perl-cgi perl-fcgi perl-term-readkey perl-xml-rss perl-crypt-ssleay 
-# perl-crypt-eksblowfish perl-crypt-x509 perl-html-mason-psgihandler perl-fcgi-procmanager
-# perl-mime-types perl-list-moreutils perl-json perl-html-quoted perl-html-scrubber 
-# perl-email-address perl-text-password-pronounceable perl-email-address-list 
-# perl-html-formattext-withlinks-andtables perl-html-rewriteattributes 
-# perl-text-wikiformat perl-text-quoted perl-datetime-format-natural 
-# perl-date-extract perl-data-guid perl-data-ical perl-string-shellquote 
-# perl-convert-color perl-dbix-searchbuilder perl-file-which perl-css-squish 
-# perl-tree-simple perl-plack perl-log-dispatch perl-module-versions-report 
-# perl-symbol-global-name perl-devel-globaldestruction perl-parallel-prefork
-# perl-cgi-emulate-psgi perl-text-template perl-net-cidr perl-apache-session 
-# perl-locale-maketext-lexicon perl-locale-maketext-fuzzy perl-regexp-common-net-cidr 
-# perl-module-refresh perl-date-manip perl-regexp-ipv6 perl-text-wrapper 
-# perl-universal-require perl-role-basic perl-convert-binhex perl-test-sharedfork 
-# perl-test-tcp perl-server-starter perl-starlet make gnupg gcc perl-dev libc-dev 
+COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
+COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 
 #ADD . ./
 COPY bin/* /usr/local/bin/
@@ -104,8 +86,9 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
   && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
-  && chown -R ${DAEMON_UID} /var/www/web277/html/revo
-
+  && mkdir -p /var/www/web277/html/tmp \
+  && chown -R ${DAEMON_UID} /var/www/web277/html/revo 
+  
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
 COPY sxangxoj.rdf /var/www/web277/html/
