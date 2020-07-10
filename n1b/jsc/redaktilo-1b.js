@@ -408,9 +408,10 @@ function helpo_pagho(url) {
 // memoras valorojn de kelkaj kampoj en la loka memoro de la retumilo
 function store_preferences() {
   var prefs = {};
-  for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo','r:cx']) {
+  for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo']) {
     prefs[key] = document.getElementById(key).value;
   }
+  prefs['r:cx'] = document.getElementById('r:cx').checked;
   window.localStorage.setItem("redaktilo_preferoj",JSON.stringify(prefs));  
 }
 
@@ -419,9 +420,10 @@ function restore_preferences() {
   var str = window.localStorage.getItem("redaktilo_preferoj");
   var prefs = (str? JSON.parse(str) : null);
   if (prefs) {
-    for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo','r:cx']) {
+    for (key of ['r:redaktanto','r:trdlng','r:klrtip','r:reftip','r:sxangxo']) {
       document.getElementById(key).value = prefs[key];
     }
+    document.getElementById('r:cx').checked = prefs['r:cx'];
   }
 }
 
@@ -798,4 +800,8 @@ ready(function() {
   revo_codes.fakoj.load("r:sfak");
   revo_codes.stiloj.load("r:sstl");
   load_xml(); // se doniĝis ?art=xxx ni fone ŝargas tiun artikolon
+
+  window.onbeforeunload = function() {
+    store_preferences();
+  }
 })
