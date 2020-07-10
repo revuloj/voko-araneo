@@ -617,7 +617,7 @@ function rkonservo() {
     add_err_msg("Nekonata fako: ",kontrolu_kodojn("fakoj",re_fak));
     add_err_msg("Nekonata stilo: ",kontrolu_kodojn("stiloj",re_stl));
     if (document.getElementById("r:eraroj").textContent == '')
-      vokomailx("konservo",art,xml);
+      vokomailx("forsendo",art,xml);
   } else {
     listigu_erarojn(["Averto: Artikolo devas komenciĝi je <?xml !"]);
   }
@@ -727,17 +727,11 @@ function vokomailx(command,art,xml) {
       var err_list = document.getElementById("r:eraroj");
       var rigardo = document.getElementById("r:tab_trigardo");
 
-      for (div of doc.getElementsByClassName("eraroj")) {
+      for (div of doc.body.getElementsByClassName("eraroj")) {
         // debugging...
         console.log("div id=" + div.id);
         err_list.appendChild(div);
       }
-
-      var html = doc.getElementById("html_rigardo")
-      var pied = html.querySelector("span.redakto");
-      if (pied) html.removeChild(pied);
-      rigardo.textContent = '';
-      rigardo.appendChild(html);
     });
 }
 

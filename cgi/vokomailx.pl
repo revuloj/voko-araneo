@@ -71,12 +71,12 @@ if ($debug) {
   print "sxangxo: $sxangxo\n";
   print "command: $command\n";
   print "xml: ".length($xmlTxt)."\n";
-  print "</div>";
+  print "</div>\n";
 }
 
 # ne faru ion ajn, se mankas la XML-teksto...
 # aŭ valida buton-komando
-unless ($xmlTxt && ($command eq 'rigardo' || $command eq 'konservo')) {
+unless ($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo')) {
   print end_html();
   exit;
 }    
@@ -90,14 +90,14 @@ my $permeso = 0;
 
 unless ($redaktanto) {
   print "<div id=\"red_err\" class=\"eraroj\">Averto: Por sendi vian redakton, vi devas ankoraŭ doni vian retadreson, ".
-        "kun kiu vi registriĝis kiel redaktanto.</div>";
+        "kun kiu vi registriĝis kiel redaktanto.</div>\n";
 } else {
   $permeso = check_redaktanto($dbh,$redaktanto);
 
   if (!$permeso) {    
     print "<div id=\"red_err\" class=\"eraroj\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
           "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
-          "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>";
+          "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>\n";
   }
 }
 
@@ -105,7 +105,7 @@ my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
-print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>";
+print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 
 # konvertu XML al HTML por la antaŭrigardo...
 
@@ -127,7 +127,7 @@ my @ref_err;
     @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
   }
 
-  print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>";
+  print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
 #}
 
 # FARENDA: fakte kun la transiro al Git ni povas toleri
@@ -164,7 +164,7 @@ if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) {
 }
 
 if ($sxg_err) {
-  print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>";
+  print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>\n";
 }
 
 # ĉu ni sendu la ŝanĝojn?

@@ -111,7 +111,7 @@ sub check_ref_cel {
                 close IN;
 
                 if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
-                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \""
+                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero "
                     ."<a href=\"$art.xml\">$art</a>\n";
         #          $ne_konservu = 8;
                 }
@@ -120,6 +120,8 @@ sub check_ref_cel {
     }
     $sth->finish;
     $sth2->finish;
+
+    return @ref_err;
 }
 
 1;
