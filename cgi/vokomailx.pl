@@ -124,7 +124,7 @@ my @ref_err;
   }
 
   if (@refs) {
-    @ref_err = check_ref_cel($dbh,$xml_dir,@refs); 
+    @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
   }
 
   print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>";

@@ -68,7 +68,7 @@ sub rxp_cmd {
     return $err;
 }
 
-sub check_art_mrk {
+sub check_ref_cel {
     my ($dbh,$xml_dir,@refs) = @_;
     my @ref_err;
 
@@ -92,7 +92,7 @@ sub check_art_mrk {
             push @ref_err, "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.\n";
             #      $ne_konservu = 7;
 
-        # ĉu la markoj ne la celata artikolo ekzistas
+        # ĉu la markoj en la celata artikolo ekzistas
         } elsif ($pkt) {
 
             $sth2->execute($mrk, $mrk, $mrk);
@@ -112,7 +112,7 @@ sub check_art_mrk {
 
                 if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
                     push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \""
-                    .a({href=>"?art=$art"}, "$art.xml")."\".\n";
+                    ."<a href=\"$art.xml\">$art</a>\n";
         #          $ne_konservu = 8;
                 }
             }
