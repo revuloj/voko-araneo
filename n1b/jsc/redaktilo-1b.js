@@ -590,6 +590,7 @@ function rantaurigardo() {
 
   if (xml.startsWith("<?xml")) {
     vokohtmlx(xml);
+    vokomailx("nur_kontrolo",art,xml);
     kontrolu_mrk(art);
     kontrolu_trd();
     kontrolu_ref();
