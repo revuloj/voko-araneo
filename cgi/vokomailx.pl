@@ -26,7 +26,7 @@ use revo::wrap;
 use revodb;
 
 #$| = 1;
-my $debug = 0; #1;
+my $debug = 0; #0|1;
 
 my $xml_max_len = 500000;
 my $art_max_len = 25;
@@ -80,18 +80,18 @@ if ($debug) {
 
 
 # ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
-check($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo'));
+check($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo'), "command");
 
 ## validigu la ceteran parametrojn...
-check(length($xmlTxt) < $xml_max_len);
-check(length($art) < $art_max_len);
-check(length($sxangxo) < $sxg_max_len);
-check(length($redaktanto) < $red_max_len);
-check($art =~ /^[a-z0-9]+$/);
+check(length($xmlTxt) < $xml_max_len, "xmlTxt");
+check(length($art) < $art_max_len, "art");
+check(length($sxangxo) < $sxg_max_len, "sxangxo");
+check(length($redaktanto) < $red_max_len, "redaktanto");
+check($art =~ /^[a-z0-9]+$/, "art rx");
 
 # tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
 # la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check($redaktanto =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/); 
+check(! $redaktanto || $redaktanto =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/, "red rx"); 
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
@@ -202,6 +202,11 @@ print end_html();
 
 sub check {
   my $cond = shift;
+
+  ## if ($debug) {
+  ##   print shift, ": ", $cond, "\n";
+  ## }
+
   unless ($cond) {
     print end_html();
     exit;
