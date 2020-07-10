@@ -605,9 +605,12 @@ function rantaurigardo() {
 }
 
 function rkonservo() {
-  document.getElementById("r:eraroj").textContent='';
   var art = document.getElementById("r:art").value;
   var xml = document.getElementById("r:xmltxt").value;
+
+  var eraroj = document.getElementById("r:eraroj");
+  eraroj.textContent='';
+  eraroj.classList.remove("collapsed"); // ĉu nur kiam certe estas eraroj?
 
   if (xml.startsWith("<?xml")) {
     kontrolu_mrk(art);

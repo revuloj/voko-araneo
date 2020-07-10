@@ -107,8 +107,6 @@ my $xml=normigu_xml($xmlTxt);
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
 print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 
-# konvertu XML al HTML por la antaŭrigardo...
-
 # FARENDA:
 # la referencojn povus ekstrakti jam JS kaj voki apartan servilan skripton por kontroli ilin
 # en la datumbazo...
@@ -168,7 +166,7 @@ if ($sxg_err) {
 }
 
 # ĉu ni sendu la ŝanĝojn?
-if ($command eq 'konservo') {
+if ($command eq 'forsendo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
