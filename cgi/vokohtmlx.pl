@@ -63,6 +63,8 @@ my ($html,$err);
 ### revo::xml2html::konv($dbh, \$xmlTxt, \$html, \$err, $debug);
 konv($dbh, \$xmlTxt, \$html, \$err, $debug);
 
+$err =~ s/^Warning[^\n]+\n//mg;
+
 if ($err) { # ???
   print "<html><body><div>";
   print pre(escapeHTML($err));
