@@ -25,9 +25,13 @@ use revo::checkxml;
 use revo::wrap;
 use revodb;
 
-$| = 1;
+#$| = 1;
+my $debug = 0; #1;
 
-my $debug = 1;
+my $xml_max_len = 500000;
+my $art_max_len = 25;
+my $red_max_len = 80;
+my $sxg_max_len = 255;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
 my $homedir    = "/var/www/web277";
@@ -37,14 +41,14 @@ my $xml_dir    = "$revo_base/xml";
 
 my $revuloj_url = 'https://revuloj.github.io/respondoj.html';
 my $mail_cmd    = '/usr/sbin/sendmail -t';
-my $smlog = "/var/log/sendmail.log"; #"$xml_dir/sendmail.log";
+my $smlog       = "$homedir/html/tmp/sendmail.log"; #"$xml_dir/sendmail.log";
 my $mail_from   = 'noreply@retavortaro.de';
 my $mail_to     = 'revo@retavortaro.de';
 
 $ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
 $ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
-autoEscape(0);
+#autoEscape(0);
 
 my $enc = "utf-8";
 
@@ -74,12 +78,20 @@ if ($debug) {
   print "</div>\n";
 }
 
-# ne faru ion ajn, se mankas la XML-teksto...
-# aŭ valida buton-komando
-unless ($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo')) {
-  print end_html();
-  exit;
-}    
+
+# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
+check($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo'));
+
+## validigu la ceteran parametrojn...
+check(length($xmlTxt) < $xml_max_len);
+check(length($art) < $art_max_len);
+check(length($sxangxo) < $sxg_max_len);
+check(length($redaktanto) < $red_max_len);
+check($art =~ /^[a-z0-9]+$/);
+
+# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+check($redaktanto =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/); 
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
@@ -187,6 +199,14 @@ $dbh->disconnect() if $dbh;
 print end_html();
 
 #######################################################################################
+
+sub check {
+  my $cond = shift;
+  unless ($cond) {
+    print end_html();
+    exit;
+  }
+}   
 
 sub check_redaktanto {
   my ($dbh,$redaktanto) = @_;
