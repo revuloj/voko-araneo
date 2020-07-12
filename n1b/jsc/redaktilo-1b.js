@@ -744,11 +744,16 @@ function vokomailx(command,art,xml) {
       var doc = parser.parseFromString(data,"text/html");
 
       var err_list = document.getElementById("r:eraroj");
-      var rigardo = document.getElementById("r:tab_trigardo");
 
       for (div of doc.body.getElementsByClassName("eraroj")) {
         // debugging...
         console.log("div id=" + div.id);
+        err_list.appendChild(div);
+      }
+      var konfirmo = doc.getElementById("konfirmo");
+      if (konfirmo) {
+        // debugging...
+        console.log("div id=" + konfirmo.id);
         err_list.appendChild(div);
       }
     });
@@ -774,7 +779,7 @@ function load_xml() {
         // Success!
         document.getElementById('r:xmltxt').value=this.response;
         document.getElementById("r:art").value = art;
-        document.getElementById("r:art_titolo").textContent = art; 
+        document.getElementById("r:art_titolo").textContent = "\u00ab" + art + "\u00bb"; 
         resetCursor();     
       });
   }

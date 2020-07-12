@@ -1,15 +1,15 @@
-HTML {
+html {
     margin: 0;
     height: 100%;
 }
 
-BODY {
+body {
     background-color: lightgoldenrodyellow;
     height: 100%;
     margin: 0;
 }
 
-H1 {
+h1 {
     font-family: monospace;
 }
 
@@ -17,10 +17,20 @@ H1 {
     display: flex;
     flex-direction: column;
     height: 100%;
+    /*overflow: auto; */
 }
 
 #r\:tabulo {
-    flex-grow: 3;
+    flex-basis: 50%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: auto; /* ŝajne grava */
+    /*max-height: 0%; */
+
+    margin: 0.3em 0.5em;
+    padding: 0.5em;
+    border: 1px dotted goldenrod;
+
 }
 
 #r\:navigado {    
@@ -34,7 +44,6 @@ H1 {
 #r\:navigado div {
     margin-bottom: 0;
 }
-
 
 #r\:navigado .filler {
     width: 2em;
@@ -52,9 +61,12 @@ H1 {
 }
 
 #r\:tab_trigardo {
+   height: 100%; /* aŭ "auto"? */
+    /*
     margin: 0.3em 0.5em;
     padding: 0.5em;
     border: 1px dotted goldenrod;
+    */
 }
 
 #r\:eraroj {
