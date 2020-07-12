@@ -779,7 +779,9 @@ function load_xml() {
         // Success!
         document.getElementById('r:xmltxt').value=this.response;
         document.getElementById("r:art").value = art;
-        document.getElementById("r:art_titolo").textContent = "\u00ab" + art + "\u00bb"; 
+        var titolo = document.getElementById("r:art_titolo");
+        titolo.textContent = "\u00ab" + art + "\u00bb"; 
+        titolo.setAttribute("href","/revo/art/"+art+".html");
         resetCursor();     
       });
   }
