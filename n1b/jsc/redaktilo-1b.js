@@ -147,6 +147,8 @@ function cxigi(b, key) {
    
 function klavo(event) {
      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+     var cx = document.getElementById("r:cx");
+
    //  alert(key);
      if (key == 13) {
        var txtarea = document.getElementById('r:xmltxt');
@@ -191,11 +193,11 @@ function klavo(event) {
        }
      } else if (key == 88 || key == 120) {   // X or x
        if (event.altKey) {	// shortcut alt-x  --> toggle cx
-         document.f.cx.checked = !document.f.cx.checked;
+         cx.checked = !cx.checked;
          return false;
        }
    
-       if (!document.f.cx.checked) return true;
+       if (!cx.checked) return true;
        var txtarea = document.getElementById('r:xmltxt');
        if (document.selection  && document.selection.createRange) { // IE/Opera
          //save window scroll position
