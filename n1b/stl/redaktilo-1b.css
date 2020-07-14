@@ -67,6 +67,7 @@ h1 {
 
 #r\:tab_txmltxt {
     height: 100%;
+    min-height: 10em;
     display: flex;    
     flex-direction: column;
 }
@@ -93,7 +94,7 @@ h1 {
 textarea {
     margin: 0; /*1px 0.3em;*/
     height: 25em;
-    min-height: 5em;
+    min-height: 8em;
 
     flex: 1; /* consume available width */     
 }
@@ -174,10 +175,19 @@ h2 {
     /*width: 66%; */
 }
 
-input, select {
+select {
     /*border-width: 2px;
     border-radius: 3px;*/
+    /*-webkit-appearance: none;*/
     padding: 0.3em 0.5em;
+    /*font-size: 1rem;*/
+}
+
+input {
+    margin: 3px 1px 0px 1px;
+    padding: 0.3em 0.5em;
+    /*font-size: 1rem;*/
+    max-width: 40%;
 }
 
 button, input[type="button"], input[type="checkbox"] {
@@ -185,7 +195,7 @@ button, input[type="button"], input[type="checkbox"] {
     /*border-radius: 3px;*/
     box-shadow: 1px 1px 2px;
     font-family: monospace;
-    font-size: 1rem;
+    /* font-size: 1rem;*/
 }
 
 .help_btn {
@@ -200,14 +210,12 @@ button, input[type="button"], input[type="checkbox"] {
     box-shadow: 1px 1px 2px;
 }
 
-input {
-    margin: 3px 1px 0px 1px;
-}
 .rubriko {
     text-align: right;
 }
 
 .piedlinio {
+    max-height: 1.6em;
     color: #104040; 
     font-family: monospace;
     text-align: center
@@ -268,7 +276,8 @@ input {
     -webkit-transition: all .2s ease;
     transition: all .2s ease;
     font-family: monospace;
-    font-size: 1rem;
+    /*font-size: 1rem;*/
+    height: 1.8rem;
     -webkit-perspective: 100px;
             perspective: 100px;
 }
