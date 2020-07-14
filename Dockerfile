@@ -24,6 +24,13 @@ RUN apk update \
   && cd /tmp/rxp-* \
   && ./configure && make install
 
+
+# chekote/gulp
+#FROM node:alpine as minifier # or :slim
+#RUN npm install gulp -g
+#ENTRYPOINT ["/bin/bash", "-c"]
+
+
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 

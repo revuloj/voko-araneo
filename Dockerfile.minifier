@@ -1,0 +1,7 @@
+FROM node:slim
+#RUN npm install gulp-cli -g
+
+# https://symfony.com/doc/3.3/frontend/assetic/uglifyjs.html#install-configure-and-use-uglifycss
+RUN npm install -g uglify-js
+# ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["uglifyjs"]
