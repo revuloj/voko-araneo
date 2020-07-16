@@ -18,6 +18,7 @@ use IPC::Open3;
 package revo::checkxml;
 
 my $rxp_cmd_line = 'rxp -Vs >/dev/null';
+my $red_url = '/revo/dlg/redaktilo.html';
 
 sub check_xml {
     my ($teksto, $xml_dir) = @_;
@@ -111,8 +112,8 @@ sub check_ref_cel {
                 close IN;
 
                 if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
-                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero "
-                    ."<a href=\"$art.xml\">$art</a>\n";
+                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
+                    ."<a href=\"$red_url?art=$art\">$art</a>\n";
         #          $ne_konservu = 8;
                 }
             }
