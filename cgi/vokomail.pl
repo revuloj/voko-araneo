@@ -1109,6 +1109,7 @@ print end_form;
 print <<"EOD" if $art;
 <h1>Klarigoj:</h1>
 <div class="averto">
+Vi povas helpi testi la <a href="/revo/dlg/redaktilo.html?art=$art">refasonatan redaktilon</a>.<br>
 Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
 klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
 klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
