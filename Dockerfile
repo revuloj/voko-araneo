@@ -1,3 +1,13 @@
+##### staĝo 1: Ni bezonas TeX kaj metapost por konverti simbolojn al png
+FROM silkeh/latex:small as metapost
+LABEL Author=<diestel@steloj.de>
+COPY mp2png.sh .
+RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/* 
+RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
+  && unzip master.zip voko-grundo-master/smb/*.mp
+RUN cd voko-grundo-master && ../mp2png.sh # && cd ${HOME}
+
+##### staĝo 2: Ni bezonas gcc/make por kompili rxp, kiu ne ekzistas kiel pakaĵo por Alpine-Linux
 FROM alpine:3.12 as builder
 
 # build and install rxp
@@ -30,7 +40,7 @@ RUN apk update \
 #RUN npm install gulp -g
 #ENTRYPOINT ["/bin/bash", "-c"]
 
-
+##### staĝo 3: Ni uzas procezumon kun retservilo Apache-httpd kaj aldonas Perlon kaj ĉion alian, kion ni bezonas por la retservo
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 
@@ -83,11 +93,13 @@ WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
   && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
-     voko-grundo-master/cfg/* voko-grundo-master/dtd/* \
+     voko-grundo-master/cfg/* voko-grundo-master/dtd/* voko-grundo-master/smb/* \
   && rm master.zip \
   && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/revo/ \
   && cp -r voko-grundo-master/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
   && mv voko-grundo-master/dtd /usr/local/apache2/htdocs/revo/ \
+  && cp -r voko-grundo-master/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
+  && cp -r voko-grundo-master/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
   && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
@@ -100,6 +112,8 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
 
 COPY sxangxoj.rdf /var/www/web277/html/
 RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
+
+COPY --from=metapost --chown=root:root voko-grundo-master/smb/ /usr/local/apache2/htdocs/revo/smb/
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
