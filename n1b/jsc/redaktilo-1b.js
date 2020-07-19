@@ -757,6 +757,7 @@ function vokomailx(command,art,xml) {
         // debugging...
         console.log("div id=" + konfirmo.id);
         err_list.appendChild(konfirmo);
+        err_list.classList.add("konfirmo");
       }
     });
 }
