@@ -714,12 +714,19 @@ function vokohtmlx(xml) {
     var doc = parser.parseFromString(data,"text/html");
     var rigardo = document.getElementById("r:tab_trigardo");
 
-    var body = doc.body;
-    var pied = body.querySelector("span.redakto");
-    if (pied) body.removeChild(pied);
-
-    rigardo.textContent = '';
-    rigardo.append(...body.childNodes);
+    var article = doc.getElementsByTagName("article");
+    if (article) {
+      rigardo.textContent = '';
+      rigardo.append(...article);  
+    } else {
+      // FARENDA: post kiam ĉiuj artikoloj havos HTMLO5-strukturon ni povos forigi tion
+      var body = doc.body;
+      var pied = body.querySelector("span.redakto");
+      if (pied) body.removeChild(pied);
+  
+      rigardo.textContent = '';
+      rigardo.append(...body.childNodes);  
+    }
   });
 }
    
