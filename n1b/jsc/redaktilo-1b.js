@@ -718,6 +718,7 @@ function vokohtmlx(xml) {
     if (article) {
       rigardo.textContent = '';
       rigardo.append(...article);  
+      preparu_art();
     } else {
       // FARENDA: post kiam ĉiuj artikoloj havos HTMLO5-strukturon ni povos forigi tion
       var body = doc.body;
