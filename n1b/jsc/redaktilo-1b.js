@@ -719,6 +719,13 @@ function vokohtmlx(xml) {
       rigardo.textContent = '';
       rigardo.append(...article);  
       preparu_art();
+
+      // eble tio devas esti en preparu_art?
+      // refaru matematikajn formulojn, se estas
+      if (typeof(MathJax) != 'undefined' && MathJax.Hub) {
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      }
+    
     } else {
       // FARENDA: post kiam ĉiuj artikoloj havos HTMLO5-strukturon ni povos forigi tion
       var body = doc.body;
