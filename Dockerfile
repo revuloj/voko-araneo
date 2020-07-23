@@ -1,3 +1,4 @@
+##### staĝo 1: Ni devas mem kompili rxp por Alpine
 FROM alpine:3.12 as builder
 
 # build and install rxp
@@ -24,13 +25,23 @@ RUN apk update \
   && cd /tmp/rxp-* \
   && ./configure && make install
 
-
 # chekote/gulp
 #FROM node:alpine as minifier # or :slim
 #RUN npm install gulp -g
 #ENTRYPOINT ["/bin/bash", "-c"]
 
+# Ni devus ricevi simbolojn poste per download_revo el revohtml...
+###### staĝo 2: Ni bezonas TeX kaj metapost por konverti simbolojn al png
+#FROM silkeh/latex:small as metapost
+#MAINTAINER <diestel@steloj.de>
+#COPY mp2png.sh .
+#RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/* 
+#RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
+#  && unzip master.zip voko-grundo-master/smb/*.mp
+#RUN cd voko-grundo-master && ../mp2png.sh # && cd ${HOME}
 
+
+##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 
@@ -87,11 +98,16 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && unzip -q ${VG_BRANCH}.zip voko-grundo-${VG_BRANCH}/xsl/* voko-grundo-${VG_BRANCH}/dok/* \
      voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
      voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
+     voko-grundo-${VG_BRANCH}/smb/* \
   && rm ${VG_BRANCH}.zip \
 # debug:  && ls voko-grundo-${VG_BRANCH}/* \
   && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
   && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
   && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+# tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
+# tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
+  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
+  && cp voko-grundo-${VG_BRANCH}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
   && cp -r voko-grundo-${VG_BRANCH}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
   && mv voko-grundo-${VG_BRANCH}/dtd /usr/local/apache2/htdocs/revo/ \
   && mv -f voko-grundo-${VG_BRANCH}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
@@ -106,6 +122,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
 
 COPY sxangxoj.rdf /var/www/web277/html/
 RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
+# COPY --from=metapost --chown=root:root voko-grundo-master/smb/ /usr/local/apache2/htdocs/revo/smb/
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
