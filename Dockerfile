@@ -47,6 +47,8 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
+# normale: master
+ARG VG_BRANCH=html5 
 
 RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
@@ -81,14 +83,18 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
-  && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
-     voko-grundo-master/cfg/* voko-grundo-master/dtd/* \
-  && rm master.zip \
-  && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/revo/ \
-  && cp -r voko-grundo-master/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
-  && mv voko-grundo-master/dtd /usr/local/apache2/htdocs/revo/ \
-  && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
+  && unzip -q ${VG_BRANCH}.zip voko-grundo-${VG_BRANCH}/xsl/* voko-grundo-${VG_BRANCH}/dok/* \
+     voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
+     voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
+  && rm ${VG_BRANCH}.zip \
+# debug:  && ls voko-grundo-${VG_BRANCH}/* \
+  && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
+  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
+  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+  && cp -r voko-grundo-${VG_BRANCH}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
+  && mv voko-grundo-${VG_BRANCH}/dtd /usr/local/apache2/htdocs/revo/ \
+  && mv -f voko-grundo-${VG_BRANCH}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
