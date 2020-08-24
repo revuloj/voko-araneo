@@ -38,8 +38,8 @@ function Codelist(xmlTag,url) {
     HTTPRequest('GET', this.url, {},
        function() {
           // Success!
-          parser = new DOMParser();
-          doc = parser.parseFromString(this.response,"text/xml");
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(this.response,"text/xml");
     
           for (e of doc.getElementsByTagName(self.xmlTag)) {
               var c = e.attributes["kodo"];
@@ -727,10 +727,10 @@ function vokohtmlx(xml) {
       }
     
     } else {
-      // FARENDA: post kiam ĉiuj artikoloj havos HTMLO5-strukturon ni povos forigi tion
+      // FARENDA: post kiam ĉiuj artikoloj havos HTML5-strukturon ni povos forigi tion
       var body = doc.body;
       var pied = body.querySelector("span.redakto");
-      if (pied) body.removeChild(pied);
+      if (pied) pied.parentElement.removeChild(pied);
   
       rigardo.textContent = '';
       rigardo.append(...body.childNodes);  
