@@ -293,8 +293,7 @@ if ($regulira) {
   Sercxu('=', $sercxata, $sercxata_eo, $preferata_lingvo);
 }
 
-
-# se vi trovis nur unu rezulton, tuj malfermi gxin
+# se vi trovis nur unu rezulton, tuj malfermu gxin
 if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
   print '<script type="text/javascript">' . "\n";
   print '<!--' . "\n";
@@ -475,6 +474,7 @@ sub MontruRezultojn
     my $lng_nomo;
     my $trd;
     my $anchor;
+    my $query;
     my $klr;
 
     if ($lng eq 'eo') {
@@ -499,7 +499,7 @@ sub MontruRezultojn
           }
 		    } # foreach
 	    } else { # formato ne txt ...
- 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#lng_$preferata_lingvo\">";
+ 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor?lng=$preferata_lingvo\">";
         $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
         while (my $ref2 = $sth2->fetchrow_hashref()) {
           $klr .= $sep.$$ref2{'trd_teksto'};
@@ -530,9 +530,9 @@ sub MontruRezultojn
         $klr = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\">$$ref{'drv_teksto'}";
         $klr .= "  <sup><i>$$ref{'snc_numero'}</i></sup>" if $$ref{'snc_numero'};
         $klr .= "</a>)";
-        $anchor = "lng_$lng";
 	    }
       $lng = $$ref{'trd_lng'};
+      $query = "lng=$lng";
       $lng_nomo = $$ref{'lng_nomo'};
       $lng_nomo =~ s/a$/e/;
       $lng_nomo .= " (preferata)" if $lng eq $preferata_lingvo;
@@ -551,7 +551,7 @@ sub MontruRezultojn
     } elsif ($formato eq "idx") {
       if ($lng eq 'eo') {
         next unless $$ref{'drv_match'};
-        my ($a, $b1, $b2) = ("#$anchor", "", "");
+        my ($a, $b1, $b2) = ("#$anchor?$query", "", "");
         ($a, $b1, $b2) = ("", "<b>", "</b>") if $trd eq $$ref{'art_kap'};
 
         my $var = $$ref{'var_org'};
@@ -563,7 +563,7 @@ sub MontruRezultojn
       if (!$regulira && $sercxata !~ /[%_]/) {
         $trd =~ s/$sercxata/<b>$sercxata<\/b>/g;
       }
-      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor", target=>"precipa"}, "$trd"), $klr;
+      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor?$query", target=>"precipa"}, "$trd"), $klr;
 
       if ($num > 100) {
         print br, "... kaj pli ...", "\n";
