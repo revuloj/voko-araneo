@@ -474,7 +474,7 @@ sub MontruRezultojn
     my $lng_nomo;
     my $trd;
     my $anchor;
-    my $query;
+    my $param;
     my $klr;
 
     if ($lng eq 'eo') {
@@ -499,7 +499,7 @@ sub MontruRezultojn
           }
 		    } # foreach
 	    } else { # formato ne txt ...
- 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor?lng=$preferata_lingvo\">";
+ 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\&lng=$preferata_lingvo\">";
         $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
         while (my $ref2 = $sth2->fetchrow_hashref()) {
           $klr .= $sep.$$ref2{'trd_teksto'};
@@ -532,7 +532,7 @@ sub MontruRezultojn
         $klr .= "</a>)";
 	    }
       $lng = $$ref{'trd_lng'};
-      $query = "lng=$lng";
+      $param = "lng=$lng";
       $lng_nomo = $$ref{'lng_nomo'};
       $lng_nomo =~ s/a$/e/;
       $lng_nomo .= " (preferata)" if $lng eq $preferata_lingvo;
@@ -551,7 +551,7 @@ sub MontruRezultojn
     } elsif ($formato eq "idx") {
       if ($lng eq 'eo') {
         next unless $$ref{'drv_match'};
-        my ($a, $b1, $b2) = ("#$anchor?$query", "", "");
+        my ($a, $b1, $b2) = ("#$anchor\&$param", "", "");
         ($a, $b1, $b2) = ("", "<b>", "</b>") if $trd eq $$ref{'art_kap'};
 
         my $var = $$ref{'var_org'};
@@ -563,7 +563,7 @@ sub MontruRezultojn
       if (!$regulira && $sercxata !~ /[%_]/) {
         $trd =~ s/$sercxata/<b>$sercxata<\/b>/g;
       }
-      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor?$query", target=>"precipa"}, "$trd"), $klr;
+      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor\&$param", target=>"precipa"}, "$trd"), $klr;
 
       if ($num > 100) {
         print br, "... kaj pli ...", "\n";
