@@ -60,15 +60,17 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 ARG DAEMON_UID=13731
 # normale: master
 ARG VG_BRANCH=master 
+ARG REVO_VER=1c
 
 RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
-    curl unzip jq && rm -f /var/cache/apk/* \
+    sed curl unzip jq && rm -f /var/cache/apk/* \
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
+# ni bezonas GNU sed por kompili CSS!
 
 # aldonu memkompilitan "rxp" de Alpine. Vd.:
 # http://www.cogsci.ed.ac.uk/~richard/rxp.html
@@ -98,12 +100,21 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && unzip -q ${VG_BRANCH}.zip voko-grundo-${VG_BRANCH}/xsl/* voko-grundo-${VG_BRANCH}/dok/* \
      voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
      voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
-     voko-grundo-${VG_BRANCH}/smb/* \
+     voko-grundo-${VG_BRANCH}/smb/* voko-grundo-${VG_BRANCH}/bin/compile* \
   && rm ${VG_BRANCH}.zip \
 # debug:  && ls voko-grundo-${VG_BRANCH}/* \
   && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
-  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
-  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+#  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
+  && mkdir /usr/local/apache2/htdocs/revo/jsc \
+  # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
+  && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/kadro.js \
+         voko-grundo-${VG_BRANCH}/jsc/artikolo.js voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
+      > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
+#  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+  # kombinu kaj malgrandigu CSS-dosierojn
+  && cd voko-grundo-${VG_BRANCH} \
+  && ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
+  && cd .. \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
