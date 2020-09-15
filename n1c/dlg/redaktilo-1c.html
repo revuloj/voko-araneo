@@ -7,12 +7,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   
-  <link rel="stylesheet" type="text/css" href="../stl/artikolo-1b.css" />
-  <link rel="stylesheet" href="../stl/redaktilo-1b.css">
-
-  <script src="../jsc/redaktilo-1b.js"></script>
-  <script src="../jsc/revo-art-1b.js"></script> 
-  <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=AM_CHTML"></script>
+  <link rel="stylesheet" href="../stl/revo-1c-min.css">
+  <script src="../jsc/revo-1c.js"></script>
 
 </head>
 <body>
@@ -66,18 +62,18 @@
         maxlength="3" 
         title="Lingvokodo por tradukoj." />
       <button accesskey="t" 
-        onclick="insertTags2('<trd lng=\&#34;',document.getElementById('r:trdlng').value,'\&#34;>','</trd>','');return false" 
+        onclick="redaktilo.trd_lng()" 
         title="Unuopa traduko"><u>t</u>rd lng</button> 
       <button
-        onclick="var i=str_indent();insertTags2('<trdgrp lng=\&#34;',document.getElementById('r:trdlng').value,'\&#34;>\n'+i+'  <trd>','</trd>,\n'+i+'  <trd></trd>\n'+i+'</trdgrp>','');return false" 
+        onclick="redaktilo.trdgrp()" 
         title="Grupon de tradukoj">trdgrp lng</button> 
     |
       <button
-        onclick="insertTags('<trd>','</trd>','');return false"
+        onclick="redaktilo.trd()"
         title="Traduko ene de grupo (sen lingvo)">trd</button> 
     |    
       <button
-        onclick="insertTags('<klr>','</klr>','');return false" 
+        onclick="redaktilo.klr()" 
         title="Klarigo sen tipo">klr</button> 
     |    
     <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="r:klrtip">
@@ -86,11 +82,11 @@
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
     <button
-        onclick="insertTags2('<klr tip=\&#34;',document.getElementById('r:klrtip').value,'\&#34;>','</klr>','');return false"
+        onclick="redaktilo.klr_tip()"
         title="Klarigo kun tipo">klr tip</button> 
     | 
       <button
-        onclick="insertTags('<ind>','</ind>','');return false" 
+        onclick="redaktilo.ind()" 
         title="Indeksita parto de traduko">ind</button> 
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
@@ -114,18 +110,18 @@
           <option value="ekz">ekz-emplo</option>
         </select>
         <button
-        onclick="insertTags2('<ref tip=\&#34;',document.getElementById('r:reftip').value,'\&#34; cel=\&#34;\&#34;>','</ref>','');return false" 
+        onclick="redaktilo.ref_tip()" 
         title="Unuopa referenco">ref tip</button>
       <button
-        onclick="var i=str_indent();insertTags('<refgrp tip=\&#34;'+document.getElementById('r:reftip').value+'\&#34;>\n'+i+'  <ref cel=\&#34;\&#34;>','</ref>\n'+i+'</refgrp>','');return false" 
+        onclick="redaktilo.refgrp()" 
         title="Grupo de refencoj">refgrp tip</button> 
     |    
       <button
-        onclick="insertTags('<ref cel=\&#34;\&#34;>','</ref>','');return false" 
+        onclick="redaktilo.ref()" 
         title="Referenco ene de grupo (sen tipo).">ref</button>
     |
       <button
-        onclick="var i=str_indent();insertTags('<rim>\n'+i+'  ','\n'+i+'</rim>','');return false" 
+        onclick="redaktilo.rim()" 
         title="Rimarko">rim</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
@@ -148,7 +144,7 @@
         <option value="9">9</option>
       </select>
       <button
-        onclick="insertTags2('<ofc>',document.getElementById('r:ofc').value,'</ofc>','','');return false" 
+        onclick="redaktilo.ofc()" 
         title="Indiko pri oficialeco">ofc</button>
     |  
         <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
@@ -168,7 +164,7 @@
         <option value="<vspec>pronomo</vspec>">pronomo</option>                            
       </select>
       <button
-        onclick="insertTags2('<gra>',document.getElementById('r:gra').value,'</gra>','','');return false"
+        onclick="redaktilo.gra()"
         title="Indikon pri gramatiko">gra</button>
     |
       <select id="r:sfak" name="uzofak" title="Elektu fakon">
@@ -176,7 +172,7 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-      onclick="insertTags2('<uzo tip=\&#34;fak\&#34;>',document.getElementById('r:sfak').value,'</uzo>','','');return false"
+      onclick="redaktilo.uzo_fak()"
       title="Fako (elektu)">uzo fak</button>
     |  
       <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
@@ -184,7 +180,7 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-        onclick="insertTags2('<uzo tip=\&#34;stl\&#34;>',document.getElementById('r:sstl').value,'</uzo>','','');return false"
+        onclick="redaktilo.uzo_stl()"
         title="Stilo (elektu)">uzo stl</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
@@ -194,23 +190,23 @@
       
     <fieldset id="r:fs_ekz" class="collapsed">
       <button
-        onclick="var i=str_indent();insertTags(&#39;<ekz>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.ekz()" 
         title="Ekzemplo">ekz</button>
     |
       <button
-        onclick="insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.tld()" 
         title="Tildo (anstataŭas la radikon)">tld</button>
     |
       <button
-        onclick="insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;[&#x2026;]&#39;);return false" 
+        onclick="redaktilo.klr_ppp" 
         title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
     |
       <button
-      onclick="insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false" 
+      onclick="redaktilo.ind()" 
       title="Tradukata parto de ekzemplo">ind</button> 
     |
       <button
-        onclick="var i=str_indent();insertTags(&#39;<fnt>\n&#39;+i+&#39;  <bib></bib>,\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\n&#39;+i+&#39;  <vrk><url ref=\&#34;\&#34;></url></vrk>,\n&#39;+i+&#39;  <lok></lok>\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.fnt()" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
@@ -220,15 +216,15 @@
       
     <fieldset id="r:fs_dif" class="collapsed">
       <button
-        onclick="var i=str_indent();insertTags(&#39;<drv mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <kap><tld/>...</kap>\n&#39;+i+&#39;  <snc mrk=\&#34;pilk.\&#34;>\n&#39;+i+&#39;    <dif>\n&#39;+i+&#39;      \n&#39;+i+&#39;    </dif>\n&#39;+i+&#39;  </snc>\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.drv()" 
         title="Nova derivaĵo">drv</button>
     |
       <button
-        onclick="var i=str_indent();insertTags(&#39;<snc mrk=\&#34;XXXX.&#39;,&#39;\&#34;>\n&#39;+i+&#39;  <dif>\n&#39;+i+&#39;    \n&#39;+i+&#39;  </dif>\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.snc()" 
         title="Nova senco">snc</button>  
     |
       <button
-        onclick="var i=str_indent();insertTags(&#39;<dif>\n&#39;+i+&#39;  &#39;,&#39;\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false" 
+        onclick="redaktilo.dif()" 
         title="Difino">dif</button>
     <span class="right">
       <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
