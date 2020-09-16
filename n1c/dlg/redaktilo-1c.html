@@ -18,13 +18,13 @@
   <div id="r:navigado">
     <div id="r:nav_btn">
       <button
-        onclick="nextTag('<drv',-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
+        onclick="redaktilo.nextTag('<drv',-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
       <button
-        onclick="nextTag('<drv',1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
+        onclick="redaktilo.nextTag('<drv',1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
       <button
-        onclick="indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
+        onclick="redaktilo.indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
       <button
-        onclick="indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
+        onclick="redaktilo.indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
       <div class="tgl-cnt">
         <input type="checkbox" id="r:cx" name="cx" class="tgl tgl-flip" value="1" accesskey="x"
               onclick="document.getElementById('r:xmltxt').focus()" />
@@ -46,8 +46,8 @@
     </div>  
     
     <div id="r:tab_txmltxt">
-      <textarea id="r:xmltxt" name="xmlTxt" cols="100" 
-        onkeypress="return klavo(event)"></textarea>
+      <textarea id="r:xmltxt" name="xmlTxt" cols="100" spellcheck="false"
+        onkeypress="return redaktilo.klavo(event)"></textarea>
       <input id="r:art" type="hidden" name="art" value="XXX" />
 
 <!-- buton-grupoj por redaktado -->
@@ -235,7 +235,7 @@
     <fieldset id="r:fs_nov" class="collapsed">
       <label for="art">Nova artikolo:</label>
       <input type="text" id="r:nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
-      <input type="button" name="button" value="kreu" onclick="create_new_art();"/>
+      <input type="button" name="button" value="kreu" onclick="redaktilo.create_new_art();"/>
     </fieldset>  
     
     <div id="r:fs_toggle" class="tabs">
