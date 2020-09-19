@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+  <meta http-equiv="X-Content-Security-Policy" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+  <meta http-equiv="X-WebKit-CSP" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+
+  <title>Reta Vortaro</title>
+  <link title="artikolo-stilo" type="text/css" rel="stylesheet" href="stl/artikolo.css"></link>
+  <script type="text/javascript" src="jsc/kuketoj.js"></script>
+  <script type="text/javascript">
+    function xAlUtf8(t,el) {
+     if (document.getElementById("x").checked) {
+        t = t.replace(/c[xX]/g, "\u0109");
+        t = t.replace(/g[xX]/g, "\u011d");
+        t = t.replace(/h[xX]/g, "\u0125");
+        t = t.replace(/j[xX]/g, "\u0135");
+        t = t.replace(/s[xX]/g, "\u015d");
+        t = t.replace(/u[xX]/g, "\u016d");
+        t = t.replace(/C[xX]/g, "\u0108");
+        t = t.replace(/G[xX]/g, "\u011c");
+        t = t.replace(/H[xX]/g, "\u0124");
+        t = t.replace(/J[xX]/g, "\u0134");
+        t = t.replace(/S[xX]/g, "\u015c");
+        t = t.replace(/U[xX]/g, "\u016c");
+        if (t != document.getElementById(el).value) {
+           document.getElementById(el).value = t;
+        }
+     }
+   }
+</script>
+
+   <style>
+  body {
+    background:url('titolo.jpg') no-repeat; 
+    background-size: cover;
+    margin: 0;
+    font-family: sans-serif;
+  }
+  main {
+    background: rgba(210, 200, 200, 40%);
+    margin: 0;
+    padding: 2em;
+    box-shadow: 0 0 1em rgba(10, 0, 0);
+  }
+
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  form>*{
+    margin-left: .6em;
+  }
+
+  input {
+    background-color: lightgoldenrodyellow;
+    height: 2.2em;
+    border: 2px solid darkslategray;
+    border-radius: 4px;    
+  } 
+
+  #w\:revo_sercho {
+    height: 3em;
+    width: 3em;
+    margin-right: 1em;
+    border-radius: 50%;
+    background: url(../smb/revo.svg) no-repeat;
+    background-position: -.14em -.27em;
+    background-size: 110%;
+    /*
+    background-color: gray;
+    border: 1px solid black;
+    */
+    border: 2px solid darkslategray;
+    background-color: lightgoldenrodyellow;
+    box-shadow: 1px 1px .5em black;
+  }
+  #w\:anaso_sercho {
+    height: 3em;
+    width: 3em;
+    border-radius: 50%;
+    background: url(../smb/duckduckgo.svg) no-repeat;
+    background-position: 0.17em 0.16em;
+    background-size: 88%;
+    border: 2px solid darkslategray;
+    background-color: lightgoldenrodyellow;
+    box-shadow: 1px 1px .5em black;
+  }
+  #w\:ecosia_sercho {
+    height: 3em;
+    width: 3em;
+    border-radius: 50%;
+    background: url(../smb/ecosia.svg) no-repeat;
+    background-position: center;
+    background-size: 150%;
+    border: 2px solid darkslategray;
+    background-color: lightgoldenrodyellow;
+    box-shadow: 1px 1px .5em black;
+  }
+      
+  </style>
+
+</head>
+<body onload="checkCookieConsent(); document.f.sercxata.focus();"
+
+  >
+  <main>
+  <h1 align="center" style="color:black; font-size: xx-large">Reta Vortaro</h1>
+  <form method="post" action="/cgi-bin/sercxu.pl" target="indekso" name="f">
+    Serĉo:
+    <input type="text" id="sercxata" name="sercxata" size="31" maxlength="255" onKeyUp="xAlUtf8(this.value,'sercxata')" 
+    placeholder="vorto..."></input>
+    <button id="w:revo_sercho" value="revo"></button>
+    <button id="w:ecosia_sercho" value="ecosia"></button>
+    <button id="w:anaso_sercho" value="anaso"></button>
+    <input type="checkbox" name="x" id="x" onClick="xAlUtf8(document.f.sercxata.value,'sercxata')" 
+      checked="checked"></input>anstataŭigu  c<u>x</u>, gx, ..., ux
+  </form>
+
+  <p>aŭ iru al 
+    <a href="/cgi-bin/hazarda_art.pl?senkadroj=1" target="indekso">iu ajn artikolo</a>.</p>
+    <div align="center">
+    </div>
+    <p>
+      Jen Revo ― la ĝenerala esperanta vortaro en la reto.
+    </p>
+    <p>
+      Se vi pretas helpi progresigi vortaron, kun
+      <a href="dok/copying.txt">libera</a>,
+      ampleksa kaj aktuala enhavo,
+      <a href="dok/redinfo.html">aliĝu al nia rondo de redaktantoj</a>.
+    </p>
+    <p>
+      Por trovi artikolon vi povas uzi la indeksojn en
+      la maldekstra kadro aŭ uzi unu el la du supraj serĉiloj.
+    </p>
+    <p>
+      Se vi uzas retumilon, kiu subtenas rapidserĉon,
+      vi povas aldoni la serĉilojn al la serĉilolisto de la retumilo,
+      elektante tie la menueron por aldono aŭ klakante sur la sekvajn
+      ligilojn por 
+      <a href="jsaverto.html" onclick="window.external.AddSearchProvider('http://reta-vortaro.de/revo/cfg/sercxo2.xml');return false;">aldoni Revoserĉon</a> aŭ
+      <a href="jsaverto.html" onclick="window.external.AddSearchProvider('http://reta-vortaro.de/revo/cfg/sercxo.xml');return false;">aldoni Revoserĉon per Guglo</a>.
+    </p>
+    <p class="piedlinio">
+      <a class="redakto" title="Reta Vortaro, konstanta URL" target="_top" href="http://purl.org/net/voko/revo/">ℛevo</a> |
+      <a class="redakto" title="Datumprotekta deklaro" href="dok/datumprotekto.html">datumprotekto</a> |
+      <a class="redakto" title="Permeso de uzado" target="_new" href="dok/copying.txt">permeso</a> |
+      <a class="redakto" title="Bibliografio" target="indekso" href="dok/bibliogr.html">bibliografio</a> |
+      <a class="redakto" title="Vortaraj mallongigoj" target="indekso" href="dok/mallongigoj.html">mallongigoj</a> |
+      <a class="redakto" title="Superserĉo per ViVo" target="_new" href="http://kono.be/vivo">ViVo</a>
+    </p>
+    <!--
+    <div class="kuketoaverto" id="kuketoaverto">
+      <p>
+      Ni uzas kuketojn (retumilajn memoretojn).
+      Uzante nian servon vi konsentas al konservado de informoj en kuketoj.
+      Eksciu pli pri la uzado de personaj datumoj en la
+       <a href="dok/datumprotekto.html">datumprotekta deklaro</a>.<br></br>
+      <button name="konfirmo" onClick="setCookieConsent(); document.f.sercxata.focus();">Mi konfirmas</button>
+      </p>      
+    </div>
+  -->
+  </main>
+  </body>
+</html>
