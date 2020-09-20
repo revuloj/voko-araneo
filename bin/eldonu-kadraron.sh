@@ -14,15 +14,18 @@
 # http://blogs.perl.org/users/smylers/2011/08/ssh-productivity-tips.html
 
 host=retavortaro.de
-release=1b
+release=1c
 
-scp n1b/dlg/redaktilo.html ${host}:/html/revo/dlg/
-scp n1b/jsc/redaktilo-${release}.js ${host}:/html/revo/jsc/
-scp n1b/stl/redaktilo-${release}.css ${host}:/html/revo/stl/
+scp n${release}/index-${release}.html ${host}:/html/revo/
+scp n${release}/titolo.jpg ${host}:/html/revo/
 
-scp cgi/vokomailx.pl ${host}:/html/cgi-bin/
-scp cgi/vokohtmlx.pl ${host}:/html/cgi-bin/
-
-scp cgi/perllib/revo/checkxml.pm ${host}:/files/perllib/revo/
+#scp n1b/dlg/redaktilo.html ${host}:/html/revo/dlg/
+#scp n1b/jsc/redaktilo-${release}.js ${host}:/html/revo/jsc/
+#scp n1b/stl/redaktilo-${release}.css ${host}:/html/revo/stl/
+#
+#scp cgi/vokomailx.pl ${host}:/html/cgi-bin/
+#scp cgi/vokohtmlx.pl ${host}:/html/cgi-bin/
+#
+#scp cgi/perllib/revo/checkxml.pm ${host}:/files/perllib/revo/
 
 
