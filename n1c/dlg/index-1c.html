@@ -4,26 +4,25 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <meta http-equiv="Content-Security-Policy" 
-            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: *.wikimedia.org; script-src 'self'">
         <meta http-equiv="X-Content-Security-Policy" 
-            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: *.wikimedia.org; script-src 'self'">
         <meta http-equiv="X-WebKit-CSP" 
-            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+            content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: *.wikimedia.org; script-src 'self'">
         <title>Reta Vortaro - Serĉo</title>
 <!--        <link rel="icon" type="image/png" href="images/favicon.png"> -->
-        <link rel="SHORTCUT ICON" href="../stl/revo.png">
+        <link rel="SHORTCUT ICON" href="../smb/revo.png">
         <link rel="stylesheet" href="../stl/revo-1c-min.css">
         <script src="../jsc/revo-1c.js"></script>
-        <script type="text/javascript" async="async" 
-            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=AM_CHTML"></script>
+        <script type="text/javascript" async="async" src="../jsc/MathJax.js"></script>
     </head>
 <body>
 <nav>
     <form id="navbar">
-        <button id="nav_inx_btn">≡</button>
-        <input type="text" id="x:sercxata" name="sercxata" 
+        <button id="x:nav_inx_btn">≡</button>
+        <input type="text" id="x:q" name="q" 
             maxlength="255" placeholder="ĵokeroj: % (pluraj) kaj _ (unu)"></input>
-        <button id="nav_srch_btn">🔍</button>
+        <button id="x:nav_srch_btn"></button>
     </form>    
     <div id="navigado" class="eble_kasxita"></div>
 </nav>
