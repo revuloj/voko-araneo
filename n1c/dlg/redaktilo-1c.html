@@ -20,13 +20,13 @@
   <div id="r:navigado">
     <div id="r:nav_btn">
       <button
-        onclick="redaktilo.nextTag('<drv',-1);return false" href="#" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
+        value="-1d" title="Serĉu antaŭan derivaĵon.">drv&#x2303;</button>
       <button
-        onclick="redaktilo.nextTag('<drv',1);return false" href="#" href="#" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
+        value="+1d" title="Serĉu sekvan derivaĵon.">drv&#x2304;</button>
       <button
-        onclick="redaktilo.indent(2);return false" href="#" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
+        value="+2i" title="Ŝovu la markitan tekston dekstren.">&gt;&gt;</button>
       <button
-        onclick="redaktilo.indent(-2);return false" href="#" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
+        value="-2i" title="Ŝovu la markitan tekston maldekstren.">&lt;&lt;</button>
       <div class="tgl-cnt">
         <input type="checkbox" id="r:cx" name="cx" class="tgl tgl-flip" value="1" accesskey="x"
               onclick="document.getElementById('r:xmltxt').focus()" />
@@ -37,8 +37,8 @@
     <h1><a id="r:art_titolo" href="/revo/art/XXX.html">XXXX</a></h1>
     <div class="filler"></div>
     <div id="r:tabs" class="tabs">
-      <a class="aktiva" id="r:txmltxt" onclick="tab_toggle('r:txmltxt');">redakti</a>
-      <a id="r:trigardo" onclick="tab_toggle('r:trigardo'); rantaurigardo()">antaŭrigardo</a>
+      <a class="aktiva" id="r:txmltxt">redakti</a>
+      <a id="r:trigardo">antaŭrigardo</a>
     </div>      
   </div> <!-- r:navigado -->
 
@@ -64,18 +64,18 @@
         maxlength="3" 
         title="Lingvokodo por tradukoj." />
       <button accesskey="t" 
-        onclick="redaktilo.trd_lng()" 
+        value="trd_lng" 
         title="Unuopa traduko"><u>t</u>rd lng</button> 
       <button
-        onclick="redaktilo.trdgrp()" 
+        value="trdgrp" 
         title="Grupon de tradukoj">trdgrp lng</button> 
     |
       <button
-        onclick="redaktilo.trd()"
+        value="trd"
         title="Traduko ene de grupo (sen lingvo)">trd</button> 
     |    
       <button
-        onclick="redaktilo.klr()" 
+        value="klr" 
         title="Klarigo sen tipo">klr</button> 
     |    
     <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="r:klrtip">
@@ -84,15 +84,15 @@
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
     <button
-        onclick="redaktilo.klr_tip()"
+        value="klr_tip"
         title="Klarigo kun tipo">klr tip</button> 
     | 
       <button
-        onclick="redaktilo.ind()" 
+        value="ind" 
         title="Indeksita parto de traduko">ind</button> 
     <span class="right">
-      <button class="help_btn" onclick="helpo_pagho('manlibro#tradukoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#tradukiloj-')">❬❭</button>
+      <button class="help_btn" value="manlibro#tradukoj">?</button>
+      <button class="help_btn" value="rnc#tradukiloj-">❬❭</button>
     </span>
     </fieldset>
 
@@ -112,22 +112,22 @@
           <option value="ekz">ekz-emplo</option>
         </select>
         <button
-        onclick="redaktilo.ref_tip()" 
+        value="ref_tip" 
         title="Unuopa referenco">ref tip</button>
       <button
-        onclick="redaktilo.refgrp()" 
+        value="refgrp" 
         title="Grupo de refencoj">refgrp tip</button> 
     |    
       <button
-        onclick="redaktilo.ref()" 
+        value="ref" 
         title="Referenco ene de grupo (sen tipo).">ref</button>
     |
       <button
-        onclick="redaktilo.rim()" 
+        value="rim" 
         title="Rimarko">rim</button>
     <span class="right">
-      <button class="help_btn" onclick="helpo_pagho('manlibro#referencoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#referenciloj-')">❬❭</button>
+      <button class="help_btn" value="manlibro#referencoj">?</button>
+      <button class="help_btn" value="rnc#referenciloj-">❬❭</button>
     </span>
     </fieldset>
 
@@ -146,7 +146,7 @@
         <option value="9">9</option>
       </select>
       <button
-        onclick="redaktilo.ofc()" 
+        value="ofc" 
         title="Indiko pri oficialeco">ofc</button>
     |  
         <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
@@ -166,7 +166,7 @@
         <option value="<vspec>pronomo</vspec>">pronomo</option>                            
       </select>
       <button
-        onclick="redaktilo.gra()"
+        value="gra"
         title="Indikon pri gramatiko">gra</button>
     |
       <select id="r:sfak" name="uzofak" title="Elektu fakon">
@@ -174,7 +174,7 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-      onclick="redaktilo.uzo_fak()"
+      value="uzo_fak"
       title="Fako (elektu)">uzo fak</button>
     |  
       <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
@@ -182,72 +182,72 @@
         <!-- plenigo per JS! -->
       </select>
       <button
-        id="r:uzo_stl"
+        value="uzo_stl"
         title="Stilo (elektu)">uzo stl</button>
     <span class="right">
-      <button class="help_btn" onclick="helpo_pagho('manlibro#uzindikoj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#uzo-')">❬❭</button>
+      <button class="help_btn" value="manlibro#uzindikoj">?</button>
+      <button class="help_btn" value="rnc#uzo-">❬❭</button>
     </span>
     </fieldset>
       
     <fieldset id="r:fs_ekz" class="collapsed">
       <button
-        id="r:ekz" 
+        value="ekz" 
         title="Ekzemplo">ekz</button>
     |
       <button
-        id="r:tld" 
+        value="tld" 
         title="Tildo (anstataŭas la radikon)">tld</button>
     |
       <button
-        id="r:klr_ppp" 
+        value="r:klr_ppp" 
         title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
     |
       <button
-      onclick="redaktilo.ind()" 
+      value="ind" 
       title="Tradukata parto de ekzemplo">ind</button> 
     |
       <button
-        onclick="redaktilo.fnt()" 
+        id="fnt" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
     <span class="right">
-      <button class="help_btn" onclick="helpo_pagho('manlibro#ekzemploj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#ekz-')">❬❭</button>
+      <button class="help_btn" value="manlibro#ekzemploj">?</button>
+      <button class="help_btn" value="rnc#ekz-">❬❭</button>
     </span>
     </fieldset>
       
     <fieldset id="r:fs_dif" class="collapsed">
       <button
-        onclick="redaktilo.drv()" 
+        value="drv" 
         title="Nova derivaĵo">drv</button>
     |
       <button
-        onclick="redaktilo.snc()" 
+        value="snc" 
         title="Nova senco">snc</button>  
     |
       <button
-        onclick="redaktilo.dif()" 
+        value="dif" 
         title="Difino">dif</button>
     <span class="right">
-      <button class="help_btn" onclick="helpo_pagho('manlibro#deriva%C4%B5oj')">?</button>
-      <button class="help_btn" onclick="helpo_pagho('rnc#drv-')">❬❭</button>
+      <button class="help_btn" value="manlibro#deriva%C4%B5oj">?</button>
+      <button class="help_btn" value="rnc#drv-">❬❭</button>
     </span>
     </fieldset>
 
     <fieldset id="r:fs_nov" class="collapsed">
       <label for="art">Nova artikolo:</label>
       <input type="text" id="r:nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
-      <input type="button" name="button" value="kreu" onclick="redaktilo.create_new_art();"/>
+      <input type="button" name="button" value="kreu" id="r:create_new_art"/>
     </fieldset>  
     
     <div id="r:fs_toggle" class="tabs">
-      <a class="aktiva" id="r:trd" onclick="fs_toggle('r:trd');">tradukoj</a>
-      <a id="r:ref" onclick="fs_toggle('r:ref');">referencoj</a>
-      <a id="r:ind" onclick="fs_toggle('r:ind');">indikiloj</a>
-      <a id="r:ekz" onclick="fs_toggle('r:ekz');">ekzemploj</a>
-      <a id="r:dif" onclick="fs_toggle('r:dif');">difinoj</a>
-      <a id="r:chiuj" onclick="fs_toggle('r:chiuj');">ĉiuj</a>
-      <a id="r:nov" onclick="fs_toggle('r:nov');">nova</a>
+      <a class="aktiva" id="r:trd">tradukoj</a>
+      <a id="r:ref">referencoj</a>
+      <a id="r:ind">indikiloj</a>
+      <a id="r:ekz">ekzemploj</a>
+      <a id="r:dif">difinoj</a>
+      <a id="r:chiuj">ĉiuj</a>
+      <a id="r:nov">nova</a>
     </div>
   </div>
       
