@@ -23,12 +23,11 @@
   <h1 align="center" style="color:black; font-size: xx-large">Reta Vortaro</h1>
   Serĉo:
   <form method="post" action="/cgi-bin/sercxu.pl" target="indekso" name="f">
-    <input type="text" id="w:q" name="q" size="31" maxlength="255" placeholder="vorto..."></input>
-    <div class="tgl-cnt">
-      <input type="checkbox" id="w:cx" name="cx" class="tgl tgl-flip" value="1" accesskey="x"
-            onclick="document.getElementById('w:sercxata').focus()" />
-      <label class="tgl-btn" data-tg-off="x=x" data-tg-on="x=◌̂" for="w:cx"></label>
-    </div>    
+    <div id="w:sercho" class="sercho">
+      <input type="text" id="w:q" name="q"
+        maxlength="255" placeholder="vorto..."></input>
+      <button id="w:cx" class="cx">x̂</button>
+    </div>
     <button id="w:revo_sercho" value="revo">
       <svg id="w:revo_icon" class="revo_icon" version="1.1" 
           xmlns="http://www.w3.org/2000/svg" 
