@@ -22,6 +22,7 @@ binmode(STDOUT, ":utf8");
 $| = 1;
 
 my $debug = 0;
+my $LIMIT = 200;
 
 #print "Content-type: text/html; charset=utf-8\n\n";
 
@@ -198,7 +199,8 @@ sub Sercxu
        d.drv_teksto " . $komparo . " ? AS drv_match
     FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
     WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
-      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk";
+      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
+      LIMIT ".$LIMIT;
 
     my $QUERY_eo_trd = 
       "SELECT distinct t.trd_teksto
@@ -206,7 +208,8 @@ sub Sercxu
         WHERE s.snc_drv_id = ?
           AND t.trd_snc_id = s.snc_id
           AND t.trd_lng = ?
-        ORDER BY t.trd_teksto collate utf8_unicode_ci";
+        ORDER BY t.trd_teksto collate utf8_unicode_ci
+        LIMIT ".$LIMIT;
 
     $sth2 = $dbh->prepare($QUERY_eo_trd);
     $sth = $dbh->prepare($QUERY_eo);
@@ -243,7 +246,8 @@ sub Sercxu
       FROM trd t
       WHERE t.trd_lng = ?
       AND t.trd_snc_id = ?
-      ORDER BY t.trd_teksto_ci";
+      ORDER BY t.trd_teksto_ci
+      LIMIT ".$LIMIT;
 	  
       $sth2 = $dbh->prepare($QUERY_lng_trd);
     }
@@ -262,12 +266,15 @@ sub Sercxu
       $QUERY_lng .=
       "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
       AND t.trd_lng = ?
-      ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero";
+      ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
+      LIMIT ".$LIMIT;
 
     } else { # cxiuj lingvojn, sed preferata unue
       $QUERY_lng.=
     "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-    ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero";
+    ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, 
+      d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
+      LIMIT ".$LIMIT;
     }
 
     $sth = $dbh->prepare($QUERY_lng);
@@ -359,13 +366,14 @@ sub MontruRezultojn
       print "  {";
       attribute("art",$$ref{'art_amrk'});
       attribute("mrk1",$$ref{'drv_mrk'});
-      attribute("vrt1",$$ref{'drv_match'}?$$ref{'drv_teksto'}:$$ref{'var_teksto'});
+      attribute("vrt1",$$ref{'drv_match'}?
+        escape($$ref{'drv_teksto'}) : escape($$ref{'var_teksto'}));
       if ($preferata_lingvo) {
         # aldonu tradukojn en preferata lingvo
         $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
         my $tradukoj=''; my $sep='';
         while (my $ref2 = $sth2->fetchrow_hashref()) {
-          $tradukoj .= $sep.$$ref2{'trd_teksto'};
+          $tradukoj .= $sep.escape($$ref2{'trd_teksto'});
           $sep = ", ";
         }
         attribute("mrk2","lng_".$preferata_lingvo);
@@ -400,9 +408,9 @@ sub MontruRezultojn
       print "  {";
       attribute("art",$$ref{'art_amrk'});
       attribute("mrk1",'lng_'.$$ref{'trd_lng'});
-      attribute("vrt1",$$ref{'trd_teksto'});
+      attribute("vrt1",escape($$ref{'trd_teksto'}));
       attribute("mrk2",$$ref{'drv_mrk'});
-      attribute("vrt2",$$ref{'drv_teksto'},1);
+      attribute("vrt2",escape($$ref{'drv_teksto'}),1); # last=1
     
       print "}";
     }
@@ -420,5 +428,11 @@ sub attribute {
   my ($name,$value,$last) = @_;
   print "\"$name\":\"$value\"";
   print "," unless ($last);
+}
+
+sub escape {
+  my $str = shift;
+  $str =~ s/\"/\\\"/g;
+  return $str;
 }
 
