@@ -433,6 +433,7 @@ sub attribute {
 sub escape {
   my $str = shift;
   $str =~ s/\"/\\\"/g;
+  $str =~ s/<[^>]+>//g;
   return $str;
 }
 
