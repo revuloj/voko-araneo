@@ -13,12 +13,17 @@ use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
+use utf8;
+#use open ':std', ':encoding(UTF-8)';
+binmode(STDOUT, ":utf8");
+
 $| = 1;
 
 my $senkadroj = param('senkadroj');
 if (!$senkadroj) {
   print "Content-type: text/html\n\n";
 
+  # anstataŭigu la enhavo de la kadraro (HTML frameset)
   open IN, "<../revo/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
   while (<IN>) {
     s/src="inx\/_eo.html"/src="hazarda_art.pl?senkadroj=1"/;
@@ -50,6 +55,8 @@ $sth->execute();
 my ($art) = $sth->fetchrow_array();
 $sth->finish();
 
+# tio legas kaj redonas adaptite la artikolon...
+# estonte ni ne plu uzos tion, sed ŝargos la artikolon per JS HTTPRequest.
 if ($senkadroj == 2) 
 {
   print header(-charset=>'utf-8');
@@ -101,7 +108,7 @@ open('/revo/art/$art.html', 'precipa');
 </script>
 EOD
 
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias";
   
 print end_table();
 print end_html();
