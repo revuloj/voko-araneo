@@ -14,7 +14,7 @@ use DBI();
 use URI::Escape;
 
 use utf8;
-#use open ':std', ':encoding(UTF-8)';
+use open ':std', ':encoding(UTF-8)';
 binmode(STDOUT, ":utf8");
 
 $| = 1;
