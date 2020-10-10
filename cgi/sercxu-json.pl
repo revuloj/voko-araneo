@@ -22,7 +22,7 @@ binmode(STDOUT, ":utf8");
 $| = 1;
 
 my $debug = 0;
-my $LIMIT = 200;
+my $LIMIT = 50;
 
 #print "Content-type: text/html; charset=utf-8\n\n";
 
@@ -199,17 +199,18 @@ sub Sercxu
        d.drv_teksto " . $komparo . " ? AS drv_match
     FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
     WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
-      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
-      LIMIT ".$LIMIT;
+      AND a.art_id = d.drv_art_id GROUP BY d.drv_id 
+    ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
+    LIMIT ".$LIMIT;
 
     my $QUERY_eo_trd = 
-      "SELECT distinct t.trd_teksto
-       FROM trd t, snc s
-        WHERE s.snc_drv_id = ?
-          AND t.trd_snc_id = s.snc_id
-          AND t.trd_lng = ?
-        ORDER BY t.trd_teksto collate utf8_unicode_ci
-        LIMIT ".$LIMIT;
+    "SELECT distinct t.trd_teksto
+    FROM trd t, snc s
+    WHERE s.snc_drv_id = ?
+      AND t.trd_snc_id = s.snc_id
+      AND t.trd_lng = ?
+    ORDER BY t.trd_teksto collate utf8_unicode_ci
+    LIMIT ".$LIMIT;
 
     $sth2 = $dbh->prepare($QUERY_eo_trd);
     $sth = $dbh->prepare($QUERY_eo);
@@ -261,7 +262,9 @@ sub Sercxu
       LEFT JOIN art a ON a.art_id = d.drv_art_id
       LEFT JOIN lng l ON t.trd_lng = l.lng_kodo ";
 
-    if ($param_lng) { # nur unu lingvo
+  # nur unu lingvo
+    if ($param_lng) { 
+
       $preferata_lingvo = $param_lng;
       $QUERY_lng .=
       "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
@@ -269,11 +272,13 @@ sub Sercxu
       ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
       LIMIT ".$LIMIT;
 
-    } else { # cxiuj lingvojn, sed preferata unue
+  # cxiuj lingvojn, sed preferata unue
+    } else { 
+
       $QUERY_lng.=
-    "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-    ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, 
-      d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
+      "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+      ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, 
+        d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
       LIMIT ".$LIMIT;
     }
 
