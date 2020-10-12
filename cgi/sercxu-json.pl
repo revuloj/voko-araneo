@@ -2,10 +2,10 @@
 #
 # sercxu.pl
 # 
-# 2006-09-__ Wieland Pusch
-# 2006-10-__ Bart Demeyere
-# 2007-03-__ Wieland Pusch
-# 2012-13 __ Wolfram Diestel
+# (c) GPL 2.0
+# 2006__ Wieland Pusch, Bart Demeyere
+# 2007__ Wieland Pusch
+# 2012-2020 __ Wolfram Diestel
 
 use strict;
 
@@ -30,78 +30,13 @@ my $LIMIT = 50;
 # perl sercxu-json.pl "sercxata=test%&cx=1&moktesto=0"
 
 
-my $MOCK = param("moktesto");
-
-if ($MOCK) {
-
-print <<EOT;
-Content-type: application/json; charset=utf-8
-
-[ 
-  {
-  "lng1": "eo",
-  "lng2": "de",
-  "titolo": "esperante (de)",
-  "trovoj": [
-    { "art": "artifi",
-      "mrk1": "artifi.0i",
-      "vrt1": "artifiki"
-    },
-    { "art": "artik",
-      "mrk1": "artik.0o",
-      "vrt1": "artiko",
-      "mrk2": "lng_de",
-      "vrt2": "Gelenk"
-    },
-    { "art": "artikl",
-      "mrk1": "artikl.0o",
-      "vrt1": "artiklo",
-      "mrk2": "lng_de",
-      "vrt2": "Artikel, Ware"
-    }
-  ]
- },
- {
-  "lng1": "de",
-  "lng2": "eo",
-  "titolo": "germane (preferata)",
-  "trovoj": [
-    { "art": "artikl",
-      "mrk1": "lng_de",
-      "vrt1": "Artikel",
-      "mrk2": "artikl.0o",
-      "vrt2": "artiklo"
-    },
-    { "art": "artiko",
-      "mrk1": "lng_de",
-      "vrt1": "Artikel",
-      "mrk2": "artiko.0o",
-      "vrt2": "artikolo"
-    },
-    { "art": "artik",
-      "mrk1": "lng_de",
-      "vrt1": "artikulieren",
-      "mrk2": "artik.0igi.FON",
-      "vrt2": "artikigi",
-      "snc2": "2"
-    }
-  ]
- }
-]
-
-EOT
-
-exit;
-} # if $MOCK
-else {
-
 # komenco
 print <<EOT;
 Content-type: application/json; charset=utf-8
 
 [
 EOT
-}
+
 
 #### preparu stirantajn parametrojn  ####
 
@@ -187,7 +122,7 @@ sub Sercxu
     $komparo = 'LIKE';
   };
 
-  # pro ricevi ĝustan ordigadon en diversaj lingvoj ni
+  # por ricevi ĝustan ordigadon en diversaj lingvoj ni
   # uzas normigitan askiigitan formon (_ci) por serĉi en la datumbazo
   my ($sercxata2,$sercxata2_eo) = normiguSercxon($sercxata);
 
@@ -196,7 +131,7 @@ sub Sercxu
 
     my $QUERY_eo =  
     "SELECT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
-       d.drv_teksto " . $komparo . " ? AS drv_match
+       LOWER(d.drv_teksto) " . $komparo . " LOWER(?) AS drv_match
     FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
     WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
       AND a.art_id = d.drv_art_id GROUP BY d.drv_id 
@@ -361,7 +296,8 @@ sub MontruRezultojn
         print " {\n";
         attribute("lng1",'eo');
         attribute("lng2",$preferata_lingvo);
-        attribute("titolo",'esperante'.($preferata_lingvo?" (de)":""));
+        attribute("max",$LIMIT);
+        attribute("titolo",'esperante'.($preferata_lingvo?" ($preferata_lingvo)":""));
         print " \"trovoj\": [\n";
         $last_lng = $lng;
       } else {
@@ -402,8 +338,9 @@ sub MontruRezultojn
 
         attribute("lng1",$$ref{'trd_lng'});
         attribute("lng2",'eo');
+        attribute("max",$LIMIT);
         attribute("titolo",$$ref{'lng_nomo'}.
-		    ($preferata_lingvo eq  $$ref{'trd_lng'}?" (preferata)":""));
+		      ($preferata_lingvo eq  $$ref{'trd_lng'}?" (preferata)":""));
         print " \"trovoj\": [\n";
         $last_lng = $$ref{'trd_lng'};
       } else {
