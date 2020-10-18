@@ -24,6 +24,16 @@
   <tr><td>
 <!-- buton-grupoj por redaktado -->
   <div id="r:v_sets">
+    
+    <div id="r:fs_toggle" class="tabs">
+      <a class="aktiva" id="r:trd">tradukoj</a>
+      <a id="r:ref">referencoj</a>
+      <a id="r:ind">indikiloj</a>
+      <a id="r:ekz">ekzemploj</a>
+      <a id="r:dif">difinoj</a>
+      <a id="r:chiuj">ĉiuj</a>
+      <a id="r:nov">nova</a>
+    </div>    
 
     <fieldset id="r:fs_trd">
       <input id="r:trdlng"
@@ -209,17 +219,21 @@
       <input type="text" id="r:nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
       <button value="kreu" id="r:create_new_art">kreu</button>
     </fieldset>  
-    
-    <div id="r:fs_toggle" class="tabs">
-      <a class="aktiva" id="r:trd">tradukoj</a>
-      <a id="r:ref">referencoj</a>
-      <a id="r:ind">indikiloj</a>
-      <a id="r:ekz">ekzemploj</a>
-      <a id="r:dif">difinoj</a>
-      <a id="r:chiuj">ĉiuj</a>
-      <a id="r:nov">nova</a>
-    </div>
+
   </div>
+
+  <details>
+    <summary><strong>Rimarkoj</strong></summary>
+    <div id="r:eraroj">
+  - <a target="_new" href="https://revuloj.github.io/respondoj.html">Informoj por redaktantoj.</a><br/>
+  - Klavoj: STIR-Z malfaras agon, STIR-Y refaras kaj STIR-F ebligas ser&#265;i<br/>
+  - Kelkajn butonojn oni povas premi depende de la operaciumo ekz. per ALT+⇧+substrekito aŭ
+    STIR+⌥+substrekito
+  - Por pli ampleksaj redaktoj ni provizas ankoraŭ
+    <a class="redakto" title="Alternativa redaktilo" target="_new"
+    href="https://revaj.steloj.de/">alternativan redaktilon</a>
+  </div>
+  </details>
   </td></tr>
 </table> <!-- r:redaktmenu -->
 
