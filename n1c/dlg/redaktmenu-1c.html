@@ -21,18 +21,27 @@
 
 <!-- iom improvizite, sed aktuale load_page_nav atendas elementon TABLE -->
 <table id="r:redaktmenu">
-  <tr><td>
+
+  <tr class="menuo eble_kasxita">
+    <td class="aktiva"><a href="../inx/_eo.html">Esperanto</a></td>
+    <td class="fona"><a href="../inx/_lng.html">Lingvoj</a></td>
+    <td class="fona"><a href="../inx/_fak.html">Fakoj</a></td>
+    <td class="fona"><a href="../inx/_ktp.html">ktp.</a></td>
+  </tr>
+
+  <tr><td class="enhavo" colspan="4">
 <!-- buton-grupoj por redaktado -->
   <div id="r:v_sets">
     
     <div id="r:fs_toggle" class="tabs">
-      <a class="aktiva" id="r:trd">tradukoj</a>
-      <a id="r:ref">referencoj</a>
-      <a id="r:ind">indikiloj</a>
-      <a id="r:ekz">ekzemploj</a>
-      <a id="r:dif">difinoj</a>
-      <a id="r:chiuj">ĉiuj</a>
+      <a class="aktiva" id="r:trd">tr<span class="eble_kasxita">a</span>d<span class="eble_kasxita">ukoj</span></a>
+      <a id="r:ref">ref<span class="eble_kasxita">erencoj</span></a>
+      <a id="r:ind">ind<span class="eble_kasxita">ikiloj</span></a>
+      <a id="r:ekz">ekz<span class="eble_kasxita">emploj</span></a>
+      <a id="r:dif">dif<span class="eble_kasxita">inoj</span></a>
+      <a id="r:chiuj"><span class="eble_kasxita">ĉiuj</span></a>
       <a id="r:nov">nova</a>
+      <a id="r:preta">preta</a>
     </div>    
 
     <fieldset id="r:fs_trd">
@@ -53,21 +62,22 @@
       <button
         value="trd"
         title="Traduko ene de grupo (sen lingvo)">trd</button> 
-    |    
-      <button
+    | <a class="se_kasxita" href="#">...</a>   
+      <button class="eble_kasxita"
         value="klr_ronda" 
         title="Klarigo sen tipo">klr</button> 
     |    
-    <select name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="r:klrtip">
+    <select class="eble_kasxita" 
+      name="klrtip" placeholder="tip" title="Elektu la tipon de la klarigo." id="r:klrtip">
       <option value=""></option>
       <option value="ind">ind-ekso</option>
       <option selected="selected" value="amb">amb-aŭ</option>
     </select>
-    <button
+    <button class="eble_kasxita"
         value="klr_tip"
         title="Klarigo kun tipo">klr<sub>tip</sub></button> 
     | 
-    <button
+    <button class="eble_kasxita"
         value="ind" 
         title="Indeksita parto de traduko">ind</button> 
     <span class="right">
@@ -184,13 +194,13 @@
         title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
     |
       <button
-      value="ind" 
-      title="Tradukata parto de ekzemplo">ind</button> 
-    |
-      <button
         value="fnt" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
-    <span class="right">
+    |
+      <button
+        value="ind" 
+        title="Tradukata parto de ekzemplo">ind</button> 
+      <span class="right">
       <button class="help_btn" value="manlibro#ekzemploj">?</button>
       <button class="help_btn" value="rnc#ekz-">❬❭</button>
     </span>
@@ -219,8 +229,21 @@
       <input type="text" id="r:nova_art" name="art" placeholder="dosiernomo" size="20" maxlength="20" />
       <button value="kreu" id="r:create_new_art">kreu</button>
     </fieldset>  
-
   </div>
+
+  <fieldset id="r:fs_preta" class="collapsed">
+    <div id="r:priskribo">
+      <label for="r:sxangxo">ŝanĝpriskribo:</label>
+      <input type="text" id="r:sxangxo" name="sxangxo" size="60" maxlength="255" placeholder="Via ŝanĝo en la artikolo" />
+      <br/><label for="r:sxangxo">retadreso:</label>
+      <input type="email" id="r:redaktanto" name="redaktanto" size="30" maxlength="80" placeholder="Via registrita retadreso" />
+    </div>
+    <div id="r:agobutonoj">
+      <button id="r:kontrolu" value="kontrolu">Kontrolu</button>
+      <button id="r:konservu" value="konservu">Sendu</button>
+      <button id="r:rezignu" value="rezignu">Rezignu</button>
+    </div>
+  </fieldset>
 
   <details>
     <summary><strong>Rimarkoj</strong></summary>
