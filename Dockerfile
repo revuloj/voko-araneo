@@ -81,7 +81,7 @@ RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi l
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
-COPY --from=metapost --chown=root:root voko-grundo-master/smb/*.svg /usr/local/apache2/htdocs/revo/smb/
+COPY --from=metapost --chown=root:root voko-grundo-master/smb/*.svg /tmp/svg/
 
 #ADD . ./
 COPY bin/* /usr/local/bin/
@@ -102,10 +102,8 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
      voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
      voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
      voko-grundo-${VG_BRANCH}/smb/* voko-grundo-${VG_BRANCH}/bin/compile* \
+     voko-grundo-${VG_BRANCH}/bin/svg2css.sh \
   && rm ${VG_BRANCH}.zip \
-# debug:  && ls voko-grundo-${VG_BRANCH}/* \
-  && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
-#  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
   && mkdir /usr/local/apache2/htdocs/revo/jsc \
   # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
   && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/kadro.js \
@@ -113,9 +111,12 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
       > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
 #  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   # kombinu kaj malgrandigu CSS-dosierojn
-  && cd voko-grundo-${VG_BRANCH} \
+  && cd voko-grundo-${VG_BRANCH} && cp /tmp/svg/* ./smb/ \
   && ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
   && cd .. \
+# debug:  && ls voko-grundo-${VG_BRANCH}/* \
+  && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
+#  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
@@ -128,7 +129,10 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
   && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
   && mkdir -p /var/www/web277/html/tmp \
-  && chown -R ${DAEMON_UID} /var/www/web277/html/revo 
+  && chown -R ${DAEMON_UID} /var/www/web277/html/revo \
+  && rm -rf /tmp/*
+
+
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
