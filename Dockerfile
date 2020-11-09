@@ -38,7 +38,7 @@ RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/*
 RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
    && unzip master.zip voko-grundo-master/bin/mp2png.sh \
    && unzip master.zip voko-grundo-master/smb/*.mp
-RUN cd voko-grundo-master && bin/mp2png.sh #&& cd ${HOME}
+RUN cd voko-grundo-master && mkdir -p build/smb && bin/mp2png.sh #&& cd ${HOME}
 
 
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
@@ -81,7 +81,7 @@ RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi l
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
-COPY --from=metapost --chown=root:root voko-grundo-master/smb/*.svg /tmp/svg/
+COPY --from=metapost --chown=root:root voko-grundo-master/build/smb/*.svg /tmp/svg/
 
 #ADD . ./
 COPY bin/* /usr/local/bin/
@@ -106,13 +106,15 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && rm ${VG_BRANCH}.zip \
   && mkdir /usr/local/apache2/htdocs/revo/jsc \
   # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
-  && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/kadro.js \
-         voko-grundo-${VG_BRANCH}/jsc/artikolo.js voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
+  && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/transiroj.js \
+         voko-grundo-${VG_BRANCH}/jsc/kadro.js voko-grundo-${VG_BRANCH}/jsc/artikolo.js \
+         voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
       > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
 #  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   # kombinu kaj malgrandigu CSS-dosierojn
-  && cd voko-grundo-${VG_BRANCH} && cp /tmp/svg/* ./smb/ \
-  && ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
+  && cd voko-grundo-${VG_BRANCH} && cp /tmp/svg/* ./smb/ && mkdir -p build/stl \
+  #&& ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
+  && ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   && cd .. \
 # debug:  && ls voko-grundo-${VG_BRANCH}/* \
   && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
