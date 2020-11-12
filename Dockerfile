@@ -36,9 +36,9 @@ FROM silkeh/latex:small as metapost
 LABEL Author=<diestel@steloj.de>
 RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/* 
 RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-   && unzip master.zip voko-grundo-master/bin/mp2png.sh \
+   && unzip master.zip voko-grundo-master/bin/mp2png_svg.sh \
    && unzip master.zip voko-grundo-master/smb/*.mp
-RUN cd voko-grundo-master && mkdir -p build/smb && bin/mp2png.sh #&& cd ${HOME}
+RUN cd voko-grundo-master && mkdir -p build/smb && bin/mp2png_svg.sh #&& cd ${HOME}
 
 
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
