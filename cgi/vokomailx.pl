@@ -117,6 +117,10 @@ my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+#$xml_err =~ s/\n/<br>\n/sg;
+$xml_err =~ s/</&lt;/sg;
+$xml_err =~ s/>/&gt;/sg;
+$xml_err =~ s/\n(Atentu:|Eraro:)/<br>\n$1/sg;
 print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 
 # FARENDA:

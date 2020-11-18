@@ -49,7 +49,7 @@ sub rxp_cmd {
       $err =~ s/^Error: /Eraro: /smg;
       $err =~ s/ of <stdin>$//smg;
       $err =~ s/^ in unnamed entity//smg;
-      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata lementokomenco $1/smg;
+      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata elementokomenco $1/smg;
       $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 ĉi tie/smg;
       $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua elementofino: anstataŭ $1 troviĝis $2/smg;
       $err =~ s/^ at line (\d+) char (\d+)$/ ĉe pozicio $1:$2/smg;
