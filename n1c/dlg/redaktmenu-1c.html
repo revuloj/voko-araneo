@@ -39,6 +39,7 @@
       <a class="aktiva" id="r:trd">tr<span class="eble_kasxita">a</span>d<span class="eble_kasxita">ukoj</span></a>
       <a id="r:ref">ref<span class="eble_kasxita">erencoj</span></a>
       <a id="r:ind">ind<span class="eble_kasxita">ikiloj</span></a>
+      <a id="r:uzo">uzo<span class="eble_kasxita">j</span></a>
       <a id="r:ekz">ekz<span class="eble_kasxita">emploj</span></a>
       <a id="r:dif">dif<span class="eble_kasxita">inoj</span></a>
       <a id="r:chiuj"><span class="eble_kasxita">ĉiuj</span></a>
@@ -63,7 +64,8 @@
       <button
         value="trd"
         title="Traduko ene de grupo (sen lingvo)">trd</button> 
-      | <!--a class="se_kasxita" href="#">|.</a -->   
+      &#x2005;
+        <!--a class="se_kasxita" href="#">|.</a -->   
       <button class="eble_kasxita"
         value="klr_ronda" 
         title="Klarigo sen tipo">klr</button>   
@@ -89,31 +91,29 @@
       <select name="reftip"  
           title="Elektu tipon de referenco." id="r:reftip">
           <option selected="selected" value=""></option>
-          <option value="vid">vid-u</option>
-          <option value="hom">hom-onima</option>
-          <option value="dif">dif-ina</option>
-          <option value="sin">sin-onimo</option>
-          <option value="ant">ant-onimo</option>
-          <option value="super">super-nocio</option>
-          <option value="sub">sub-nocio</option>
-          <option value="prt">part-o</option>
-          <option value="malprt">malpart-o</option>
-          <option value="ekz">ekz-emplo</option>
+          <option value="vid">vidu</option>
+          <option value="hom">homonimo</option>
+          <option value="dif">difino</option>
+          <option value="sin">sinonimo</option>
+          <option value="ant">antonimo</option>
+          <option value="super">supernocio</option>
+          <option value="sub">subnocio</option>
+          <option value="prt">parto</option>
+          <option value="malprt">malparto</option>
+          <option value="ekz">ekzemplo</option>
         </select>
-        <button
+      <button
         value="ref_tip" 
         title="Unuopa referenco">ref<sub>tip</sub></button>
       <button
+        value="ref_lst" 
+        title="Listoreferenco">ref<sub>lst</sub></button>
+      <button
         value="refgrp" 
         title="Grupo de refencoj">refgrp</button> 
-    |    
       <button
         value="ref" 
         title="Referenco ene de grupo (sen tipo).">ref</button>
-    |
-      <button
-        value="rim" 
-        title="Rimarko">rim</button>
     <span class="right">
       <button class="help_btn" value="manlibro#referencoj">?</button>
       <button class="help_btn" value="rnc#referenciloj-">❬❭</button>
@@ -137,7 +137,7 @@
       <button
         value="ofc" 
         title="Indiko pri oficialeco">ofc</button>
-    |  
+    &#x2005;  
         <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
         <option selected="selected" value=""></option>
         <option value="&lt;vspec&gt;tr&lt;/vspec&gt;">tr</option>
@@ -157,7 +157,9 @@
       <button
         value="gra"
         title="Indikon pri gramatiko">gra</button>
-    |
+    </fieldset>
+
+    <fieldset id="r:fs_uzo" class="collapsed">  
       <select id="r:sfak" name="uzofak" title="Elektu fakon">
         <option selected="selected" value=""></option>
         <!-- plenigo per JS! -->
@@ -165,7 +167,7 @@
       <button
       value="uzo_fak"
       title="Fako (elektu)">uzo<sub>fak</sub></button>
-    |  
+    &#x2005;  
       <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
         <option selected="selected" value=""></option>
         <!-- plenigo per JS! -->
@@ -183,22 +185,29 @@
       <button
         value="ekz" 
         title="Ekzemplo">ekz</button>
-    |
       <button
         value="tld" 
         title="Tildo (anstataŭas la radikon)">tld</button>
-    |
       <button
         value="klr_ppp" 
         title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
-    |
       <button
         value="fnt" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
-    |
+    &#x2005;
       <button
         value="ind" 
         title="Tradukata parto de ekzemplo">ind</button> 
+      <button
+        value="nom" 
+        title="Nomo neesperantigita">nom</button> 
+      <button
+        value="nac" 
+        title="Nacilingva esprimo">nac</button> 
+      <button class="eble_kasxita"
+        value="esc" 
+        title="Escepta uzo de esperanto">esc</button> 
+
       <span class="right">
       <button class="help_btn" value="manlibro#ekzemploj">?</button>
       <button class="help_btn" value="rnc#ekz-">❬❭</button>
@@ -209,14 +218,23 @@
       <button
         value="drv" 
         title="Nova derivaĵo">drv</button>
-    |
       <button
         value="snc" 
         title="Nova senco">snc</button>  
-    |
       <button
         value="dif" 
         title="Difino">dif</button>
+      <button
+        value="rim" 
+        title="Rimarko">rim</button>  
+    &#x2005;
+      <button
+        value="nom" 
+        title="Nomo neesperantigita">nom</button> 
+      <button
+        value="nac" 
+        title="Nacilingva esprimo">nac</button> 
+
     <span class="right">
       <button class="help_btn" value="manlibro#deriva%C4%B5oj">?</button>
       <button class="help_btn" value="rnc#drv-">❬❭</button>
