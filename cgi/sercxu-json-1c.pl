@@ -63,15 +63,14 @@ my $cx2cx = param('cx');
 my $pado = "..";
 $pado = "/revo" if param('pado') eq 'revo';
 
-
-#### eltrovu preferatan lingvon de la uzanto laŭ la retumilo ####
-
 #$ENV{HTTP_ACCEPT_LANGUAGE} = ''; # por testi
 
+#### eltrovu preferatan lingvon de la uzanto laŭ la retumilo ####
+### PLIBONIGU: limigu preferatajn lingvojn al 3 aŭ 5!
 my @preferataj_lingvoj;
 {
   my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
-  for $l (@a) {
+  for my $l (@a) {
     #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
     $l =~ s/^([a-z]{2,3})/$1/;
     push @preferataj_lingvoj, ($l) if ($l);
@@ -143,13 +142,15 @@ sub Sercxu
     ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
     LIMIT ".$LIMIT;
 
+    # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉijn tradukojn
+    # de unu lingvo en unu signoĉeno!
     my $QUERY_eo_trd = 
-    "SELECT distinct t.trd_teksto
+    "SELECT DISTINCT t.trd_lng, t.trd_teksto
     FROM trd t, snc s
     WHERE s.snc_drv_id = ?
       AND t.trd_snc_id = s.snc_id
       AND t.trd_lng IN $pref_lng
-    ORDER BY t.trd_teksto collate utf8_unicode_ci
+    ORDER BY t.trd_lng, t.trd_teksto collate utf8_unicode_ci
     LIMIT ".$LIMIT;
 
     $sth2 = $dbh->prepare($QUERY_eo_trd);
@@ -171,7 +172,7 @@ sub Sercxu
         print "Err ".$sth->err." - $@";
       }
     } else {
-      MontruRezultojn($sth, 'eo', $pref_lng, $sth2);
+      MontruRezultojn_eo($sth, $sth2);
     }
   #}
 
@@ -238,7 +239,7 @@ sub Sercxu
       }
 
     } else {
-      MontruRezultojn($sth, $param_lng, $pref_lng, $sth2);
+      MontruRezultojn_trd($sth, $pref_lng, $sth2);
     }
   }
 }
@@ -280,10 +281,102 @@ sub normiguSercxon {
 # funkcioj por eldono                                             #
 ###################################################################
 
-sub MontruRezultojn
+
+sub MontruRezultojn_eo
 {
-  my ($res, $lng, $preferata_lingvo, $sth2) = @_;
+  my ($res, $sth2) = @_;
   my $num = 0;
+
+  # trakuru ĉiujn DB-serĉrezultojn...
+  while (my $ref = $res->fetchrow_hashref()) {
+
+    $num++;
+
+    if ($num == 1) {
+      #print " ]\n },\n {" unless ($num==1);
+
+      json_obj_start({
+        "lng"=>"eo",
+        "max"=>$LIMIT,
+        "titolo"=>"esperante"
+      });
+
+      print " \"trovoj\": [\n";
+      #$last_lng = $lng;
+    } else {
+      print ",\n";
+    }
+
+    json_obj_start({
+      "art"=>$$ref{'art_amrk'}
+    });
+
+    print "\"eo\":";
+    json_obj({
+      "mrk"=>$$ref{'drv_mrk'},
+      "vrt"=>$$ref{'drv_match'}?
+          escape($$ref{'drv_teksto'}) : escape($$ref{'var_teksto'})
+    });
+
+
+    ### aldonu tradukojn en preferataj lingvoj
+    $sth2->execute($$ref{'drv_id'});
+    my $tradukoj=''; 
+    my $sep='';
+    my $last_lng= '';
+
+    while (my $ref2 = $sth2->fetchrow_hashref()) {
+
+      my $lng = $$ref2{'trd_lng'};
+
+      # ĉe komenco de nova lingvo...
+      unless ($last_lng) { # unua
+        print ",\n  \"$lng\":{";
+
+      } elsif ($lng ne $last_lng) { # plia
+        attribute("vrt",$tradukoj,1);
+        print "},\n  \"$lng\":{";
+        $tradukoj = '';
+      }
+      # en ambaŭ supraj kazoj
+      if ($lng ne $last_lng) {
+        attribute("mrk","lng_$lng");
+        $sep = '';
+      }
+
+      $last_lng = $lng; 
+
+      # kunigu ĉiujn tradukojn de unu lingvo...
+      $tradukoj .= $sep.escape($$ref2{'trd_teksto'});
+      #print "DBTRD: ".$tradukoj;
+
+      $sep = ", ";
+    }
+
+    # eligu la reston
+    if ($last_lng) {
+        attribute("vrt",$tradukoj,1);
+        print "}\n";
+    }
+
+    print "}";
+
+  } # ...while
+  $res->finish();
+    
+  if ($num) {
+    $neniu_trafo = 0;
+    print "\n]}\n";
+  }
+}
+
+
+
+sub MontruRezultojn_trd
+{
+  my ($res, $pref_lng, $sth2) = @_;
+  my $num = 0;
+  my $sep = '';
   my $last_lng;
 
 
@@ -291,85 +384,71 @@ sub MontruRezultojn
   while (my $ref = $res->fetchrow_hashref()) {
 
     $num++;
-
-    #### lng=eo ####
-
-    if ($lng eq 'eo') {
-
-      if ($num == 1) {
-        #print " ]\n },\n {" unless ($num==1);
-        print " {\n";
-        attribute("lng1",'eo');
-        attribute("lng2",$preferata_lingvo);
-        attribute("max",$LIMIT);
-        attribute("titolo",'esperante'.($preferata_lingvo?" ($preferata_lingvo)":""));
-        print " \"trovoj\": [\n";
-        $last_lng = $lng;
-      } else {
-	      print ",\n";
-      }
-
-      print "  {";
-      attribute("art",$$ref{'art_amrk'});
-      attribute("mrk1",$$ref{'drv_mrk'});
-      attribute("vrt1",$$ref{'drv_match'}?
-        escape($$ref{'drv_teksto'}) : escape($$ref{'var_teksto'}));
-      if ($preferata_lingvo) {
-        # aldonu tradukojn en preferata lingvo
-        $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
-        my $tradukoj=''; my $sep='';
-        while (my $ref2 = $sth2->fetchrow_hashref()) {
-          $tradukoj .= $sep.escape($$ref2{'trd_teksto'});
-          $sep = ", ";
-        }
-        attribute("mrk2","lng_".$preferata_lingvo);
-        attribute("vrt2",$tradukoj,1);
-      }
-      print "}";
-
-    #### lng != eo ####
-    
-    } else {
-
-      if ($num == 1 or $$ref{'trd_lng'} ne $last_lng) {
-
-        if ($num == 1) { 
-          print ",\n" unless ($lng eq 'eo' or $neniu_trafo);
-          print " {\n" 
-        }
-        else { 
-          print " ]\n },\n {" 
-        }; 
-
-        attribute("lng1",$$ref{'trd_lng'});
-        attribute("lng2",'eo');
-        attribute("max",$LIMIT);
-        attribute("titolo",$$ref{'lng_nomo'}.
-		      ($preferata_lingvo eq  $$ref{'trd_lng'}?" (preferata)":""));
-        print " \"trovoj\": [\n";
-        $last_lng = $$ref{'trd_lng'};
-      } else {
-	      print ",\n";
-      }
-
-      print "  {";
-      attribute("art",$$ref{'art_amrk'});
-      attribute("mrk1",'lng_'.$$ref{'trd_lng'});
-      attribute("vrt1",escape($$ref{'trd_teksto'}));
-      attribute("mrk2",$$ref{'drv_mrk'});
-      attribute("vrt2",escape($$ref{'drv_teksto'}),1); # last=1
-    
-      print "}";
+    if ($num == 1) {
+      # se ni trovis tradukojn kaj jam skribis "eo", ni bezonas komon...
+      print ",\n" unless ($neniu_trafo); #($lng eq 'eo' or $neniu_trafo);
     }
-  }
+
+    my $lng = $$ref{'trd_lng'};
+
+    print $sep;
+
+    json_obj_start({
+      "lng"=>$lng,
+      "max"=>$LIMIT,
+      "titolo"=>$$ref{'lng_nomo'}
+    });
+    print " \"trovoj\": [\n";
+    $last_lng = $lng;
+
+    json_obj_start({
+      "art"=>$$ref{'art_amrk'}
+    });
+
+    print "\"$lng\":";
+    json_obj({
+      "mrk"=>'lng_'.$$ref{'trd_lng'},
+      "vrt"=>escape($$ref{'trd_teksto'})
+    });
+
+    print "\"eo\":";
+    json_obj({
+      "mrk"=>$$ref{'drv_mrk'},
+      "vrt"=>escape($$ref{'drv_teksto'})
+    });
+  
+    print "}\n]}";
+    $sep = ",\n";
+
+  } # ...while
   $res->finish();
     
-  if ($num) {
-    $neniu_trafo = 0;
-    print " ]\n }";
+  #if ($num) {
+  #  #$neniu_trafo = 0;
+  #  #
+  #}
+}
+
+sub json_obj_start {
+  my $hash_ref = shift;
+  my $size = scalar keys %{$hash_ref};
+  my $n = 0;
+  print "{";
+  while (my ($key, $value) = each %{$hash_ref}) {
+    attribute($key, $value)
   }
 }
 
+sub json_obj {
+  my $hash_ref = shift;
+  my $size = scalar keys %{$hash_ref};
+  my $n = 0;
+  print "{";
+  while (my ($key, $value) = each %{$hash_ref}) {
+    attribute($key, $value, ++$n >= $size)
+  }
+  print "}"; 
+}
 
 sub attribute {
   my ($name,$value,$last) = @_;
