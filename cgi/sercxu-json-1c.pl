@@ -23,6 +23,7 @@ $| = 1;
 
 my $debug = 0;
 my $LIMIT = 50;
+my $LIMIT_lng = 3;
 
 #print "Content-type: text/html; charset=utf-8\n\n";
 
@@ -72,11 +73,17 @@ my @preferataj_lingvoj;
   my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
   for my $l (@a) {
     #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
-    $l =~ s/^([a-z]{2,3})/$1/;
-    push @preferataj_lingvoj, ($l) if ($l);
+    $l =~ s/^([a-z]{2,3}).*$/$1/;
+    unless (grep(/$l/,@preferataj_lingvoj)) {
+      push @preferataj_lingvoj, ($l) if ($l);
+    }
+    #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
+    last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
   #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
   }
 }
+
+#print "DEBUG ".join(',',@preferataj_lingvoj);
 
 @preferataj_lingvoj = ('en') unless (@preferataj_lingvoj); 
 my $pref_lng = "('".join("','",@preferataj_lingvoj)."')";
@@ -298,7 +305,7 @@ sub MontruRezultojn_eo
       json_obj_start({
         "lng"=>"eo",
         "max"=>$LIMIT,
-        "titolo"=>"esperante"
+        "titolo"=>"esperanta"
       });
 
       print " \"trovoj\": [\n";
@@ -391,15 +398,21 @@ sub MontruRezultojn_trd
 
     my $lng = $$ref{'trd_lng'};
 
-    print $sep;
+    # trovoj estas ordigitaj laŭ lingvo,
+    # ĉe komenco de nova lingvo, finu alineon kaj skribu enkondukon por nova
+    if ($lng ne $last_lng) {
+      print "]},\n" if ($last_lng);
 
-    json_obj_start({
-      "lng"=>$lng,
-      "max"=>$LIMIT,
-      "titolo"=>$$ref{'lng_nomo'}
-    });
-    print " \"trovoj\": [\n";
-    $last_lng = $lng;
+      json_obj_start({
+        "lng"=>$lng,
+        "max"=>$LIMIT,
+        "titolo"=>$$ref{'lng_nomo'}
+      });
+      print " \"trovoj\": [\n";
+      $last_lng = $lng;
+    } else {
+      print $sep;
+    }
 
     json_obj_start({
       "art"=>$$ref{'art_amrk'}
@@ -411,22 +424,24 @@ sub MontruRezultojn_trd
       "vrt"=>escape($$ref{'trd_teksto'})
     });
 
-    print "\"eo\":";
+    print ",\"eo\":";
     json_obj({
       "mrk"=>$$ref{'drv_mrk'},
       "vrt"=>escape($$ref{'drv_teksto'})
     });
   
-    print "}\n]}";
+    print "}\n"; 
     $sep = ",\n";
 
   } # ...while
+
+
   $res->finish();
     
-  #if ($num) {
+  if ($num) {
+    print "]}\n";
   #  #$neniu_trafo = 0;
-  #  #
-  #}
+  }
 }
 
 sub json_obj_start {
