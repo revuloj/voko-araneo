@@ -107,13 +107,13 @@ sub check_ref_cel {
             if (! $mrk_ekzistas) {
                 #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
                 # eble temas pri marko de subsenco?
-                open IN, "<", "$xml_dir";
+                open IN, "<", "$xml_dir/$art.xml";
                 my $celxml = join '', <IN>;
                 close IN;
 
                 if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
                     push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
-                    ."<a href=\"$red_url?art=$art\">$art</a>\n";
+                    ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
         #          $ne_konservu = 8;
                 }
             }

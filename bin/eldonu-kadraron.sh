@@ -17,10 +17,10 @@ host=retavortaro.de
 release=1c
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-scp n${release}/index.html ${host}:/html/revo/dlg/
-scp n${release}/index.html ${host}:/html/revo/
-##
-scp n${release}/dlg/index-${release}.html ${host}:/html/revo/dlg/
+#scp n${release}/index.html ${host}:/html/revo/dlg/
+#scp n${release}/index.html ${host}:/html/revo/
+###
+#scp n${release}/dlg/index-${release}.html ${host}:/html/revo/dlg/
 #scp n${release}/dlg/titolo-${release}.html ${host}:/html/revo/dlg/
 ## ###scp n${release}/dlg/titolo.jpg ${host}:/html/revo/dlg/
 #scp n${release}/dlg/redaktilo-${release}.html ${host}:/html/revo/dlg/
@@ -40,6 +40,6 @@ scp n${release}/dlg/index-${release}.html ${host}:/html/revo/dlg/
 #scp cgi/vokohtmlx.pl ${host}:/html/cgi-bin/
 #scp cgi/hazarda_art.pl ${host}:/html/cgi-bin/
 #
-#scp cgi/perllib/revo/checkxml.pm ${host}:/files/perllib/revo/
+scp cgi/perllib/revo/checkxml.pm ${host}:/files/perllib/revo/
 
 
