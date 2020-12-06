@@ -144,7 +144,7 @@ COPY --from=metapost --chown=root:root voko-grundo-master/smb/ /usr/local/apache
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
-COPY n${REVO_VER}/ /usr/local/apache2/htdocs/revo/
+COPY revo/ /usr/local/apache2/htdocs/revo/
 
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...

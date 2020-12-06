@@ -17,23 +17,23 @@ host=retavortaro.de
 release=1c
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-#scp n${release}/index.html ${host}:/html/revo/dlg/
-#scp n${release}/index.html ${host}:/html/revo/
+#scp revo/index.html ${host}:/html/revo/dlg/
+#scp revo/index.html ${host}:/html/revo/
 ###
-#scp n${release}/dlg/index-${release}.html ${host}:/html/revo/dlg/
-#scp n${release}/dlg/titolo-${release}.html ${host}:/html/revo/dlg/
-## ###scp n${release}/dlg/titolo.jpg ${host}:/html/revo/dlg/
-#scp n${release}/dlg/redaktilo-${release}.html ${host}:/html/revo/dlg/
-#scp n${release}/dlg/redaktmenu-${release}.html ${host}:/html/revo/dlg/
-#scp n${release}/dlg/zamenhof_legas.jpg ${host}:/html/revo/dlg/
-##scp n${release}/dlg/404.html ${host}:/html/revo/dlg/
+#scp revo/dlg/index-${release}.html ${host}:/html/revo/dlg/
+#scp revo/dlg/titolo-${release}.html ${host}:/html/revo/dlg/
+## ###scp revo/dlg/titolo.jpg ${host}:/html/revo/dlg/
+#scp revo/dlg/redaktilo-${release}.html ${host}:/html/revo/dlg/
+#scp revo/dlg/redaktmenu-${release}.html ${host}:/html/revo/dlg/
+#scp revo/dlg/zamenhof_legas.jpg ${host}:/html/revo/dlg/
+##scp revo/dlg/404.html ${host}:/html/revo/dlg/
 
-#scp n${release}/smb/duckduckgo.svg ${host}:/html/revo/smb/
-#scp n${release}/smb/ecosia.svg ${host}:/html/revo/smb/
-#scp n${release}/smb/revo.svg ${host}:/html/revo/smb/
+#scp revo/smb/duckduckgo.svg ${host}:/html/revo/smb/
+#scp revo/smb/ecosia.svg ${host}:/html/revo/smb/
+#scp revo/smb/revo.svg ${host}:/html/revo/smb/
 
-#scp n${release}/smb/revo.svg ${host}:/html/favicon.ico
-#scp n${release}/smb/revo64.png ${host}:/html/favicon.ico
+#scp revo/smb/revo.svg ${host}:/html/favicon.ico
+#scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
 #scp cgi/sercxu-json-${release}.pl ${host}:/html/cgi-bin/
 #scp cgi/vokomailx.pl ${host}:/html/cgi-bin/
