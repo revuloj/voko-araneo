@@ -109,7 +109,7 @@ sub konv {
         
         if ($tez_ekzistas) {
           $ref =~ tr/./_/;
-          $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso"><img src="../smb/tezauro.png" alt="TEZ" title="al la tezauro" border="0"></a>#;
+          $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso" class="tez-ref" title="al la tezaŭro">↝</a>#;
       } else {
           $$html =~ s###;
       }

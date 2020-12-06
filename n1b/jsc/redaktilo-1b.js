@@ -38,8 +38,8 @@ function Codelist(xmlTag,url) {
     HTTPRequest('GET', this.url, {},
        function() {
           // Success!
-          parser = new DOMParser();
-          doc = parser.parseFromString(this.response,"text/xml");
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(this.response,"text/xml");
     
           for (e of doc.getElementsByTagName(self.xmlTag)) {
               var c = e.attributes["kodo"];
@@ -714,12 +714,27 @@ function vokohtmlx(xml) {
     var doc = parser.parseFromString(data,"text/html");
     var rigardo = document.getElementById("r:tab_trigardo");
 
-    var body = doc.body;
-    var pied = body.querySelector("span.redakto");
-    if (pied) body.removeChild(pied);
+    var article = doc.getElementsByTagName("article");
+    if (article) {
+      rigardo.textContent = '';
+      rigardo.append(...article);  
+      preparu_art();
 
-    rigardo.textContent = '';
-    rigardo.append(...body.childNodes);
+      // eble tio devas esti en preparu_art?
+      // refaru matematikajn formulojn, se estas
+      if (typeof(MathJax) != 'undefined' && MathJax.Hub) {
+          MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      }
+    
+    } else {
+      // FARENDA: post kiam ĉiuj artikoloj havos HTML5-strukturon ni povos forigi tion
+      var body = doc.body;
+      var pied = body.querySelector("span.redakto");
+      if (pied) pied.parentElement.removeChild(pied);
+  
+      rigardo.textContent = '';
+      rigardo.append(...body.childNodes);  
+    }
   });
 }
    
@@ -757,6 +772,7 @@ function vokomailx(command,art,xml) {
         // debugging...
         console.log("div id=" + konfirmo.id);
         err_list.appendChild(konfirmo);
+        err_list.classList.add("konfirmo");
       }
     });
 }

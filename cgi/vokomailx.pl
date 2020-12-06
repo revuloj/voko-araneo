@@ -117,6 +117,10 @@ my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
 my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+#$xml_err =~ s/\n/<br>\n/sg;
+$xml_err =~ s/</&lt;/sg;
+$xml_err =~ s/>/&gt;/sg;
+$xml_err =~ s/\n(Atentu:|Eraro:)/<br>\n$1/sg;
 print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 
 # FARENDA:
@@ -186,7 +190,7 @@ if ($command eq 'forsendo') {
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
   } else {
     if (send_xml($redaktanto,$art,$sxangxo,\$xml)) {
-      print "<div id=\"konfirmo\">Bone: Ni sendis vian ŝanĝon al la redaktoservo.</div>\n";
+      print "<div id=\"konfirmo\">Bone: Via ŝanĝo sendiĝis al la redaktoservo.</div>\n";
     } else {
       print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
         "al la redaktoservo. Bv. reprovi poste aŭ sendi la ŝanĝon per ordinara retpoŝto kaj averti administranton.</div>\n";

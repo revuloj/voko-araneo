@@ -219,14 +219,11 @@ if (param('ans')) {
 
   print br."Lingvo: ",
 		hidden('ans', 1),
-		popup_menu(-name    => 'lng',
-                   -values  => \@values,
-				   -labels  => \%lng,
-                   -default => $preferata_lingvo);
-#		br."Traduko: ",
-#		popup_menu('trd',
-#                   ['eo', 'de','en','nl'],
-#                    'de');
+		popup_menu(
+      -name    => 'lng',
+      -values  => \@values,
+			-labels  => \%lng,
+      -default => $preferata_lingvo);
   exit if $sercxata eq "";
 }
 
@@ -277,16 +274,6 @@ if (param('cx')) {
   $sercxata_eo =~ s/U[xX]/Ŭ/g;
 }
 
-#my $sorter = new eosort;
-#
-#if ($sercxata_eo eq $sercxata) {
-#  $sercxata = $sorter->remap_ci($sercxata);
-#  $sercxata_eo = $sercxata;
-#} else {
-#  $sercxata = $sorter->remap_ci($sercxata);
-#  $sercxata_eo = $sorter->remap_ci($sercxata_eo);
-#}
-
 # Connect to the database.
 my $dbh = revodb::connect();
 
@@ -299,32 +286,19 @@ my %trovitajPagxoj;
 my $regulira = $sercxata =~ /[.^$\[\(\|+?{\\]/;
 
 if ($regulira) {
-#  print "REGEXP<p>\n";
   Sercxu('REGEXP', $sercxata, $sercxata_eo, $preferata_lingvo);
 } elsif ($sercxata =~ /[%_]/) {
-#  print "LIKE<p>\n";
   Sercxu('LIKE', $sercxata, $sercxata_eo, $preferata_lingvo);
 } else {
-#  print "=<p>\n";
   Sercxu('=', $sercxata, $sercxata_eo, $preferata_lingvo);
-#  print "REGEXP<br>\n";
-#  Sercxu('REGEXP', '^' . $sercxata . '[ (.-]|[ -]' . $sercxata . '[ (.-]' . '|[ -]' . $sercxata . '$');
-#  print "REGEXP<br>\n";
-#  Sercxu('REGEXP', '[:alnum:]' . $sercxata . '|' . $sercxata . '[:alnum:]');
 }
 
-
-# se vi trovis nur unu rezulton, tuj malfermi gxin
+# se vi trovis nur unu rezulton, tuj malfermu gxin
 if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
   print '<script type="text/javascript">' . "\n";
   print '<!--' . "\n";
 
   foreach my $pagxo (keys %trovitajPagxoj) {
-#    print "open('/revo/art/" . $pagxo
-#      . ".html#$trovitajPagxoj{$pagxo}', 'precipa');\n";
-#    print "alert(parent.location.href);\n";
-#    print "parent.precipa.location.href = parent.location.href + 'art/" . $pagxo
-#      . ".html#$trovitajPagxoj{$pagxo}';\n";
     print "parent.precipa.location.href = '/revo/art/" . $pagxo
       . ".html#$trovitajPagxoj{$pagxo}';\n";
     last;
@@ -335,8 +309,6 @@ if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
 
 $dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
   
-
-
 #print h1("Fino.");
   print "<br>" if $neniu_trafo and $formato ne "txt";
   print "Neniu trafo..." if $neniu_trafo;
@@ -385,23 +357,17 @@ sub Sercxu
 
   {
     my @fak = param("fak");
-#    print h1("fak = ".join(",", @fak)) if $verbose;
     foreach my $fak (@fak) {
       $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_fak$not like '%\_$_\_%'"} split(/,/, $fak)).")";
     }
   }
-#  print h1("addqry = $addqry") if $verbose;
 
   {
     my @stl = param("stl");
-#    print h1("stl = ".join(",", @stl)) if $verbose;
     foreach my $stl (@stl) {
       $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_stl$not like '%\_$_\_%'"} split(/,/, $stl)).")";
     }
   }
-#  print h1("addqry = $addqry") if $verbose;
-
-#  print h2("qry = $addqry") if $verbose;
 
 # ekz. aĝ -> AI:
 # SELECT d.*, a.*, v.*, d.drv_teksto LIKE 'AI%' as drv_match
@@ -491,11 +457,7 @@ sub Sercxu
         print "Err ".$sth->err." - $@";
       }
     } else {
-#      print '<small>query: ' . tv_interval ($tempo) . ' sekundoj</small><p>';
-#      $tempo = [gettimeofday];
       MontruRezultojn($sth, $param_lng, $preferata_lingvo, $sth2);
-#      print '<small>montrado: ' . tv_interval ($tempo) . ' sekundoj</small><p>';
-#      print '<font size=1>&nbsp;<p /></font>' . "\n";
     }
   }
 }
@@ -512,6 +474,7 @@ sub MontruRezultojn
     my $lng_nomo;
     my $trd;
     my $anchor;
+    my $param;
     my $klr;
 
     if ($lng eq 'eo') {
@@ -525,7 +488,7 @@ sub MontruRezultojn
       $lng_nomo .= " ($preferata_lingvo)" if $preferata_lingvo;
 
       if ($formato eq "txt") {
-	    foreach (split ",", param("trd")) {
+	      foreach (split ",", param("trd")) {
           $klr .= "|";
   	      my $sep;
 #		  print "--drv_id=$$ref{'drv_id'}--";
@@ -534,9 +497,9 @@ sub MontruRezultojn
             $klr .= $sep.$$ref2{'trd_teksto'};
             $sep = ",";
           }
-		}
-	  } else {
- 	    my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#lng_$preferata_lingvo\">";
+		    } # foreach
+	    } else { # formato ne txt ...
+ 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\&lng=$preferata_lingvo\">";
         $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
         while (my $ref2 = $sth2->fetchrow_hashref()) {
           $klr .= $sep.$$ref2{'trd_teksto'};
@@ -545,31 +508,31 @@ sub MontruRezultojn
         $klr .= "</a>)" if $klr;
       }
 
-    } else {
+    } else { # lng ne eo
       $trd = $$ref{'trd_teksto'};
       $anchor = $$ref{'drv_mrk'};
       $anchor = $$ref{'snc_mrk'} if $$ref{'snc_numero'}; 
       if ($formato eq "txt") {
-	    foreach (split ",", param("trd")) {
+	      foreach (split ",", param("trd")) {
           $klr .= "|";
-            my $sep;
-        if ($_ eq "eo") {
-          $klr .= $$ref{'drv_teksto'};
-        } else {
-              $sth2->execute($_, $$ref{'snc_id'});
-              while (my $ref2 = $sth2->fetchrow_hashref()) {
-                $klr .= $sep.$$ref2{'trd_teksto'};
-                $sep = ",";
+          my $sep;
+          if ($_ eq "eo") {
+            $klr .= $$ref{'drv_teksto'};
+          } else {
+            $sth2->execute($_, $$ref{'snc_id'});
+            while (my $ref2 = $sth2->fetchrow_hashref()) {
+              $klr .= $sep.$$ref2{'trd_teksto'};
+              $sep = ",";
+            }
           }
-        }
-      }
-	  } else {
+        } # foreach
+	    } else { # formato ne txt
         $klr = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\">$$ref{'drv_teksto'}";
         $klr .= "  <sup><i>$$ref{'snc_numero'}</i></sup>" if $$ref{'snc_numero'};
         $klr .= "</a>)";
-        $anchor = "lng_$lng";
-	  }
+	    }
       $lng = $$ref{'trd_lng'};
+      $param = "lng=$lng";
       $lng_nomo = $$ref{'lng_nomo'};
       $lng_nomo =~ s/a$/e/;
       $lng_nomo .= " (preferata)" if $lng eq $preferata_lingvo;
@@ -583,36 +546,24 @@ sub MontruRezultojn
     $last_lng = $lng;
 
     if ($formato eq "txt") {
-#      if ($lng eq 'eo') {
         print "$trd, /revo/art/$$ref{'art_amrk'}.html#$anchor$klr\n";
-#      } else {
-#	    print "$trd, /revo/art/$$ref{'art_amrk'}.html#$anchor\n";
-#	  }
+
     } elsif ($formato eq "idx") {
       if ($lng eq 'eo') {
         next unless $$ref{'drv_match'};
-        my ($a, $b1, $b2) = ("#$anchor", "", "");
+        my ($a, $b1, $b2) = ("#$anchor\&$param", "", "");
         ($a, $b1, $b2) = ("", "<b>", "</b>") if $trd eq $$ref{'art_kap'};
-#        print "trd=$trd kap=$$ref{'art_kap'}\n" if $trd ne $$ref{'art_kap'};
-
-#        my $var = $$ref{'var_teksto'};
-#        if ($var) {
-#          $var = ", $var";
-#        } else {
-#          $var = "";
-#        }
-#        print "         <a href=\"../art/$$ref{'art_amrk'}.html$a\" target=\"precipa\">$b1$trd$var$b2</a><br>\n";
 
         my $var = $$ref{'var_org'};
         $trd = $var if $var;
 
         print "         <a href=\"$pado/art/$$ref{'art_amrk'}.html$a\" target=\"precipa\">$b1$trd$b2</a><br>\n";
       }
-    } else {
+    } else { # formato ne txt || idx
       if (!$regulira && $sercxata !~ /[%_]/) {
         $trd =~ s/$sercxata/<b>$sercxata<\/b>/g;
       }
-      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor", target=>"precipa"}, "$trd"), $klr;
+      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor\&$param", target=>"precipa"}, "$trd"), $klr;
 
       if ($num > 100) {
         print br, "... kaj pli ...", "\n";
@@ -624,5 +575,5 @@ sub MontruRezultojn
   $res->finish();
       
   $neniu_trafo = 0 if $num;
-}
+} # MontruRezultojn
 

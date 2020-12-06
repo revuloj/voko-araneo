@@ -100,6 +100,10 @@ body {
     border: 2px solid orangered;
 }
 
+#r\:eraroj.konfirmo {
+    border: 2px solid seagreen;
+}
+
 textarea {
     margin: 0; /*1px 0.3em;*/
     height: 25em;

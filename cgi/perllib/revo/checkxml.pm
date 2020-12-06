@@ -49,7 +49,7 @@ sub rxp_cmd {
       $err =~ s/^Error: /Eraro: /smg;
       $err =~ s/ of <stdin>$//smg;
       $err =~ s/^ in unnamed entity//smg;
-      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata lementokomenco $1/smg;
+      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata elementokomenco $1/smg;
       $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 ĉi tie/smg;
       $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua elementofino: anstataŭ $1 troviĝis $2/smg;
       $err =~ s/^ at line (\d+) char (\d+)$/ ĉe pozicio $1:$2/smg;
@@ -107,13 +107,13 @@ sub check_ref_cel {
             if (! $mrk_ekzistas) {
                 #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
                 # eble temas pri marko de subsenco?
-                open IN, "<", "$xml_dir";
+                open IN, "<", "$xml_dir/$art.xml";
                 my $celxml = join '', <IN>;
                 close IN;
 
                 if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
                     push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
-                    ."<a href=\"$red_url?art=$art\">$art</a>\n";
+                    ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
         #          $ne_konservu = 8;
                 }
             }

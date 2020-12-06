@@ -1,4 +1,4 @@
-name: procesumo voko-araneo
+name: procezumo voko-araneo
 # https://github.com/actions/starter-workflows/blob/master/ci/docker-push.yml
 
 on:
