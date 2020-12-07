@@ -1,3 +1,13 @@
+##### staĝo 1: Ni bezonas TeX kaj metapost por konverti simbolojn al png
+FROM silkeh/latex:small as metapost
+LABEL Author=<diestel@steloj.de>
+COPY mp2png.sh .
+RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/* 
+RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
+  && unzip master.zip voko-grundo-master/smb/*.mp
+RUN cd voko-grundo-master && ../mp2png.sh # && cd ${HOME}
+
+##### staĝo 2: Ni bezonas gcc/make por kompili rxp, kiu ne ekzistas kiel pakaĵo por Alpine-Linux
 FROM alpine:3.12 as builder
 
 # build and install rxp
@@ -24,13 +34,12 @@ RUN apk update \
   && cd /tmp/rxp-* \
   && ./configure && make install
 
-
 # chekote/gulp
 #FROM node:alpine as minifier # or :slim
 #RUN npm install gulp -g
 #ENTRYPOINT ["/bin/bash", "-c"]
 
-
+##### staĝo 3: Ni uzas procezumon kun retservilo Apache-httpd kaj aldonas Perlon kaj ĉion alian, kion ni bezonas por la retservo
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 
@@ -47,15 +56,19 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
+# normale: master
+ARG VG_BRANCH=master 
+ARG REVO_VER=1c
 
 RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
-    curl unzip jq && rm -f /var/cache/apk/* \
+    sed curl unzip jq && rm -f /var/cache/apk/* \
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
+# ni bezonas GNU sed por kompili CSS!
 
 # aldonu memkompilitan "rxp" de Alpine. Vd.:
 # http://www.cogsci.ed.ac.uk/~richard/rxp.html
@@ -66,6 +79,7 @@ RUN apk --update --update-cache --upgrade add mysql-client perl-dbd-mysql fcgi l
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
+COPY --from=metapost --chown=root:root voko-grundo-master/build/smb/*.svg /tmp/svg/
 
 #ADD . ./
 COPY bin/* /usr/local/bin/
@@ -81,29 +95,56 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
-  && curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-  && unzip -q master.zip voko-grundo-master/xsl/* voko-grundo-master/dok/* \
-     voko-grundo-master/cfg/* voko-grundo-master/dtd/* \
-  && rm master.zip \
-  && mv voko-grundo-master/xsl /usr/local/apache2/htdocs/revo/ \
-  && cp -r voko-grundo-master/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
-  && mv voko-grundo-master/dtd /usr/local/apache2/htdocs/revo/ \
-  && mv -f voko-grundo-master/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
+  && unzip -q ${VG_BRANCH}.zip voko-grundo-${VG_BRANCH}/xsl/* voko-grundo-${VG_BRANCH}/dok/* \
+     voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
+     voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
+     voko-grundo-${VG_BRANCH}/smb/* voko-grundo-${VG_BRANCH}/bin/compile* \
+     voko-grundo-${VG_BRANCH}/bin/svg2css.sh \
+  && rm ${VG_BRANCH}.zip \
+  && mkdir /usr/local/apache2/htdocs/revo/jsc \
+  # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
+  && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/transiroj.js \
+         voko-grundo-${VG_BRANCH}/jsc/kadro.js voko-grundo-${VG_BRANCH}/jsc/artikolo.js \
+         voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
+      > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
+#  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+  # kombinu kaj malgrandigu CSS-dosierojn
+  && cd voko-grundo-${VG_BRANCH} && mkdir -p build/smb && cp /tmp/svg/* ./build/smb/ \
+  && mkdir -p build/stl \
+  #&& ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
+  && ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+  && cd .. \
+# debug:  && ls voko-grundo-${VG_BRANCH}/* \
+  && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
+#  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
+# tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
+# tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
+#  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
+  && cp voko-grundo-${VG_BRANCH}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
+  && cp -r voko-grundo-${VG_BRANCH}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
+  && mv voko-grundo-${VG_BRANCH}/dtd /usr/local/apache2/htdocs/revo/ \
+  && mv -f voko-grundo-${VG_BRANCH}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
   && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
   && mkdir -p /var/www/web277/html/tmp \
-  && chown -R ${DAEMON_UID} /var/www/web277/html/revo 
+  && chown -R ${DAEMON_UID} /var/www/web277/html/revo \
+  && rm -rf /tmp/*
+
+
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
 COPY sxangxoj.rdf /var/www/web277/html/
 RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 
+COPY --from=metapost --chown=root:root voko-grundo-master/smb/ /usr/local/apache2/htdocs/revo/smb/
+
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
-COPY n1b/ /usr/local/apache2/htdocs/revo/
+COPY revo/ /usr/local/apache2/htdocs/revo/
 
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...

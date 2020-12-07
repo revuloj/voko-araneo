@@ -41,6 +41,10 @@ sub connect {
 }
 
 ######################################################################
+
+my %radikoj;
+my $debug = 0; #1;
+
 sub parse {
   my $dbh = shift @_;
   my $art = shift @_;
@@ -81,7 +85,8 @@ sub parse {
 
     print pre(escapeHTML("co:\n$_\nend co.\n")) if $verbose;
 
-    my ($amrk, $arad, $akap);
+    my ($amrk, $akap);
+    %radikoj = ();
 
     # elprenu la markon
     if (s/^.*<art mrk\="([a-zA-Z0-9]+)">//si) { 
@@ -153,26 +158,27 @@ sub parse {
     print pre(escapeHTML("parse kap:\n$_")) if $verbose;
     # legu la kapvorton
     if (s/^\s*<kap[^>]*>(.*?)\n*\s*<\/kap\s*>(?=<[ds]|$)//si) { 
-      $arad = $1;
-      $arad =~ s/<ofc>(.*?)<\/ofc>//sg;
-      $arad =~ s/<fnt>(.*?)<\/fnt>//sg;
-      $akap = $arad;
-      #print pre("akap: $akap\n") if $verbose;
-
-      $arad =~ s/.*?<rad>(.*?)<\/rad>.*/\1/sg;
-      $arad =~ s/<[^<]*>//sg;
-      $arad =~ s/\s+Z?$//;
-      $arad =~ s/\s+/ /sg;
-      $arad =~ s/^\s+//;
-      $arad =~ s/^\n+//;
-
-      $akap =~ s/<[^<]*>//sg;
-      $akap =~ s/\s+Z?$//;
-      $akap =~ s/\s+/ /sg;
-      $akap =~ s/^\s+//;
-      $akap =~ s/\///;
-      $akap =~ s/^\n+//;
-      print pre("rad: $arad\n") if $verbose;
+      $akap = kap_rad($1);
+#      $arad = $1;
+#      $arad =~ s/<ofc>(.*?)<\/ofc>//sg;
+#      $arad =~ s/<fnt>(.*?)<\/fnt>//sg;
+#      $akap = $arad;
+#      #print pre("akap: $akap\n") if $verbose;
+#
+#      $arad =~ s/.*?<rad>(.*?)<\/rad>.*/\1/sg;
+#      $arad =~ s/<[^<]*>//sg;
+#      $arad =~ s/\s+Z?$//;
+#      $arad =~ s/\s+/ /sg;
+#      $arad =~ s/^\s+//;
+#      $arad =~ s/^\n+//;
+#
+#      $akap =~ s/<[^<]*>//sg;
+#      $akap =~ s/\s+Z?$//;
+#      $akap =~ s/\s+/ /sg;
+#      $akap =~ s/^\s+//;
+#      $akap =~ s/\///;
+#      $akap =~ s/^\n+//;
+      print pre("rad: ".radikoj_str()."\n") if $verbose;
       print pre("kap: $akap\n") if $verbose;
     };
 
@@ -180,19 +186,22 @@ sub parse {
     $aid = $dbh->{'mysql_insertid'} unless defined($aid);
     print "aid = $aid\n" if $verbose;
 
-    # tildojn anstata�igu per la radiko
+    # tildojn anstatauigu per la radiko
+    s/(<tld.*?\/>)/tld_rad($1)/sieg;
+    print pre(escapeHTML("lit:\n$_\n")) if $verbose;
 #      print pre(escapeHTML("lit:\n$_\n"));# if $verbose;
-    { my $subst_arad = substr($arad,1);   # anstatauxigu unuan literon
-      s/<tld lit="([^"]+)"\/?>/\1$subst_arad/sig;
-      s/<tld[^>]*\/?>/$arad/sig;
-      print pre(escapeHTML("lit:\n$_\n")) if $verbose;
-    }
+#    { my $subst_arad = substr($arad,1);   # anstatauxigu unuan literon
+#      s/<tld lit="([^"]+)"\/?>/\1$subst_arad/sig;
+#      s/<tld[^>]*\/?>/$arad/sig;
+#      print pre(escapeHTML("lit:\n$_\n")) if $verbose;
+#    }
 
     # traktu snc sen drv, kiel drv kun kap el art
     if (/^(.*?)<drv/si) {
       my $predrv = $1;
       print pre(escapeHTML("predrv:\n$predrv\nend predrv.\n")) if $verbose;
       if ($predrv =~ /<snc/) {
+        my $arad = $radikoj{'_0'};
         s/^(.*?)(<drv)/<drv mrk="$amrk"><kap>$arad<\/kap>\1<\/drv>\2/si;
       }
     }
@@ -363,6 +372,108 @@ sub do_snc {
       do_trd($dbh, $sorter, $sid, $lng, $trd, $verbose);
     }
   };
+}
+
+sub kap_rad {
+  my $kapstr = shift;
+  my ($rad,$key);
+
+  # <kap><ofc>3</ofc><rad>teĥnik</rad>/o ,
+  #  <var><kap><ofc>3</ofc><rad>teknik</rad>/o </kap></var>
+  # </kap>
+
+  $kapstr =~ s/<ofc>(.*?)<\/ofc>//sg;
+  $kapstr =~ s/<fnt>(.*?)<\/fnt>//sg;
+  $kapstr =~ s/<uzo(.*?)<\/uzo>//sg;
+
+  # <kap><rad>teĥnik</rad>/o ,
+  #  <var><kap><rad>teknik</rad>/o </kap></var>
+  # </kap>
+
+  # ekstraktu ĉiujn var...
+  while ($kapstr =~ s/(<var.*?<\/var>)//sig) {
+    ($rad,$key) = _rad($1);
+    $radikoj{$key} = $rad;
+  }
+
+  # tio, kio restas, kune kun la unua radiko (_0_) estas la kapvorto
+  $kapstr =~ m/^.*(<rad.*?<\/rad>)/si;
+  ($rad,$key) = _rad($1);
+  $radikoj{'_0_'} = $rad;
+  $kapstr =~ s/^.*(<rad.*?<\/rad>)/$rad/si;
+
+  $kapstr =~ s/<[^<]*>//sg;
+  $kapstr =~ s/\s+Z?$//;
+  $kapstr =~ s/\s+/ /sg;
+  $kapstr =~ s/^\s+//;
+  $kapstr =~ s/\///;
+  $kapstr =~ s/^\n+//;
+
+  print pre("kapstr: $kapstr; radikoj: ".radikoj_str()."\n") if $debug;
+
+  return $kapstr;
+}
+
+sub _rad {
+  my $arad = shift;
+  my $key;
+
+  if ($arad =~ m/\s+var\s*=\s*"(.*?)"/sg) {
+    $key = $1;
+  }
+  $arad =~ s/^.*<rad.*?>(.*?)<\/rad>.*$/\1/sg;
+  
+  $arad =~ s/<[^<]*>//sg;
+  $arad =~ s/\s+Z?$//;
+  $arad =~ s/\s+/ /sg;
+  $arad =~ s/^\s+//;
+  $arad =~ s/^\n+//;
+
+  print "rad: $arad var: $key; " if ($debug);
+
+  return ($arad,$key);
+}
+
+sub radikoj_str {
+  my ($str, $e);
+  foreach $e (keys(%radikoj)){
+    $str .= $e.'-'.$radikoj{$e}." ";
+  }
+  return $str;
+}
+ 
+
+sub tld_rad {
+  my $tldstr = shift;
+  my ($lit, $var, $rad);
+
+  #print "<pre>tldstr1: $tldstr\n</pre>" if $debug;
+
+  if ($tldstr =~ m/\s+lit\s*=\s*"(.*?)"/s) {
+    $lit = $1
+  }
+  if ($tldstr =~ m/\s+var\s*=\s*"(.*?)"/s) {
+    $var = $1
+  }
+  print "<pre>tldvar: $var</pre>\n" if $debug;
+
+  if ($var) {
+    $rad = $radikoj{$var}
+  } else {
+    $rad = $radikoj{'_0_'}
+  }
+
+  print "<pre>tldrad: $rad</pre>\n" if $debug;
+
+  if ($lit) {
+    $rad = $lit.substr($rad,1);
+  }
+
+  $tldstr =~ s/<tld.*?\/>/$rad/e;
+
+  print "<pre>tldstr: $tldstr<br/></pre>\n" if $debug;
+
+  return $tldstr;
 }
 
 ######################################################################

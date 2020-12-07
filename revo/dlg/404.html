@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+  <meta http-equiv="X-Content-Security-Policy" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+  <meta http-equiv="X-WebKit-CSP" 
+    content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'">
+
+  <title>Reta Vortaro - 404</title>
+  <link rel="SHORTCUT ICON" href="../smb/revo.png">
+  <link rel="stylesheet" href="../stl/revo-1c-min.css">
+  <script src="../jsc/revo-1c.js"></script>
+
+  <style>
+
+    @keyframes error-color-change-vid {
+        0% {color: inherit}
+        60% {color: transparent}
+    }
+    @keyframes error-color-change-vic {
+        30% {color: transparent}
+        50% {color: inherit}
+        90% {color: transparent}
+    }
+    @keyframes error-color-change-404 {
+        60% {color: transparent}
+        100% {color: inherit}
+    }
+
+    body {
+      background-color: #222;
+      color: #ffd;
+    }
+
+    div.e404 {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+    } 
+    .e404 div {
+      font-size: large;
+      text-align: center;
+      margin: 0 1em;
+    } 
+    .e404 img {
+      max-width: 100%;
+      max-height: 80vh;
+    }
+    .http_code {
+      font-size: x-large;
+      margin: .3em;
+    }
+    .http_code span:first-child {
+      color: transparent;
+      position: relative;
+      left: 2.9em;
+      animation: error-color-change-vid 10s 1;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    .http_code span:nth-child(2) {
+      color: transparent;
+      position: relative;
+      left: .5em;
+      animation: error-color-change-vic 10s 1;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+    .http_code span:nth-child(3) {
+      color: transparent;
+      position: relative;
+      left: -2.2em;
+      animation: error-color-change-404 10s 1;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="e404">
+    <img src="zamenhof_legas.jpg">
+    <div>
+    <p class="http_code">
+      <span>VID'</span>
+      <span>VIC'</span>
+      <span>CD'IV</span>
+    </p>
+    <p>
+      Ĉu vi dormas? Ho, amiko, <br>
+      Kial tia senmoveco? <br>
+      Mankon jen ornamas fliko <br>
+      Pro misfar' de l' trua speco. <br>
+    </p><p>
+      Malgraŭ ŝtopo, jar' post jaro', <br>
+      Ho, totopo kvarcent kvaro!
+    </p>
+    </div>
+  </div>
+</body>
+</html>

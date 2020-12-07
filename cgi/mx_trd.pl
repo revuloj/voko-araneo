@@ -28,7 +28,9 @@ print header(-charset=>'utf-8'),
 unless ($lng) {
   my %lng;
   print h2("Elektu la lingvon:");
-  open IN, "<../revo/cfg/lingvoj.xml" or die "ne povas malfermi lingvoj.xml";
+  #open IN, "<../revo/cfg/lingvoj.xml" 
+  open IN, "< /var/www/web277/html/revo/cfg/lingvoj.xml"
+    or die "ne povas malfermi lingvoj.xml";
   while (<IN>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
 #      print "lng $1 -> $2".br."\n";
