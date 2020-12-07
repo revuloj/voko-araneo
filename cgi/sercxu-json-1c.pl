@@ -9,8 +9,9 @@
 
 use strict;
 
-use CGI qw(:standard *table);
-#use CGI qw(:standard *table -utf8);
+#use CGI qw(:standard *table);
+##use CGI qw(:standard -utf8);
+use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
@@ -48,10 +49,10 @@ my $neniu_trafo = 1;
 my $formato = "json";
 
 # kion serĉi
-my $sercxata = param('q2');
-$sercxata = param('sercxata') if param('sercxata');
-utf8::decode($sercxata);
-
+#my $sercxata = param('q2');
+my $sercxata = param('sercxata'); #if param('sercxata');
+#? utf8::decode($sercxata);
+ 
 # ĉu traduki cx al ĉ ktp.
 my $cx2cx = param('cx');
 #$cx2cx = "checked" if $cx2cx;
@@ -149,7 +150,7 @@ sub Sercxu
     ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
     LIMIT ".$LIMIT;
 
-    # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉijn tradukojn
+    # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉiujn tradukojn
     # de unu lingvo en unu signoĉeno!
     my $QUERY_eo_trd = 
     "SELECT DISTINCT t.trd_lng, t.trd_teksto
@@ -165,6 +166,7 @@ sub Sercxu
 
     eval {
       print "$QUERY_eo\n" if ($debug);
+      print "$QUERY_eo_trd\n" if ($debug);
       print "serĉu: $sercxata2_eo\n" if ($debug);
       $sth->execute($sercxata2_eo, $sercxata2_eo, $sercxata2_eo);
       ###exit;
@@ -246,7 +248,7 @@ sub Sercxu
       }
 
     } else {
-      MontruRezultojn_trd($sth, $pref_lng, $sth2);
+      MontruRezultojn_trd($sth);
     }
   }
 }
@@ -381,7 +383,7 @@ sub MontruRezultojn_eo
 
 sub MontruRezultojn_trd
 {
-  my ($res, $pref_lng, $sth2) = @_;
+  my ($res) = @_;
   my $num = 0;
   my $sep = '';
   my $last_lng;
