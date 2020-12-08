@@ -107,9 +107,13 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && mkdir /usr/local/apache2/htdocs/revo/jsc \
   # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
   && cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/transiroj.js \
-         voko-grundo-${VG_BRANCH}/jsc/kadro.js voko-grundo-${VG_BRANCH}/jsc/artikolo.js \
-         voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
+         voko-grundo-${VG_BRANCH}/jsc/preferoj.js voko-grundo-${VG_BRANCH}/jsc/kadro.js \
+         voko-grundo-${VG_BRANCH}/jsc/artikolo.js \
+         voko-grundo-${VG_BRANCH}/jsc/voko_entities.js  voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
       > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
+  # subteno de malnova fasado / malnovaj retumiloj
+  && cp voko-grundo-${VG_BRANCH}/jsc/malnova.js /usr/local/apache2/htdocs/revo/jsc/ \
+  && cp voko-grundo-${VG_BRANCH}/jsc/revo-art-1b.js /usr/local/apache2/htdocs/revo/jsc/ \
 #  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   # kombinu kaj malgrandigu CSS-dosierojn
   && cd voko-grundo-${VG_BRANCH} && mkdir -p build/smb && cp /tmp/svg/* ./build/smb/ \
@@ -144,7 +148,7 @@ RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
 
 #COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
 
-COPY n${REVO_VER}/ /usr/local/apache2/htdocs/revo/
+COPY revo/ /usr/local/apache2/htdocs/revo/
 
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...
