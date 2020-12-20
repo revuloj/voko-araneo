@@ -118,9 +118,9 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   # kombinu kaj malgrandigu CSS-dosierojn
   && cd voko-grundo-${VG_BRANCH} && mkdir -p build/smb && cp /tmp/svg/* ./build/smb/ \
   && mkdir -p build/stl \
-  && pwd && ls * \
+  && pwd && ls -l bin \
   #&& ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
-  && ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
+  && bash ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   && cd .. \
 # debug:  && ls voko-grundo-${VG_BRANCH}/* \
   && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
