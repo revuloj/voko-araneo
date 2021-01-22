@@ -24,7 +24,7 @@ use revodb;
 my $debug = 0;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /hp/af/ag/ri/www
-my $homedir    = "/hp/af/ag/ri/";
+my $homedir    = "/hp/af/ag/ri";
 my $htmldir    = "$homedir/www";
 my $revo_base  = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
