@@ -26,16 +26,21 @@ release=1c
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
-# malnovaj
-scp cgi/vokomail.pl ${cgibin}/
-scp cgi/sercxu.pl ${cgibin}/
+# cgi-bin/admin
+scp cgi/admin/* ${cgibin}/admin/
+scp cgi/admin/.ht* ${cgibin}/admin/
 
-# novaj
-scp cgi/sercxu-json-${release}.pl ${cgibin}/
-scp cgi/vokomailx.pl ${cgibin}/
-scp cgi/vokohtmlx.pl ${cgibin}/
-scp cgi/hazarda_art.pl ${cgibin}/
-scp cgi/mx_trd.pl ${cgibin}/
+
+## # malnovaj
+## scp cgi/vokomail.pl ${cgibin}/
+## scp cgi/sercxu.pl ${cgibin}/
+## 
+## # novaj
+## scp cgi/sercxu-json-${release}.pl ${cgibin}/
+## scp cgi/vokomailx.pl ${cgibin}/
+## scp cgi/vokohtmlx.pl ${cgibin}/
+## scp cgi/hazarda_art.pl ${cgibin}/
+## scp cgi/mx_trd.pl ${cgibin}/
 #
 
 #scp cgi/perllib/*.pm ${perllib}/

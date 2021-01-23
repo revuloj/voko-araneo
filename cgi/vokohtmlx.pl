@@ -29,7 +29,7 @@ my $htmldir    = "$homedir/www";
 my $revo_base  = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
 
-my $xsltproc = "xsltproc --path $revo_base/cfg $revo_base/xsl/revohtml.xsl -";
+my $xsltproc = "xsltproc --path $revo_base/cfg $homedir/files/xsl/revohtml.xsl -";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";

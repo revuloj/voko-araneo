@@ -1,4 +1,4 @@
 AuthType Basic
 AuthName "Restricted Content"
-AuthUserFile /usr/local/apache2/conf/.htpasswd
+AuthUserFile /hp/af/ag/ri/www/cgi-bin/admin/.htpasswd
 Require valid-user

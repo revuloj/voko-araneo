@@ -7,7 +7,7 @@ use IO::Handle;
 #use Unicode::String qw(utf8);
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 
 use revodb;
 
@@ -16,6 +16,11 @@ my $exitcode;
 print header(-charset=>'utf-8'),
       start_html('aktualigu viki-ligojn'),
 	  h2(scalar(localtime));
+
+
+my $homedir = "/hp/af/ag/ri";
+#print h1("homedir = $homedir");
+   
 
 sub mylc {	# lower case pro esperantaj signoj
   my $a = shift @_;
@@ -69,7 +74,7 @@ my $sth_insert = $dbh->prepare("INSERT INTO r2_vikititolo (titolo, titolo_lc) VA
 
 my %viki;				# nun mi kolektas cxiujn vortojn de vikipedio
 					# hash kun artikolo -> hash kun ligo kaj vorto
-open IN, "gzip -d <../../../files/eoviki.gz 2>&1 |" or die "ne povas gzip";
+open IN, "gzip -d <$homedir/files/eoviki.gz 2>&1 |" or die "ne povas gzip";
 <IN>;  # forjxetu unuan linion, estas nur titolo
 while (<IN>) {
   chomp;
