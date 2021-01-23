@@ -33,6 +33,7 @@ $| = 1;
 my $homedir = "/hp/af/ag/ri";
 my $htmldir    = "$homedir/www";
 my $revo_base    = "$homedir/www/revo";
+my $smlog = "$homedir/files/log/sendmail.log";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
@@ -483,7 +484,7 @@ EOD
   $xml2 = revo::encode::encode2($xml, 20);
 } elsif ($art) {
 #  $debugmsg .= "open\n";
-  open IN, "<", "$homedir/html/revo/xml/$art.xml" or die "open";
+  open IN, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
   $xml = join '', <IN>;
   close IN;
 
@@ -887,7 +888,7 @@ EOD
       }
       if (my $to = join(', ', @to)) {
         my $subject = "Revo redaktu.pl $art";
-		my $smlog = "sendmail.log";
+		#my $smlog = "$homedir/logfiles/sendmail.log";
 
         # konektu al retposxtservilo
         open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";

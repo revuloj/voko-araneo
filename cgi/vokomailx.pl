@@ -41,7 +41,7 @@ my $xml_dir    = "$revo_base/xml";
 
 my $revuloj_url = 'https://revuloj.github.io/respondoj.html';
 my $mail_cmd    = '/usr/sbin/sendmail -t';
-my $smlog       = "$homedir/html/tmp/sendmail.log"; #"$xml_dir/sendmail.log";
+my $smlog       = "$homedir/files/log/sendmail.log"; #"$xml_dir/sendmail.log";
 my $mail_from   = 'noreply@retavortaro.de';
 my $mail_to     = 'revo@retavortaro.de';
 
