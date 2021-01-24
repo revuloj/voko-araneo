@@ -61,6 +61,8 @@ ARG DAEMON_UID=13731
 # normale: master
 ARG VG_BRANCH=master 
 ARG REVO_VER=1c
+ARG HOME_DIR=/hp/af/ag/ri
+ARG HTTP_DIR=/hp/af/ag/ri/www
 
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
@@ -123,7 +125,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
   && cd .. \
 # debug:  && ls voko-grundo-${VG_BRANCH}/* \
-  && mv voko-grundo-${VG_BRANCH}/xsl /usr/local/apache2/htdocs/revo/ \
+  && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${VG_BRANCH}/xsl ${HOME_DIR}/files/ \
 #  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
@@ -133,21 +135,21 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && mv voko-grundo-${VG_BRANCH}/dtd /usr/local/apache2/htdocs/revo/ \
   && mv -f voko-grundo-${VG_BRANCH}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
-  && mkdir -p /var/www/web277/files/log && chown daemon.daemon /var/www/web277/files/log \
-  && ln -sT /usr/local/apache2/cgi-bin/perllib /var/www/web277/files/perllib \
-  && ln -sT /usr/local/apache2/htdocs /var/www/web277/html \
-  && mkdir -p /var/www/web277/html/tmp \
-  && chown -R ${DAEMON_UID} /var/www/web277/html/revo \
+  && mkdir -p ${HOME_DIR}/files/log && chown daemon.daemon ${HOME_DIR}/files/log \
+  && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
+  && ln -sT /usr/local/apache2/htdocs ${HTTP_DIR} \
+  && mkdir -p ${HTTP_DIR}/tmp \
+  && chown -R ${DAEMON_UID} ${HTTP_DIR}/revo \
   && rm -rf /tmp/*
 
 
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
-COPY sxangxoj.rdf /var/www/web277/html/
-RUN chown ${DAEMON_UID} /var/www/web277/html/sxangxoj.rdf
+COPY sxangxoj.rdf ${HTTP_DIR}/
+RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 
-#COPY sercho.xsl /var/www/web277/html/xsl/sercho.xsl
+#COPY sercho.xsl ${HOME_DIR}/files/xsl/sercho.xsl
 
 COPY revo/ /usr/local/apache2/htdocs/revo/
 
