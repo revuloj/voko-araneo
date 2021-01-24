@@ -53,8 +53,10 @@ sub parse {
   my $start_time = time();
   my $sorter = new revo::eosort();
 
-  my $xsldir = $xmldir;
-  $xsldir =~ s/xml/xsl/;
+  #my $xsldir = $xmldir;
+  #$xsldir =~ s/xml/xsl/;
+  my $xsldir = "/hp/af/ag/ri/files/xsl";
+
 
   my $homedir = $xmldir;
   $homedir =~ s#/html/revo/xml##;
