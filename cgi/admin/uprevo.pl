@@ -9,7 +9,7 @@ use IO::Handle;
 use lib("/hp/af/ag/ri/files/perllib");
 use parseart;
 use parseart2;
-use revorss;
+# use revorss;
 use revodb;
 
 my $exitcode;
@@ -77,7 +77,7 @@ $exitcode = $?;
 print h2("tar -xv -> $exitcode");
 print LOG "tar -xv -> $exitcode\n$ret";
 print pre($ret);
-revorss::write($ret, $htmldir, -1, 0);
+# revorss::write($ret, $htmldir, -1, 0);
 
 # Connect to the database.
 my $dbh = parseart::connect();
