@@ -27,9 +27,11 @@ release=1c
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
 # cgi-bin/admin
-scp cgi/admin/* ${cgibin}/admin/
-scp cgi/admin/.ht* ${cgibin}/admin/
+#scp cgi/admin/* ${cgibin}/admin/
+#scp cgi/admin/.ht* ${cgibin}/admin/
 
+scp cgi/admin/up* ${cgibin}/admin/
+scp cgi/perllib/parse* ${perllib}/
 
 ## # malnovaj
 ## scp cgi/vokomail.pl ${cgibin}/
