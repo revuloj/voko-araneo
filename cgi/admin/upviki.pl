@@ -33,7 +33,7 @@ sub mylc {	# lower case pro esperantaj signoj
   return lc $a;
 }
 
-my $abak = "abel";
+#my $abak = "abel";
 
 # Connect to the database.
 my $dbh = revodb::connect();
@@ -56,10 +56,10 @@ my %vikihelpo;
 my $sth = $dbh->prepare("SELECT ind_teksto, ind_celref FROM r2_indekso WHERE ind_kat='LNG' and ind_subkat='eo'") or die;
 $sth->execute();
 while (my ($t, $celref) = $sth->fetchrow_array) {
-  print pre("test1: $t -> $celref")."\n" if $t =~ m/^$abak/i;
+  #print pre("test1: $t -> $celref")."\n" if $t =~ m/^$abak/i;
   next if $celref =~ m#^art/tez/#;	# mi ne certas, kial cxi tie povas esti tezauxro ligoj.
   $_ = mylc $t;				# minuskligi
-  print pre("test2: $t -> $_  $celref")."\n" if $t =~ m/^$abak/;
+  #print pre("test2: $t -> $_  $celref")."\n" if $t =~ m/^$abak/;
 #  $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
   push @{$revo{$_}}, $celref;		# aldoni la la ligon por tio vorto
 }
@@ -88,22 +88,22 @@ while (<IN>) {
   next if $orgviki =~ m/["<>]/;		# por sekureco "<> estas malpermesita
   next unless $orgviki =~ m/[a-z]/;		# ne prenu sen unu minuskla litero, cxar estas mallongigo
   $_ = mylc $_;				# minuskligi
-  print pre("test: $_")."\n" if m/^$abak/i;
+  #print pre("test: $_")."\n" if m/^$abak/i;
   s/_/ /g;				# _ -> spaco
   $sth_insert->execute($orgviki, $_) if param("download");
   $count++;
   if (my $celrefar = $revo{$_}) {	# cxu tio vorto eksistas en revo?
-    print pre("test: trovis en revo $_")."\n" if m/^$abak/i;
+    #print pre("test: trovis en revo $_")."\n" if m/^$abak/i;
     foreach my $celref (@$celrefar) {	# cxiuj ligoj de tio vorto
       my $fname = $celref;		# prenu la artikolon kaj la markon el la ligo
       my $mrk;
-      print pre("test: fname = $fname $_")."\n" if m/^$abak/i;
+      #print pre("test: fname = $fname $_")."\n" if m/^$abak/i;
       $fname =~ s/^art\///;
       if ($fname =~ s/#(.*)$//) {
         $mrk = $1;
       }
       $fname =~ s/\.html$//;
-      print pre("html: $_  -  $fname  #  $mrk") if $mrk and $fname =~ /^$abak/;
+      #print pre("html: $_  -  $fname  #  $mrk") if $mrk and $fname =~ /^$abak/;
 
       my %h = (celref => $celref, orgviki => $orgviki);
       $viki{$fname} = [] unless $viki{$fname};
