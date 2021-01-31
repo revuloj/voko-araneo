@@ -184,7 +184,7 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
 #      $t .= "\n\n\thtml=".escapeHTML($html);
     }
   }
-  print pre($t);						# montru la informojn
+  #print pre($t);						# montru la informojn
 
 								# savu la novan artikolon kun vikiligoj
   open HTML, ">", "../../revo/art/$fname.html" or die "ne povas skribi ../../revo/art/$fname.html";
