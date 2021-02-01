@@ -33,7 +33,7 @@ sub mylc {	# lower case pro esperantaj signoj
   return lc $a;
 }
 
-#my $abak = "abel";
+#my $abak = "kamp";
 
 # Connect to the database.
 my $dbh = revodb::connect();
@@ -60,7 +60,7 @@ while (my ($t, $celref) = $sth->fetchrow_array) {
   next if $celref =~ m#^art/tez/#;	# mi ne certas, kial cxi tie povas esti tezauxro ligoj.
   $_ = mylc $t;				# minuskligi
   #print pre("test2: $t -> $_  $celref")."\n" if $t =~ m/^$abak/;
-#  $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
+  $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
   push @{$revo{$_}}, $celref;		# aldoni la la ligon por tio vorto
 }
 
@@ -84,7 +84,7 @@ while (<IN>) {
   chomp;
 
   my $orgviki = $_;
-#  print pre("test: $_")."\n" if m/^$abak/i;
+  #print pre("test: $_")."\n" if m/^$abak/i;
   next if $orgviki =~ m/["<>]/;		# por sekureco "<> estas malpermesita
   next unless $orgviki =~ m/[a-z]/;		# ne prenu sen unu minuskla litero, cxar estas mallongigo
   $_ = mylc $_;				# minuskligi
@@ -170,6 +170,7 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
 		print pre("orgviki=$$h{orgviki}");
         if (1 and $h2 =~ m#eo\.wikipedia\.org/wiki#) {			# 0 cxiuj vikiligoj, 1 nur unu vikiligo
           $t .= "\n\t!!!!!";
+		  $h2 = "";
           print pre("aldonu: $fname - $$h{celref} - $$h{orgviki} - $mrk");
         } else {
           print "aldonu2: $fname - ".a({href=>"/revo/$$h{celref}"}, $$h{celref})." - $$h{orgviki} - $mrk".br;
@@ -178,13 +179,13 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
         }
       }
 
-      $t .= "\n\th2=".escapeHTML($h2);
+      print pre("mrk=$mrk h2=".escapeHTML($h2));
 									# aldonu h2 al artikolo
       $html =~ s/<h2 id="$mrk">(.*?)<\/h2>/<h2 id="$mrk">\1 $h2<\/h2>/sm;
 #      $t .= "\n\n\thtml=".escapeHTML($html);
     }
   }
-  print pre($t);						# montru la informojn
+  #print pre($t);						# montru la informojn
 
 								# savu la novan artikolon kun vikiligoj
   open HTML, ">", "../../revo/art/$fname.html" or die "ne povas skribi ../../revo/art/$fname.html";
