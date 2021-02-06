@@ -55,8 +55,9 @@ sub parse {
   my $start_time = time();
   my $sorter = new eosort();
 
-  my $xsldir = $xmldir;
-  $xsldir =~ s/revo\/xml/xsl/;
+  #my $xsldir = $xmldir;
+  #$xsldir =~ s/revo\/xml/xsl/;
+  my $xsldir = "/hp/af/ag/ri/files/xsl";
 
   #print "<PRE>\n";
   while (<$xmldir/$art.xml>) {

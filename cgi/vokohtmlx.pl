@@ -15,24 +15,24 @@ use IPC::Open3; # uzata de xml2html.pm
 use Encode;
 
 # propraj perl moduloj estas en:
-# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /var/www/web277/files/
-use lib("/var/www/web277/files/perllib");
+# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
+use lib("/hp/af/ag/ri/files/perllib");
 ### use revo::xml2html;
 use revodb;
 
 #$| = 1;
 my $debug = 0;
 
-# por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
-my $homedir    = "/var/www/web277";
-my $htmldir    = "$homedir/html";
-my $revo_base  = "$homedir/html/revo";
+# por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /hp/af/ag/ri/www
+my $homedir    = "/hp/af/ag/ri";
+my $htmldir    = "$homedir/www";
+my $revo_base  = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
 
-my $xsltproc = "xsltproc --path $revo_base/cfg $revo_base/xsl/revohtml.xsl -";
+my $xsltproc = "xsltproc --path $revo_base/cfg $homedir/files/xsl/revohtml.xsl -";
 
-$ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
-$ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
+$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+$ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
 #autoEscape(0);
 

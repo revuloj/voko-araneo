@@ -254,7 +254,7 @@ EOD
 
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 #use eosort;
 

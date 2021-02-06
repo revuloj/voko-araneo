@@ -18,8 +18,8 @@ use Text::Tabs;
 use POSIX qw(strftime);
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
-# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /var/www/web277/files/
+use lib("/hp/af/ag/ri/files/perllib");
+# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
 
 use revo::decode;
 use revo::encode;
@@ -29,13 +29,14 @@ use revodb;
 
 $| = 1;
 
-# por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /var/www/web277/html
-my $homedir = "/var/www/web277";
-my $htmldir    = "$homedir/html";
-my $revo_base    = "$homedir/html/revo";
+# por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /hp/af/ag/ri/www
+my $homedir = "/hp/af/ag/ri";
+my $htmldir    = "$homedir/www";
+my $revo_base    = "$homedir/www/revo";
+my $smlog = "$homedir/files/log/sendmail.log";
 
-$ENV{'LD_LIBRARY_PATH'} = '/var/www/web277/files/lib';
-$ENV{'PATH'} = "$ENV{'PATH'}:/var/www/web277/files/bin";
+$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+$ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
 
@@ -483,7 +484,7 @@ EOD
   $xml2 = revo::encode::encode2($xml, 20);
 } elsif ($art) {
 #  $debugmsg .= "open\n";
-  open IN, "<", "$homedir/html/revo/xml/$art.xml" or die "open";
+  open IN, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
   $xml = join '', <IN>;
   close IN;
 
@@ -887,7 +888,7 @@ EOD
       }
       if (my $to = join(', ', @to)) {
         my $subject = "Revo redaktu.pl $art";
-		my $smlog = "sendmail.log";
+		#my $smlog = "$homedir/logfiles/sendmail.log";
 
         # konektu al retposxtservilo
         open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";

@@ -29,7 +29,7 @@ unless ($lng) {
   my %lng;
   print h2("Elektu la lingvon:");
   #open IN, "<../revo/cfg/lingvoj.xml" 
-  open IN, "< /var/www/web277/html/revo/cfg/lingvoj.xml"
+  open IN, "< /hp/af/ag/ri/www/revo/cfg/lingvoj.xml"
     or die "ne povas malfermi lingvoj.xml";
   while (<IN>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
@@ -59,7 +59,7 @@ print start_table(-cellspacing=>0),
 
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 #use eosort;
 

@@ -1,12 +1,16 @@
 #!/usr/bin/perl
 
+# La aktualigaj tar-arĥivoj, kiujn ni sendas el redaktoservo (formiko) enhavas
+# liston de dosieroj forigendajn: bv_forigu_tiujn.lst
+# tiu-ĉi skripto malpkas nur tiun liston kaj forigas la listigitajn dosierojn
+
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use parseart;
 
 my $exitcode;
@@ -15,15 +19,16 @@ print header,
       start_html('Sendu sxangxitajn pagxojn'),
       h1('fname='.param('fname'));
 
-open LOG, ">>../../../files/log/uprevo.log" or die("ne eblas skribi log");	
+my $homedir = "/hp/af/ag/ri";
+#print h1("homedir = $homedir");
+      
+open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush LOG 1;
 
 my $fname = param('fname');
 
-my $homedir = "/var/www/web277";
-#print h1("homedir = $homedir");
 
-my $htmldir = "$homedir/html";
+my $htmldir = "$homedir/www";
 
 $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 

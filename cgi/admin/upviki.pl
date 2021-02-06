@@ -7,7 +7,7 @@ use IO::Handle;
 #use Unicode::String qw(utf8);
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 
 use revodb;
 
@@ -16,6 +16,11 @@ my $exitcode;
 print header(-charset=>'utf-8'),
       start_html('aktualigu viki-ligojn'),
 	  h2(scalar(localtime));
+
+
+my $homedir = "/hp/af/ag/ri";
+#print h1("homedir = $homedir");
+   
 
 sub mylc {	# lower case pro esperantaj signoj
   my $a = shift @_;
@@ -28,10 +33,13 @@ sub mylc {	# lower case pro esperantaj signoj
   return lc $a;
 }
 
+#my $abak = "kamp";
+
 # Connect to the database.
 my $dbh = revodb::connect();
 
-if (param("download")) {	# 0 por testi - 1 por vere esxuti aktualan liston
+if (param("download")) {	# 0 por testi - 1 por vere elsxuti aktualan liston
+  print pre(`pwd`);
   my $ret = `wget -nv http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz -O ../../../files/eoviki.gz 2>&1`;
 #  my $ret = `wget -nv http://download.wikimedia.org/eowiki/20090211/eowiki-20090211-all-titles-in-ns0.gz -O ../../../files/eoviki.gz 2>&1`;
   print h2("wget -> $exitcode");
@@ -48,18 +56,18 @@ my %vikihelpo;
 my $sth = $dbh->prepare("SELECT ind_teksto, ind_celref FROM r2_indekso WHERE ind_kat='LNG' and ind_subkat='eo'") or die;
 $sth->execute();
 while (my ($t, $celref) = $sth->fetchrow_array) {
-  print pre("test1: $t -> $celref")."\n" if $t =~ m/^frega/i;
+  #print pre("test1: $t -> $celref")."\n" if $t =~ m/^$abak/i;
   next if $celref =~ m#^art/tez/#;	# mi ne certas, kial cxi tie povas esti tezauxro ligoj.
   $_ = mylc $t;				# minuskligi
-  print pre("test2: $t -> $_  $celref")."\n" if $t =~ m/^frega/;
-#  $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
+  #print pre("test2: $t -> $_  $celref")."\n" if $t =~ m/^$abak/;
+  $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
   push @{$revo{$_}}, $celref;		# aldoni la la ligon por tio vorto
 }
 
 my $sth = $dbh->prepare("SELECT vik_celref, vik_artikolo, vik_revo FROM r2_vikicelo") or die;
 $sth->execute();
 while (my ($celref, $vikart, $revo) = $sth->fetchrow_array) {
-  print pre("helpo: $celref => $vikart")."\n";
+#  print pre("helpo: $celref => $vikart")."\n";
   $vikihelpo{$celref} = $vikart;
   splice @{$revo{mylc $vikart}}, 0;		# forigu antauxajn
   push @{$revo{mylc $vikart}}, $celref;		# aldoni la la ligon por tio vorto
@@ -67,33 +75,35 @@ while (my ($celref, $vikart, $revo) = $sth->fetchrow_array) {
 
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikititolo (titolo, titolo_lc) VALUES (?,?)") or die;
 
+my $count;
 my %viki;				# nun mi kolektas cxiujn vortojn de vikipedio
 					# hash kun artikolo -> hash kun ligo kaj vorto
-open IN, "gzip -d <../../../files/eoviki.gz 2>&1 |" or die "ne povas gzip";
+open IN, "gzip -d <$homedir/files/eoviki.gz 2>&1 |" or die "ne povas gzip";
 <IN>;  # forjxetu unuan linion, estas nur titolo
 while (<IN>) {
   chomp;
 
   my $orgviki = $_;
-  print pre("test: $_")."\n" if m/^frega/i;
+  #print pre("test: $_")."\n" if m/^$abak/i;
   next if $orgviki =~ m/["<>]/;		# por sekureco "<> estas malpermesita
-  next unless $orgviki =~ m/[a-z]/;		# ne prenu sen unu minuskla litro, cxar estas mallongigo
+  next unless $orgviki =~ m/[a-z]/;		# ne prenu sen unu minuskla litero, cxar estas mallongigo
   $_ = mylc $_;				# minuskligi
-  print pre("test: $_")."\n" if m/^frega/i;
+  #print pre("test: $_")."\n" if m/^$abak/i;
   s/_/ /g;				# _ -> spaco
-  $sth_insert->execute($orgviki, $_);
+  $sth_insert->execute($orgviki, $_) if param("download");
+  $count++;
   if (my $celrefar = $revo{$_}) {	# cxu tio vorto eksistas en revo?
-    print pre("test: trovis en revo $_")."\n" if m/^frega/i;
+    #print pre("test: trovis en revo $_")."\n" if m/^$abak/i;
     foreach my $celref (@$celrefar) {	# cxiuj ligoj de tio vorto
       my $fname = $celref;		# prenu la artikolon kaj la markon el la ligo
       my $mrk;
-      print pre("test: fname = $fname $_")."\n" if m/^frega/i;
+      #print pre("test: fname = $fname $_")."\n" if m/^$abak/i;
       $fname =~ s/^art\///;
       if ($fname =~ s/#(.*)$//) {
         $mrk = $1;
       }
       $fname =~ s/\.html$//;
-      print pre("html: $_  -  $fname  #  $mrk") if $mrk and $fname =~ /^frega/;
+      #print pre("html: $_  -  $fname  #  $mrk") if $mrk and $fname =~ /^$abak/;
 
       my %h = (celref => $celref, orgviki => $orgviki);
       $viki{$fname} = [] unless $viki{$fname};
@@ -102,14 +112,15 @@ while (<IN>) {
   }
 }
 close IN;
+print pre("$count titoloj el vikio");
 $sth_insert->finish();
 $dbh->disconnect() or die "DB disconnect ne funkcias";
 
 my $num;
 foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn ankaux sen ligo, por forigi la ligojn
   $fname =~ s#^\.\./\.\./revo/art/([^/.]*)\.html$#\1#;		# prenu la artikolon el la dosiernomo
-#  print pre("fname = $fname");
-#  next unless $fname =~ m#^abel#;				# por testi nur malmulaj artikoloj
+  #next unless $fname =~ m#^$abak$#;				# por testi nur malmulaj artikoloj
+  print pre("fname = $fname\nviki = ".join(', ', @{$viki{$fname}}));
 
   $num++;							# por nombri kiom la artikoloj estas prilaborita
   my $t = "$fname:";						# por poste skribi en html
@@ -118,10 +129,11 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
   open HTML, "<", "../../revo/art/$fname.html" or die "ne povas legi ../../revo/art/$fname.html";
   my $html = join '', <HTML>;
   close HTML;
-#  $t .= "\n\thtml=".escapeHTML($html);				# nur por testi
+  $t .= "\n\thtml=".escapeHTML($html);				# nur por testi
 
 								# forigo de la ligoj, eble en du formatoj, se mi sxangxis la formaton
 #  $html =~ s# <a href="http://eo.wikipedia.org/wiki/[^"]*" target="_new"><img src="../smb/vikio.png" alt="VIKI" title="al la vikio" border="0"></a>##smg;
+#  $html =~ s# <a href="http://eo.wikipedia.org/wiki/[^"]*" target="_new" onclick="event.stopPropagation();"><img src="../smb/vikio.png" alt="Vikipedio" title="Al Vikipedio" border="0"></a>##smg;
   $html =~ s# <a href="http://eo.wikipedia.org/wiki/[^"]*" target="_new"><img src="../smb/vikio.png" alt="Vikipedio" title="Al Vikipedio" border="0"></a>##smg;
 #  $t .= "\n\n\thtml=".escapeHTML($html);
 
@@ -135,16 +147,18 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
       $mrk = $1;
       $t .= "\n\tmrk=$mrk";
     } else {							# ... se ne, prenu la unuan markon en la artikolo
-      if ($html =~ m/<a name="([^"]+)"><\/a>\n?<h2>/) {
+      if ($html =~ m/<h2 id="([^"]+)">/) {
         $mrk = $1;
         $t .= "\n\tmrk=$mrk";
-      }
+      } else {
+        $t .= "\n\tmrk=$mrk";		# aux ne estas marko
+	  }
     }
 
-    if ($html =~ m/<a name="$mrk"><\/a>\n?<h2>(.*?)<\/h2>/smg) {	# sercxu la markon kun la vorto
+    if ($html =~ m/<h2 id="$mrk">(.*?)<\/h2>/smg) {	# sercxu la markon kun la vorto
       my $h2 = $1;							# la vortoj kun eble tezauxroligo
       $h2 =~ s/[ \n\t]+$//sm;						# forigu spacoj cxe la fino
-      $t .= "\n\ttrovis: $mrk h2=".escapeHTML($h2);
+      $t .= pre("\n\ttrovis: $mrk h2=".escapeHTML($h2));
       print pre("vikihelpo1: $$h{celref}");
       if (exists $vikihelpo{$$h{celref}}) {
         print pre("vikihelpo: $$h{celref} $vikihelpo{$$h{celref}}");
@@ -153,22 +167,25 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
       }
 		
       if ($$h{orgviki}) {							# aldonu vikiligon al h2
+		print pre("orgviki=$$h{orgviki}");
         if (1 and $h2 =~ m#eo\.wikipedia\.org/wiki#) {			# 0 cxiuj vikiligoj, 1 nur unu vikiligo
           $t .= "\n\t!!!!!";
-          print pre("$fname - $$h{celref} - $$h{orgviki} - $mrk");
+		  $h2 = "";
+          print pre("aldonu: $fname - $$h{celref} - $$h{orgviki} - $mrk");
         } else {
-          print "$fname - ".a({href=>"/revo/$$h{celref}"}, $$h{celref})." - $$h{orgviki} - $mrk".br;
-          $h2 .= " <a href=\"http://eo.wikipedia.org/wiki/$$h{orgviki}\" target=\"_new\"><img src=\"../smb/vikio.png\" alt=\"Vikipedio\" title=\"Al Vikipedio\" border=\"0\"></a>";
+          print "aldonu2: $fname - ".a({href=>"/revo/$$h{celref}"}, $$h{celref})." - $$h{orgviki} - $mrk".br;
+          $h2 = " <a href=\"http://eo.wikipedia.org/wiki/$$h{orgviki}\" target=\"_new\"><img src=\"../smb/vikio.png\" alt=\"Vikipedio\" title=\"Al Vikipedio\" border=\"0\"></a>";
+		  #  onclick=\"event.stopPropagation();\"
         }
       }
 
-      $t .= "\n\th2=".escapeHTML($h2);
+      print pre("mrk=$mrk h2=".escapeHTML($h2));
 									# aldonu h2 al artikolo
-      $html =~ s/<a name="$mrk"><\/a>\n?<h2>(.*?)<\/h2>/<a name="$mrk"><\/a><h2>$h2<\/h2>/sm;
+      $html =~ s/<h2 id="$mrk">(.*?)<\/h2>/<h2 id="$mrk">\1 $h2<\/h2>/sm;
 #      $t .= "\n\n\thtml=".escapeHTML($html);
     }
   }
-  print pre($t);						# montru la informojn
+  #print pre($t);						# montru la informojn
 
 								# savu la novan artikolon kun vikiligoj
   open HTML, ">", "../../revo/art/$fname.html" or die "ne povas skribi ../../revo/art/$fname.html";

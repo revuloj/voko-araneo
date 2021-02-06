@@ -15,7 +15,7 @@ use DBI();
 print header(-type=>'text/plain', -charset=>'utf-8');
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 
 # Connect to the database.

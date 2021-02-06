@@ -34,12 +34,12 @@ if (param('arts')) {
 
 print h1('Enhavo de '.param('art').".xml");
 
-my $homedir = "/var/www/web277";
+my $homedir = "/hp/af/ag/ri";
 print h1("homedir = $homedir");
 
 my $start_time = time();
 
-my $xmldir = "$homedir/html/revo/xml";
+my $xmldir = "$homedir/www/revo/xml";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
@@ -47,7 +47,7 @@ $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use revo::encode;
 use revo::decode;
 

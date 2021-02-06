@@ -13,33 +13,39 @@
 # + ControlPersist 2m
 # http://blogs.perl.org/users/smylers/2011/08/ssh-productivity-tips.html
 
-host=retavortaro.de
+# aldonu en /etc/hosts!
+host=revo
+revo=${host}:www/revo
+cgibin=${host}:www/cgi-bin
+perllib=${host}:files/perllib
 release=1c
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-#scp revo/index.html ${host}:/html/revo/dlg/
-#scp revo/index.html ${host}:/html/revo/
-###
-#scp revo/dlg/index-${release}.html ${host}:/html/revo/dlg/
-#scp revo/dlg/titolo-${release}.html ${host}:/html/revo/dlg/
-## ###scp revo/dlg/titolo.jpg ${host}:/html/revo/dlg/
-#scp revo/dlg/redaktilo-${release}.html ${host}:/html/revo/dlg/
-#scp revo/dlg/redaktmenu-${release}.html ${host}:/html/revo/dlg/
-#scp revo/dlg/zamenhof_legas.jpg ${host}:/html/revo/dlg/
-##scp revo/dlg/404.html ${host}:/html/revo/dlg/
-
-#scp revo/smb/duckduckgo.svg ${host}:/html/revo/smb/
-#scp revo/smb/ecosia.svg ${host}:/html/revo/smb/
-#scp revo/smb/revo.svg ${host}:/html/revo/smb/
+#scp -r revo/ ${revo}/
 
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
-#scp cgi/sercxu-json-${release}.pl ${host}:/html/cgi-bin/
-#scp cgi/vokomailx.pl ${host}:/html/cgi-bin/
-#scp cgi/vokohtmlx.pl ${host}:/html/cgi-bin/
-#scp cgi/hazarda_art.pl ${host}:/html/cgi-bin/
+# cgi-bin/admin
+#scp cgi/admin/* ${cgibin}/admin/
+#scp cgi/admin/.ht* ${cgibin}/admin/
+
+scp cgi/admin/up* ${cgibin}/admin/
+scp cgi/perllib/parse* ${perllib}/
+
+## # malnovaj
+## scp cgi/vokomail.pl ${cgibin}/
+## scp cgi/sercxu.pl ${cgibin}/
+## 
+## # novaj
+## scp cgi/sercxu-json-${release}.pl ${cgibin}/
+## scp cgi/vokomailx.pl ${cgibin}/
+## scp cgi/vokohtmlx.pl ${cgibin}/
+## scp cgi/hazarda_art.pl ${cgibin}/
+## scp cgi/mx_trd.pl ${cgibin}/
 #
-scp cgi/perllib/revo/checkxml.pm ${host}:/files/perllib/revo/
+
+#scp cgi/perllib/*.pm ${perllib}/
+#scp cgi/perllib/revo/*.pm ${perllib}/revo/
 
 

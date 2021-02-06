@@ -16,6 +16,8 @@ use Encode;
 
 ######################################################################
 
+my $xsldir = "/hp/af/ag/ri/files/xsl";
+
 sub konv {
   my ($dbh, $xml, $html, $err, $debug) = @_;
 
@@ -30,7 +32,7 @@ sub konv {
   
   my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
 #                      "xalan -XSL ../xsl/revohtml.xsl");
-                      "xsltproc ../xsl/revohtml.xsl -");
+                      "xsltproc $xsldir/revohtml.xsl -");
   print CHLD_IN $$xml;
   close CHLD_IN;
 #  binmode CHLD_OUT, ":utf8";

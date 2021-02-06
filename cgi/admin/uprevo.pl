@@ -6,10 +6,10 @@ use Cwd;
 use IO::Handle;
 
 # propraj perl moduloj estas en:
-use lib("/var/www/web277/files/perllib");
+use lib("/hp/af/ag/ri/files/perllib");
 use parseart;
 use parseart2;
-use revorss;
+# use revorss;
 use revodb;
 
 my $exitcode;
@@ -21,7 +21,7 @@ print header,
 
 my $fname = param('fname');
 
-my $homedir = "/var/www/web277";
+my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
 open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush LOG 1;
@@ -30,9 +30,9 @@ $ret = `du -sh $homedir`;
 print LOG "du -> $exitcode\n$ret\n";
 print pre($ret);
 
-my $htmldir = "$homedir/html";
-my $xmldir = "$homedir/html/revo/xml";
-my $revodir = "$homedir/html/revo";
+my $htmldir = "$homedir/www";
+my $revodir = "$htmldir/revo";
+my $xmldir = "$revodir/xml";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
@@ -77,7 +77,7 @@ $exitcode = $?;
 print h2("tar -xv -> $exitcode");
 print LOG "tar -xv -> $exitcode\n$ret";
 print pre($ret);
-revorss::write($ret, $htmldir, -1, 0);
+# revorss::write($ret, $htmldir, -1, 0);
 
 # Connect to the database.
 my $dbh = parseart::connect();
