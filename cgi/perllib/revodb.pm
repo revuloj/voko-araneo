@@ -17,7 +17,7 @@ use DBI();
 sub connect {
   # Connect to the database.
   #  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=127.0.0.1",
-  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=0.0.0.0;port=3366",
+  my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=0.0.0.0;port=3366",
                          "root", "sekreto",
                          {'RaiseError' => 1}) or die "DB ne funkcias";
   $dbh->do("set names utf8");
@@ -32,7 +32,10 @@ sub pop3login {
 
 sub mysqldump {
 #  return "mysqldump --user=XXX --password=XXX --databases XXX";
-  return "mysqldump --user=web277 --password=<pwd> --ignore-table=usr_web277_1.r2_vikititolo --ignore-table=usr_web277_1.email --ignore-table=usr_web277_1.redaktanto --databases usr_web277_1";
+  my $db="db314802x3159000";
+  my $usr="<user>";
+  my $pwd="<pwd>";
+  return "mysqldump --user='$usr' --password='$pwd' --ignore-table=$db.r2_vikititolo --ignore-table=$db.email --ignore-table=$db.redaktanto --databases $db";
 }
 ######################################################################
 
