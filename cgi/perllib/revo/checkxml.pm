@@ -111,7 +111,7 @@ sub check_ref_cel {
                 my $celxml = join '', <IN>;
                 close IN;
 
-                if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
+                if ($celxml !~ /<(?:sub)?snc\s+mrk="$mrk">/) {
                     push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
                     ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
         #          $ne_konservu = 8;
