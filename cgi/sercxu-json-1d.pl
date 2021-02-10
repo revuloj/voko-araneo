@@ -142,11 +142,11 @@ sub Sercxu
   #if ($param_lng eq 'eo' or $param_lng eq '') {
 
     my $QUERY_eo =  
-    "SELECT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
+    "SELECT DISTINCT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
        LOWER(d.drv_teksto) " . $komparo . " LOWER(?) AS drv_match
     FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
     WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
-      AND a.art_id = d.drv_art_id GROUP BY d.drv_id 
+      AND a.art_id = d.drv_art_id 
     ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
     LIMIT ".$LIMIT;
 

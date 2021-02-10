@@ -21,8 +21,8 @@ close $fh;
 ######################################################################
 sub connect {
   # Connect to the database.
-  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=abelo;port=3306",
-                         "web277", $mysql_password,
+  my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306",
+                         "s314802_3159000", $mysql_password,
                          {'RaiseError' => 1}) or die "DB ne funkcias";
   $dbh->do("set names utf8");
   return $dbh;
