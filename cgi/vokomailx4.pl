@@ -292,9 +292,9 @@ sub submetu_xml {
   $sth->bind_param(2,$red_cmd);
   $sth->bind_param(3,$sxangxo);
   $sth->bind_param(4,$art);
-  $sth->bind_param(5,$xml);
+  $sth->bind_param(5,$$xml);
 
-  $sth-execute()  
+  $sth->execute()  
     or return "Ne povis submeti redakton: $DBI::errstr\n"; 
 }
 
