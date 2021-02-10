@@ -65,12 +65,12 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 ARG DAEMON_UID=13731
 # normale: master
 ARG VG_BRANCH=master 
-ARG REVO_VER=1c
+ARG REVO_VER=1d
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
-    perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime perl-xml-rss \
+    perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
     sed curl unzip jq && rm -f /var/cache/apk/* \
@@ -154,9 +154,9 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && chown -R ${DAEMON_UID} ${HTTP_DIR}/revo \
   && rm -rf /tmp/*
 
-COPY --from=grundo build/smb /usr/local/apache2/htdocs/revo/
-COPY --from=grundo build/jsc /usr/local/apache2/htdocs/revo/
-COPY --from=grundo build/stl /usr/local/apache2/htdocs/revo/
+COPY --from=grundo build/smb/ /usr/local/apache2/htdocs/revo/smb/
+COPY --from=grundo build/jsc/ /usr/local/apache2/htdocs/revo/jsc/
+COPY --from=grundo build/stl/ /usr/local/apache2/htdocs/revo/stl/
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
