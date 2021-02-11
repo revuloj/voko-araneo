@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # 2008 Wieland Pusch
-# 2020 Wolfram Diestel
+# 2020-2021 Wolfram Diestel
 
 
 use strict;
@@ -287,12 +287,13 @@ sub submetu_xml {
   $dbh->{PrintError} = 1;
   $dbh->{RaiseError} = 1;
 
-  my $sth = $dbh->prepare("INSERT INTO submeto(sub_email,sub_cmd,sub_desc,sub_fname,sub_content) VALUES (?,?,?,?,?)");
+  my $sth = $dbh->prepare("INSERT INTO submeto(sub_email,sub_cmd,sub_state,sub_desc,sub_fname,sub_content) VALUES (?,?,?,?,?,?)");
   $sth->bind_param(1,$redaktanto);
   $sth->bind_param(2,$red_cmd);
-  $sth->bind_param(3,$sxangxo);
-  $sth->bind_param(4,$art);
-  $sth->bind_param(5,$$xml);
+  $sth->bind_param(3,'ignor'); # dum testa fazo ni nur konservas sed ne volas trakti...
+  $sth->bind_param(4,$sxangxo);
+  $sth->bind_param(5,$art);
+  $sth->bind_param(6,$$xml);
 
   $sth->execute()  
     or return "Ne povis submeti redakton: $DBI::errstr\n"; 
