@@ -12,4 +12,10 @@ print "\n# CGI ENV\n";
 foreach $key (sort keys(%ENV)) {
   print "$key = $ENV{$key}\n";
 }
+
+print "\n\n";
+print qx/find $_ -name "*.pm"/ foreach ( @INC );
+
 print "</pre>\n";
+
+
