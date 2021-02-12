@@ -34,7 +34,9 @@ if (param('id') || param('type') eq 'text') {
 
 my $dbh = revodb::connect();
 
-if (param('id')) {
+if (param('id') && param('result') && param('state')) {
+    submeto_rezulto();
+} elsif (param('id')) {
     pluku_submeton(param('id'));
 } else {
     listigu_novajn();
@@ -44,7 +46,7 @@ $dbh->disconnect() if $dbh;
 
 
 # finu HTML-on
-if (param('id') || param('type') ne 'text') {
+if (not param('id') || param('type') ne 'text') {
     print end_pre(), end_html();
 }    
 
@@ -57,7 +59,7 @@ sub listigu_novajn {
 
         # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
         my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_cmd,sub_desc,sub_fname "
-            ."FROM submeto where sub_state IN ('nov','ignor') AND sub_type='xml' LIMIT 200");
+            ."FROM submeto WHERE sub_state IN ('nov','ignor') AND sub_type='xml' LIMIT 200");
 
         $select->execute();
         my $submeto = $select->fetchrow_arrayref();
@@ -74,9 +76,9 @@ sub listigu_novajn {
     }; 
     
     if ($@) { 
-        warn "Transaction aborted: $@"; 
-        eval { $dbh->rollback() }; # in case rollback() fails 
-        # do your application cleanup here 
+        warn "Datumbaza eraro: $@"; 
+        # eval { $dbh->rollback() }; # in case rollback() fails 
+        # cleanup here 
     } 
 }
 
@@ -118,8 +120,34 @@ sub pluku_submeton {
     }; 
     
     if ($@) { 
-        warn "Transaction aborted: $@"; 
+        warn "Datumbaza eraro: $@"; 
         eval { $dbh->rollback() }; # in case rollback() fails 
-        # do your application cleanup here 
+        # cleanup here 
+    } 
+}
+
+sub submeto_rezulto {
+
+    $dbh->{AutoCommit} = 1;
+    $dbh->{RaiseError} = 1;
+
+    eval { 
+
+        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        my $upd = $dbh->prepare("UPDATE submeto SET sub_state=?,sub_result=? "
+            ."WHERE sub_state = 'trakt' AND sub_id=?");
+
+        $upd->bind_param(1,param('state'));
+        $upd->bind_param(2,param('result'));
+        $upd->bind_param(2,param('id'));
+
+        my $rv = $upd->execute();
+        print "$rv\n" # 1 = aktualigita, 0E0 = ne aktualigita, pro nekongruo de sub_id aŭ sub_state
+    }; 
+    
+    if ($@) { 
+        warn "Datumbaza eraro: $@"; 
+        # eval { $dbh->rollback() }; # in case rollback() fails 
+        # cleanup here 
     } 
 }
