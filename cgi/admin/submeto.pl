@@ -16,10 +16,12 @@ use lib("/hp/af/ag/ri/files/perllib");
 
 use revodb;
 
-my $debug = 0; #0|1;
+my $debug = 1; #0|1;
+
+#binmode STDOUT, ":utf8";
 
 # ni povas postuli 'text', aliokaze redoniĝos html
-if (param('id') || param('type') eq 'text') {
+if (param('id') || param('format') eq 'text') {
     print header(-type => 'text/plain', -charset => 'utf-8');
 } else {
     print header(-charset=>'utf-8'),
@@ -27,12 +29,14 @@ if (param('id') || param('type') eq 'text') {
             -dtd => ['-//W3C//DTD HTML 4.01 Transitional//EN','http://www.w3.org/TR/html4/loose.dtd'],
             -lang => 'eo',
             -title => 'submetoj'),
-        start_pre(),
-        "id;state;cmd;desc;fname\n";
+        start_pre()
 }
+
+print "id;state;cmd;desc;fname\n";
 
 
 my $dbh = revodb::connect();
+$dbh->{mysql_enable_utf8} = 1;
 
 if (param('id') && param('result') && param('state')) {
     submeto_rezulto();
@@ -44,9 +48,8 @@ if (param('id') && param('result') && param('state')) {
 
 $dbh->disconnect() if $dbh;
 
-
 # finu HTML-on
-if (not param('id') || param('type') ne 'text') {
+if ((not param('id')) && (param('format') ne 'text')) {
     print end_pre(), end_html();
 }    
 
@@ -64,12 +67,18 @@ sub listigu_novajn {
         $select->execute();
         my $submeto = $select->fetchrow_arrayref();
         while ($submeto) {
+            #if ($debug) { print "id:".$submeto->[0]."\n" };
+            # protektu specialajn signojn en desc
+            $submeto->[3] =~ s/([;'"])/\\$1/g;
+            $submeto->[3] =~ s/\n/\\n/g;
+            $submeto->[3] =~ s/\r/\\r/g;
+            $submeto->[3] =~ s/\t/\\t/g;
 
-            if (param('type') eq 'text') {
-                print join(';',@$submeto);
+            if (param('format') eq 'text') {
+                print join(';',@$submeto),"\n";
             } else {
                 my $id = $submeto->[0];
-                print qq(<a href="submeto.pl?id=$id">$id</a>;),join(';',splice @$submeto,1);
+                print qq(<a href="submeto.pl?id=$id">$id</a>;),join(';',splice @$submeto,1),"\n";
             }
             $submeto = $select->fetchrow_arrayref();
         }
@@ -102,11 +111,11 @@ sub pluku_submeton {
 
         if ($submeto) {
             print "From: ".$submeto->{'sub_email'}."\n\n";
-            if ($submeto->{'sub_cmd'} eq 'aldono') {
-                print $submeto->{'sub_cmd'}.": ".$submeto->{'sub_fname'}."\n\n";
-            } else {
-                print $submeto->{'sub_cmd'}.": ".$submeto->{'sub_desc'}."\n\n";
-            }
+            #if ($submeto->{'sub_cmd'} eq 'aldono') {
+            #    print $submeto->{'sub_cmd'}.": ".$submeto->{'sub_fname'}."\n\n";
+            #} else {
+            #    print $submeto->{'sub_cmd'}.": ".$submeto->{'sub_desc'}."\n\n";
+            #}
             print $submeto->{'sub_content'};
 
             # marku la submeton por traktado
