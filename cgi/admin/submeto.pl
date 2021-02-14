@@ -32,8 +32,9 @@ if (param('id') || param('format') eq 'text') {
         start_pre()
 }
 
-print "id;state;cmd;desc;fname\n";
-
+unless(param('id')) {
+    print "id;state;time;cmd;desc;fname\n";
+}
 
 my $dbh = revodb::connect();
 $dbh->{mysql_enable_utf8} = 1;
@@ -41,7 +42,7 @@ $dbh->{mysql_enable_utf8} = 1;
 if (param('id') && param('result') && param('state')) {
     submeto_rezulto();
 } elsif (param('id')) {
-    pluku_submeton(param('id'));
+    pluku_submeton();
 } else {
     listigu_novajn();
 };
@@ -61,7 +62,7 @@ sub listigu_novajn {
     eval { 
 
         # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
-        my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_cmd,sub_desc,sub_fname "
+        my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_time,sub_cmd,sub_desc,sub_fname "
             ."FROM submeto WHERE sub_state IN ('nov','ignor') AND sub_type='xml' LIMIT 200");
 
         $select->execute();
@@ -69,11 +70,12 @@ sub listigu_novajn {
         while ($submeto) {
             #if ($debug) { print "id:".$submeto->[0]."\n" };
             # protektu specialajn signojn en desc
-            $submeto->[3] =~ s/([;'"])/\\$1/g;
-            $submeto->[3] =~ s/\n/\\n/g;
-            $submeto->[3] =~ s/\r/\\r/g;
-            $submeto->[3] =~ s/\t/\\t/g;
-
+            my $desc=4;
+            $submeto->[$desc] =~ s/\n/\\n/g;
+            $submeto->[$desc] =~ s/\r/\\r/g;
+            $submeto->[$desc] =~ s/\t/\\t/g;
+            $submeto->[$desc] =~ s/"/""/g;
+            $submeto->[$desc] = '"'.$submeto->[$desc].'"';
             if (param('format') eq 'text') {
                 print join(';',@$submeto),"\n";
             } else {
@@ -92,7 +94,7 @@ sub listigu_novajn {
 }
 
 sub pluku_submeton {
-    my $id = shift;
+    my $id = param('id');
 
     # malŝaltu aŭtomatan eraro-presadon(?)
     #$dbh->{PrintError} = 1;
@@ -103,7 +105,8 @@ sub pluku_submeton {
     eval { 
 
         # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
-        my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_cmd,sub_desc,sub_fname,sub_content "
+        #my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_cmd,sub_desc,sub_fname,sub_content "
+        my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_content "
             ."FROM submeto where sub_id=? FOR UPDATE");
 
         $select->execute($id);
