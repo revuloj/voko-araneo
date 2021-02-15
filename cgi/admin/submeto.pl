@@ -6,7 +6,7 @@
 use strict;
 use utf8;
 
-use CGI qw(:standard *pre);
+use CGI qw(:standard *pre *table);
 use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
@@ -28,11 +28,10 @@ if (param('id') || param('format') eq 'text') {
         start_html(
             -dtd => ['-//W3C//DTD HTML 4.01 Transitional//EN','http://www.w3.org/TR/html4/loose.dtd'],
             -lang => 'eo',
-            -title => 'submetoj'),
-        start_pre()
+            -title => 'submetoj');
 }
 
-unless(param('id')) {
+unless(param('id') || param('email')) {
     print "id;state;time;cmd;desc;fname\n";
 }
 
@@ -43,15 +42,19 @@ if (param('id') && param('result') && param('state')) {
     submeto_rezulto();
 } elsif (param('id')) {
     pluku_submeton();
+} elsif (param('email')) {
+    redakto_statoj();
 } else {
+    print start_pre() unless (param('format') eq 'text');
     listigu_novajn();
+    print end_pre() unless (param('format') eq 'text');
 };
 
 $dbh->disconnect() if $dbh;
 
 # finu HTML-on
 if ((not param('id')) && (param('format') ne 'text')) {
-    print end_pre(), end_html();
+    print end_html();
 }    
 
 ##############################
@@ -158,6 +161,50 @@ sub submeto_rezulto {
 
         my $rv = $upd->execute($state,$result,$id);
         print "$rv\n" # 1 = aktualigita, 0E0 = ne aktualigita, pro nekongruo de sub_id aŭ sub_state
+    }; 
+    
+    if ($@) { 
+        warn "Datumbaza eraro: $@"; 
+        # eval { $dbh->rollback() }; # in case rollback() fails 
+        # cleanup here 
+    } 
+}
+
+sub redakto_statoj {
+
+    $dbh->{RaiseError} = 1;
+
+    eval { 
+
+        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        my $select = $dbh->prepare("SELECT sub_id,sub_fname,sub_state,sub_time,sub_desc,sub_result "
+            ."FROM submeto WHERE sub_email=? ORDER BY sub_time DESC LIMIT 20");
+        # PLIBONIGU: trovu ankaŭ samredaktorajn submetojn kun alternativaj retadresoj:
+        # JOIN email ON sub_email = ema_email AND...?
+
+        my $email = param('email');
+        $select->execute($email);
+
+        print start_table({-border=>1,-cellspacing=>0});
+        #print "email: $email\n";
+        my $submeto = $select->fetchrow_arrayref();
+
+        #print $submeto->[0];
+        while ($submeto) {
+            #print join(';',@$submeto),"\n";
+            print Tr(
+              td({},$submeto->[0]),
+              td({},$submeto->[1]),
+              td({},$submeto->[2]),
+              td({},$submeto->[3]),
+              td({},$submeto->[4]),
+              td({},$submeto->[5])
+            );
+
+            $submeto = $select->fetchrow_arrayref();
+        }
+
+        print end_table();
     }; 
     
     if ($@) { 
