@@ -20,7 +20,10 @@ use utf8;
 #use open ':std', ':encoding(UTF-8)';
 binmode(STDOUT, ":utf8");
 
-$| = 1;
+use JSON;
+my $json_parser = JSON->new->allow_nonref;
+
+#$| = 1;
 
 my $debug = 0;
 my $LIMIT = 50;
@@ -421,13 +424,19 @@ sub MontruRezultojn_trd
     });
 
     print "\"$lng\":";
-    json_obj({
+    print $json_parser->encode({
       "mrk"=>'lng_'.$$ref{'trd_lng'},
       "vrt"=>escape($$ref{'trd_teksto'})
     });
 
+    #json_obj({
+    #  "mrk"=>'lng_'.$$ref{'trd_lng'},
+    #  "vrt"=>escape($$ref{'trd_teksto'})
+    #});
+
     print ",\"eo\":";
-    json_obj({
+    #json_obj(
+    print $json_parser->encode({
       "mrk"=>$$ref{'drv_mrk'},
       "vrt"=>escape($$ref{'drv_teksto'})
     });
