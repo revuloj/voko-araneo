@@ -106,7 +106,7 @@ sub pluku_submeton {
 
         # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
         #my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_cmd,sub_desc,sub_fname,sub_content "
-        my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_content "
+        my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_email,sub_content "
             ."FROM submeto where sub_id=? FOR UPDATE");
 
         $select->execute($id);
@@ -149,11 +149,14 @@ sub submeto_rezulto {
         my $upd = $dbh->prepare("UPDATE submeto SET sub_state=?,sub_result=? "
             ."WHERE sub_state = 'trakt' AND sub_id=?");
 
-        $upd->bind_param(1,param('state'));
-        $upd->bind_param(2,param('result'));
-        $upd->bind_param(2,param('id'));
+        #$upd->bind_param(1,param('state'));
+        #$upd->bind_param(2,param('result'));
+        #$upd->bind_param(2,param('id'));
+        my $state = param('state');
+        my $result = param('result');
+        my $id = param('id');
 
-        my $rv = $upd->execute();
+        my $rv = $upd->execute($state,$result,$id);
         print "$rv\n" # 1 = aktualigita, 0E0 = ne aktualigita, pro nekongruo de sub_id aŭ sub_state
     }; 
     
