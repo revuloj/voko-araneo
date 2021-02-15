@@ -324,7 +324,8 @@ sub MontruRezultojn_eo
     });
 
     print "\"eo\":";
-    json_obj({
+    #json_obj(
+    print $json_parser->encode({
       "mrk"=>$$ref{'drv_mrk'},
       "vrt"=>$$ref{'drv_match'}?
           escape($$ref{'drv_teksto'}) : escape($$ref{'var_teksto'})
@@ -465,16 +466,16 @@ sub json_obj_start {
   }
 }
 
-sub json_obj {
-  my $hash_ref = shift;
-  my $size = scalar keys %{$hash_ref};
-  my $n = 0;
-  print "{";
-  while (my ($key, $value) = each %{$hash_ref}) {
-    attribute($key, $value, ++$n >= $size)
-  }
-  print "}"; 
-}
+#sub json_obj {
+#  my $hash_ref = shift;
+#  my $size = scalar keys %{$hash_ref};
+#  my $n = 0;
+#  print "{";
+#  while (my ($key, $value) = each %{$hash_ref}) {
+#    attribute($key, $value, ++$n >= $size)
+#  }
+#  print "}"; 
+#}
 
 sub attribute {
   my ($name,$value,$last) = @_;
