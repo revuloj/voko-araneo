@@ -22,9 +22,9 @@ release=1d
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
 #scp -r revo/ ${revo}/
-scp -r revo/dlg/index-${release}.html ${revo}/dlg/
-scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
-scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+# scp -r revo/dlg/index-${release}.html ${revo}/dlg/
+# scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
+# scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
@@ -37,8 +37,8 @@ scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 #scp cgi/perllib/parse* ${perllib}/
 
 scp cgi/sercxu-json-${release}.pl ${cgibin}/
-scp cgi/vokosubmx.pl ${cgibin}/
-scp cgi/admin/submeto.pl ${cgibin}/admin/
+# scp cgi/vokosubmx.pl ${cgibin}/
+# scp cgi/admin/submeto.pl ${cgibin}/admin/
 
 ## # malnovaj
 ## scp cgi/vokomail.pl ${cgibin}/

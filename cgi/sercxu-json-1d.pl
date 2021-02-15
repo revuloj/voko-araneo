@@ -320,7 +320,7 @@ sub MontruRezultojn_eo
     );
 
     ### aldonu tradukojn en preferataj lingvoj
-    $sth2->execute($$ref{'drv_id'});
+    $sth2->execute($ref->{drv_id});
 
 ##    my %tradukoj;
 
@@ -360,6 +360,7 @@ sub MontruRezultojn_trd
   my $sep = '';
   my $last_lng;
 
+  my %trovoj_lng;
 
   # trakuru ĉiujn DB-serĉrezultojn...
   while (my $ref = $res->fetchrow_hashref()) {
@@ -370,85 +371,52 @@ sub MontruRezultojn_trd
       print ",\n" unless ($neniu_trafo); #($lng eq 'eo' or $neniu_trafo);
     }
 
-    my $lng = $$ref{'trd_lng'};
+    my $lng = $ref->{trd_lng};
 
     # trovoj estas ordigitaj laŭ lingvo,
     # ĉe komenco de nova lingvo, finu alineon kaj skribu enkondukon por nova
     if ($lng ne $last_lng) {
-      print "]},\n" if ($last_lng);
+      if ($last_lng) {
+        print $json_parser->encode(\%trovoj_lng);
+        print ",\n";
+      }
 
-      json_obj_start({
-        "lng"=>$lng,
-        "max"=>$LIMIT,
-        "titolo"=>$$ref{'lng_nomo'}
-      });
-      print " \"trovoj\": [\n";
       $last_lng = $lng;
-    } else {
-      print $sep;
+
+      %trovoj_lng = (
+        lng => $lng,
+        max => $LIMIT,
+        titolo => $ref->{lng_nomo},
+        trovoj => ()
+      );
     }
 
-    json_obj_start({
-      "art"=>$$ref{'art_amrk'}
-    });
+    my %trovo = (
+      art => $ref->{art_amrk},
+      $lng => {
+        mrk => 'lng_'.$ref->{trd_lng},
+        vrt => escape($ref->{trd_teksto})
+      },
+      eo => {
+        mrk => $ref->{drv_mrk},
+        vrt => escape($ref->{drv_teksto})
+      }
+    );
 
-    print "\"$lng\":";
-    print $json_parser->encode({
-      "mrk"=>'lng_'.$$ref{'trd_lng'},
-      "vrt"=>escape($$ref{'trd_teksto'})
-    });
-
-    #json_obj({
-    #  "mrk"=>'lng_'.$$ref{'trd_lng'},
-    #  "vrt"=>escape($$ref{'trd_teksto'})
-    #});
-
-    print ",\"eo\":";
-    #json_obj(
-    print $json_parser->encode({
-      "mrk"=>$$ref{'drv_mrk'},
-      "vrt"=>escape($$ref{'drv_teksto'})
-    });
-  
-    print "}\n"; 
-    $sep = ",\n";
+    push @{$trovoj_lng{trovoj}}, \%trovo;
 
   } # ...while
 
+  # eligu la lastan lingvon...
+  print $json_parser->encode(\%trovoj_lng);
 
   $res->finish();
     
   if ($num) {
-    print "]}\n";
+    #print "]}\n";
+    print "\n";
   #  #$neniu_trafo = 0;
   }
-}
-
-sub json_obj_start {
-  my $hash_ref = shift;
-  my $size = scalar keys %{$hash_ref};
-  my $n = 0;
-  print "{";
-  while (my ($key, $value) = each %{$hash_ref}) {
-    attribute($key, $value)
-  }
-}
-
-#sub json_obj {
-#  my $hash_ref = shift;
-#  my $size = scalar keys %{$hash_ref};
-#  my $n = 0;
-#  print "{";
-#  while (my ($key, $value) = each %{$hash_ref}) {
-#    attribute($key, $value, ++$n >= $size)
-#  }
-#  print "}"; 
-#}
-
-sub attribute {
-  my ($name,$value,$last) = @_;
-  print "\"$name\":\"$value\"";
-  print "," unless ($last);
 }
 
 sub escape {
