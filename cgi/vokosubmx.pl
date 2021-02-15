@@ -303,6 +303,8 @@ sub send_xml {
   my ($redaktanto,$art,$sxangxo,$xml) = @_;
 
   my $name    = "\"Revo redaktu.pl $redaktanto\"";
+  $name =~ s/\@/_/g;
+
   my (@to, $red_cmd);
   push @to, $redaktanto; 
   push @to, $mail_to; 
