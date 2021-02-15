@@ -299,87 +299,55 @@ sub MontruRezultojn_eo
   my ($res, $sth2) = @_;
   my $num = 0;
 
+  my %trovoj_eo = (
+    lng => 'eo',
+    max => $LIMIT,
+    titolo => 'esperanta',
+    trovoj => ()
+  );
   # trakuru ĉiujn DB-serĉrezultojn...
+
   while (my $ref = $res->fetchrow_hashref()) {
 
     $num++;
 
-    if ($num == 1) {
-      #print " ]\n },\n {" unless ($num==1);
-
-      json_obj_start({
-        "lng"=>"eo",
-        "max"=>$LIMIT,
-        "titolo"=>"esperanta"
-      });
-
-      print " \"trovoj\": [\n";
-      #$last_lng = $lng;
-    } else {
-      print ",\n";
-    }
-
-    json_obj_start({
-      "art"=>$$ref{'art_amrk'}
-    });
-
-    print "\"eo\":";
-    #json_obj(
-    print $json_parser->encode({
-      "mrk"=>$$ref{'drv_mrk'},
-      "vrt"=>$$ref{'drv_match'}?
-          escape($$ref{'drv_teksto'}) : escape($$ref{'var_teksto'})
-    });
-
+    my %trovo = (
+      art => $ref->{art_amrk},
+      eo => {
+        mrk => $ref->{drv_mrk},
+        vrt => escape($ref->{drv_match}? $ref->{drv_teksto} : $ref->{var_teksto})
+      }
+    );
 
     ### aldonu tradukojn en preferataj lingvoj
     $sth2->execute($$ref{'drv_id'});
-    my $tradukoj=''; 
-    my $sep='';
-    my $last_lng= '';
+
+##    my %tradukoj;
+
+#    my $tradukoj=''; 
+#    my $sep='';
+#    my $last_lng= '';
 
     while (my $ref2 = $sth2->fetchrow_hashref()) {
 
-      my $lng = $$ref2{'trd_lng'};
+      my $lng = $ref2->{trd_lng};
 
-      # ĉe komenco de nova lingvo...
-      unless ($last_lng) { # unua
-        print ",\n  \"$lng\":{";
-
-      } elsif ($lng ne $last_lng) { # plia
-        attribute("vrt",$tradukoj,1);
-        print "},\n  \"$lng\":{";
-        $tradukoj = '';
-      }
-      # en ambaŭ supraj kazoj
-      if ($lng ne $last_lng) {
-        attribute("mrk","lng_$lng");
-        $sep = '';
-      }
-
-      $last_lng = $lng; 
-
-      # kunigu ĉiujn tradukojn de unu lingvo...
-      $tradukoj .= $sep.escape($$ref2{'trd_teksto'});
-      #print "DBTRD: ".$tradukoj;
-
-      $sep = ", ";
+      $trovo{$lng} =
+        [
+          mrk => "lng_$lng",
+          vrt => escape($ref2->{trd_teksto})
+        ];        
     }
-
-    # eligu la reston
-    if ($last_lng) {
-        attribute("vrt",$tradukoj,1);
-        print "}\n";
-    }
-
-    print "}";
+    push @{$trovoj_eo{trovoj}}, \%trovo;
 
   } # ...while
   $res->finish();
+
+  print $json_parser->encode(\%trovoj_eo);
     
   if ($num) {
     $neniu_trafo = 0;
-    print "\n]}\n";
+  #  print "\n]}\n";
   }
 }
 
