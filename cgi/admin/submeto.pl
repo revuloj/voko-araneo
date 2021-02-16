@@ -64,9 +64,9 @@ sub listigu_novajn {
 
     eval { 
 
-        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        # elprenu unu submeton kun stato=nov 
         my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_time,sub_cmd,sub_desc,sub_fname "
-            ."FROM submeto WHERE sub_state IN ('nov','ignor') AND sub_type='xml' LIMIT 200");
+            ."FROM submeto WHERE sub_state = 'nov' AND sub_type='xml' LIMIT 200");
 
         $select->execute();
         my $submeto = $select->fetchrow_arrayref();
@@ -107,7 +107,7 @@ sub pluku_submeton {
 
     eval { 
 
-        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        # elprenu unu submeton laŭ parametro 'id'
         #my $select = $dbh->prepare("SELECT sub_id,sub_email,sub_cmd,sub_desc,sub_fname,sub_content "
         my $select = $dbh->prepare("SELECT sub_id,sub_state,sub_email,sub_content "
             ."FROM submeto where sub_id=? FOR UPDATE");
@@ -148,7 +148,7 @@ sub submeto_rezulto {
 
     eval { 
 
-        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        # aktualigu submeton kun stato=trakt al 'arkiv' aŭ 'erar' aldonante rezulto-mesaĝon
         my $upd = $dbh->prepare("UPDATE submeto SET sub_state=?,sub_result=? "
             ."WHERE sub_state = 'trakt' AND sub_id=?");
 

@@ -290,7 +290,7 @@ sub submetu_xml {
   my $sth = $dbh->prepare("INSERT INTO submeto(sub_email,sub_cmd,sub_state,sub_desc,sub_fname,sub_content) VALUES (?,?,?,?,?,?)");
   $sth->bind_param(1,$redaktanto);
   $sth->bind_param(2,$red_cmd);
-  $sth->bind_param(3,'ignor'); # dum testa fazo ni nur konservas sed ne volas trakti...
+  $sth->bind_param(3,'nov'); 
   $sth->bind_param(4,$sxangxo);
   $sth->bind_param(5,$art);
   $sth->bind_param(6,$$xml);
