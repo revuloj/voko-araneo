@@ -21,6 +21,13 @@ my $max_age = 200; # post kiom da tagoj ni forigos malnovajn per forigu_malnovaj
 
 #binmode STDOUT, ":utf8";
 
+# uzu prefere POST ol GET
+# listo: sen parametro
+# listo kiel pura CSV: ?format=text
+# forigo de malnovaj: ?forigo=1
+# unuopa submeto kun stato-ŝango nov->trakt: ?id=<id>
+# aktualigo de submeto post trakto: ?id=<id>&state=<arkiv|eraro>&result=<mesaĝo>
+
 # ni povas postuli 'text', aliokaze redoniĝos html
 my $format_text = (param('id') || param('forigo') || param('format') eq 'text');
 if ($format_text) {
