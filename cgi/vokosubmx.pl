@@ -43,7 +43,7 @@ my $revuloj_url = 'https://revuloj.github.io/respondoj.html';
 my $mail_cmd    = '/usr/sbin/sendmail -t';
 my $smlog       = "$homedir/files/log/sendmail.log"; #"$xml_dir/sendmail.log";
 my $mail_from   = 'noreply@retavortaro.de';
-my $mail_to     = 'revo@retavortaro.de';
+#my $mail_to     = 'revo@retavortaro.de';
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
@@ -101,7 +101,7 @@ my $dbh = revodb::connect();
 my $permeso = 0;
 
 unless ($redaktanto) {
-  print "<div id=\"red_err\" class=\"eraroj\">Averto: Por sendi vian redakton, vi devas ankoraŭ doni vian retadreson, ".
+  print "<div id=\"red_err\" class=\"eraroj\">Averto: Por submeti vian redakton, vi devas ankoraŭ doni vian retadreson, ".
         "kun kiu vi registriĝis kiel redaktanto.</div>\n";
 } else {
   $permeso = check_redaktanto($dbh,$redaktanto);
@@ -186,7 +186,7 @@ if ($command eq 'forsendo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
-    print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
+    print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne submetis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
   } else {
     # konservu la redakton en la datumbazo, tabelo "submeto"
@@ -199,9 +199,9 @@ if ($command eq 'forsendo') {
     }
     # aldone sendu la redakton al la redaktinto kaj al revo...
     if (send_xml($redaktanto,$art,$sxangxo,\$xml)) {
-      print "<div id=\"konfirmo\">Bone: Via ŝanĝo sendiĝis al la redaktoservo.</div>\n";
+      print "<div id=\"konfirmo\">Bone: Via ŝanĝo submetiĝis al la redaktoservo.</div>\n";
     } else {
-      print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro problemo kun la retpoŝta servo, ni ne povis sendi vian ŝanĝon ".
+      print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro problemo kun la retpoŝta servo, ni ne povis submeti vian ŝanĝon ".
         "al la redaktoservo. Bv. reprovi poste aŭ sendi la ŝanĝon per ordinara retpoŝto kaj averti administranton.</div>\n";
     }
   }
@@ -307,7 +307,7 @@ sub send_xml {
 
   my (@to, $red_cmd);
   push @to, $redaktanto; 
-  push @to, $mail_to; 
+  # ne plu sendu al redaktoservo: push @to, $mail_to; 
 
   # unua linio de retpoŝto
   if (param('nova')) {
