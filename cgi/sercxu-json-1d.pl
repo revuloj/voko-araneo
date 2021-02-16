@@ -333,10 +333,10 @@ sub MontruRezultojn_eo
       my $lng = $ref2->{trd_lng};
 
       $trovo{$lng} =
-        [
+        {
           mrk => "lng_$lng",
           vrt => escape($ref2->{trd_teksto})
-        ];        
+        };        
     }
     push @{$trovoj_eo{trovoj}}, \%trovo;
 
