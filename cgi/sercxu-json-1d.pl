@@ -407,12 +407,12 @@ sub MontruRezultojn_trd
 
   } # ...while
 
-  # eligu la lastan lingvon...
-  print $json_parser->encode(\%trovoj_lng);
 
   $res->finish();
     
   if ($num) {
+    # eligu la lastan lingvon...
+    print $json_parser->encode(\%trovoj_lng);
     #print "]}\n";
     print "\n";
   #  #$neniu_trafo = 0;
