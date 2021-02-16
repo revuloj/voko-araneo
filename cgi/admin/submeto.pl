@@ -16,12 +16,14 @@ use lib("/hp/af/ag/ri/files/perllib");
 
 use revodb;
 
-my $debug = 1; #0|1;
+my $debug = 0; #0|1;
+my $max_age = 200; # post kiom da tagoj ni forigos malnovajn per forigu_malnovajn()
 
 #binmode STDOUT, ":utf8";
 
 # ni povas postuli 'text', aliokaze redoniĝos html
-if (param('id') || param('format') eq 'text') {
+my $format_text = (param('id') || param('forigo') || param('format') eq 'text');
+if ($format_text) {
     print header(-type => 'text/plain', -charset => 'utf-8');
 } else {
     print header(-charset=>'utf-8'),
@@ -31,7 +33,7 @@ if (param('id') || param('format') eq 'text') {
             -title => 'submetoj');
 }
 
-unless(param('id') || param('email')) {
+unless(param('id') || param('forigo') || param('email')) {
     print "id;state;time;cmd;desc;fname\n";
 }
 
@@ -44,6 +46,8 @@ if (param('id') && param('result') && param('state')) {
     pluku_submeton();
 } elsif (param('email')) {
     redakto_statoj();
+} elsif (param('forigo')) {
+    forigu_malnovajn();
 } else {
     print start_pre() unless (param('format') eq 'text');
     listigu_novajn();
@@ -53,7 +57,7 @@ if (param('id') && param('result') && param('state')) {
 $dbh->disconnect() if $dbh;
 
 # finu HTML-on
-if ((not param('id')) && (param('format') ne 'text')) {
+unless ($format_text) {
     print end_html();
 }    
 
@@ -87,6 +91,24 @@ sub listigu_novajn {
             }
             $submeto = $select->fetchrow_arrayref();
         }
+    }; 
+    
+    if ($@) { 
+        warn "Datumbaza eraro: $@"; 
+        # eval { $dbh->rollback() }; # in case rollback() fails 
+        # cleanup here 
+    } 
+}
+
+sub forigu_malnovajn {    
+    $dbh->{AutoCommit} = 1;
+    $dbh->{RaiseError} = 1;
+
+    eval { 
+        # forigu pli malnovajn ol $max_age tagojn
+        my $del = $dbh->prepare("DELETE FROM submeto WHERE TIMESTAMPDIFF(DAY,sub_time,NOW()) > ?;");
+        my $rv = $del->execute($max_age);
+        print "$rv\n" # 1..999 = tiom da forigitaj, 0E0 = neniu
     }; 
     
     if ($@) { 
