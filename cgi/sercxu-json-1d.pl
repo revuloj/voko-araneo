@@ -343,14 +343,15 @@ sub MontruRezultojn_eo
   } # ...while
   $res->finish();
 
-  print $json_parser->encode(\%trovoj_eo);
+  if ($num) {
+    print $json_parser->encode(\%trovoj_eo);
+  }
     
   if ($num) {
     $neniu_trafo = 0;
   #  print "\n]}\n";
   }
 }
-
 
 
 sub MontruRezultojn_trd
