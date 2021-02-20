@@ -127,6 +127,7 @@ sub forigu_malnovajn {
 
 sub pluku_submeton {
     my $id = param('id');
+    my $state = param('state');
 
     # malŝaltu aŭtomatan eraro-presadon(?)
     #$dbh->{PrintError} = 1;
@@ -154,7 +155,7 @@ sub pluku_submeton {
             print $submeto->{'sub_content'};
 
             # marku la submeton por traktado
-            if ($submeto->{"sub_state"} eq 'nov') {
+            if ($state eq 'trakt' && $submeto->{"sub_state"} eq 'nov') {
                 my $upd = $dbh->prepare("UPDATE submeto set sub_state='trakt' WHERE sub_state='nov' AND sub_id=?");
                 $upd->execute($id);               
             }
