@@ -70,7 +70,7 @@ ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
-    perl-cgi perl-fcgi perl-uri perl-unicode-string perl-datetime \
+    perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths make \
     sed curl wget unzip jq && rm -f /var/cache/apk/* \
