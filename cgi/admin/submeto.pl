@@ -222,8 +222,10 @@ sub redakto_statoj {
         #print $submeto->[0];
         while ($submeto) {
             #print join(';',@$submeto),"\n";
+            my $id = $submeto->[0];
+
             print Tr(
-              td({},$submeto->[0]),
+              td({},qq(<a href="submeto.pl?id=$id">$id</a>)),
               td({},$submeto->[1]),
               td({},$submeto->[2]),
               td({},$submeto->[3]),
