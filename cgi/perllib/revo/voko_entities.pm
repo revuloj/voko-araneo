@@ -1,4 +1,4 @@
-package revo::voko_entities;
+package revo::voko_entities; use utf8;
 sub entities { return \%voko_entities; }
 %voko_entities = (
 'Ĉ'=>'Ccirc',

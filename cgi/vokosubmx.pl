@@ -19,8 +19,8 @@ use DBI();
 use lib("/hp/af/ag/ri/files/perllib");
 # por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
 
-use revo::decode;
-use revo::encode;
+#use revo::decode;
+use revo::encodex;
 use revo::checkxml;
 use revo::wrap;
 use revodb;
@@ -260,7 +260,7 @@ sub normigu_xml {
     #$debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
 
     # trovu la identigilon de la artikolo,
-    # se ĝi rompiĝos ni devos restarigi gin malsupre...
+    # se ĝi rompiĝos ni devos restarigi ĝin malsupre...
     my $id;
     if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
       #$debugmsg .= "ID: $1-\n";
@@ -273,7 +273,7 @@ sub normigu_xml {
   }
 
   # kodigu ne-askiajn signojn per literunuoj...
-  return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+  return revo::encodex::encode2($xmlTxt, 20) if $xmlTxt;
 }
 
 sub submetu_xml {
