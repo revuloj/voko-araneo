@@ -24,7 +24,7 @@ release=1d
 #scp -r revo/ ${revo}/
 # scp -r revo/dlg/index-${release}.html ${revo}/dlg/
 # scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
-# scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+#scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
@@ -36,9 +36,10 @@ release=1d
 #scp cgi/admin/up* ${cgibin}/admin/
 #scp cgi/perllib/parse* ${perllib}/
 
-scp cgi/sercxu-json-${release}.pl ${cgibin}/
-# scp cgi/vokosubmx.pl ${cgibin}/
-# scp cgi/admin/submeto.pl ${cgibin}/admin/
+#scp cgi/sercxu-json-${release}.pl ${cgibin}/
+scp cgi/vokosubmx.pl ${cgibin}/
+#scp cgi/vokosubm-json.pl ${cgibin}/
+#scp cgi/admin/submeto.pl ${cgibin}/admin/
 
 ## # malnovaj
 ## scp cgi/vokomail.pl ${cgibin}/
@@ -53,6 +54,8 @@ scp cgi/sercxu-json-${release}.pl ${cgibin}/
 #
 
 #scp cgi/perllib/*.pm ${perllib}/
-#scp cgi/perllib/revo/*.pm ${perllib}/revo/
+
+scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
+scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
 
 

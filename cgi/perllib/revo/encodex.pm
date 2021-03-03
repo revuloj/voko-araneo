@@ -47,9 +47,10 @@ sub encode2 {
   my @res = split('', $str);
 
   my $n=0;
+  my $map = revo::voko_entities::entities;
   for my $chr (@res) {
     if (ord($chr) > 127) {
-      my $ent = revo::voko_entities::entities->{$chr};
+      my $ent = $map->{$chr};
       if ($ent) {
         $res[$n] = "&$ent;";
       } else {
