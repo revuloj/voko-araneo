@@ -64,6 +64,7 @@ jobs:
         run: |
           echo $GITHUB_TOKEN | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
           docker pull "docker.pkg.github.com/revuloj/voko-grundo/voko-grundo:latest"
+          docker tag docker.pkg.github.com/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
         #run: 
         #  echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
@@ -72,8 +73,7 @@ jobs:
 
       - name: Push image
         run: |
-          #IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          # ĉu eblas ankau nur /revuloj/ ($ORGANIZATION) ?
+          # ĉu eblus ankau nur /revuloj/ ($ORGANIZATION) ?
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
 
           # Strip git ref prefix from version
