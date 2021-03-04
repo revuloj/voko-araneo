@@ -58,11 +58,17 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
+      - name: Saluto al docker.pkg.github.com kaj preni 'voko-grundo'
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          echo "${{ GITHUB_TOKEN }}" docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+          docker pull "docker.pkg.github.com/revuloj/voko-grundo/voko-grundo:latest"
+        #run: 
+        #  echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
-
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Push image
         run: |
