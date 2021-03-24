@@ -49,6 +49,30 @@ if (param("download")) {	# 0 por testi - 1 por vere elsxuti aktualan liston
   $sth->execute();
 }
 
+# Ni provas trovi konektojn tiel:
+#    v-dosiero -- v-titolo =¹ r-kapvorto -- r-marko -- r-dosiero
+#
+# ĉe tio la rilaton =¹ ni povas anstataŭigi per la esceptoj el la tabelo r2_vikicelo
+#
+# Ni legas el la sekvaj tabeloj de la datumbazo
+#
+# r2_indekso (ind_kat='LNG' / 'eo') 
+#      ind_teksto = kapvorto de derivaĵo, ekz. abelisto
+#      ind_celref = pado kun marko, ekz. art/abel.html#abel0isto 
+#
+# r2_vikicelo (por esceptoj)
+#      vik_celref  = kiel ind_celref (supre)
+#      vik_artikolo = artikolnomo en Vikipedio aŭ NULL se nenio
+#      vik_revo = NULL aŭ devia nomo en Revo
+#
+# Ni skribas al la sekva tabelo en la datumbazo
+# 
+# r2_vikititolo 
+#      titolo = Titolo de la Viki-paĝo
+#      titolo_lc = minuskla titolo
+
+### En %revo ni kolektas la markojn kaj esceptajn Viki-referencojn de la *kapvortoj*
+
 my %revo;				# unue mi kolektas cxiujn vortojn kun ligoj kiel hash -> array
 my %vikihelpo;
 #my %viki2revo;
@@ -75,6 +99,8 @@ while (my ($celref, $vikart, $revo) = $sth->fetchrow_array) {
 
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikititolo (titolo, titolo_lc) VALUES (?,?)") or die;
 
+### En %viki ni kolektas laŭ *Revo-dosiernomo*, la markojn kaj Viki-referencojn 
+
 my $count;
 my %viki;				# nun mi kolektas cxiujn vortojn de vikipedio
 					# hash kun artikolo -> hash kun ligo kaj vorto
@@ -92,6 +118,7 @@ while (<IN>) {
   s/_/ /g;				# _ -> spaco
   $sth_insert->execute($orgviki, $_) if param("download");
   $count++;
+
   if (my $celrefar = $revo{$_}) {	# cxu tio vorto eksistas en revo?
     #print pre("test: trovis en revo $_")."\n" if m/^$abak/i;
     foreach my $celref (@$celrefar) {	# cxiuj ligoj de tio vorto
@@ -115,6 +142,10 @@ close IN;
 print pre("$count titoloj el vikio");
 $sth_insert->finish();
 $dbh->disconnect() or die "DB disconnect ne funkcias";
+
+
+### Nun ni trairas ĉiujn Revo-dosierojn en la ujo art/ kaj
+### se ni havas referencojn en %viki ni aldonas ilin ĉe la kapvortoj de la derivaĵoj (h2)
 
 my $num;
 foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn ankaux sen ligo, por forigi la ligojn
@@ -167,7 +198,7 @@ foreach my $fname (<../../revo/art/*.html>) {			# prilaboru cxiujn artikolojn an
       }
 		
       if ($$h{orgviki}) {							# aldonu vikiligon al h2
-		print pre("orgviki=$$h{orgviki}");
+		    print pre("orgviki=$$h{orgviki}");
         if (1 and $h2 =~ m#eo\.wikipedia\.org/wiki#) {			# 0 cxiuj vikiligoj, 1 nur unu vikiligo
           $t .= "\n\t!!!!!";
 		  $h2 = "";
