@@ -4,55 +4,34 @@
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
-#use Unicode::String qw(utf8);
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-
+#use Unicode::String qw(utf8);
+use utf8; binmode STDOUT, ":utf8";
 use revodb;
+
+my $homedir = "/hp/af/ag/ri";
+# Ni legas el aŭ el DB...?
+#my $viki_local = "$homedir/files/eoviki.gz";
 
 my $exitcode;
 
 print header(-charset=>'utf-8'),
-      start_html('aktualigu viki-ligojn'),
+    start_html('aktualigu viki-ligojn'),
 	  h2(scalar(localtime));
 
-
 my $homedir = "/hp/af/ag/ri";
-#print h1("homedir = $homedir");
-   
 
-sub mylc {	# lower case pro esperantaj signoj
-  my $a = shift @_;
-  $a =~ s/Ĉ/ĉ/g;
-  $a =~ s/Ĵ/ĵ/g;
-  $a =~ s/Ĥ/ĥ/g;
-  $a =~ s/Ŭ/ŭ/g;
-  $a =~ s/Ĝ/ĝ/g;
-  $a =~ s/Ŝ/ŝ/g;
-  return lc $a;
-}
-
-#my $abak = "kamp";
-
-# Connect to the database.
+# Konektiĝu kun la datumbazo
 my $dbh = revodb::connect();
-
-if (param("download")) {	# 0 por testi - 1 por vere elsxuti aktualan liston
-  print pre(`pwd`);
-  my $ret = `wget -nv http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz -O ../../../files/eoviki.gz 2>&1`;
-#  my $ret = `wget -nv http://download.wikimedia.org/eowiki/20090211/eowiki-20090211-all-titles-in-ns0.gz -O ../../../files/eoviki.gz 2>&1`;
-  print h2("wget -> $exitcode");
-  print pre($ret);
-  
-  my $sth = $dbh->prepare("TRUNCATE TABLE r2_vikititolo") or die;
-  $sth->execute();
-}
 
 # Ni provas trovi konektojn tiel:
 #    v-dosiero -- v-titolo =¹ r-kapvorto -- r-marko -- r-dosiero
 #
-# ĉe tio la rilaton =¹ ni povas anstataŭigi per la esceptoj el la tabelo r2_vikicelo
+# Ĉe tio la rilaton =¹ ni povas anstataŭigi per la esceptoj el la tabelo r2_vikicelo
+# kaj ni komparas la minuskligitajn titolojn al minuskligitaj kapvortoj, ĉar
+# Vikipedio ĉiam uzas komencan majusklon pro kio oni ne povas distingi proprajn nomojn.
 #
 # Ni legas el la sekvaj tabeloj de la datumbazo
 #
@@ -65,10 +44,8 @@ if (param("download")) {	# 0 por testi - 1 por vere elsxuti aktualan liston
 #      vik_artikolo = artikolnomo en Vikipedio aŭ NULL se nenio
 #      vik_revo = NULL aŭ devia nomo en Revo
 #
-# Ni skribas al la sekva tabelo en la datumbazo
-# 
 # r2_vikititolo 
-#      titolo = Titolo de la Viki-paĝo
+#      titolo = Titolo/dosiernomo de la Viki-paĝo
 #      titolo_lc = minuskla titolo
 
 ### En %revo ni kolektas la markojn kaj esceptajn Viki-referencojn de la *kapvortoj*
@@ -76,6 +53,11 @@ if (param("download")) {	# 0 por testi - 1 por vere elsxuti aktualan liston
 my %revo;				# unue mi kolektas cxiujn vortojn kun ligoj kiel hash -> array
 my %vikihelpo;
 #my %viki2revo;
+
+# SELECT  v.titolo, r.ind_celref 
+# FROM r2_indekso r
+# LEFT JOIN r2_vikititolo v ON LOWER(r.ind_teksto) = v.titolo_lc 
+# WHERE r.ind_kat='LNG' AND r.ind_subkat='eo';
 
 my $sth = $dbh->prepare("SELECT ind_teksto, ind_celref FROM r2_indekso WHERE ind_kat='LNG' and ind_subkat='eo'") or die;
 $sth->execute();
@@ -87,6 +69,7 @@ while (my ($t, $celref) = $sth->fetchrow_array) {
   $revo{$_} = [] unless $revo{$_};	# malplena tablo por komenci tion vorton
   push @{$revo{$_}}, $celref;		# aldoni la la ligon por tio vorto
 }
+
 
 my $sth = $dbh->prepare("SELECT vik_celref, vik_artikolo, vik_revo FROM r2_vikicelo") or die;
 $sth->execute();
