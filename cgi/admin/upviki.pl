@@ -10,6 +10,7 @@ use JSON;
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 #use Unicode::String qw(utf8);
+use Encode;
 use utf8; binmode STDOUT, ":utf8";
 use revodb;
 
@@ -33,14 +34,22 @@ die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos..
 my $dbh = revodb::connect();
 my $sth = $dbh->prepare("TRUNCATE TABLE r2_vikicelo") or die;
 $sth->execute();
+$dbh->{'mysql_enable_utf8'}=1;
+$dbh->do("set names utf8");
 
 # nun ni trakuras la referencojn kaj enmetas en la datumbazon
-my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) VALUES (?,?)") or die;
+# kelkaj markoj povas duobliĝi, ekz-e ni havas ambaŭ abrikotujo kaj abrikotarbo,
+# sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
+# per ON DUPLICATE...
+my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) " 
+    ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") or die;
 
 for $ref (@$refs) {
-    my $v = $ref->[0];
-    my $r = $ref->[1];
-    $sth_insert->execute($r, $v);
+    # ial json_parser ne aŭtomate supozas UTF8!?
+    my $v = decode('UTF-8', $ref->[0]);
+    my $r = decode('UTF-8', $ref->[1]);
+    print pre("$v\n") if ($debug);
+    $sth_insert->execute($r, $v) if ($r);
 }
 
 $sth_insert->finish();
