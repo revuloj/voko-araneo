@@ -38,6 +38,8 @@ my $verbose = 1;
 
 my $modified;
 my $doc; # la aktuala artikola DOM, globale ni ŝparas sub-argumenton plurloke...
+local $XML::LibXML::setTagCompression = 1; # skribante <script .../> rezultas en nevalida HTML...
+local $XML::LibXML::skipXMLDeclaration = 1;
 
 @artikoloj = @ARGV;
 
@@ -111,7 +113,7 @@ sub process_art {
     if ($modified) {
         print "### skribas aktualigitan artikolon $artout...\n";
         open OUT, ">", $artout || die "Ne povas skribi al '$artout': $!\n";        
-        print OUT $doc;
+        print OUT $doc->toString();
         close OUT;
     } else {
         print "  # ne ŝanĝita\n" if ($verbose);
