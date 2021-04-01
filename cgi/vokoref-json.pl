@@ -54,34 +54,32 @@ sub viki_refs {
 sub tez_refs {
     my $rows = $dbh->selectall_arrayref("SELECT tez_fontteksto, tez_fontref, tez_fontn, "
         . "tez_celteksto, tez_celref, tez_celn, tez_tipo, tez_fako FROM r2_tezauro "
-        . "WHERE tez_kapvorto = '$art' LIMIT $LIMIT", { Slice=>{} });
-    my @refs;
-    # strukturu la rezultojn
-    for my $row (@$rows) {
-        # fakte referencoj sen mrk ne havas sencon, sed ili enestas tamen,
+        . "WHERE tez_kapvorto = '$art' AND tez_fontref IS NOT NULL AND tez_celref IS NOT NULL LIMIT $LIMIT", { Slice=>{} });
+        # fakte referencoj sen mrk (tez_fontref, tez_celref) ne havas sencon, sed ili enestas tamen,
         # ekz-e por marki fakon de artikolo - eble iam plibonirug parseart2 kaj la rtabelon r2_tezauro
         # fakindikoj povus havi lokon en alia tabelo!
-        if ($row->{tez_fontref} && $row->{tez_celref}) {
-            my $fnt = { 
-                'm' => $row->{tez_fontref},
-                'k' => $row->{tez_fontteksto}
-            };
-            $fnt->{n} = $row->{tez_fontn} if ($row->{tez_fontn});
+    my @refs;
+    # strukturu la rezultojn
+    for my $row (@$rows) {        
+        my $fnt = { 
+            'm' => $row->{tez_fontref},
+            'k' => $row->{tez_fontteksto}
+        };
+        $fnt->{n} = $row->{tez_fontn} if ($row->{tez_fontn});
 
-            my $cel = { 
-                'm' => $row->{tez_celref},
-                'k' => $row->{tez_celteksto}
-            };
-            $cel ->{n} = $row->{tez_celn} if ($row->{tez_celn});
+        my $cel = { 
+            'm' => $row->{tez_celref},
+            'k' => $row->{tez_celteksto}
+        };
+        $cel ->{n} = $row->{tez_celn} if ($row->{tez_celn});
 
-            my $ref = {
-                'tip'=> $row->{tez_tipo},
-                'fnt'=>$fnt,
-                'cel'=>$cel
-            };
-            $ref ->{fak} = $row->{tez_fako} if ($row->{tez_fako});
-            push @refs, $ref;
-        }
+        my $ref = {
+            'tip'=> $row->{tez_tipo},
+            'fnt'=>$fnt,
+            'cel'=>$cel
+        };
+        $ref ->{fak} = $row->{tez_fako} if ($row->{tez_fako});
+        push @refs, $ref;
     }
     # redonu la rezulton
     return \@refs;
