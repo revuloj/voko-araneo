@@ -14,7 +14,7 @@ use Encode;
 use utf8; binmode STDOUT, ":utf8";
 use revodb;
 
-$debug = 1;
+$debug = 0;
 
 my $homedir = "/hp/af/ag/ri";
 my $vikiref = "$homedir/www/revo/inx/vikiref.json";
