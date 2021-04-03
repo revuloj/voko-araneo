@@ -54,8 +54,9 @@ sub viki_refs {
 sub tez_refs {
     # ni kolektas referencojn en ambaŭ referencoj, por la kontraŭa direkto 
     # ni interŝanĝas fonton kaj celon kaj la referenctipon:
-    # KOREKTU: por la inversa direkto ni devos interŝanĝi 
-    # dif->sin, sub->super, super->sub, prt->malprt, malprt->prt, (lst->ekz, ekz->lst)
+    # dif->sin, sub->super, super->sub, prt->malprt, malprt->prt, ekz->super
+    # KOREKTU: ni devus aldoni DISTINCT sur la plej supra nivelo, sed
+    # prefere kreu UNION kiel VIEW kaj poste ni povas tie elekti neduoblajn...
     my $rows = $dbh->selectall_arrayref(
           "SELECT tez_fontteksto AS fk, tez_fontref AS fm, tez_fontn AS fn, "
         .   "tez_celteksto AS ck, tez_celref AS cm, tez_celn AS cn, "
@@ -64,8 +65,8 @@ sub tez_refs {
         .   "AND tez_fontref IS NOT NULL AND tez_celref IS NOT NULL "
         . "UNION SELECT tez_celteksto AS fk, tez_celref AS fn, tez_celn AS fn, "
         .   "tez_fontteksto AS ck, tez_fontref AS cm, tez_fontn AS cn, "
-        .   "CASE tez_tipo WHEN 'dif' THEN 'sin' WHEN 'sub' THEN 'super' WHEN 'super' THEN 'sub' "
-        .     "WHEN 'prt' THEN 'malprt' WHEN 'malprt' THEN 'prt' WHEN 'ekz' THEN 'super' "
+        .   "CASE tez_tipo WHEN 'dif' THEN 'sin' WHEN 'sub' THEN 'super' WHEN 'sup' THEN 'sub' "
+        .     " WHEN 'super' THEN 'sub' WHEN 'prt' THEN 'malprt' WHEN 'malprt' THEN 'prt' WHEN 'ekz' THEN 'super' "
         .     "ELSE tez_tipo END AS tip, tez_fako AS fak FROM r2_tezauro "
         . "WHERE tez_celref LIKE '$art.%' AND tez_celteksto != '???' "
         .   "AND tez_fontref IS NOT NULL AND tez_celref IS NOT NULL "
