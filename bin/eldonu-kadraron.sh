@@ -18,13 +18,12 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=1d
+release=1e
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-#scp -r revo/ ${revo}/
-# scp -r revo/dlg/index-${release}.html ${revo}/dlg/
-# scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
-#scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+scp -r revo/dlg/index-${release}.html ${revo}/dlg/
+scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
+scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
@@ -34,10 +33,11 @@ release=1d
 #scp cgi/admin/.ht* ${cgibin}/admin/
 
 #scp cgi/admin/up* ${cgibin}/admin/
+scp cgi/admin/upviki.pl ${cgibin}/admin/
 #scp cgi/perllib/parse* ${perllib}/
 
 #scp cgi/sercxu-json-${release}.pl ${cgibin}/
-scp cgi/vokosubmx.pl ${cgibin}/
+#scp cgi/vokosubmx.pl ${cgibin}/
 #scp cgi/vokosubm-json.pl ${cgibin}/
 #scp cgi/admin/submeto.pl ${cgibin}/admin/
 
@@ -46,7 +46,8 @@ scp cgi/vokosubmx.pl ${cgibin}/
 ## scp cgi/sercxu.pl ${cgibin}/
 ## 
 ## # novaj
-## scp cgi/sercxu-json-${release}.pl ${cgibin}/
+scp cgi/sercxu-json-${release}.pl ${cgibin}/
+scp cgi/vokoref-json.pl ${cgibin}/
 ## scp cgi/vokomailx.pl ${cgibin}/
 ## scp cgi/vokohtmlx.pl ${cgibin}/
 ## scp cgi/hazarda_art.pl ${cgibin}/
@@ -55,7 +56,7 @@ scp cgi/vokosubmx.pl ${cgibin}/
 
 #scp cgi/perllib/*.pm ${perllib}/
 
-scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
-scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
+#scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
+#scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
 
 
