@@ -65,8 +65,8 @@ sub tez_refs {
         .   "AND tez_fontref IS NOT NULL AND tez_celref IS NOT NULL "
         . "UNION SELECT tez_celteksto AS fk, tez_celref AS fn, tez_celn AS fn, "
         .   "tez_fontteksto AS ck, tez_fontref AS cm, tez_fontn AS cn, "
-        .   "CASE tez_tipo WHEN 'dif' THEN 'sin' WHEN 'sub' THEN 'super' WHEN 'sup' THEN 'sub' "
-        .     " WHEN 'super' THEN 'sub' WHEN 'prt' THEN 'malprt' WHEN 'malprt' THEN 'prt' WHEN 'ekz' THEN 'super' "
+        .   "CASE tez_tipo WHEN 'dif' THEN 'sin' WHEN 'sub' THEN 'sup' WHEN 'sup' THEN 'sub' "
+        .     "WHEN 'prt' THEN 'malprt' WHEN 'mal' THEN 'prt' WHEN 'ekz' THEN 'super' "
         .     "ELSE tez_tipo END AS tip, tez_fako AS fak FROM r2_tezauro "
         . "WHERE tez_celref LIKE '$art.%' AND tez_celteksto != '???' "
         .   "AND tez_fontref IS NOT NULL " #  . ") AS referencoj 
