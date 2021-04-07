@@ -13,19 +13,20 @@ use lib("/hp/af/ag/ri/files/perllib");
 use Encode;
 use utf8; binmode STDOUT, ":utf8";
 use revodb;
+use fileutil;
 
 $debug = 0;
 
 my $homedir = "/hp/af/ag/ri";
 my $vikiref = "$homedir/www/revo/inx/vikiref.json";
-my $json_parser = JSON->new->allow_nonref;
+#my $json_parser = JSON->new->allow_nonref;
 
 print header(-charset=>'utf-8'),
       start_html('aktualigu viki-ligojn'),
 	  h2(scalar(localtime));
 
 # unue legu la viki-referencojn el JSON, ĉar se tio fiaskas, ni ne tuŝos la datumbazon!
-my $refs = read_json_file($vikiref);
+my $refs = fileutil::read_json_file($vikiref);
 #print Dumper $refs if ($debug);
 my $count = scalar(@{$refs});
 die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos...\n" unless ($count > 10000);
@@ -61,38 +62,38 @@ print end_html;
 ################# helpaj funkcioj ###################
 
 # legi JSON-dosieron
-sub read_json_file {
-	my $file = shift;
-  	my $j = read_file($file);
-
-	print ("json file: $file\n") if ($debug);
-
-	unless ($j) {
-		warn("Malplena aŭ mankanta JSON-dosiero '$file'\n");
-		return;
-	}
-    print(substr($j,0,20)."...\n") if ($debug);
-
-    my $parsed;
-	eval {
-    	$parsed = $json_parser->decode($j);
-    	1;
-	} or do {
-  		my $error = $@;
-		die("Ne eblis analizi enhavon de JSON-dosiero '$file': $error\n");
-	};
-
-	return $parsed;	  
-}
-
-
-# legi dosieron
-sub read_file {
-	my $file = shift;
-	unless (open FILE, $file) {
-		warn("Ne povis malfermi '$file': $!\n"); return;
-	}
-	my $text = join('',<FILE>);
-	close FILE;
-	return $text;
-}
+#sub read_json_file {
+#	my $file = shift;
+#  	my $j = read_file($file);
+#
+#	print ("json file: $file\n") if ($debug);
+#
+#	unless ($j) {
+#		warn("Malplena aŭ mankanta JSON-dosiero '$file'\n");
+#		return;
+#	}
+#    print(substr($j,0,20)."...\n") if ($debug);
+#
+#    my $parsed;
+#	eval {
+#    	$parsed = $json_parser->decode($j);
+#    	1;
+#	} or do {
+#  		my $error = $@;
+#		die("Ne eblis analizi enhavon de JSON-dosiero '$file': $error\n");
+#	};
+#
+#	return $parsed;	  
+#}
+#
+#
+## legi dosieron
+#sub read_file {
+#	my $file = shift;
+#	unless (open FILE, $file) {
+#		warn("Ne povis malfermi '$file': $!\n"); return;
+#	}
+#	my $text = join('',<FILE>);
+#	close FILE;
+#	return $text;
+#}
