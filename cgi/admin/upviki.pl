@@ -4,7 +4,7 @@
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
-use JSON;
+#use JSON;
 #use Data::Dumper;
 
 # propraj perl moduloj estas en:
