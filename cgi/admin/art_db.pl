@@ -89,12 +89,12 @@ sub process_ref_json {
 sub process_kap {
   my ($art,$json) = @_;
 
-  $kap_del->execute("$art.");
+  $kap_del->execute("$art.%");
 
   for my $k (@{$json->{kap}}) {
     my $kap = decode('UTF-8',$k->[0]);
     my $mrk = $k->[1];
-    my $var = decode('UTF-8',$k->[2]); #? $k->[2] : undef;
+    my $var = decode('UTF-8',$k->[2]?$k->[2]:'');
 
     print pre("KAP art: $art, kap: $kap, mrk: $mrk, var: $var\n") if ($debug);
 
@@ -104,7 +104,9 @@ sub process_kap {
       (!$var || $var =~ /^[\pL\d ]+$/) )
     {
       $mrk = "$art$mrk";
-      $kap_ins->execute($kap,$mrk,$var,undef); # ofc: ni devos aldoni ankoraŭ en JSON!
+      $kap_ins->execute($kap,$mrk,$var,''); # ofc: ni devos aldoni ankoraŭ en JSON!
+
+      $kap_cnt++;
     }
   }
 }
@@ -112,19 +114,29 @@ sub process_kap {
 sub process_mrk {
   my ($art,$json) = @_;
 
-  $mrk_del->execute("$art.");
+  $mrk_del->execute("$art.%");
 
-  # unue ni aldonas drv-mrk (el kap:)
+  # unue ni aldonas drv-mrk (el kap:), pro variaĵoj ni povus havi
+  # duoblajn, do ni devas memori ilin por eviti tion
+  my $drv_mrk = {};
+
   for my $k (@{$json->{kap}}) {
     my $mrk = $k->[1];
 
-    if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ )
-    {
-      $mrk = "$art$mrk";
-      $mrk_ins->execute($mrk,'drv',undef,$mrk); # ofc: ni devos aldoni ankoraŭ en JSON!
+    #print "MRK $mrk".$drv_mrk->{$mrk} if ($debug);
 
-      $kap_cnt++;
+    unless ($drv_mrk->{$mrk}) {
+      $drv_mrk->{$mrk} = 1;
+      print pre("MRK art: $art, mrk: $mrk\n") if ($debug);
+
+      if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
+        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ )
+      {
+        $mrk = "$art$mrk";
+        $mrk_ins->execute($mrk,'drv','',$mrk); # ofc: ni devos aldoni ankoraŭ en JSON!
+
+        $mrk_cnt++;
+      }
     }
   }
 
@@ -132,7 +144,7 @@ sub process_mrk {
   for my $m (@{$json->{mrk}}) {
     my $mrk = $m->[0];
     my $ele = $m->[1];
-    my $num = $m->[2]; #? $m->[2] : undef;
+    my $num = $m->[2]?$m->[2]:'';
     my $drv = (split /\./, $mrk)[1];
 
     print pre("MRK art: $art, mrk: $mrk, ele: $ele, num: $num, drv: $drv\n") if ($debug);
@@ -155,7 +167,7 @@ sub process_mrk {
 sub process_ref {
   my ($art,$json) = @_;
 
-  $ref_del->execute("$art.");
+  $ref_del->execute("$art.%");
   
   for my $ref (@{$json->{ref}}) {
     my $mrk = $ref->[0];
