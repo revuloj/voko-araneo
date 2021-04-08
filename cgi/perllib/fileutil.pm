@@ -11,10 +11,11 @@
 use strict;
 package fileutil;
 
-$debug = 1;
-
 use JSON;
 my $json_parser = JSON->new->allow_nonref;
+
+my $debug = 1;
+
 
 # legi JSON-dosieron
 sub read_json_file {

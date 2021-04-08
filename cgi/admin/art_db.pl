@@ -15,7 +15,8 @@ use utf8; binmode STDOUT, ":utf8";
 use revodb;
 use fileutil;
 
-$debug = 0;
+my $debug = 1;
+my $verbose = 1;
 
 my $homedir = "/hp/af/ag/ri";
 my $tezdir = "$homedir/www/revo/tez";
@@ -41,13 +42,13 @@ $dbh->do("set names utf8");
 
 # preparu SQL
 my $kap_del = $dbh->prepare("DELETE FROM r3kap WHERE mrk LIKE ?");
-my $kap_ins = $dbh->prepare("INSERT INTO r3kap (kap,mrk,var,ofc) VALUES (?,?,?,?)";
+my $kap_ins = $dbh->prepare("INSERT INTO r3kap (kap,mrk,var,ofc) VALUES (?,?,?,?)");
 
 my $mrk_del = $dbh->prepare("DELETE FROM r3mrk WHERE mrk LIKE ?");
-my $mrk_ins = $dbh->prepare("INSERT INTO r3mrk (mrk,ele,num,drv) VALUES (?,?,?,?)";
+my $mrk_ins = $dbh->prepare("INSERT INTO r3mrk (mrk,ele,num,drv) VALUES (?,?,?,?)");
 
 my $ref_del = $dbh->prepare("DELETE FROM r3ref WHERE mrk LIKE ?");
-my $ref_ins = $dbh->prepare("INSERT INTO r3ref (mrk,tip,cel,lst) VALUES (?,?,?,?)";
+my $ref_ins = $dbh->prepare("INSERT INTO r3ref (mrk,tip,cel,lst) VALUES (?,?,?,?)");
 
 
 # legu la datumojn el JSON, 
@@ -59,6 +60,8 @@ my $ref_cnt = 0;
 
 for my $art (@arts) {
   if ($art =~ /^[a-z0-9]{1,30}$/) {
+
+    print pre("$art...") if ($verbose);
     process_ref_json($art);
     $art_cnt++;
   }
@@ -88,14 +91,16 @@ sub process_kap {
 
   $kap_del->execute("$art.");
 
-  for my $k (@{$json->{$art}->{kap}}) {
+  for my $k (@{$json->{kap}}) {
     my $kap = decode('UTF-8',$k->[0]);
     my $mrk = $k->[1];
     my $var = decode('UTF-8',$k->[2]); #? $k->[2] : undef;
 
+    print pre("KAP art: $art, kap: $kap, mrk: $mrk, var: $var\n") if ($debug);
+
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
       $kap =~ /^[\pL\d\*][- \pL]*$/ && 
-      $mrk =~ /^\.[a-z0-9A-Z_\.]$/ &&
+      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
       (!$var || $var =~ /^[\pL\d ]+$/) )
     {
       $mrk = "$art$mrk";
@@ -110,11 +115,11 @@ sub process_mrk {
   $mrk_del->execute("$art.");
 
   # unue ni aldonas drv-mrk (el kap:)
-  for my $k (@{$json->{$art}->{kap}}) {
+  for my $k (@{$json->{kap}}) {
     my $mrk = $k->[1];
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $mrk =~ /^\.[a-z0-9A-Z_\.]$/ )
+      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ )
     {
       $mrk = "$art$mrk";
       $mrk_ins->execute($mrk,'drv',undef,$mrk); # ofc: ni devos aldoni ankoraŭ en JSON!
@@ -124,17 +129,19 @@ sub process_mrk {
   }
 
   # sekve ni aldonas la aliajn (sub)snc-mrk el mrk: 
-  for my $m (@{$json->{$art}->{mrk}}) {
+  for my $m (@{$json->{mrk}}) {
     my $mrk = $m->[0];
-    my $ele = $m->[1]
+    my $ele = $m->[1];
     my $num = $m->[2]; #? $m->[2] : undef;
-    my $drv = split(/\./,$mrk)[1];
+    my $drv = (split /\./, $mrk)[1];
+
+    print pre("MRK art: $art, mrk: $mrk, ele: $ele, num: $num, drv: $drv\n") if ($debug);
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $mrk =~ /^\.[a-z0-9A-Z_\.]$/ &&
+      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
       $ele =~ /^(drv|subdrv|snc|subsnc|rim)$/ &&
-      $drv =~ /^[a-z0-9A-Z_]$/ &&
-      (!$num || $num =~ /^[0-9a-z]$/) )
+      $drv =~ /^[a-z0-9A-Z_]+$/ &&
+      (!$num || $num =~ /^[0-9a-z]+$/) )
     {
       $mrk = "$art$mrk";
       $drv = "$art.$mrk";
@@ -150,15 +157,17 @@ sub process_ref {
 
   $ref_del->execute("$art.");
   
-  for my $ref (@{$json->{$art}->{ref}}) {
+  for my $ref (@{$json->{ref}}) {
     my $mrk = $ref->[0];
     my $tip = $ref->[1];
     my $cel = $ref->[2];
     my $lst = decode('UTF-8',$ref->[3]); # ? $ref->[3]: undef;
 
+    print pre("REF art: $art, mrk: $mrk, tip: $tip, cel: $cel, lst: $lst\n") if ($debug);
+
     if (
-        $mrk =~ /^\.[a-z0-9A-Z_\.]$/ &&
-        $cel =~ /^[a-z0-9A-Z_\.]$/ &&
+        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
+        $cel =~ /^[a-z0-9A-Z_\.]+$/ &&
         $tip =~ /^(sin|ant|hom|vid|sup|sub|prt|mal|ekz|lst)$/ &&
         (!$lst || $lst =~ /^\pL[\pL_]+$/) )
     {
