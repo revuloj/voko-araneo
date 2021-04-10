@@ -29,10 +29,22 @@ print header(-charset=>'utf-8'),
 # ekstraktu la artikolojn el la parametro(j)
 my @arts;
 if (param('arts')) {
-  @arts = sort split /\r?\n/,param('arts');
+  @arts = sort split /\s+/,param('arts');
   die "Tro multaj artikoloj, maks. 1000\n" if ($#arts > 1000);
-} else {
+
+} elsif (param('art')) {
   push @arts, param('art');
+
+} elsif (param('prefix')) {
+  my $prefix = param('prefix');
+
+  if ($prefix =~ /^[a-z0-9]{1,10}$/) {
+    for $file (glob "$tezdir/$prefix*.json") {
+      $file =~ /\/([a-z0-9]+)\.json/;
+      print pre("glob: $1") if ($verbose);
+      push @arts, $1;
+    }
+  }
 }
 
 # Konektiĝi kun la datumbazo kaj malplenigi la tabelon
