@@ -23,7 +23,7 @@ my $tezdir = "$homedir/www/revo/tez";
 #my $json_parser = JSON->new->allow_nonref;
 
 print header(-charset=>'utf-8'),
-      start_html('aktualigu viki-ligojn'),
+      start_html('aktualigu datumbazon kap,mrk,ref el json'),
 	  h2(scalar(localtime));
 
 # ekstraktu la artikolojn el la parametro(j)
@@ -38,7 +38,7 @@ if (param('arts')) {
 } elsif (param('prefix')) {
   my $prefix = param('prefix');
 
-  if ($prefix =~ /^[a-z0-9]{1,10}$/) {
+  if ($prefix =~ /^[a-z0-9\[\]\-]{1,10}$/) {
     for $file (glob "$tezdir/$prefix*.json") {
       $file =~ /\/([a-z0-9]+)\.json/;
       print pre("glob: $1") if ($verbose);
