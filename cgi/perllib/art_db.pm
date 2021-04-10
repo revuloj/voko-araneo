@@ -122,7 +122,7 @@ sub process_mrk {
 
     #print "MRK $mrk".$drv_mrk->{$mrk} if ($debug);
 
-    unless ($drv_mrk->{$mrk}) {
+    unless ($drv_mrk->{$mrk}) { # evitu la duoblaĵojn...
       $drv_mrk->{$mrk} = 1;
       print pre("MRK art: $art, mrk: $mrk\n") if ($debug);
 
@@ -146,14 +146,16 @@ sub process_mrk {
 
     print pre("MRK art: $art, mrk: $mrk, ele: $ele, num: $num, drv: $drv\n") if ($debug);
 
+    # subart@mrk ni ignoras... ĉar ni nur kolektas kapvortojn de drv kaj ĉio ene de drv...
+
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
       $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
-      $ele =~ /^(drv|subdrv|snc|subsnc|rim)$/ &&
+      $ele =~ /^(subdrv|snc|subsnc|ekz|bld|rim)$/ &&
       $drv =~ /^[a-z0-9A-Z_]+$/ &&
       (!$num || $num =~ /^[0-9a-z]+$/) )
     {
       $mrk = "$art$mrk";
-      $drv = "$art.$mrk";
+      $drv = "$art.$drv";
       $mrk_ins->execute($mrk,$ele,$num,$drv); # ofc: ni devos aldoni ankoraŭ en JSON!
 
       $counter->{mrk}++;
@@ -177,7 +179,7 @@ sub process_ref {
     if (
         $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
         $cel =~ /^[a-z0-9A-Z_\.]+$/ &&
-        $tip =~ /^(sin|ant|hom|vid|sup|sub|prt|mal|ekz|lst)$/ &&
+        (!$tip || $tip =~ /^(dif|sin|ant|hom|vid|super|sub|prt|malprt|ekz|lst)$/) &&
         (!$lst || $lst =~ /^\pL[\pL_]+$/) )
     {
       $mrk = "$art$mrk";
