@@ -9,10 +9,12 @@ use IO::Handle;
 use lib("/hp/af/ag/ri/files/perllib");
 use parseart;
 use parseart2;
+use art_db; # r3 - tezaŭro
 # use revorss;
 use revodb;
 
 my $exitcode;
+my $db_verbose = 1;
 
 print header,
       start_html('Sendu sxangxitajn pagxojn'),
@@ -83,11 +85,17 @@ print pre($ret);
 my $dbh = parseart::connect();
 #chdir $revodir or die "chdir revo ne funkciis";
 chdir $xmldir or die "chdir revo ne funkciis";
+my @arts;
+
 while ($ret =~ m/revo\/xml\/([^.\s]+)\.xml/gm) {
 #  print pre("- $1 -")."\n";
+  push @arts, $1;
   parseart::parse($dbh, $1, $xmldir, 0);
   parseart2::parse($dbh, $1, $xmldir, 0);
 }
+
+art_db::process($dbh,\@arts,$db_verbose);
+
 $dbh->disconnect() or die "DB disconnect ne funkcias";
 chdir $htmldir or die "chdir html ne funkciis";
 
