@@ -29,23 +29,6 @@ RUN apk update \
   && cd /tmp/rxp-* \
   && ./configure && make install
 
-# chekote/gulp
-#FROM node:alpine as minifier # or :slim
-#RUN npm install gulp -g
-#ENTRYPOINT ["/bin/bash", "-c"]
-
-# NE PLU BEZONATA: ni kopias de voko-grundo!
-###### staĝo 2: Ni bezonas TeX kaj metapost por konverti simbolojn al SVG
-# (PNG ni ricevos el la ĉiutaga eldono)
-# FROM silkeh/latex:small as metapost
-# LABEL Author=<diestel@steloj.de>
-# RUN apk --update add curl unzip librsvg --no-cache && rm -f /var/cache/apk/* 
-# RUN curl -LO https://github.com/revuloj/voko-grundo/archive/master.zip \
-#    && unzip master.zip voko-grundo-master/bin/mp2png_svg.sh \
-#    && unzip master.zip voko-grundo-master/smb/*.mp
-# RUN cd voko-grundo-master && mkdir -p build/smb && bin/mp2png_svg.sh #&& cd ${HOME}
-
-
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
@@ -63,9 +46,9 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
-# normale: master
-ARG VG_BRANCH=master 
-ARG REVO_VER=1d
+# normale: master - por alia ni aktuale havos konflikton kun revo_download_gh.sh - korektenda!?
+ARG VG_BRANCH=master
+ARG REVO_VER=1e
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
@@ -77,7 +60,7 @@ RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql f
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
-# ni bezonas GNU sed por kompili CSS!
+# ni bezonas GNU 'sed' por kompili CSS!
 
 # aldonu memkompilitan "rxp" de Alpine. Vd.:
 # http://www.cogsci.ed.ac.uk/~richard/rxp.html
@@ -119,26 +102,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
      #voko-grundo-${VG_BRANCH}/smb/* voko-grundo-${VG_BRANCH}/bin/compile* \
      #voko-grundo-${VG_BRANCH}/bin/svg2css.sh \
   && rm ${VG_BRANCH}.zip \
-  #&& mkdir /usr/local/apache2/htdocs/revo/jsc \
-  # provizore ni nur kunigas JS, poste uzu google-closure-compiler / compile-js.sh
-  #&& cat voko-grundo-${VG_BRANCH}/jsc/util.js voko-grundo-${VG_BRANCH}/jsc/transiroj.js \
-  #       voko-grundo-${VG_BRANCH}/jsc/preferoj.js voko-grundo-${VG_BRANCH}/jsc/kadro.js \
-  #       voko-grundo-${VG_BRANCH}/jsc/artikolo.js \
-  #       voko-grundo-${VG_BRANCH}/jsc/voko_entities.js  voko-grundo-${VG_BRANCH}/jsc/redaktilo.js \
-  #    > /usr/local/apache2/htdocs/revo/jsc/revo-${REVO_VER}.js \
-  # subteno de malnova fasado / malnovaj retumiloj
-  #&& cp voko-grundo-${VG_BRANCH}/jsc/malnova.js /usr/local/apache2/htdocs/revo/jsc/ \
-  #&& cp voko-grundo-${VG_BRANCH}/jsc/revo-art-1b.js /usr/local/apache2/htdocs/revo/jsc/ \
-#  && cp voko-grundo-${VG_BRANCH}/stl/* /usr/local/apache2/htdocs/revo/stl/ \
-  # kombinu kaj malgrandigu CSS-dosierojn
-  #&& cd voko-grundo-${VG_BRANCH} && mkdir -p build/smb && cp /tmp/svg/* ./build/smb/ \
-  #&& mkdir -p build/stl \
-  #&& ./bin/compile-css.sh  > /usr/local/apache2/htdocs/revo/stl/revo-${REVO_VER}-min.css \
-  #&& ./bin/compile-css.sh && mv build/stl/* /usr/local/apache2/htdocs/revo/stl/ \
-  #&& cd .. \
-# debug:  && ls voko-grundo-${VG_BRANCH}/* \
   && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${VG_BRANCH}/xsl ${HOME_DIR}/files/ \
-#  && mv voko-grundo-${VG_BRANCH}/jsc /usr/local/apache2/htdocs/revo/ \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
