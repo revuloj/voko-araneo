@@ -96,7 +96,7 @@ sub process_kap {
     print pre("KAP art: $art, kap: $kap, mrk: $mrk, var: $var\n") if ($debug);
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $kap =~ /^[\pL\d\*][- \pL]*$/ && 
+      $kap =~ /^[\pL\d\*-][- \pL]*$/ && 
       $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
       (!$var || $var =~ /^[\pL\d ]+$/) )
     {
