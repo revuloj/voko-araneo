@@ -14,7 +14,7 @@ package fileutil;
 use JSON;
 my $json_parser = JSON->new->allow_nonref;
 
-my $debug = 1;
+my $debug = 0;
 
 
 # legi JSON-dosieron
@@ -52,3 +52,5 @@ sub read_file {
 	close FILE;
 	return $text;
 }
+
+1;
