@@ -152,7 +152,7 @@ sub process_mrk {
       $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
       $ele =~ /^(subdrv|snc|subsnc|ekz|bld|rim)$/ &&
       $drv =~ /^[a-z0-9A-Z_]+$/ &&
-      (!$num || $num =~ /^[0-9a-z]+$/) )
+      (!$num || $num =~ /^[0-9\.a-z]+$/) )
     {
       $mrk = "$art$mrk";
       $drv = "$art.$drv";
