@@ -8,7 +8,7 @@ use IO::Handle;
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 use parseart;
-use parseart2;
+##use parseart2;
 use art_db; # r3 - tezaŭro
 # use revorss;
 use revodb;
@@ -91,7 +91,9 @@ while ($ret =~ m/revo\/xml\/([^.\s]+)\.xml/gm) {
 #  print pre("- $1 -")."\n";
   push @arts, $1;
   parseart::parse($dbh, $1, $xmldir, 0);
-  parseart2::parse($dbh, $1, $xmldir, 0);
+  
+  ### anstataŭigata de art_db!
+  ### parseart2::parse($dbh, $1, $xmldir, 0);
 }
 
 art_db::process($dbh,\@arts,$db_verbose);
