@@ -46,8 +46,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
-# normale: master - por alia ni aktuale havos konflikton kun revo_download_gh.sh - korektenda!?
-ARG VG_BRANCH=master
+# normale: master aŭ v1e ks
+ARG VG_BRANCH=v1e
+# por brancoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
+# do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
+ARG ZIP_SUFFIX=1e
 ARG REVO_VER=1e
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
@@ -94,22 +97,20 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
-  && unzip -q ${VG_BRANCH}.zip voko-grundo-${VG_BRANCH}/xsl/* voko-grundo-${VG_BRANCH}/dok/* \
-     voko-grundo-${VG_BRANCH}/cfg/* voko-grundo-${VG_BRANCH}/dtd/* \
+  && unzip -l ${VG_BRANCH}.zip \
+  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/xsl/* voko-grundo-${ZIP_SUFFIX}/dok/* \
+     voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
      # necesaj ankoraŭ por la malnova fasado:
-     voko-grundo-${VG_BRANCH}/smb/*.gif \
-     #voko-grundo-${VG_BRANCH}/jsc/* voko-grundo-${VG_BRANCH}/stl/* \
-     #voko-grundo-${VG_BRANCH}/smb/* voko-grundo-${VG_BRANCH}/bin/compile* \
-     #voko-grundo-${VG_BRANCH}/bin/svg2css.sh \
+     voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
   && rm ${VG_BRANCH}.zip \
-  && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${VG_BRANCH}/xsl ${HOME_DIR}/files/ \
+  && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${ZIP_SUFFIX}/xsl ${HOME_DIR}/files/ \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
-  && cp voko-grundo-${VG_BRANCH}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
-  && cp -r voko-grundo-${VG_BRANCH}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
-  && mv voko-grundo-${VG_BRANCH}/dtd /usr/local/apache2/htdocs/revo/ \
-  && mv -f voko-grundo-${VG_BRANCH}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && cp voko-grundo-${ZIP_SUFFIX}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
+  && cp -r voko-grundo-${ZIP_SUFFIX}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
+  && mv voko-grundo-${ZIP_SUFFIX}/dtd /usr/local/apache2/htdocs/revo/ \
+  && mv -f voko-grundo-${ZIP_SUFFIX}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p ${HOME_DIR}/files/log && chown daemon.daemon ${HOME_DIR}/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
