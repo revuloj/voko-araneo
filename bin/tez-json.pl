@@ -23,7 +23,7 @@ for $xml (glob "$revodir/xml/*.xml") {
     $json =~ s|/xml/(.*)\.xml|/tez/$1.json|;
     push @arts, $1;
 
-    if ( stat($xml)->mtime > stat($json)->mtime) {
+    if ( ! -e $json || stat($xml)->mtime > stat($json)->mtime) {
         print "$xml -> $json...\n" if ($verbose);
         qx($xsltproc $xml > $json);
     }
