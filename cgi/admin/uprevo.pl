@@ -116,7 +116,7 @@ print LOG "pwd -> $exitcode\n$ret";
 
 if (open IN, "<bv_forigu_tiujn.lst") {
 #  print h2("open true");
-  my $count;
+  my $count = 0;
   while (<IN>) {
     chomp;
     if ((/^revo\// or /^tgz\//) and not /\.\./ and not / / and not /\*/ and not /\?/ and not /^$/) {
@@ -131,8 +131,8 @@ if (open IN, "<bv_forigu_tiujn.lst") {
       print LOG "nelegala $_\n";
     }
   }
-  print h2("forigis $count");
-  print LOG "forigis $count\n";
+  print h2("forigis: $count");
+  print LOG "forigis: $count\n";
   close IN;
 
 }
