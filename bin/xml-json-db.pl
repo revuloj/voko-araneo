@@ -42,6 +42,6 @@ my $cnt = art_db::process($dbh,\@arts,$verbose);
 
 $dbh->disconnect() or die "Malkonektiĝi de DB ne funkciis.\n";
 
-print "daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap: "
-    ."$cnt->{kap}\nmrk: $cnt->{mrk}\nref: $cnt->{ref}\n" if ($verbose);	
+print "daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap:$cnt->{kap}\n"
+     ."mrk: $cnt->{mrk}\nref: $cnt->{ref}\ntrd: $cnt->{trd}\n" if ($verbose);	
 

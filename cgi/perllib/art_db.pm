@@ -27,6 +27,9 @@ my $homedir = "/hp/af/ag/ri";
 my $tezdir = "$homedir/www/revo/tez";
 #my $json_parser = JSON->new->allow_nonref;
 
+my $len_ind = 100;
+my $len_trd = 255;
+
 # SQL-komandoj
 my $kap_del;
 my $kap_ins;
@@ -215,10 +218,23 @@ sub process_trd {
         $lng =~ /^[a-z]{2,3}$/ )
     {
       $mrk = "$art$mrk";
-      # ni provizore uzas \u7F por citiloj en JSON
+      # ni provizore uzas \u7F por citiloj en JSON (lng=he)
       $ind =~ s/\x7F/"/g; $text =~ s/\x7F/"/g;
-      unless ($text) { $text = $ind; };     
-      $trd_ins->execute($mrk,$lng,$ind,$text);
+      # kaj ¦ por \ (lng=he)
+      $ind =~ s/¦/\\/g; $text =~ s/¦/\\/g;
+
+      unless ($text) { $text = $ind; };
+      $text = substr($text,0,255); # limigu tro longajn tradukojn
+
+      if (length($ind) < 100) { # se ind estas tro longa verŝajne la traduko estas
+                                # iel fuŝa kaj parto eble estu klarigo, aŭ aplikiĝu mll
+                                # por koncizigo - do ni ignoras ilin
+                                # se iam ni tamen volas tiom longajn - ekz-e pro ekz/trd
+                                # ni aŭ larĝigu la tabelon aŭ tranĉu la tradukon!
+        $trd_ins->execute($mrk,$lng,$ind,$text);
+      } else {
+        warn "Tro longa traduk-indeksero: \"$ind\" en $art!\n"
+      }
 
       $counter->{trd}++;
     }
