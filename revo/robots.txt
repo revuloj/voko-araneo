@@ -1,0 +1,11 @@
+# robots.txt por ekskludi neinteresajn ujojn de robota legado
+User-agent: *
+Disallow: /revo/cfg/
+Disallow: /revo/smb/
+Disallow: /revo/jsc/
+Disallow: /revo/stl/
+Disallow: /revo/tez/
+Disallow: /revo/hst/
+Disallow: /revo/xml/
+Disallow: /revo/xsl/
+Disallow: /cgi-bin/
