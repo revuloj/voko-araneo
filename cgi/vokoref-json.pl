@@ -52,14 +52,33 @@ sub viki_refs {
 }
 
 sub tez_refs {
-    my $rows = $dbh->selectall_arrayref("SELECT DISTINCT mrk,tip,cel,lst,kap,num "
-        . "FROM v3tezauro WHERE mrk LIKE '$art.%' "
-        . "LIMIT $LIMIT", { Slice=>{} }); 
-    
 
+    my $r1 = $dbh->selectall_arrayref(
+    "SELECT r.cel AS `mrk`, "
+      ."CASE tip WHEN 'prt' THEN 'malprt' WHEN 'malprt' THEN 'prt' "
+               ."WHEN 'sub' THEN 'super' WHEN 'super' THEN 'sub' "
+               ."WHEN 'ekz' THEN 'super' WHEN 'dif' THEN 'sin' "
+      ."ELSE tip END AS `tip`, r.mrk AS `cel`, NULL AS `lst`, k.kap, k.var, m.num "
+    ."FROM `r3ref` r "
+    ."INNER JOIN r3mrk m ON r.mrk = m.mrk "
+    ."INNER JOIN r3kap k ON m.drv = k.mrk AND k.var = '' "
+    ."WHERE tip <> 'lst' AND r.cel like '$art.%' LIMIT $LIMIT", { Slice=>{} }); 
+
+    my $r2 = $dbh->selectall_arrayref(
+    "SELECT r.mrk, r.tip, r.cel, r.lst, k.kap, k.var, m.num "
+    ."FROM `r3ref` r "
+    ."INNER JOIN r3mrk m ON r.cel = m.mrk "
+    ."INNER JOIN r3kap k ON m.drv = k.mrk AND k.var = '' "
+    ."WHERE r.mrk like '$art.%' LIMIT $LIMIT", { Slice=>{} }); 
+
+
+    #my $rows = $dbh->selectall_arrayref("SELECT DISTINCT mrk,tip,cel,lst,kap,num "
+    #    . "FROM v3tezauro WHERE mrk LIKE '$art.%' "
+    #    . "LIMIT $LIMIT", { Slice=>{} }); 
+   
     my @refs;
     # strukturu la rezultojn
-    for my $row (@$rows) {        
+    for my $row (@$r1,@$r2) {        
         my $cel = { 
             'm' => $row->{cel},
             'k' => $row->{kap}
