@@ -34,6 +34,8 @@ my $mrk_del;
 my $mrk_ins;
 my $ref_del;
 my $ref_ins;
+my $trd_del;
+my $trd_ins;
 
 my $counter;
 
@@ -49,13 +51,16 @@ sub process {
   $mrk_ins = $dbh->prepare("INSERT INTO r3mrk (mrk,ele,num,drv) VALUES (?,?,?,?)");
   $ref_del = $dbh->prepare("DELETE FROM r3ref WHERE mrk LIKE ?");
   $ref_ins = $dbh->prepare("INSERT INTO r3ref (mrk,tip,cel,lst) VALUES (?,?,?,?)");
+  $trd_del = $dbh->prepare("DELETE FROM r3trd WHERE mrk LIKE ?");
+  $trd_ins = $dbh->prepare("INSERT INTO r3trd (mrk,lng,ind,trd) VALUES (?,?,?,?)");
 
   # nuligu nombrilojn
   $counter = {
     art => 0,
     mrk => 0,
     kap => 0,
-    ref => 0
+    ref => 0,
+    trd => 0
   };  
 
   for my $art (@$arts) {
@@ -80,6 +85,7 @@ sub process_ref_json {
       process_kap($art,$json->{$art});
       process_mrk($art,$json->{$art});
       process_ref($art,$json->{$art});
+      process_trd($art,$json->{$art});
     }
 }
 
@@ -186,6 +192,35 @@ sub process_ref {
       $ref_ins->execute($mrk,$tip,$cel,$lst);
 
       $counter->{ref}++;
+    }
+  }
+}
+
+
+sub process_trd {
+  my ($art,$json) = @_;
+
+  $trd_del->execute("$art.%");
+  
+  for my $trd (@{$json->{trd}}) {
+    my $mrk = $trd->[0];
+    my $lng = $trd->[1];
+    my $ind = decode('UTF-8',$trd->[2]);
+    my $text = decode('UTF-8',$trd->[3]); # ? $trd->[3]: undef;
+
+    print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text\n") if ($debug);
+
+    if (
+        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
+        $lng =~ /^[a-z]{2,3}$/ )
+    {
+      $mrk = "$art$mrk";
+      # ni provizore uzas \u7F por citiloj en JSON
+      $ind =~ s/\x7F/"/g; $text =~ s/\x7F/"/g;
+      unless ($text) { $text = $ind; };     
+      $trd_ins->execute($mrk,$lng,$ind,$text);
+
+      $counter->{trd}++;
     }
   }
 }
