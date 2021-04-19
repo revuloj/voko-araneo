@@ -3,7 +3,7 @@ FROM voko-grundo as grundo
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.12 as builder
+FROM alpine:3.13 as builder
 
 # build and install rxp
 RUN apk update \
