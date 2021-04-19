@@ -877,6 +877,7 @@ EOD
     } else {
       my $from    = 'noreply@retavortaro.de';
       my $name    = "\"Revo redaktu.pl $redaktanto\"";
+	  $name =~ s/\@/_/g;
       my (@to, $sxangxo2);
       push @to, $redaktanto; # if param('sendu_al_tio');
       push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');

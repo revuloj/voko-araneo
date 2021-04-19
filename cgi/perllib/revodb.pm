@@ -35,7 +35,7 @@ sub mysqldump {
   my $db="db314802x3159000";
   my $usr="<user>";
   my $pwd="<pwd>";
-  return "mysqldump --user='$usr' --password='$pwd' --ignore-table=$db.r2_vikititolo --ignore-table=$db.email --ignore-table=$db.redaktanto --databases $db";
+  return "mysqldump --user='$usr' --password='$pwd' --ignore-table=$db.r2_vikititolo --ignore-table=$db.email --ignore-table=$db.redaktanto --ignore-table=$db.submeto --databases $db";
 }
 ######################################################################
 
