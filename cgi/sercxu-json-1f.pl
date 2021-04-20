@@ -1,11 +1,11 @@
 #!/usr/bin/perl 
 #
-# sercxu.pl
+# sercxu-json
 # 
-# (c) GPL 2.0
+# (c) permesilo: GPL 2.0
 # 2006__ Wieland Pusch, Bart Demeyere
 # 2007__ Wieland Pusch
-# 2012-2020 __ Wolfram Diestel
+# 2012-2021 __ Wolfram Diestel
 
 use strict;
 
@@ -26,8 +26,9 @@ my $json_parser = JSON->new->allow_nonref;
 #$| = 1;
 
 my $debug = 0;
-my $LIMIT = 50;
+my $LIMIT_eo = 50;
 my $LIMIT_lng = 3;
+my $LIMIT_trd = 250;
 
 #print "Content-type: text/html; charset=utf-8\n\n";
 
@@ -36,11 +37,7 @@ my $LIMIT_lng = 3;
 
 
 # komenco
-print <<EOT;
-Content-type: application/json; charset=utf-8
-
-[
-EOT
+print "Content-type: application/json; charset=utf-8\n\n";
 
 
 #### preparu stirantajn parametrojn  ####
@@ -101,7 +98,7 @@ my $pref_lng = "('".join("','",@preferataj_lingvoj)."')";
 #use lib ("./perllib");
 use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
-use eosort;
+#use eosort;
 
 # serĉo en la datumbazo
 my $dbh = revodb::connect();
@@ -109,12 +106,12 @@ my $dbh = revodb::connect();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
-use Time::HiRes qw (gettimeofday tv_interval);
+#use Time::HiRes qw (gettimeofday tv_interval);
 Sercxu($sercxata, $pref_lng);
 $dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
 
 # fino
-print "\n]\n";
+#print "\n]\n";
 exit;
 
 
@@ -126,8 +123,8 @@ exit;
 sub Sercxu
 {
   my ($sercxata, $pref_lng) = @_;
-  my $tempo = [gettimeofday];
-  my ($sth, $sth2);
+  #my $tempo = [gettimeofday];
+  my ($sth);
 
   # $komparo estas unu el: =, LIKE, REGEXP
   my $komparo = '=';
@@ -137,155 +134,73 @@ sub Sercxu
     $komparo = 'LIKE';
   };
 
-  # por ricevi ĝustan ordigadon en diversaj lingvoj ni
-  # uzas normigitan askiigitan formon (_ci) por serĉi en la datumbazo
-  my ($sercxata2,$sercxata2_eo) = normiguSercxon($sercxata);
+  my $QUERY =
+      "SELECT mrk, kap, num, lng, trd " 
+    ."FROM v3esperanto "
+    ."WHERE kap $komparo ? AND lng IN $pref_lng "
+    ."ORDER BY kap LIMIT $LIMIT_eo";
+  $sth = $dbh->prepare($QUERY);
 
-  # serĉo en Esperanto aŭ sen difinita lingvo
-  #if ($param_lng eq 'eo' or $param_lng eq '') {
+  # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉiujn tradukojn
+  # de unu lingvo en unu signoĉeno!      
 
-    my $QUERY_eo =  
-    "SELECT DISTINCT d.drv_mrk, d.drv_teksto, d.drv_id, a.art_amrk, v.var_teksto, 
-       LOWER(d.drv_teksto) " . $komparo . " LOWER(?) AS drv_match
-    FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
-    WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
-      AND a.art_id = d.drv_art_id 
-    ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk 
-    LIMIT ".$LIMIT;
+  my $trovoj_eo;
+  my $trovoj_trd;
 
-    # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉiujn tradukojn
-    # de unu lingvo en unu signoĉeno!
-    my $QUERY_eo_trd = 
-    "SELECT DISTINCT t.trd_lng, t.trd_teksto
-    FROM trd t, snc s
-    WHERE s.snc_drv_id = ?
-      AND t.trd_snc_id = s.snc_id
-      AND t.trd_lng IN $pref_lng
-    ORDER BY t.trd_lng, t.trd_teksto collate utf8_unicode_ci
-    LIMIT ".$LIMIT;
+  eval {
+    print "\n\n$QUERY\n" if ($debug);
+    print "serĉu: $sercxata\n" if ($debug);
+    $sth->execute($sercxata);
+    ###exit;
+  };
 
-    $sth2 = $dbh->prepare($QUERY_eo_trd);
-    $sth = $dbh->prepare($QUERY_eo);
-
-    eval {
-      print "$QUERY_eo\n" if ($debug);
-      print "$QUERY_eo_trd\n" if ($debug);
-      print "serĉu: $sercxata2_eo\n" if ($debug);
-      $sth->execute($sercxata2_eo, $sercxata2_eo, $sercxata2_eo);
-      ###exit;
-    };
-
-    # kontrolu kaj eldonu erarojn, aliokaze la rezultojn
-    # TODO: necesas adapti por json
-    if ($@) {
-      if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
-        print "Eraro: La rektaj krampoj ([ ]) ne kongruas.<br>\n";
-      } else {
-        print "Err ".$sth->err." - $@";
-      }
+  # kontrolu kaj eldonu erarojn, aliokaze la rezultojn
+  # FARENDA: necesas adapti por json
+  if ($@) {
+    if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
+      print "Eraro: La rektaj krampoj ([ ]) ne paras.<br>\n";
     } else {
-      MontruRezultojn_eo($sth, $sth2);
+      print "Err ".$sth->err." - $@";
     }
-  #}
-
-  # serĉo en aliaj lingvoj ol Esperanto
-##  } else 
-
-  {
-    
-    $sth2 = undef;
-    if (param("trd")) {
-      my $QUERY_lng_trd =
-      "SELECT t.*
-      FROM trd t
-      WHERE t.trd_lng IN $pref_lng
-      AND t.trd_snc_id = ?
-      ORDER BY t.trd_teksto_ci
-      LIMIT ".$LIMIT;
-	  
-      $sth2 = $dbh->prepare($QUERY_lng_trd);
-    }
-
-    my $QUERY_lng = 
-      "SELECT t.trd_lng, t.trd_teksto, s.snc_mrk, s.snc_numero, 
-                d.drv_mrk, d.drv_teksto, a.art_amrk, l.lng_nomo
-      FROM trd t
-      LEFT JOIN snc s ON t.trd_snc_id = s.snc_id
-      LEFT JOIN drv d ON d.drv_id = s.snc_drv_id
-      LEFT JOIN art a ON a.art_id = d.drv_art_id
-      LEFT JOIN lng l ON t.trd_lng = l.lng_kodo ";
-
-  # nur unu lingvo
-  #  if ($param_lng) { 
-#
-  #    $preferata_lingvo = $param_lng;
-  #    $QUERY_lng .=
-  #    "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-  #    AND t.trd_lng = ?
-  #    ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
-  #    LIMIT ".$LIMIT;
-#
-  ## cxiuj lingvojn, sed preferata unue
-  #  } else { 
-
-      $QUERY_lng.=
-      "WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-      ORDER BY l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, 
-        d.drv_teksto collate utf8_esperanto_ci, s.snc_numero
-      LIMIT ".$LIMIT;
-  #  }
-
-    $sth = $dbh->prepare($QUERY_lng);
-    eval {
-      print "$QUERY_lng\n" if ($debug);
-      print "serĉu: $sercxata2\n" if ($debug);
-      $sth->execute($sercxata2);
-    };
-
-    # TODO: eligon de eraro adaptu por JSON
-    if ($@) {
-      # $sth->err and $DBI::err will be true if error was from DBI
-      if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
-      } else {
-        print "Err ".$sth->err." - $@";
-      }
-
-    } else {
-      MontruRezultojn_trd($sth);
-    }
-  }
-}
-
-sub normiguSercxon {
-  my $sercxata = shift @_;
-  my $sercxata_eo = $sercxata;
-
-  if ($cx2cx) {
-    $sercxata_eo =~ s/c[xX]/ĉ/g;
-    $sercxata_eo =~ s/g[xX]/ĝ/g;
-    $sercxata_eo =~ s/h[xX]/ĥ/g;
-    $sercxata_eo =~ s/j[xX]/ĵ/g;
-    $sercxata_eo =~ s/s[xX]/ŝ/g;
-    $sercxata_eo =~ s/u[xX]/ŭ/g;
-    $sercxata_eo =~ s/C[xX]/Ĉ/g;
-    $sercxata_eo =~ s/G[xX]/Ĝ/g;
-    $sercxata_eo =~ s/H[xX]/Ĥ/g;
-    $sercxata_eo =~ s/J[xX]/Ĵ/g;
-    $sercxata_eo =~ s/S[xX]/Ŝ/g;
-    $sercxata_eo =~ s/U[xX]/Ŭ/g;
+  } else {
+    $trovoj_eo = $sth->fetchall_arrayref(); 
   }
 
-  #my $sorter = new eosort;
-  
-  #if ($sercxata_eo eq $sercxata) {
-  #  $sercxata = $sorter->remap_ci($sercxata);
-  #  $sercxata_eo = $sercxata;
-  #} else {
-  #  $sercxata = $sorter->remap_ci($sercxata);
-  #  $sercxata_eo = $sorter->remap_ci($sercxata_eo);
-  #}
 
-  return ($sercxata_eo,$sercxata_eo);
+  my $QUERY = 
+      "SELECT mrk, kap, num, lng, ind, trd "
+    ."FROM v3traduko "
+    ."WHERE ind $komparo ? AND lng IN $pref_lng "
+    ."ORDER BY ind LIMIT $LIMIT_trd";
+  $sth = $dbh->prepare($QUERY);
+
+  eval {
+    print "\n\n$QUERY\n" if ($debug);
+    print "serĉu: $sercxata\n" if ($debug);
+    $sth->execute($sercxata);
+  };
+
+  # TODO: eligon de eraro adaptu por JSON
+  if ($@) {
+    # $sth->err and $DBI::err will be true if error was from DBI
+    if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
+    } else {
+      print "Err ".$sth->err." - $@";
+    }
+
+  } else {
+    $trovoj_trd = $sth->fetchall_arrayref();
+  }
+
+  print $json_parser->encode(
+    {
+      eo => $trovoj_eo,
+      max_eo => $LIMIT_eo,
+      trd => $trovoj_trd,
+      max_trd => $LIMIT_trd
+    }
+  );
+
 }
 
 
@@ -293,132 +208,24 @@ sub normiguSercxon {
 # funkcioj por eldono                                             #
 ###################################################################
 
+#    my %trovo = (
+#      art => $ref->{art_amrk},
+#      $lng => {
+#        mrk => 'lng_'.$ref->{trd_lng},
+#        vrt => escape($ref->{trd_teksto})
+#      },
+#      eo => {
+#        mrk => $ref->{drv_mrk},
+#        vrt => escape($ref->{drv_teksto})
+#      }
+#    );
 
-sub MontruRezultojn_eo
-{
-  my ($res, $sth2) = @_;
-  my $num = 0;
-
-  my %trovoj_eo = (
-    lng => 'eo',
-    max => $LIMIT,
-    titolo => 'esperanta',
-    trovoj => ()
-  );
-  # trakuru ĉiujn DB-serĉrezultojn...
-
-  while (my $ref = $res->fetchrow_hashref()) {
-
-    $num++;
-
-    my %trovo = (
-      art => $ref->{art_amrk},
-      eo => {
-        mrk => $ref->{drv_mrk},
-        vrt => escape($ref->{drv_match}? $ref->{drv_teksto} : $ref->{var_teksto})
-      }
-    );
-
-    ### aldonu tradukojn en preferataj lingvoj
-    $sth2->execute($ref->{drv_id});
-
-##    my %tradukoj;
-
-#    my $tradukoj=''; 
-#    my $sep='';
-#    my $last_lng= '';
-
-    while (my $ref2 = $sth2->fetchrow_hashref()) {
-
-      my $lng = $ref2->{trd_lng};
-
-      $trovo{$lng} =
-        {
-          mrk => "lng_$lng",
-          vrt => escape($ref2->{trd_teksto})
-        };        
-    }
-    push @{$trovoj_eo{trovoj}}, \%trovo;
-
-  } # ...while
-  $res->finish();
-
-  if ($num) {
-    print $json_parser->encode(\%trovoj_eo);
-  }
-    
-  if ($num) {
-    $neniu_trafo = 0;
-  #  print "\n]}\n";
-  }
-}
-
-
-sub MontruRezultojn_trd
-{
-  my ($res) = @_;
-  my $num = 0;
-  my $sep = '';
-  my $last_lng;
-
-  my %trovoj_lng;
-
-  # trakuru ĉiujn DB-serĉrezultojn...
-  while (my $ref = $res->fetchrow_hashref()) {
-
-    $num++;
-    if ($num == 1) {
-      # se ni trovis tradukojn kaj jam skribis "eo", ni bezonas komon...
-      print ",\n" unless ($neniu_trafo); #($lng eq 'eo' or $neniu_trafo);
-    }
-
-    my $lng = $ref->{trd_lng};
-
-    # trovoj estas ordigitaj laŭ lingvo,
-    # ĉe komenco de nova lingvo, finu alineon kaj skribu enkondukon por nova
-    if ($lng ne $last_lng) {
-      if ($last_lng) {
-        print $json_parser->encode(\%trovoj_lng);
-        print ",\n";
-      }
-
-      $last_lng = $lng;
-
-      %trovoj_lng = (
-        lng => $lng,
-        max => $LIMIT,
-        titolo => $ref->{lng_nomo},
-        trovoj => ()
-      );
-    }
-
-    my %trovo = (
-      art => $ref->{art_amrk},
-      $lng => {
-        mrk => 'lng_'.$ref->{trd_lng},
-        vrt => escape($ref->{trd_teksto})
-      },
-      eo => {
-        mrk => $ref->{drv_mrk},
-        vrt => escape($ref->{drv_teksto})
-      }
-    );
-
-    push @{$trovoj_lng{trovoj}}, \%trovo;
-
-  } # ...while
-
-
-  $res->finish();
-    
-  if ($num) {
-    # eligu la lastan lingvon...
-    print $json_parser->encode(\%trovoj_lng);
-    #print "]}\n";
-    print "\n";
-  #  #$neniu_trafo = 0;
-  }
-}
+#    push @{$trovoj_lng{trovoj}}, \%trovo;
+#
+#  } # ...while
+#
+#
+#  $res->finish();    
 
 sub escape {
   my $str = shift;
