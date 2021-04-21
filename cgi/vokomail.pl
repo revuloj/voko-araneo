@@ -705,7 +705,7 @@ EOD
   chdir($revo_base."/xml") or die "chdir";
   
   my ($html, $err);
-  revo::xml2html::konv($dbh, \$xml2, \$html, \$err, $debug);
+  revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
 #  $html = Encode::decode($enc, $html);
   if ($html and $debug) {
     open HTML, ">:utf8", "../art2/$art.html" or die "open write html";

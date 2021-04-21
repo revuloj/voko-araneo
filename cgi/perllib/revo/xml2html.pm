@@ -3,8 +3,8 @@
 #
 # revo::xml2html.pm
 # 
-# 2009-05-09 Wieland Pusch
-#
+# 2009 Wieland Pusch
+# 2021 Wolfram Diestel
 
 use strict;
 #use warnings;
@@ -22,7 +22,7 @@ my $htmldir    = "$homedir/www";
 my $revo_base  = "$homedir/www/revo";
 
 sub konv {
-  my ($dbh, $xml, $html, $err, $debug) = @_;
+  my ($xml, $html, $err, $debug) = @_;
 
 #  print "<pre>xml ".(ref $xml)."</pre>\n";
   if (not ref $xml) {
@@ -53,19 +53,19 @@ sub konv {
 
   {
     $$html =~ s#<!DOCTYPE .*?>##sm;
-    my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or (tez_celref = ? and tez_tipo in ('sin','vid'))");
-    while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
-      my $ref = $1;
-      $sth->execute($1,$1);
-      my ($tez_ekzistas) = $sth->fetchrow_array();
-	  print "<pre>tez=$1 $tez_ekzistas</pre>\n" if $debug;
-      if ($tez_ekzistas) {
-  	    $ref =~ tr/./_/;
-        $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso"><img src="../smb/tezauro.png" alt="TEZ" title="al la tezauro" border="0"></a>#;
-	  } else {
-        $$html =~ s###;
-	  }
-	}
+    #my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or #(tez_celref = ? and tez_tipo in ('sin','vid'))");
+    #while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
+    #  my $ref = $1;
+    #  $sth->execute($1,$1);
+    #  my ($tez_ekzistas) = $sth->fetchrow_array();
+	  #print "<pre>tez=$1 $tez_ekzistas</pre>\n" if $debug;
+    #  if ($tez_ekzistas) {
+  	#    $ref =~ tr/./_/;
+    #    $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso"><img src="../smb/tezauro.#png" alt="TEZ" title="al la tezauro" border="0"></a>#;
+	  #} else {
+    #    $$html =~ s###;
+	  #}
+	  #}
   }
   
   # nur por beligi
