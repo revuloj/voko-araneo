@@ -2,6 +2,27 @@
 FROM voko-grundo as grundo 
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
+
+# tie ĉi ni kreas JSON-dosierojn el la XML-fontoj por poste plenigi la datumbazon
+# por havi pli aktualajn JSON-dosierojn ni devos aldoni la kreadon al la ĉiutaga eldono
+# kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
+#FROM ubuntu:focal as json-builder
+#LABEL maintainer=<diestel@steloj.de>
+#ARG VG_BRANCH=1f
+#ARG DEBIAN_FRONTEND=noninteractive
+#
+#COPY bin/xml-json.pl bin/  
+## ni bezonas curl, unzip, perl, xsltproc por kompili la datumbazon el la XML-fontoj
+#RUN apt-get update && apt-get install -y --no-install-recommends \
+#    ca-certificates curl unzip xsltproc perl \
+#	&& curl -Lo revo-fonto.zip https://github.com/revuloj/revo-fonto/archive/master.zip \
+#	&& curl -Lo voko-grundo.zip https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
+#  && unzip -q revo-fonto.zip && unzip -q voko-grundo.zip \
+#  && ln -s revo-fonto-master revo-fonto \
+#  && ln -s voko-grundo-${VG_BRANCH} voko-grundo 
+#RUN ls -l \
+#  && perl bin/xml-json.pl  
+
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
 FROM alpine:3.13 as builder
 
@@ -74,6 +95,7 @@ RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql f
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
+#COPY --from=json-builder json/* ${HTTP_DIR}/revo/tez/
 #COPY --from=metapost --chown=root:root voko-grundo-master/build/smb/*.svg /tmp/svg/
 
 #ADD . ./
