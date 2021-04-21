@@ -223,7 +223,7 @@ sub process_trd {
       # kaj ¦ por \ (lng=he)
       $ind =~ s/¦/\\/g; $text =~ s/¦/\\/g;
 
-      unless ($text) { $text = $ind; };
+      # unless ($text) { $text = $ind; };
       $text = substr($text,0,255); # limigu tro longajn tradukojn
 
       if (length($ind) < 100) { # se ind estas tro longa verŝajne la traduko estas
