@@ -4,7 +4,7 @@
 # revo::checkxml.pm
 # 
 # 2008 Wieland Pusch
-# 2020 Wolfram Diestel
+# 2021 Wolfram Diestel
 #
 
 use strict;
@@ -74,53 +74,54 @@ sub check_ref_cel {
     my @ref_err;
 
     my $sth = $dbh->prepare(
-        "SELECT count(*) FROM art WHERE art_amrk = ?");
-    my $sth2 = $dbh->prepare(
-        "SELECT drv_mrk FROM drv WHERE drv_mrk = ? ".
-        "UNION SELECT snc_mrk FROM snc WHERE snc_mrk = ? ".
-        "UNION SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
+        "SELECT mrk FROM r3mrk WHERE mrk = ?;"
+    #    "SELECT count(*) FROM art WHERE art_amrk = ?");
+    #my $sth2 = $dbh->prepare(
+    #    "SELECT drv_mrk FROM drv WHERE drv_mrk = ? ".
+    #    "UNION SELECT snc_mrk FROM snc WHERE snc_mrk = ? ".
+    #    "UNION SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
     
     for my $ref (@refs) {
-        my ($art,$pkt,$rest)= (@$ref);
+        # por abel.0ujo.HOR - ni havas la tri argumentojn:
+        # "abel" "." "0ujo.HOR"
+        my ($art,$pkt,$rest) = (@$ref);
         my $mrk = "$art$pkt$rest";
 
-        # ĉu la referencita artikolo ekzistas
-        $sth->execute($art);
-        my ($art_ekzistas) = $sth->fetchrow_array();
+        # ĉu la referencita marko ekzistas
+        $sth->execute($mrk);
+        my ($cel_ekzistas) = $sth->fetchrow_array();
 
-        if (!$art_ekzistas) {
+        if (!$cel_ekzistas) {
             #      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
-            push @ref_err, "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.\n";
+            push @ref_err, "Referenco celas al marko \"$mrk\", kiu ne ekzistas.\n";
             #      $ne_konservu = 7;
-
-        # ĉu la markoj en la celata artikolo ekzistas
-        } elsif ($pkt) {
-
-            $sth2->execute($mrk, $mrk, $mrk);
-            my ($mrk_ekzistas) = $sth2->fetchrow_array();
-
-            # se la marko ne celas konatan drv, snc, rim
-            # eble ĝi referencas subsnc - ni ne havas en la datumbazo,
-            # do ni devas malfermi la XML por rigardi...
-            # FARENDA: estonte ni havu ĉiujn ref-cel/mrk en la datumbazo
-            # por eviti malfermi nombron da XML-dosieroj sur la servilo!
-            if (! $mrk_ekzistas) {
-                #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
-                # eble temas pri marko de subsenco?
-                open IN, "<", "$xml_dir/$art.xml";
-                my $celxml = join '', <IN>;
-                close IN;
-
-                if ($celxml !~ /<(?:sub)?snc\s+mrk="$mrk">/) {
-                    push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
-                    ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
-        #          $ne_konservu = 8;
-                }
-            }
         }
+        # ĉu la markoj en la celata artikolo ekzistas
+        #} elsif ($pkt) {
+#
+        #    $sth2->execute($mrk, $mrk, $mrk);
+        #    my ($mrk_ekzistas) = $sth2->fetchrow_array();
+#
+        #    # se la marko ne celas konatan drv, snc, rim
+        #    # eble ĝi referencas subsnc - ni ne havas en la datumbazo,
+        #    # do ni devas malfermi la XML por rigardi...
+        #    # FARENDA: estonte ni havu ĉiujn ref-cel/mrk en la datumbazo
+        #    # por eviti malfermi nombron da XML-dosieroj sur la servilo!
+        #    if (! $mrk_ekzistas) {
+        #        #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
+        #        # eble temas pri marko de subsenco?
+        #        open IN, "<", "$xml_dir/$art.xml";
+        #        my $celxml = join '', <IN>;
+        #        close IN;
+#
+        #        if ($celxml !~ /<(?:sub)?snc\s+mrk="$mrk">/) {
+        #            push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
+        #            ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
+        ##          $ne_konservu = 8;
+        #        }
+        #    }
+        #}
     }
-    $sth->finish;
-    $sth2->finish;
 
     return @ref_err;
 }
