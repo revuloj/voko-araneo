@@ -95,6 +95,7 @@ check(! $redaktanto || $redaktanto =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/, "red rx")
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
+# kaj por submeti la redakton en la fino...
 my $dbh = revodb::connect();
 
 # ĉu la redaktanto, se donita estas registrita?
