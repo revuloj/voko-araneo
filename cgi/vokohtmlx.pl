@@ -14,12 +14,6 @@ use DBI();
 use IPC::Open3; # uzata de xml2html.pm
 use Encode;
 
-# propraj perl moduloj estas en:
-# por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
-use lib("/hp/af/ag/ri/files/perllib");
-### use revo::xml2html;
-use revodb;
-
 #$| = 1;
 my $debug = 0;
 
@@ -30,7 +24,8 @@ my $revo_base  = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
 
 my $xsltproc = "xsltproc --path $revo_base/cfg $homedir/files/xsl/revohtml.xsl -";
-
+# ni uzas meminstalitan xsltproc, kiu bezonas trovi siajn partojn
+# laŭ apartaj padoj:
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
@@ -45,9 +40,6 @@ unless ($xmlTxt) {
   exit;
 }    
 
-# Konektiĝu al la datumbazo...
-# konvx uzas la datumbazon por enŝovi tezaŭro-referencojn
-my $dbh = revodb::connect();
 
 binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
@@ -55,13 +47,8 @@ print header(-charset=>'utf-8',
 
 # konvertu XML al HTML por la antaŭrigardo...
 chdir($xml_dir) or die "Mi ne povas atingi dosierujon ".$xml_dir;
-  #my $htm2;
-  #if (revo::xml2html::konv($dbh, $xml, \$htm2, $err, $debug)) {
-    #$htm2 =~ m/<body>(.*)<\/body>/s;
-    #$$html = $1;
 my ($html,$err);
-### revo::xml2html::konv($dbh, \$xmlTxt, \$html, \$err, $debug);
-konv($dbh, \$xmlTxt, \$html, \$err, $debug);
+konv(\$xmlTxt, \$html, \$err, $debug);
 
 $err =~ s/^Warning[^\n]+\n//mg;
 
@@ -73,12 +60,11 @@ if ($err) { # ???
   print $html;
 }
 
-$dbh->disconnect() if ($dbh);
 
 ###################################################################
 
 sub konv {
-  my ($dbh, $xml, $html, $err, $debug) = @_;
+  my ($xml, $html, $err, $debug) = @_;
 
   if (not ref $xml) {
     open IN, "<", $xml or die;
@@ -101,19 +87,6 @@ sub konv {
 
   {
     $$html =~ s#<!DOCTYPE .*?>##sm;
-    # my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or (tez_celref = ? and tez_tipo in ('sin','vid'))");
-    # while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
-    #     my $ref = $1;
-    #     $sth->execute($1,$1);
-    #     my ($tez_ekzistas) = $sth->fetchrow_array();
-        
-    #     if ($tez_ekzistas) {
-    #       $ref =~ tr/./_/;
-    #       $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso" class="tez-ref" title="al la tezaŭro">↝</a>#;
-    #   } else {
-    #       $$html =~ s###;
-    #   }
-    #}
   }
   
   return 1;
