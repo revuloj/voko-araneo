@@ -89,7 +89,7 @@ if ($sercxata =~ /[.^$\[\(\|+?{\\]/) {
 my ($sth);
 
 my $QUERY =
-   "SELECT mrk, kap, num, lng, trd " 
+   "SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd " 
   ."FROM v3esperanto "
   ."WHERE kap $komparo ? AND lng IN $pref_lng "
   ."ORDER BY kap LIMIT $LIMIT_eo";
