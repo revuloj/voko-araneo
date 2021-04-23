@@ -120,12 +120,12 @@ WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
   && unzip -l ${VG_BRANCH}.zip \
-  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/xsl/* voko-grundo-${ZIP_SUFFIX}/dok/* \
+  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
      voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
      # necesaj ankoraŭ por la malnova fasado:
      voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
   && rm ${VG_BRANCH}.zip \
-  && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${ZIP_SUFFIX}/xsl ${HOME_DIR}/files/ \
+  && mkdir -p ${HOME_DIR}/files \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
@@ -144,6 +144,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
 COPY --from=grundo build/smb/ /usr/local/apache2/htdocs/revo/smb/
 COPY --from=grundo build/jsc/ /usr/local/apache2/htdocs/revo/jsc/
 COPY --from=grundo build/stl/ /usr/local/apache2/htdocs/revo/stl/
+COPY --from=grundo build/xsl/ ${HOME_DIR}/files/xsl/
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 
