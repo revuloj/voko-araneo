@@ -55,7 +55,7 @@ sub process {
   $ref_del = $dbh->prepare("DELETE FROM r3ref WHERE mrk LIKE ?");
   $ref_ins = $dbh->prepare("INSERT INTO r3ref (mrk,tip,cel,lst) VALUES (?,?,?,?)");
   $trd_del = $dbh->prepare("DELETE FROM r3trd WHERE mrk LIKE ?");
-  $trd_ins = $dbh->prepare("INSERT INTO r3trd (mrk,lng,ind,trd) VALUES (?,?,?,?)");
+  $trd_ins = $dbh->prepare("INSERT INTO r3trd (mrk,lng,ind,trd,ekz) VALUES (?,?,?,?,?)");
 
   # nuligu nombrilojn
   $counter = {
@@ -210,8 +210,9 @@ sub process_trd {
     my $lng = $trd->[1];
     my $ind = decode('UTF-8',$trd->[2]);
     my $text = decode('UTF-8',$trd->[3]); # ? $trd->[3]: undef;
+    my $ekz = decode('UTF-8',$trd->[4]); # ? $trd->[3]: undef;
 
-    print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text\n") if ($debug);
+    print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text, ekz: $ekz\n") if ($debug);
 
     if (
         $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
@@ -225,13 +226,14 @@ sub process_trd {
 
       # unless ($text) { $text = $ind; };
       $text = substr($text,0,255); # limigu tro longajn tradukojn
+      $ekz = substr($ekz,0,255); # limigu tro longajn tradukojn
 
       if (length($ind) < 100) { # se ind estas tro longa verŝajne la traduko estas
                                 # iel fuŝa kaj parto eble estu klarigo, aŭ aplikiĝu mll
                                 # por koncizigo - do ni ignoras ilin
                                 # se iam ni tamen volas tiom longajn - ekz-e pro ekz/trd
                                 # ni aŭ larĝigu la tabelon aŭ tranĉu la tradukon!
-        $trd_ins->execute($mrk,$lng,$ind,$text);
+        $trd_ins->execute($mrk,$lng,$ind,$text,$ekz);
       } else {
         warn "Tro longa traduk-indeksero: \"$ind\" en $art!\n"
       }
