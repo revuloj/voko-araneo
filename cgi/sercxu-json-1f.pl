@@ -30,7 +30,7 @@ my $json_parser = JSON->new->allow_nonref;
 
 my $debug = 0;
 my $LIMIT_eo = 50;
-my $LIMIT_lng = 3;
+my $LIMIT_lng = 5;
 my $LIMIT_trd = 250;
 
 #print "Content-type: text/html; charset=utf-8\n\n";
@@ -47,6 +47,7 @@ my $sercxata = param('sercxata');
 exit unless($sercxata);
 
 my $pref_lng = preflng();
+#print $pref_lng; exit;
 
 ###################################################################
 #  serĉo en la datumbazo                                             #
@@ -182,7 +183,7 @@ sub preflng {
       #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
       $l =~ s/^([a-z]{2,3}).*$/$1/;
       unless (grep(/$l/,@preferataj_lingvoj)) {
-        push @preferataj_lingvoj, ($l) if ($l);
+        push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
       }
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
       last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
