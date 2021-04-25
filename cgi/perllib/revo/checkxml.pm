@@ -74,7 +74,7 @@ sub check_ref_cel {
     my @ref_err;
 
     my $sth = $dbh->prepare(
-        "SELECT mrk FROM r3mrk WHERE mrk = ?;"
+        "SELECT mrk FROM r3mrk WHERE mrk = ?");
     #    "SELECT count(*) FROM art WHERE art_amrk = ?");
     #my $sth2 = $dbh->prepare(
     #    "SELECT drv_mrk FROM drv WHERE drv_mrk = ? ".
