@@ -90,10 +90,14 @@ if ($sercxata =~ /[.^$\[\(\|+?{\\]/) {
 my ($sth);
 
 my $QUERY =
-   "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd " 
-  ."FROM v3esperanto "
-  ."WHERE kap $komparo ? AND lng IN $pref_lng "
-  ."ORDER BY kap LIMIT $LIMIT_eo";
+   "SELECT DISTINCT * FROM ( "
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
+    ."FROM v3esperanto  WHERE kap $komparo ? "
+  ."UNION "
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz, lng, ind, trd "
+    ."FROM v3traduko  WHERE ekz $komparo ? "
+  .") AS u WHERE lng IN $pref_lng LIMIT $LIMIT_eo";
+
 $sth = $dbh->prepare($QUERY);
 
 # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉiujn tradukojn
@@ -105,7 +109,7 @@ my $trovoj_trd;
 eval {
   #print "\n\n$QUERY\n" if ($debug);
   #print "serĉu: $sercxata\n" if ($debug);
-  $sth->execute($sercxata);
+  $sth->execute($sercxata,$sercxata);
 };
 
 # kontrolu kaj eldonu erarojn, aliokaze la rezultojn
@@ -132,7 +136,7 @@ my $QUERY =
    "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
   ."FROM v3traduko "
   ."WHERE ind $komparo ? AND lng IN $pref_lng "
-  ."ORDER BY ind LIMIT $LIMIT_trd";
+  ."LIMIT $LIMIT_trd";
 $sth = $dbh->prepare($QUERY);
 
 eval {
