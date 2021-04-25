@@ -24,6 +24,7 @@ use lib("/hp/af/ag/ri/files/perllib");
 use revo::decode;
 use revo::encode;
 use revo::xml2html;
+use revo::checkxml;
 use revo::wrap;
 use revodb;
 
@@ -33,12 +34,18 @@ $| = 1;
 my $homedir = "/hp/af/ag/ri";
 my $htmldir    = "$homedir/www";
 my $revo_base    = "$homedir/www/revo";
+my $xml_dir    = "$revo_base/xml";
 my $smlog = "$homedir/files/log/sendmail.log";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
 $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
+
+my $xml_max_len = 500000;
+my $art_max_len = 25;
+my $red_max_len = 80;
+my $sxg_max_len = 255;
 
 my $JSCRIPT=<<'END';
 function str_repeat(rStr, rNum) {
@@ -684,6 +691,21 @@ if ($art) {
   close IN;
 }
 
+# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
+check(param('xmlTxt'),"xmlTxt");
+# check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
+
+## validigu la ceteran parametrojn...
+check(length(param('xmlTxt')) < $xml_max_len, "xmlTxt");
+check(length(param('art')) < $art_max_len, "art");
+check(length(param('sxangxo')) < $sxg_max_len, "sxangxo");
+check(length(param('redaktanto')) < $red_max_len, "redaktanto");
+check(param('art') =~ /^[a-z0-9]+$/, "art rx");
+
+# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+check(! param('redaktanto') || param('redaktanto') =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/, "red rx"); 
+
 # Connect to the database.
 my $dbh = revodb::connect();
 
@@ -760,33 +782,52 @@ EOD
     }
   }
 
-  my $sth = $dbh->prepare("SELECT count(*) FROM art WHERE art_amrk = ?");
-  my $sth2 = $dbh->prepare("SELECT drv_mrk FROM drv WHERE drv_mrk = ? union SELECT snc_mrk FROM snc WHERE snc_mrk = ? union SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
-  while ($xml2 =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
-    my ($art, $mrk) = ($1, "$1$2$3");
-    $sth->execute($art);
-    my ($art_ekzistas) = $sth->fetchrow_array();
-    if (!$art_ekzistas) {
-#      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
-      print "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.<br>\n";
-#      $ne_konservu = 7;
-    } elsif ($2) {
-      $sth2->execute($mrk, $mrk, $mrk);
-      my ($mrk_ekzistas) = $sth2->fetchrow_array();
-      if (!$mrk_ekzistas) {
-#        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
-        # eble temas pri marko de subsenco?
-        open IN, "<", "$homedir/html/revo/xml/$art.xml";
-        my $celxml = join '', <IN>;
-        close IN;
-        if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
-          print "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \"".a({href=>"?art=$art"}, "$art.xml")."\".<br>\n";
-#          $ne_konservu = 8;
-        }
-      }
+##  my $sth = $dbh->prepare("SELECT count(*) FROM art WHERE art_amrk = ?");
+##  my $sth2 = $dbh->prepare("SELECT drv_mrk FROM drv WHERE drv_mrk = ? union SELECT snc_mrk FROM snc WHERE snc_mrk = ? ##union SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
+##
+##  while ($xml2 =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
+##    my ($art, $mrk) = ($1, "$1$2$3");
+##    $sth->execute($art);
+##    my ($art_ekzistas) = $sth->fetchrow_array();
+##    if (!$art_ekzistas) {
+###      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
+##      print "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.<br>\n";
+###      $ne_konservu = 7;
+##    } elsif ($2) {
+##      $sth2->execute($mrk, $mrk, $mrk);
+##      my ($mrk_ekzistas) = $sth2->fetchrow_array();
+##      if (!$mrk_ekzistas) {
+###        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
+##        # eble temas pri marko de subsenco?
+##        open IN, "<", "$homedir/html/revo/xml/$art.xml";
+##        my $celxml = join '', <IN>;
+##        close IN;
+##        if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
+##          print "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \"".a({href=>"?art=$art"}, "$art.xml")."\".##<br>\n";
+###          $ne_konservu = 8;
+##        }
+##      }
+##    }
+##  }
+##  $sth->finish;
+
+  my @ref_err;
+
+  #if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
+  my @refs;
+  while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
+    my ($art,$p,$rest) = ($1,$2,$3);
+    push @refs, [$art,$p,$rest];
+  }
+
+  if (@refs) {
+    @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
+
+    if (@ref_err) {
+      print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
     }
   }
-  $sth->finish;
+
 
   while ($xml2 =~ /<uzo tip="fak">(.*?)<\/uzo>/gi) {
     my $fako = $1;
@@ -1111,7 +1152,6 @@ print end_form;
 print <<"EOD" if $art;
 <h1>Klarigoj:</h1>
 <div class="averto">
-Vi povas helpi testi la <a href="/revo/dlg/redaktilo.html?art=$art">refasonatan redaktilon</a>.<br>
 Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
 klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
 klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
@@ -1247,4 +1287,20 @@ sub xml_context {
 
     return ('', 0, 0);
 }
+
+#######################################################################################
+
+sub check {
+  my $cond = shift;
+
+  ## if ($debug) {
+  ##   print shift, ": ", $cond, "\n";
+  ## }
+
+  unless ($cond) {
+    print "eraro: ".shift,"!\n";
+    print end_html();
+    exit;
+  }
+}  
 
