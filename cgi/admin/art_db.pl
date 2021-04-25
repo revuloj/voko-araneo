@@ -23,7 +23,7 @@ my $tezdir = "$homedir/www/revo/tez";
 #my $json_parser = JSON->new->allow_nonref;
 
 print header(-charset=>'utf-8'),
-      start_html('aktualigu datumbazon kap,mrk,ref el json'),
+      start_html('aktualigu datumbazon kap,mrk,ref,trd el json'),
 	  h2(scalar(localtime));
 
 # ekstraktu la artikolojn el la parametro(j)
