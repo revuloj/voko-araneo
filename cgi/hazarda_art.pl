@@ -19,12 +19,14 @@ binmode(STDOUT, ":utf8");
 
 $| = 1;
 
+my $revo_dir = '/hp/af/ag/ri/www/revo';
+
 my $senkadroj = param('senkadroj');
 if (!$senkadroj) {
   print "Content-type: text/html\n\n";
 
   # anstataŭigu la enhavo de la kadraro (HTML frameset)
-  open IN, "<../revo/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
+  open IN, "< $revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
   while (<IN>) {
     s/src="inx\/_eo.html"/src="hazarda_art.pl?senkadroj=1"/;
     s/src="titolo.html"/src="hazarda_art.pl?senkadroj=2#toptop"/;
@@ -45,23 +47,30 @@ my $dbh = revodb::connect();
 #$dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
-my $sth = $dbh->prepare("SELECT floor(rand() * count(*)) FROM art");
-$sth->execute();
-my ($row) = $sth->fetchrow_array();
-$sth->finish();
+my $cnt = $dbh->selectrow_hashref("SELECT count(*) AS c FROM r3kap");
+my $rno = int(rand($cnt->{c}));
+my ($hazarda_mrk) = $dbh->selectrow_array("SELECT mrk FROM r3kap LIMIT $rno,1");
 
-$sth = $dbh->prepare("SELECT art_amrk FROM art LIMIT $row,1");
-$sth->execute();
-my ($art) = $sth->fetchrow_array();
-$sth->finish();
+$hazarda_mrk =~ m/^([a-z0-9]+)\./;
+my $art = $1;
+
+# my $sth = $dbh->prepare("SELECT floor(rand() * count(*)) FROM art");
+# $sth->execute();
+# my ($row) = $sth->fetchrow_array();
+# $sth->finish();
+# 
+# $sth = $dbh->prepare("SELECT art_amrk FROM art LIMIT $row,1");
+# $sth->execute();
+# my ($art) = $sth->fetchrow_array();
+# $sth->finish();
 
 # tio legas kaj redonas adaptite la artikolon...
 # estonte ni ne plu uzos tion, sed ŝargos la artikolon per JS HTTPRequest.
-if ($senkadroj == 2) 
+if ($senkadroj == 2 && $art) 
 {
   print header(-charset=>'utf-8');
 
-  open IN, "<", "../revo/art/$art.html" or die "open html";
+  open IN, "<", "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
   while (<IN>) {
 #    s/<\/title>/<\/title><script type="text\/javascript"><!--\nscroll(0,0);\n\/\/--><\/script>/;
      s/(\[<a class="redakto" href="\/cgi-bin\/vokomail)(\.pl\?art=[a-z0-9]+">)(redakti)(\.\.\.<\/a>\])/$1\l$2$3$4\n$1\l2$2traduki$4/;
