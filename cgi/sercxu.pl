@@ -26,6 +26,9 @@ use open ':std', ':encoding(UTF-8)';
 
 $| = 1;
 
+my $LIMIT_eo = 50;
+my $LIMIT_trd = 250;
+
 ## my $verbose=1; # 1 = debugging...
 
 #print "Content-type: text/html\n\n";
@@ -376,25 +379,36 @@ sub Sercxu
 #      AND a.art_id = d.drv_art_id GROUP BY d.drv_id ORDER BY d.drv_teksto, a.art_amrk
 
   if ($param_lng eq 'eo' or $param_lng eq '') {
-    $sth2 = $dbh->prepare(
-      "SELECT distinct t.trd_teksto
-       FROM trd t, snc s
-        WHERE s.snc_drv_id = ?
-          AND t.trd_snc_id = s.snc_id
-          AND t.trd_lng = ?
-        ORDER BY t.trd_teksto collate utf8_unicode_ci");
-  
-    $sth = $dbh->prepare("SELECT d.*, a.*, v.*, d.drv_teksto " . $komparo . " ? drv_match
-    FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
-    WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
-      AND a.art_id = d.drv_art_id$addqry GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk");
-    
+    #$sth2 = $dbh->prepare(
+    #  "SELECT distinct t.trd_teksto
+    #   FROM trd t, snc s
+    #    WHERE s.snc_drv_id = ?
+    #      AND t.trd_snc_id = s.snc_id
+    #      AND t.trd_lng = ?
+    #    ORDER BY t.trd_teksto collate utf8_unicode_ci");
+  #
+    #$sth = $dbh->prepare("SELECT d.*, a.*, v.*, d.drv_teksto " . $komparo . " ? drv_match
+    #FROM art a, drv d LEFT OUTER JOIN var v ON d.drv_id = v.var_drv_id
+    #WHERE (LOWER(d.drv_teksto) " . $komparo . " LOWER(?) or LOWER(v.var_teksto) " . $komparo . " LOWER(?))
+    #  AND a.art_id = d.drv_art_id$addqry GROUP BY d.drv_id ORDER BY d.drv_teksto collate utf8_esperanto_ci, a.art_amrk");
+
+    $sth = $dbh->prepare(
+       "SELECT DISTINCT drvmrk,kap,lng,GROUP_CONCAT(DISTINCT CASE WHEN trd THEN trd ELSE ind END) AS trd "
+      ."FROM ( "
+        ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
+        ."FROM v3esperanto  WHERE kap $komparo ? "
+      ."UNION "
+        ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz, lng, ind, trd "
+        ."FROM v3traduko  WHERE ekz $komparo ? "
+      .") AS u WHERE lng=? GROUP BY drvmrk,kap,lng LIMIT $LIMIT_eo");
+       
     #print h2($sth->{Statement}) if $verbose;
     #print h3($sth2->{Statement}) if $verbose;
     
     eval {
-      $sth->execute($sercxata2_eo, $sercxata2_eo, $sercxata2_eo);
+      $sth->execute($sercxata2_eo, $sercxata2_eo,  $preferata_lingvo);
     };
+    $sth2 = undef; # ni ne plu bezonas...
 
     if ($@) {
       # $sth->err and $DBI::err will be true if error was from DBI
@@ -404,11 +418,17 @@ sub Sercxu
         print "Err ".$sth->err." - $@";
       }
     } else {
-      MontruRezultojn($sth, 'eo', $preferata_lingvo, $sth2);
+
+      print "<h1>esperanta</h1>\n";
+
+      while (my $ref = $sth->fetchrow_hashref()) {
+        my $href = $ref->{drvmrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
+        print a({href=>"$href", target=>"precipa"}, $ref->{kap}), $ref->{trd}, br();
+
+        $neniu_trafo = 0;
+      }
     }
   }
-
-  $sth2 = undef;
 
 
   if (($formato ne "txt" or $param_lng ne 'eo') and $formato ne "idx") {
@@ -425,25 +445,36 @@ sub Sercxu
     if ($param_lng) {	# nur unu lingvo
 	  $preferata_lingvo = $param_lng;
       $sth = $dbh->prepare(
-        "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
-        FROM trd t, snc s, drv d, art a, lng l
-        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-        AND t.trd_lng = ?
-		    AND t.trd_snc_id = s.snc_id
-        AND t.trd_lng = l.lng_kodo
-        AND d.drv_id = s.snc_drv_id
-        AND a.art_id = d.drv_art_id
-        ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero");
+         "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
+        ."FROM v3traduko "
+        ."WHERE ind $komparo ? AND lng = ? "
+        ."ORDER BY lng, ind, kap "
+        ."LIMIT $LIMIT_trd");
+#        "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
+#        FROM trd t, snc s, drv d, art a, lng l
+#        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+#        AND t.trd_lng = ?
+#		    AND t.trd_snc_id = s.snc_id
+#        AND t.trd_lng = l.lng_kodo
+#        AND d.drv_id = s.snc_drv_id
+#        AND a.art_id = d.drv_art_id
+#        ORDER BY l.lng_nomo, t.trd_teksto, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero");
 	} else {			# cxiuj lingvojn
       $sth = $dbh->prepare(
-        "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
-        FROM trd t, snc s, drv d, art a, lng l
-        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
-        AND t.trd_snc_id = s.snc_id
-        AND t.trd_lng = l.lng_kodo
-        AND d.drv_id = s.snc_drv_id
-        AND a.art_id = d.drv_art_id
-        ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, d.drv_teksto collate utf8_esperanto_ci, s.snc_numero");
+         "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
+        ."FROM v3traduko "
+        ."WHERE ind $komparo ? "
+        ."ORDER BY ABS(STRCMP(lng, ?)), lng, ind, kap "
+        ."LIMIT $LIMIT_trd");
+#      $sth = $dbh->prepare(
+#        "SELECT t.*, s.*, d.*, a.*, l.lng_nomo
+#        FROM trd t, snc s, drv d, art a, lng l
+#        WHERE LOWER(t.trd_teksto) " . $komparo . " LOWER(?)
+#        AND t.trd_snc_id = s.snc_id
+#        AND t.trd_lng = l.lng_kodo
+#        AND d.drv_id = s.snc_drv_id
+#        AND a.art_id = d.drv_art_id
+#        ORDER BY abs(strcmp(t.trd_lng, ?)), l.lng_nomo, t.trd_teksto collate utf8_unicode_ci, d.drv_teksto collate utf8_esperanto_ci, #s.snc_numero");
 	}
 
     eval {
@@ -457,123 +488,157 @@ sub Sercxu
         print "Err ".$sth->err." - $@";
       }
     } else {
-      MontruRezultojn($sth, $param_lng, $preferata_lingvo, $sth2);
+      # MontruRezultojn($sth, $param_lng, $preferata_lingvo, $sth2);
+
+      my $last_lng = 'eo';
+
+      while (my $ref = $sth->fetchrow_hashref()) {
+        my $lng = $ref->{lng};
+
+        # TODO!
+        my $lng_nomo = $lng.$lng;
+
+        # titolo ĉe nova lingvo en la listo...
+        print "<br>\n" if $lng ne $last_lng;
+        print "<h1>$lng_nomo</h1>\n" if $lng ne $last_lng;
+        $last_lng = $lng;
+
+        my $href = $ref->{drvmrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
+        print a({href=>"$href\&lng=$lng", target=>"precipa"}, $ref->{kap}), $ref->{trd}, br();
+
+        $neniu_trafo = 0;
+      }
     }
   }
 }
 
-sub MontruRezultojn
-{
-  my ($res, $lng, $preferata_lingvo, $sth2) = @_;
-  my $num = 0;
-  my $last_lng;
-
-  while (my $ref = $res->fetchrow_hashref()) {
-    $num++;
-
-    my $lng_nomo;
-    my $trd;
-    my $anchor;
-    my $param;
-    my $klr;
-
-    if ($lng eq 'eo') {
-      if ($$ref{'var_org'}) {
-        $trd = $$ref{'var_org'};
-      } else {
-        $trd = $$ref{'drv_teksto'};
-      }
-      $anchor = $$ref{'drv_mrk'};
-      $lng_nomo = "esperante";
-      $lng_nomo .= " ($preferata_lingvo)" if $preferata_lingvo;
-
-      if ($formato eq "txt") {
-	      foreach (split ",", param("trd")) {
-          $klr .= "|";
-  	      my $sep;
-#		  print "--drv_id=$$ref{'drv_id'}--";
-          $sth2->execute($$ref{'drv_id'}, $_);
-          while (my $ref2 = $sth2->fetchrow_hashref()) {
-            $klr .= $sep.$$ref2{'trd_teksto'};
-            $sep = ",";
-          }
-		    } # foreach
-	    } else { # formato ne txt ...
- 	      my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\&lng=$preferata_lingvo\">";
-        $sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
-        while (my $ref2 = $sth2->fetchrow_hashref()) {
-          $klr .= $sep.$$ref2{'trd_teksto'};
-          $sep = ", ";
-        }
-        $klr .= "</a>)" if $klr;
-      }
-
-    } else { # lng ne eo
-      $trd = $$ref{'trd_teksto'};
-      $anchor = $$ref{'drv_mrk'};
-      $anchor = $$ref{'snc_mrk'} if $$ref{'snc_numero'}; 
-      if ($formato eq "txt") {
-	      foreach (split ",", param("trd")) {
-          $klr .= "|";
-          my $sep;
-          if ($_ eq "eo") {
-            $klr .= $$ref{'drv_teksto'};
-          } else {
-            $sth2->execute($_, $$ref{'snc_id'});
-            while (my $ref2 = $sth2->fetchrow_hashref()) {
-              $klr .= $sep.$$ref2{'trd_teksto'};
-              $sep = ",";
-            }
-          }
-        } # foreach
-	    } else { # formato ne txt
-        $klr = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\">$$ref{'drv_teksto'}";
-        $klr .= "  <sup><i>$$ref{'snc_numero'}</i></sup>" if $$ref{'snc_numero'};
-        $klr .= "</a>)";
-	    }
-      $lng = $$ref{'trd_lng'};
-      $param = "lng=$lng";
-      $lng_nomo = $$ref{'lng_nomo'};
-      $lng_nomo =~ s/a$/e/;
-      $lng_nomo .= " (preferata)" if $lng eq $preferata_lingvo;
-    }
-
-    $trovitajPagxoj{$$ref{'art_amrk'}} = $anchor if $lng eq 'eo' or $lng eq $preferata_lingvo;
-    if ($formato ne "txt" and $formato ne "idx") {
-      print "<br>\n" if $lng ne $last_lng;
-      print "<h1>$lng_nomo</h1>\n" if $num == 1 or $lng ne $last_lng;
-    }
-    $last_lng = $lng;
-
-    if ($formato eq "txt") {
-        print "$trd, /revo/art/$$ref{'art_amrk'}.html#$anchor$klr\n";
-
-    } elsif ($formato eq "idx") {
-      if ($lng eq 'eo') {
-        next unless $$ref{'drv_match'};
-        my ($a, $b1, $b2) = ("#$anchor\&$param", "", "");
-        ($a, $b1, $b2) = ("", "<b>", "</b>") if $trd eq $$ref{'art_kap'};
-
-        my $var = $$ref{'var_org'};
-        $trd = $var if $var;
-
-        print "         <a href=\"$pado/art/$$ref{'art_amrk'}.html$a\" target=\"precipa\">$b1$trd$b2</a><br>\n";
-      }
-    } else { # formato ne txt || idx
-      if (!$regulira && $sercxata !~ /[%_]/) {
-        $trd =~ s/$sercxata/<b>$sercxata<\/b>/g;
-      }
-      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor\&$param", target=>"precipa"}, "$trd"), $klr;
-
-      if ($num > 100) {
-        print br, "... kaj pli ...", "\n";
-        last;
-      }
-      print br, "\n";
-    }
-  }
-  $res->finish();
-      
-  $neniu_trafo = 0 if $num;
-} # MontruRezultojn
+#sub MontruRezultojn
+#{
+#  my ($res, $lng, $preferata_lingvo, $sth2) = @_;
+#  my $num = 0;
+#  my $last_lng;
+#
+#  while (my $ref = $res->fetchrow_hashref()) {
+#    $num++;
+#
+#    my $lng_nomo;
+#    my $trd;
+#    my $anchor;
+#    my $param;
+#    my $klr;
+#
+#    # esperanto-serĉo...
+#    if ($lng eq 'eo') {
+#
+#      ##=> kolumnoj: drvmrk, kap, lng, trd
+#
+#      #if ($$ref{'var_org'}) {
+#      #  $trd = $$ref{'var_org'};
+#      #} else {
+#      #  $trd = $$ref{'drv_teksto'};
+#      #}
+#      $anchor = $ref->{drvmrk};
+#      $lng_nomo = "esperante";
+#      $lng_nomo .= " ($preferata_lingvo)" if $preferata_lingvo;
+#
+#      if ($formato eq "txt") {
+#	      #foreach (split ",", param("trd")) {
+#        #  $klr .= "|";
+#  	    #  my $sep;
+##		  print "--drv_id=$$ref{'drv_id'}--";
+#          #$sth2->execute($$ref{'drv_id'}, $_);
+#          #while (my $ref2 = $sth2->fetchrow_hashref()) {
+#          #  $klr .= $sep.$$ref2{'trd_teksto'};
+#          #  $sep = ",";
+#          #}
+#		    #} # foreach
+#	    } else { # formato ne txt ...
+#
+#
+#        my $href = $anchor; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$anchor|;
+#        print a({href=>"$href", target=>"precipa"}, $ref->{kap}), $ref->{trd};
+#
+# 	      #my $sep = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\&lng=$preferata_lingvo\">";
+#        #$sth2->execute($$ref{'drv_id'}, $preferata_lingvo);
+#        #while (my $ref2 = $sth2->fetchrow_hashref()) {
+#        #  $klr .= $sep.$$ref2{'trd_teksto'};
+#        #  $sep = ", ";
+#        #}
+#        #$klr .= "</a>)" if $klr;
+#      }
+#
+#    } else { # lng ne eo
+#      $trd = $ref->{trd};
+#      $anchor = $ref->{drvmrk};
+#
+#      #$anchor = $$ref{'snc_mrk'} if $$ref{'snc_numero'}; 
+#      if ($formato eq "txt") {
+#	      #foreach (split ",", param("trd")) {
+#        #  $klr .= "|";
+#        #  my $sep;
+#        #  if ($_ eq "eo") {
+#        #    $klr .= $$ref{'drv_teksto'};
+#        #  } else {
+#        #    $sth2->execute($_, $$ref{'snc_id'});
+#        #    while (my $ref2 = $sth2->fetchrow_hashref()) {
+#        #      $klr .= $sep.$$ref2{'trd_teksto'};
+#        #      $sep = ",";
+#        #    }
+#        #  }
+#        #} # foreach
+#	    } else { # formato ne txt
+#
+#        my $href = $anchor; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$anchor|;
+#        print a({href=>"$href\&lng=$lng", target=>"precipa"}, $ref->{kap}), $ref->{trd};
+#
+#        #$klr = " (<a target=\"precipa\" href=\"/revo/art/$$ref{'art_amrk'}.html#$anchor\">$$ref{'drv_teksto'}";
+#        #$klr .= "  <sup><i>$$ref{'snc_numero'}</i></sup>" if $$ref{'snc_numero'};
+#        #$klr .= "</a>)";
+#	    }
+#      #$lng = $$ref{'trd_lng'};
+#      #$param = "lng=$lng";
+#
+#      # $lng_nomo = $$ref{'lng_nomo'};
+#      # $lng_nomo =~ s/a$/e/;
+#      # $lng_nomo .= " (preferata)" if $lng eq $preferata_lingvo;
+#    }
+#
+#    $trovitajPagxoj{$$ref{'art_amrk'}} = $anchor if $lng eq 'eo' or $lng eq $preferata_lingvo;
+#    if ($formato ne "txt" and $formato ne "idx") {
+#      print "<br>\n" if $lng ne $last_lng;
+#      print "<h1>$lng_nomo</h1>\n" if $num == 1 or $lng ne $last_lng;
+#    }
+#    $last_lng = $lng;
+#
+#    if ($formato eq "txt") {
+#        print "$trd, /revo/art/$$ref{'art_amrk'}.html#$anchor$klr\n";
+#
+#    } elsif ($formato eq "idx") {
+#      if ($lng eq 'eo') {
+#        next unless $$ref{'drv_match'};
+#        my ($a, $b1, $b2) = ("#$anchor\&$param", "", "");
+#        ($a, $b1, $b2) = ("", "<b>", "</b>") if $trd eq $$ref{'art_kap'};
+#
+#        my $var = $$ref{'var_org'};
+#        $trd = $var if $var;
+#
+#        print "         <a href=\"$pado/art/$$ref{'art_amrk'}.html$a\" target=\"precipa\">$b1$trd$b2</a><br>\n";
+#      }
+#    } else { # formato ne txt || idx
+#      if (!$regulira && $sercxata !~ /[%_]/) {
+#        $trd =~ s/$sercxata/<b>$sercxata<\/b>/g;
+#      }
+#      print a({href=>"/revo/art/$$ref{'art_amrk'}.html#$anchor\&$param", target=>"precipa"}, "$trd"), $klr;
+#
+#      if ($num > 100) {
+#        print br, "... kaj pli ...", "\n";
+#        last;
+#      }
+#      print br, "\n";
+#    }
+#  }
+#  $res->finish();
+#      
+#  $neniu_trafo = 0 if $num;
+#} # MontruRezultojn
 
