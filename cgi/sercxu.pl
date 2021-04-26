@@ -208,28 +208,6 @@ EOD
 EOD
  }
 
-if (param('ans')) {
-  my %lng;
-  open IN, "<../revo/cfg/lingvoj.xml" or die "ne povas malfermi dosieron 'lingvoj.xml'";
-  while (<IN>) {
-    if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
-#      print "lng $1 -> $2\n";
-      $lng{$1} = "$1 - $2";
-    }
-  }
-  close IN;
-  my @values = sort keys %lng;
-
-  print br."Lingvo: ",
-		hidden('ans', 1),
-		popup_menu(
-      -name    => 'lng',
-      -values  => \@values,
-			-labels  => \%lng,
-      -default => $preferata_lingvo);
-  exit if $sercxata eq "";
-}
-
   print <<EOD;
 </form>
 EOD
@@ -358,19 +336,22 @@ sub Sercxu
   my $addqry = "";
   my ($sth, $sth2);
 
-  {
-    my @fak = param("fak");
-    foreach my $fak (@fak) {
-      $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_fak$not like '%\_$_\_%'"} split(/,/, $fak)).")";
-    }
-  }
+  #{
+  #  my @fak = param("fak");
+  #  foreach my $fak (@fak) {
+  #    $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_fak$not like '%\_$_\_%'"} split(/,#/, $fak)).")";
+  #  }
+  #}
+#
+  #{
+  #  my @stl = param("stl");
+  #  foreach my $stl (@stl) {
+  #    $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_stl$not like '%\_$_\_%'"} split(/,#/, $stl)).")";
+  #  }
+  #}
 
-  {
-    my @stl = param("stl");
-    foreach my $stl (@stl) {
-      $addqry .= " and (".join(" or ", map {my $not=" not" if s/^!//; "d.drv_stl$not like '%\_$_\_%'"} split(/,/, $stl)).")";
-    }
-  }
+  # ni bezonas la lingvo-nomojn...
+  my $lingvoj = $dbh->selectall_hashref("SELECT lng_kodo, lng_nomo FROM lng",'lng_kodo');
 
 
   if ($param_lng eq 'eo' or $param_lng eq '') {
@@ -448,9 +429,15 @@ sub Sercxu
       my $first = 1;
       while (my $ref = $sth->fetchrow_hashref()) {
         if ($first) {
-          print "<h1>esperanta</h1>\n";
+          if ($preferata_lingvo) {
+            my $pnomo = $lingvoj->{$preferata_lingvo}->{lng_nomo} || $preferata_lingvo;
+            print "<h1>esperanta ($pnomo)</h1>\n";
+          } else {
+            print "<h1>esperanta</h1>\n";
+          }
           $first = 0;
         };
+
         my $href = $ref->{drvmrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
         my $kap = $ref->{ekz}? $ref->{ekz} : $ref->{kap};
         my $klr = $ref->{trd}? ' ('.$ref->{trd}.')' : '';
@@ -464,8 +451,6 @@ sub Sercxu
 
   if (($formato ne "txt" or $param_lng ne 'eo') and $formato ne "idx") {
 
-    # ni bezonas la lingvo-nomojn...
-    my $lingvoj = $dbh->selectall_hashref("SELECT lng_kodo, lng_nomo FROM lng",'lng_kodo');
 
     if ($param_lng) {	# nur unu lingvo
 	    $preferata_lingvo = $param_lng;
@@ -502,8 +487,6 @@ sub Sercxu
 
       while (my $ref = $sth->fetchrow_hashref()) {
         my $lng = $ref->{lng};
-
-        # TODO!
         my $lng_nomo = $lingvoj->{$lng}->{lng_nomo} || $lng;
 
         # titolo ĉe nova lingvo en la listo...
