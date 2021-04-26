@@ -89,14 +89,21 @@ if ($sercxata =~ /[.^$\[\(\|+?{\\]/) {
 ### serĉu esperantajn vortojn ###
 my ($sth);
 
+# la unua SELECT trovas ĉiujn kapvortojn kun tradukoj en la preferataj lingvoj
+# per la dua SELECT ni certigos, ke ni enlistigas la kapvorton, eĉ se ĝi ne havas tradukojn de tiuj lingvoj
+# la tria SELECT trovas ekzemplojn kun ties tradukoj, ci-kaze ni rezigas listigi ilin, sed mankas
+# traduko, ĉu ni tamen montru ĝin...? - se jes ni bezonus kvaran SELECT
 my $QUERY =
    "SELECT DISTINCT * FROM ( "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
-    ."FROM v3esperanto  WHERE kap $komparo ? "
+    ."FROM v3esperanto  WHERE kap $komparo ? AND (ekz = '' OR ekz IS NULL) "
   ."UNION "
-    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz, lng, ind, trd "
-    ."FROM v3traduko  WHERE ekz $komparo ? "
-  .") AS u WHERE lng IN $pref_lng LIMIT $LIMIT_eo";
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, ''  AS lng, NULL AS ind, NULL AS trd "
+    ."FROM r3kap  WHERE kap $komparo ? "    
+  ."UNION "
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz AS kap, lng, ind, trd "
+    ."FROM v3traduko WHERE ekz $komparo ? "
+  .") AS u WHERE lng = '' OR lng IN $pref_lng LIMIT $LIMIT_eo";
 
 $sth = $dbh->prepare($QUERY);
 
@@ -109,7 +116,7 @@ my $trovoj_trd;
 eval {
   #print "\n\n$QUERY\n" if ($debug);
   #print "serĉu: $sercxata\n" if ($debug);
-  $sth->execute($sercxata,$sercxata);
+  $sth->execute($sercxata,$sercxata,$sercxata);
 };
 
 # kontrolu kaj eldonu erarojn, aliokaze la rezultojn
