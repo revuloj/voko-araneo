@@ -68,7 +68,7 @@ sub process {
 
   for my $art (@$arts) {
     if ($art =~ /^[a-z0-9]{1,30}$/) {
-      print pre("$art...") if ($verbose);
+      print pre("$art..."),"\n" if ($verbose);
       process_ref_json($art);
       $counter->{art}++;
     }
