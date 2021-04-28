@@ -29,7 +29,7 @@ $| = 1;
 my $LIMIT_eo = 50;
 my $LIMIT_trd = 250;
 
-my $verbose=1; # 1 = debugging...
+my $verbose=0; # 1 = debugging...
 
 #print "Content-type: text/html\n\n";
 
