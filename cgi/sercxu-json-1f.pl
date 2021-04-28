@@ -78,7 +78,7 @@ my $komparo = '=';
   # se enestas iuj specialsignoj kiel: . ^ + ? aŭ malferma krampo
   # ni supozas regulesprimon!
   # ni ne testas *, ĉu ni aldonu?
-if ($sercxata =~ /[.^$\[\(\|+?{\\]/) {
+if ($sercxata =~ /[\.\^\$\[\(\|+\?{\\]/) {
   $komparo = 'REGEXP'
   # se enestas % aŭ _ ni interpretas ilin kiel ĵokeroj kun LIKE
 } elsif ($sercxata =~ /[%_]/) {
@@ -99,13 +99,16 @@ my $QUERY =
     ."FROM v3esperanto  WHERE kap $komparo ? AND (ekz = '' OR ekz IS NULL) "
   ."UNION "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, ''  AS lng, NULL AS ind, NULL AS trd "
-    ."FROM r3kap  WHERE kap $komparo ? "    
+    ."FROM r3kap WHERE kap $komparo ? "    
   ."UNION "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz AS kap, lng, ind, trd "
     ."FROM v3traduko WHERE ekz $komparo ? "
   .") AS u WHERE lng = '' OR lng IN $pref_lng LIMIT $LIMIT_eo";
 
 $sth = $dbh->prepare($QUERY);
+
+#debug
+# print $QUERY; exit;
 
 # ekde mySQL 5.6. ni povus uzi GROUP_CONCAT por kunigi ĉiujn tradukojn
 # de unu lingvo en unu signoĉeno!      
@@ -147,8 +150,9 @@ my $QUERY =
 $sth = $dbh->prepare($QUERY);
 
 eval {
-  print "\n\n$QUERY\n" if ($debug);
-  print "serĉu: $sercxata\n" if ($debug);
+  #my $debug = 1;
+  #print "\n\n$QUERY\n" if ($debug);
+  #print "serĉu: $sercxata\n" if ($debug);
   $sth->execute($sercxata);
 };
 
