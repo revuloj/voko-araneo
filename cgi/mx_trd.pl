@@ -35,12 +35,15 @@ print header(
   -charset => 'utf-8'),
   start_html(
     -title => "mankantaj tradukoj". ($lng? " por lingvo $lng" : ""),
-	  -style =>{-src => '/revo/stl/indeksoj.css'},
-);
+	  -style =>{-src => '/revo/stl/indeksoj.css'}  
+), "<article>";
 
 unless ($lng) {
-  my %lng;
-  print h2("Elektu la lingvon:");
+  my @pref_lng = preflng();
+  my %lng; 
+  my %pref;
+
+  print h2("Elektu la lingvon:"),br;
   #open IN, "<../revo/cfg/lingvoj.xml" 
 
   # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
@@ -51,16 +54,31 @@ unless ($lng) {
   while (<IN>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
 #      print "lng $1 -> $2".br."\n";
-      $lng{$2} = $1 if $1 ne "eo";
+      if ($1 ne "eo") {
+        if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
+          $pref{$2} = $1;
+        } else {
+          $lng{$2} = $1;
+        }
+      }
     }
   }
   close IN;
 
-  my $i;
-  foreach (sort keys %lng) {
-    $i++;
-    print a({href=>"?lng=$lng{$_}"}, "$i. $_").br."\n";
+  foreach (sort keys %pref) {
+    print a({href=>"?lng=$pref{$_}"}, "$_").br."\n";
   }
+
+  print br."<p style='column-count: 3'>";
+
+  #my $i;
+  foreach (sort keys %lng) {
+    #$i++;
+    print a({href=>"?lng=$lng{$_}"}, "$_").br."\n";
+  }
+
+  print "</p>";
+
   exit 0;
 }
 
@@ -140,6 +158,7 @@ for my $row (@$rows) {
 $dbh->disconnect() or die "DB disconnect ne funkcias";
   
 print_nav($de,$ghis,0);
+print "</article>";
 print end_html();
 
 #########################################################
@@ -181,5 +200,27 @@ sub print_nav {
 
   print br;
 }
+
+sub preflng {
+  my @preferataj_lingvoj;
+  {
+    my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
+    for my $l (@a) {
+      #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
+      $l =~ s/^([a-z]{2,3}).*$/$1/;
+      unless (grep(/$l/,@preferataj_lingvoj)) {
+        push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
+      }
+      #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
+      # last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
+    #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
+    }
+  }
+
+  #print "DEBUG ".join(',',@preferataj_lingvoj);
+  #@preferataj_lingvoj = ('en') unless (@preferataj_lingvoj); 
+  return @preferataj_lingvoj;
+}
+
 
 
