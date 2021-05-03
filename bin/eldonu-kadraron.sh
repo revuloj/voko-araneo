@@ -21,9 +21,6 @@ perllib=${host}:files/perllib
 release=1f
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-#scp -r revo/dlg/index-${release}.html ${revo}/dlg/
-#scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
-#scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
@@ -41,24 +38,32 @@ release=1f
 #scp cgi/vokosubm-json.pl ${cgibin}/
 #scp cgi/admin/submeto.pl ${cgibin}/admin/
 
+#scp cgi/admin/uprevo.pl ${cgibin}/admin/
+
 ## # malnovaj
-scp cgi/vokomail.pl ${cgibin}/
+# scp cgi/vokomail.pl ${cgibin}/
 #scp cgi/sercxu.pl ${cgibin}/
 ## 
-## # novaj
-#scp cgi/sercxu-json-${release}.pl ${cgibin}/
-#scp cgi/vokoref-json.pl ${cgibin}/
-## scp cgi/vokomailx.pl ${cgibin}/
-## scp cgi/vokohtmlx.pl ${cgibin}/
-## scp cgi/hazarda_art.pl ${cgibin}/
-## scp cgi/mx_trd.pl ${cgibin}/
-#
+
+
 
 #scp cgi/perllib/*.pm ${perllib}/
 
 #scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
 #scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
-scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
-scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
+#scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
+#scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
 
 
+## # novaj
+#scp cgi/sercxu-json-${release}.pl ${cgibin}/
+#scp cgi/vokoref-json.pl ${cgibin}/
+## scp cgi/vokomailx.pl ${cgibin}/
+scp cgi/vokohtmlx.pl ${cgibin}/
+## scp cgi/hazarda_art.pl ${cgibin}/
+#scp cgi/mx_trd.pl ${cgibin}/
+#
+#scp -r revo/dlg/index-${release}.html ${revo}/dlg/
+#scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
+#scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+#scp -r revo/dlg/404.html ${revo}/dlg/
