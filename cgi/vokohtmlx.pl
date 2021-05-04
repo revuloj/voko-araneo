@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # 2008 Wieland Pusch
-# 2020 Wolfram Diestel
+# 2020-2021 Wolfram Diestel
 
 use strict;
 use utf8;
@@ -101,19 +101,19 @@ sub konv {
 
   {
     $$html =~ s#<!DOCTYPE .*?>##sm;
-    my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or (tez_celref = ? and tez_tipo in ('sin','vid'))");
-    while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
-        my $ref = $1;
-        $sth->execute($1,$1);
-        my ($tez_ekzistas) = $sth->fetchrow_array();
+    # my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or (tez_celref = ? and tez_tipo in ('sin','vid'))");
+    # while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
+    #     my $ref = $1;
+    #     $sth->execute($1,$1);
+    #     my ($tez_ekzistas) = $sth->fetchrow_array();
         
-        if ($tez_ekzistas) {
-          $ref =~ tr/./_/;
-          $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso" class="tez-ref" title="al la tezaŭro">↝</a>#;
-      } else {
-          $$html =~ s###;
-      }
-    }
+    #     if ($tez_ekzistas) {
+    #       $ref =~ tr/./_/;
+    #       $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso" class="tez-ref" title="al la tezaŭro">↝</a>#;
+    #   } else {
+    #       $$html =~ s###;
+    #   }
+    #}
   }
   
   return 1;

@@ -399,11 +399,13 @@ sub parse {
         }
       }
 
-      $nod =~ s/\s*<((?:super)|(?:sub)|(?:dif)|(?:sin)|(?:vid)|(?:ant)|(?:malprt)|(?:prt)|(?:ekz)|(?:lst))\/>\s*//smg;
+      $nod =~ s/\s*<((?:super)|(?:sub)|(?:dif)|(?:sin)|(?:vid)|(?:ant)|(?:malprt)|(?:prt)|(?:hom)|(?:ekz)|(?:lst))\/>\s*//smg;
 
-      while ($nod =~ m/<((?:super)|(?:sub)|(?:dif)|(?:sin)|(?:vid)|(?:ant)|(?:ekz)|(?:lst))>(.*?)\s*<\/\1>\s*/smg) {
+      while ($nod =~ m/<((?:super)|(?:sub)|(?:dif)|(?:sin)|(?:vid)|(?:ant)|(?:malprt)|(?:prt)|(?:hom)|(?:ekz)|(?:lst))>(.*?)\s*<\/\1>\s*/smg) {
 		# |(?:malprt)|(?:prt)
         my ($tipo, $resto) = ($1, $2);
+        # la kampo tez_tipo havas nur tri sginojn
+        $tipo = substr($tipo,0,3);
 #        print pre(escapeHTML("tipo $tipo, $resto"));
         $nod =~ s///;
 
