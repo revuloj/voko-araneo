@@ -15,7 +15,6 @@ my $tezdir = "$revodir/tez";
 
 my $xsltproc = "xsltproc $homedir/files/xsl/revo_json.xsl";
 
-
 # transformu ciujn XML-dosierojn al JSON
 my @arts;
 for $xml (glob "$revodir/xml/*.xml") {
@@ -29,17 +28,33 @@ for $xml (glob "$revodir/xml/*.xml") {
     }
 }
 
-# uzu db_art.pm por enmeti la enhavon de JSON en la datumbazon
 
-print 'aktualigu datumbazon kap,mrk,ref el json' if ($verbose);
+### uzu db_art.pm por enmeti la enhavon de JSON en la datumbazon
+print "aktualigu datumbazon kap,mrk,ref el json\n" if ($verbose);
 
-# Konektiĝi kun la datumbazo kaj malplenigi la tabelon
+# Malfermi la datumbazon kaj plenigi la tabelojn
 my $dbh = revodb::connect();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
 my $cnt = art_db::process($dbh,\@arts,$verbose);
 
+
+### legu la lingvo-liston el XML kaj skribu al tabelo lng
+print "aktualigu datumbazon lng el xml\n" if ($verbose);
+my $ins = $dbh->prepare("INSERT INTO lng(lng_kodo,lng_nomo) VALUES (?,?)");
+
+open IN, "< $revodir/cfg/lingvoj.xml"
+    or die "ne povas malfermi dosieron lingvoj.xml";
+while (<IN>) {
+    if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
+        #print "$1:$2\n";
+        $ins->execute(substr($1,0,3),$2);
+    }
+}
+close IN;
+
+# Fermi la datumbazon
 $dbh->disconnect() or die "Malkonektiĝi de DB ne funkciis.\n";
 
 print "daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap:$cnt->{kap}\n"
