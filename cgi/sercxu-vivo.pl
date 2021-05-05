@@ -37,7 +37,10 @@ my $LIMIT_rec = 100;
 
 my $sercxata = param('sercxata') if param('sercxata'); utf8::decode($sercxata);
 my $lng = param('lng') || ''; # serĉlingvo
+my @lingvoj = ();
 my $trdlng = trdlng(); # aldonaj traduklingvoj ('en','fr'...) aŭ ('')
+
+#debug: print $trdlng,"\n";
 
 if ($sercxata eq "") {
   print "Bonvolu meti ion, kion serĉi";
@@ -61,8 +64,6 @@ use revodb;
 
 # Malfermu la datumbazon
 my $dbh = revodb::connect();
-
-my @lingvoj = ();
 
 # necesas!
 $dbh->{'mysql_enable_utf8'} = 1;
@@ -128,7 +129,7 @@ if ($@) {
   my $neniu_trafo = 1;
   # ni ricevis rezulton, kiun ni devas aranĝo laŭlinie ...
   while (my $ref = $sth->fetchrow_hashref()) {
-    skribu_linion($ref,@lingvoj);
+    skribu_linion($ref);
     $neniu_trafo = 0;
   }
   
@@ -147,7 +148,7 @@ exit;
 ###################################################################
 
 sub skribu_linion {
-  my ($ref, @lingvoj) = @_;
+  my $ref = shift;
   my $tradukoj = {};
 
   # transformu mrk al href
@@ -155,9 +156,11 @@ sub skribu_linion {
 
   # kunkolektu la unuopajn tradukoj laŭ lingvo
   if ($ref->{eo}) {
-    $tradukoj->{eo} = (split ':', $ref->{eo})[1];
+    my @s = split ':', $ref->{eo};
+    @{$tradukoj->{eo}} = splice(@s, 1, 1);
   }
-  for my $trd (split '|', $ref->{trd}) {
+
+  for my $trd (split '\|', $ref->{trd}) {
     my ($l,$t) = split ':', $trd;
     $tradukoj->{$l} = () unless $tradukoj->{$l};
     push @{$tradukoj->{$l}}, $t;
@@ -166,10 +169,14 @@ sub skribu_linion {
   # ordigu la tradukojn laŭ la ordo de petitaj trd-lingvoj
   my @trd_lst = ();
   for my $lng (@lingvoj) {
-    push @trd_lst, join(',',$tradukoj->{$lng});
+    if ($tradukoj->{$lng}) {
+      push @trd_lst, join(',',@{$tradukoj->{$lng}});
+    } else {
+      push @trd_lst, '';
+    }
   }
 
-  print join('|',$ref->{kap},$href,@trd_lst), "\n";
+  print join('|',$ref->{kap}.', '.$href,@trd_lst), "\n";
 }
 
 sub trdlng {
