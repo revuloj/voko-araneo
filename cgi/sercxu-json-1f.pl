@@ -203,6 +203,7 @@ sub preflng {
       #unless (grep(/$l/,@preferataj_lingvoj)) { 
       push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
       #}
+
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
       last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
     #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';

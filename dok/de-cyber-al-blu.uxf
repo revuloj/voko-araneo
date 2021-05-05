@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><diagram program="umlet" version="13.3">
+  <zoom_level>14</zoom_level>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>140</x>
+      <y>70</y>
+      <w>350</w>
+      <h>266</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;environment&gt;&gt;
+cyberweb</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>854</x>
+      <y>588</y>
+      <w>350</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;environment&gt;&gt;
+redaktoservo</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1036</x>
+      <y>210</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+revo@c-p.de
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>322</x>
+      <y>196</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+revo@r-v.de
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>882</x>
+      <y>210</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+redaktilo
+bg=cyan</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>448</x>
+      <y>238</y>
+      <w>462</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.) redaktoj
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;20.0;310.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>154</x>
+      <y>196</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+redaktilo
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>196</x>
+      <y>294</y>
+      <w>182</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.) redaktoj
+fg=gray</panel_attributes>
+    <additional_attributes>110.0;10.0;110.0;70.0;10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>854</x>
+      <y>98</y>
+      <w>350</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;environment&gt;&gt;
+blu7</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>308</x>
+      <y>700</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+redaktilo
+bg=#3c7a00</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>364</x>
+      <y>294</y>
+      <w>112</w>
+      <h>434</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.)
+redaktoj
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;290.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>252</x>
+      <y>602</y>
+      <w>252</w>
+      <h>238</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;environment&gt;&gt;
+steloj</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>420</x>
+      <y>294</y>
+      <w>476</w>
+      <h>476</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;
+(1.)
+pop3 (redaktoj)
+smtp (konfirmoj)
+fg=gray</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;320.0;320.0;320.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>868</x>
+      <y>700</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+processmail
+bg=light_gray</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1022</x>
+      <y>700</y>
+      <w>140</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+aktualigoj
+bg=light_gray</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1078</x>
+      <y>364</y>
+      <w>154</w>
+      <h>364</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+aktualigoj 
+per ftps+cgi
+fg=#000088</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>476</x>
+      <y>294</y>
+      <w>616</w>
+      <h>434</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+aktualigoj per ftp+cgi
+fg=#000088</panel_attributes>
+    <additional_attributes>10.0;10.0;420.0;290.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>308</y>
+      <w>182</w>
+      <h>420</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-&gt;
+(1.)
+pop3 (redaktoj)
+smtp (konfirmoj)
+fg=red</panel_attributes>
+    <additional_attributes>100.0;10.0;20.0;80.0;20.0;280.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>448</x>
+      <y>266</y>
+      <w>616</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(1.) plusendo
+fg=red</panel_attributes>
+    <additional_attributes>420.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>42</y>
+      <w>182</w>
+      <h>196</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.) redaktoj
+fg=red</panel_attributes>
+    <additional_attributes>110.0;120.0;110.0;20.0;10.0;20.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>238</x>
+      <y>0</y>
+      <w>938</w>
+      <h>238</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.) redaktoj
+fg=red</panel_attributes>
+    <additional_attributes>650.0;150.0;650.0;20.0;10.0;20.0;10.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>392</x>
+      <y>266</y>
+      <w>1106</w>
+      <h>672</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+(2.) redaktoj
+fg=red</panel_attributes>
+    <additional_attributes>560.0;10.0;690.0;10.0;690.0;460.0;10.0;460.0;10.0;390.0</additional_attributes>
+  </element>
+</diagram>
