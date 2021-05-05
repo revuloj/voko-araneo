@@ -91,6 +91,8 @@ my ($sth);
 
 # la unua SELECT trovas ĉiujn *kapvortojn kun tradukoj* en la preferataj lingvoj
 # per la dua SELECT ni certigos, ke ni enlistigas la *kapvorton, eĉ se ĝi ne havas tradukojn* de tiuj lingvoj
+# PLIBONIGU: Fakte pli bone ni devus filtri la lingvojn ne en WHERE, sed en ON por inkluzivi kapvortojn sen
+# koncernaj tradukoj! 
 # la tria SELECT trovas *ekzemplojn kun ties tradukoj*. 
 # Ĉi-kaze ni rezigas listigi ilin, se mankas traduko! 
 # Ĉu ni tamen montru ĝin...? - se jes ni bezonus kvaran SELECT

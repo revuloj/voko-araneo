@@ -374,6 +374,8 @@ sub Sercxu
     } else {
       # ni devas iom truki, por ricevi ankaŭ kapvortojn, kiuj ne havas tradukon
       # en $preferata_lingvo:
+      # PLIBONIGU: ni devos movi la lingvo-filtradon el WHERE al ON, rezignante pri v3esperanto
+      # por inkluzvi kapvortojn sen koncernaj tradukoj!
       $sth = $dbh->prepare(
          "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk,kap,ekz,lng, "
         ."GROUP_CONCAT(DISTINCT CASE WHEN trd THEN trd ELSE ind END SEPARATOR ', ') AS trd "
