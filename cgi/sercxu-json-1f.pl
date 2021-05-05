@@ -89,10 +89,13 @@ if ($sercxata =~ /[\.\^\$\[\(\|+\?{\\]/) {
 ### serĉu esperantajn vortojn ###
 my ($sth);
 
-# la unua SELECT trovas ĉiujn kapvortojn kun tradukoj en la preferataj lingvoj
-# per la dua SELECT ni certigos, ke ni enlistigas la kapvorton, eĉ se ĝi ne havas tradukojn de tiuj lingvoj
-# la tria SELECT trovas ekzemplojn kun ties tradukoj, ci-kaze ni rezigas listigi ilin, sed mankas
-# traduko, ĉu ni tamen montru ĝin...? - se jes ni bezonus kvaran SELECT
+# la unua SELECT trovas ĉiujn *kapvortojn kun tradukoj* en la preferataj lingvoj
+# per la dua SELECT ni certigos, ke ni enlistigas la *kapvorton, eĉ se ĝi ne havas tradukojn* de tiuj lingvoj
+# PLIBONIGU: Fakte pli bone ni devus filtri la lingvojn ne en WHERE, sed en ON por inkluzivi kapvortojn sen
+# koncernaj tradukoj! 
+# la tria SELECT trovas *ekzemplojn kun ties tradukoj*. 
+# Ĉi-kaze ni rezigas listigi ilin, se mankas traduko! 
+# Ĉu ni tamen montru ĝin...? - se jes ni bezonus kvaran SELECT
 my $QUERY =
    "SELECT DISTINCT * FROM ( "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
@@ -197,9 +200,10 @@ sub preflng {
     for my $l (@a) {
       #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
       $l =~ s/^([a-z]{2,3}).*$/$1/;
-      unless (grep(/$l/,@preferataj_lingvoj)) {
-        push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
-      }
+      #unless (grep(/$l/,@preferataj_lingvoj)) { 
+      push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
+      #}
+
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
       last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
     #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
