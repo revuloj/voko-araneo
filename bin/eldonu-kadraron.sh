@@ -43,6 +43,7 @@ release=1f
 ## # malnovaj
 # scp cgi/vokomail.pl ${cgibin}/
 #scp cgi/sercxu.pl ${cgibin}/
+#scp cgi/sercxu-vivo.pl ${cgibin}/
 ## 
 
 
@@ -59,10 +60,13 @@ release=1f
 #scp cgi/sercxu-json-${release}.pl ${cgibin}/
 #scp cgi/vokoref-json.pl ${cgibin}/
 ## scp cgi/vokomailx.pl ${cgibin}/
-scp cgi/vokohtmlx.pl ${cgibin}/
+# scp cgi/vokohtmlx.pl ${cgibin}/
 ## scp cgi/hazarda_art.pl ${cgibin}/
 #scp cgi/mx_trd.pl ${cgibin}/
 #
+scp -r revo/index.html ${revo}/
+scp -r revo/index.html ${host}:www/
+
 #scp -r revo/dlg/index-${release}.html ${revo}/dlg/
 #scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
 #scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
