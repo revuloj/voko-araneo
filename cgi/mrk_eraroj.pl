@@ -24,11 +24,12 @@ my $json_parser = JSON->new->allow_nonref;
 
 my $limit = 50;
 
-print header(-type => 'application/json');
+print header(-type=>'application/json',-charset=>'utf-8');
 
 # Malfermu la datumbazon
 my $dbh = revodb::connect();
-
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do("set names utf8");
 
 my ($drv) = $dbh->selectall_arrayref("SELECT mrk,kap FROM r3kap WHERE mrk LIKE '%.%.%' LIMIT $limit");
 my ($snc) = $dbh->selectall_arrayref("SELECT  r3mrk.mrk,ele,drv FROM r3mrk LEFT JOIN r3kap ON r3kap.mrk = r3mrk.drv "
