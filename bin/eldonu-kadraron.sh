@@ -28,6 +28,8 @@ release=1f
 # cgi-bin/admin
 #scp cgi/admin/* ${cgibin}/admin/
 #scp cgi/admin/.ht* ${cgibin}/admin/
+scp cgi/admin/checkversioj.pl ${cgibin}/admin/
+scp cgi/perllib/art_db.pm ${perllib}/
 
 #scp cgi/admin/up* ${cgibin}/admin/
 #scp cgi/admin/upviki.pl ${cgibin}/admin/
@@ -64,8 +66,8 @@ release=1f
 ## scp cgi/hazarda_art.pl ${cgibin}/
 #scp cgi/mx_trd.pl ${cgibin}/
 #
-scp -r revo/index.html ${revo}/
-scp -r revo/index.html ${host}:www/
+#scp -r revo/index.html ${revo}/
+#scp -r revo/index.html ${host}:www/
 
 #scp -r revo/dlg/index-${release}.html ${revo}/dlg/
 #scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
