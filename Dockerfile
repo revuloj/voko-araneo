@@ -2,8 +2,29 @@
 FROM voko-grundo as grundo 
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
+
+# tie ĉi ni kreas JSON-dosierojn el la XML-fontoj por poste plenigi la datumbazon
+# por havi pli aktualajn JSON-dosierojn ni devos aldoni la kreadon al la ĉiutaga eldono
+# kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
+#FROM ubuntu:focal as json-builder
+#LABEL maintainer=<diestel@steloj.de>
+#ARG VG_BRANCH=1f
+#ARG DEBIAN_FRONTEND=noninteractive
+#
+#COPY bin/xml-json.pl bin/  
+## ni bezonas curl, unzip, perl, xsltproc por kompili la datumbazon el la XML-fontoj
+#RUN apt-get update && apt-get install -y --no-install-recommends \
+#    ca-certificates curl unzip xsltproc perl \
+#	&& curl -Lo revo-fonto.zip https://github.com/revuloj/revo-fonto/archive/master.zip \
+#	&& curl -Lo voko-grundo.zip https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
+#  && unzip -q revo-fonto.zip && unzip -q voko-grundo.zip \
+#  && ln -s revo-fonto-master revo-fonto \
+#  && ln -s voko-grundo-${VG_BRANCH} voko-grundo 
+#RUN ls -l \
+#  && perl bin/xml-json.pl  
+
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.12 as builder
+FROM alpine:3.13 as builder
 
 # build and install rxp
 RUN apk update \
@@ -47,11 +68,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks
-ARG VG_BRANCH=v1e
+ARG VG_BRANCH=1f
 # por brancoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=1e
-ARG REVO_VER=1e
+ARG ZIP_SUFFIX=1f
+ARG REVO_VER=1f
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
@@ -74,6 +95,7 @@ RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql f
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
+#COPY --from=json-builder json/* ${HTTP_DIR}/revo/tez/
 #COPY --from=metapost --chown=root:root voko-grundo-master/build/smb/*.svg /tmp/svg/
 
 #ADD . ./
@@ -98,12 +120,13 @@ WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
   && unzip -l ${VG_BRANCH}.zip \
-  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/xsl/* voko-grundo-${ZIP_SUFFIX}/dok/* \
+  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
      voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
      # necesaj ankoraŭ por la malnova fasado:
      voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
   && rm ${VG_BRANCH}.zip \
-  && mkdir -p ${HOME_DIR}/files && mv voko-grundo-${ZIP_SUFFIX}/xsl ${HOME_DIR}/files/ \
+  && mkdir -p ${HOME_DIR}/files \
+  && curl -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
@@ -122,6 +145,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
 COPY --from=grundo build/smb/ /usr/local/apache2/htdocs/revo/smb/
 COPY --from=grundo build/jsc/ /usr/local/apache2/htdocs/revo/jsc/
 COPY --from=grundo build/stl/ /usr/local/apache2/htdocs/revo/stl/
+COPY --from=grundo build/xsl/ ${HOME_DIR}/files/xsl/
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
 

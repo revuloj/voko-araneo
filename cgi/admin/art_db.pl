@@ -23,7 +23,7 @@ my $tezdir = "$homedir/www/revo/tez";
 #my $json_parser = JSON->new->allow_nonref;
 
 print header(-charset=>'utf-8'),
-      start_html('aktualigu datumbazon kap,mrk,ref el json'),
+      start_html('aktualigu datumbazon kap,mrk,ref,trd el json'),
 	  h2(scalar(localtime));
 
 # ekstraktu la artikolojn el la parametro(j)
@@ -56,5 +56,6 @@ my $cnt = art_db::process($dbh,\@arts,$verbose);
 
 $dbh->disconnect() or die "Malkonektiĝi de DB ne funkciis.\n";
 
-print pre("daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap: $cnt->{kap}\nmrk: $cnt->{mrk}\nref: $cnt->{ref}\n");	
+print pre("daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap: $cnt->{kap}\n"
+         ."mrk: $cnt->{mrk}\nref: $cnt->{ref}\ntrd: $cnt->{trd}\n");	
 print end_html;

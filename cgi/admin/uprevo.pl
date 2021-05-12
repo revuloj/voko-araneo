@@ -145,54 +145,54 @@ print pre($ret);
 
 print LOG "date: ".`date`."\n";
 
-my $dbtext = "";
-my $fsize = `du -h $htmldir/alveno/$fname`; $fsize =~ s/\t.*$//; chomp $fsize;
-if (! -e "$htmldir/alveno/$dbfname") {
-  my $dumpcmd = revodb::mysqldump;
-  $ret = `$dumpcmd --skip-lock-tables | gzip >$htmldir/alveno/$dbfname`;
-  print LOG "mysqldump -> \n$ret",
-        "date: ".`date`;
-  my $dbsize = `du -h $htmldir/alveno/$dbfname`; $dbsize =~ s/\t.*$//; chomp $dbsize;
-  $dbtext = "Aktuala datumbazo estas en http://www.reta-vortaro.de/alveno/$dbfname ($dbsize)";
-  
-  if (param('nomail')) {
-    print h2("Ne sendas retmesagxon.")."\n";
-  } else {
-    print h2("Sendas retmesagxon.")."\n";
-# FARENDA: unuecigu sendadon de poŝto en uprevo, vokomail, processmail
-# kreu poshtsendo.pm aŭ simile kaj anstataŭ sendmail
-# eble uzu estonte: https://metacpan.org/pod/Mail::Sendmail::Enhanced
-    my $from    = revodb::mail_from;
-    my $name    = "Revo Upload";
-    my $to      = revodb::mail_to;
-    my $subject = "Revo Upload";
-    my $oldfiles = "";
-	
-    open IN, "<", "$htmldir/alveno/mail.txt";
-    $oldfiles = join('', <IN>);
-    close IN;
-    open IN, ">", "$htmldir/alveno/mail.txt";
-    close IN;
-
-    open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >sendmail.log" or print LOG "ne povas sendmail\n";
-    print SENDMAIL <<End_of_Mail;
-From: $name <$from>
-To: $to
-Reply-To: $from
-Subject: $subject
-
-Novaj sxangxoj alvenis en
-$oldfiles http://www.reta-vortaro.de/alveno/$fname ($fsize)
-$dbtext
-End_of_Mail
-    close SENDMAIL;
-  }
-} else {
-  open MAIL, ">>", "$htmldir/alveno/mail.txt";
-  print MAIL " http://www.reta-vortaro.de/alveno/$fname ($fsize)\n";
-  close MAIL;
-}
-
+##my $dbtext = "";
+##my $fsize = `du -h $htmldir/alveno/$fname`; $fsize =~ s/\t.*$//; chomp $fsize;
+##if (! -e "$htmldir/alveno/$dbfname") {
+##  my $dumpcmd = revodb::mysqldump;
+##  $ret = `$dumpcmd --skip-lock-tables | gzip >$htmldir/alveno/$dbfname`;
+##  print LOG "mysqldump -> \n$ret",
+##        "date: ".`date`;
+##  my $dbsize = `du -h $htmldir/alveno/$dbfname`; $dbsize =~ s/\t.*$//; chomp $dbsize;
+##  $dbtext = "Aktuala datumbazo estas en http://www.reta-vortaro.de/alveno/$dbfname ($dbsize)";
+##  
+##  if (param('nomail')) {
+##    print h2("Ne sendas retmesagxon.")."\n";
+##  } else {
+##    print h2("Sendas retmesagxon.")."\n";
+### FARENDA: unuecigu sendadon de poŝto en uprevo, vokomail, processmail
+### kreu poshtsendo.pm aŭ simile kaj anstataŭ sendmail
+### eble uzu estonte: https://metacpan.org/pod/Mail::Sendmail::Enhanced
+##    my $from    = revodb::mail_from;
+##    my $name    = "Revo Upload";
+##    my $to      = revodb::mail_to;
+##    my $subject = "Revo Upload";
+##    my $oldfiles = "";
+##	
+##    open IN, "<", "$htmldir/alveno/mail.txt";
+##    $oldfiles = join('', <IN>);
+##    close IN;
+##    open IN, ">", "$htmldir/alveno/mail.txt";
+##    close IN;
+##
+##    open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >sendmail.log" or print LOG "ne povas sendmail\n";
+##    print SENDMAIL <<End_of_Mail;
+##From: $name <$from>
+##To: $to
+##Reply-To: $from
+##Subject: $subject
+##
+##Novaj sxangxoj alvenis en
+##$oldfiles http://www.reta-vortaro.de/alveno/$fname ($fsize)
+##$dbtext
+##End_of_Mail
+##    close SENDMAIL;
+##  }
+##} else {
+##  open MAIL, ">>", "$htmldir/alveno/mail.txt";
+##  print MAIL " http://www.reta-vortaro.de/alveno/$fname ($fsize)\n";
+##  close MAIL;
+##}
+##
 $ret = `du -sh $homedir`;
 #print h2("du -> $exitcode");
 print pre($ret);

@@ -27,6 +27,9 @@ my $homedir = "/hp/af/ag/ri";
 my $tezdir = "$homedir/www/revo/tez";
 #my $json_parser = JSON->new->allow_nonref;
 
+my $len_ind = 100;
+my $len_trd = 255;
+
 # SQL-komandoj
 my $kap_del;
 my $kap_ins;
@@ -34,6 +37,8 @@ my $mrk_del;
 my $mrk_ins;
 my $ref_del;
 my $ref_ins;
+my $trd_del;
+my $trd_ins;
 
 my $counter;
 
@@ -49,18 +54,21 @@ sub process {
   $mrk_ins = $dbh->prepare("INSERT INTO r3mrk (mrk,ele,num,drv) VALUES (?,?,?,?)");
   $ref_del = $dbh->prepare("DELETE FROM r3ref WHERE mrk LIKE ?");
   $ref_ins = $dbh->prepare("INSERT INTO r3ref (mrk,tip,cel,lst) VALUES (?,?,?,?)");
+  $trd_del = $dbh->prepare("DELETE FROM r3trd WHERE mrk LIKE ?");
+  $trd_ins = $dbh->prepare("INSERT INTO r3trd (mrk,lng,ind,trd,ekz) VALUES (?,?,?,?,?)");
 
   # nuligu nombrilojn
   $counter = {
     art => 0,
     mrk => 0,
     kap => 0,
-    ref => 0
+    ref => 0,
+    trd => 0
   };  
 
   for my $art (@$arts) {
     if ($art =~ /^[a-z0-9]{1,30}$/) {
-      print pre("$art...") if ($verbose);
+      print pre("$art..."),"\n" if ($verbose);
       process_ref_json($art);
       $counter->{art}++;
     }
@@ -80,6 +88,7 @@ sub process_ref_json {
       process_kap($art,$json->{$art});
       process_mrk($art,$json->{$art});
       process_ref($art,$json->{$art});
+      process_trd($art,$json->{$art});
     }
 }
 
@@ -96,7 +105,7 @@ sub process_kap {
     print pre("KAP art: $art, kap: $kap, mrk: $mrk, var: $var\n") if ($debug);
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $kap =~ /^[\pL\d\*-][- \pL]*$/ && 
+      $kap =~ /^[\pL\d\*\(\-][-'\(\),!\.\h\pL]*$/ && 
       $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
       (!$var || $var =~ /^[\pL\d ]+$/) )
     {
@@ -186,6 +195,50 @@ sub process_ref {
       $ref_ins->execute($mrk,$tip,$cel,$lst);
 
       $counter->{ref}++;
+    }
+  }
+}
+
+
+sub process_trd {
+  my ($art,$json) = @_;
+
+  $trd_del->execute("$art.%");
+  
+  for my $trd (@{$json->{trd}}) {
+    my $mrk = $trd->[0];
+    my $lng = $trd->[1];
+    my $ind = decode('UTF-8',$trd->[2]);
+    my $text = decode('UTF-8',$trd->[3]); # ? $trd->[3]: undef;
+    my $ekz = decode('UTF-8',$trd->[4]); # ? $trd->[3]: undef;
+
+    print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text, ekz: $ekz\n") if ($debug);
+
+    if (
+        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
+        $lng =~ /^[a-z]{2,3}$/ )
+    {
+      $mrk = "$art$mrk";
+      # ni provizore uzas \u7F por citiloj en JSON (lng=he)
+      $ind =~ s/\x7F/"/g; $text =~ s/\x7F/"/g;
+      # kaj ¦ por \ (lng=he)
+      $ind =~ s/¦/\\/g; $text =~ s/¦/\\/g;
+
+      # unless ($text) { $text = $ind; };
+      $text = substr($text,0,255); # limigu tro longajn tradukojn
+      $ekz = substr($ekz,0,255); # limigu tro longajn tradukojn
+
+      if (length($ind) < 100) { # se ind estas tro longa verŝajne la traduko estas
+                                # iel fuŝa kaj parto eble estu klarigo, aŭ aplikiĝu mll
+                                # por koncizigo - do ni ignoras ilin
+                                # se iam ni tamen volas tiom longajn - ekz-e pro ekz/trd
+                                # ni aŭ larĝigu la tabelon aŭ tranĉu la tradukon!
+        $trd_ins->execute($mrk,$lng,$ind,$text,$ekz);
+      } else {
+        warn "Tro longa traduk-indeksero: \"$ind\" en $art!\n"
+      }
+
+      $counter->{trd}++;
     }
   }
 }
