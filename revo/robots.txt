@@ -9,3 +9,4 @@ Disallow: /revo/hst/
 Disallow: /revo/xml/
 Disallow: /revo/xsl/
 Disallow: /cgi-bin/
+Disallow: /cgi-bin/vokomail*

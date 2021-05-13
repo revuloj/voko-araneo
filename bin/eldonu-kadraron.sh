@@ -18,7 +18,7 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=1f
+release=1g
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
 #scp -r revo/dlg/index-${release}.html ${revo}/dlg/
