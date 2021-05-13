@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# parseart2.pl
+# checkencode.pl
 # 
 # 2008-03-24 Wieland Pusch
 #
@@ -70,7 +70,7 @@ foreach my $art (@arts) {
   }
 }
   
-print h2("Tuta dauxro: ".(time() - $start_time)." sekundoj por $art_count artikoloj.");
+print h2("Tuta daŭro: ".(time() - $start_time)." sekundoj por $art_count artikoloj.");
 print h1("Fino.");
 
 print end_html();

@@ -19,7 +19,6 @@ $debug = 0;
 
 my $homedir = "/hp/af/ag/ri";
 my $vikiref = "$homedir/www/revo/inx/vikiref.json";
-#my $json_parser = JSON->new->allow_nonref;
 
 print header(-charset=>'utf-8'),
       start_html('aktualigu viki-ligojn'),
@@ -58,42 +57,3 @@ $dbh->disconnect() or die "DB disconnect ne funkcias";
 
 print pre("daŭro: ".(time - $^T)." sekundoj por $count referencoj");	
 print end_html;
-
-################# helpaj funkcioj ###################
-
-# legi JSON-dosieron
-#sub read_json_file {
-#	my $file = shift;
-#  	my $j = read_file($file);
-#
-#	print ("json file: $file\n") if ($debug);
-#
-#	unless ($j) {
-#		warn("Malplena aŭ mankanta JSON-dosiero '$file'\n");
-#		return;
-#	}
-#    print(substr($j,0,20)."...\n") if ($debug);
-#
-#    my $parsed;
-#	eval {
-#    	$parsed = $json_parser->decode($j);
-#    	1;
-#	} or do {
-#  		my $error = $@;
-#		die("Ne eblis analizi enhavon de JSON-dosiero '$file': $error\n");
-#	};
-#
-#	return $parsed;	  
-#}
-#
-#
-## legi dosieron
-#sub read_file {
-#	my $file = shift;
-#	unless (open FILE, $file) {
-#		warn("Ne povis malfermi '$file': $!\n"); return;
-#	}
-#	my $text = join('',<FILE>);
-#	close FILE;
-#	return $text;
-#}

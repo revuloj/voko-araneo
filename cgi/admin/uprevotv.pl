@@ -10,7 +10,6 @@ use IO::Handle;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-use parseart;
 
 my $exitcode;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# parseart.pm
+# fileutil.pm
 # 
 # 2021 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
