@@ -27,18 +27,18 @@ my $homedir = "/hp/af/ag/ri";
 my $xmldir = "$homedir/www/revo/xml";
 my $artdir = "$homedir/www/revo/art";
 my $tezdir = "$homedir/www/revo/tez";
+my $hstdir = "$homedir/www/revo/hst";
 
-my ($xml,$art,$tez);
+my ($xml,$art,$hst,$tez);
 for (glob "$xmldir/*.xml") { /([^\/]+)\.xml$/; $xml->{$1} = 1 };
 for (glob "$artdir/*.html") { /([^\/]+)\.html$/; $art->{$1} = 1 };
+for (glob "$hstdir/*.html") { /([^\/]+)\.html$/; $hst->{$1} = 1 };
 for (glob "$tezdir/*.json") { /([^\/]+)\.json$/; $tez->{$1} = 1 };
-#my @art = map { /([^\/]+)\.html$/; $1 } glob "$artdir/*.html";
-#my @tez = map { /([^\/]+)\.json$/; $1 } glob "$tezdir/*.json";
-#my @x_a = grep { not ($_ ~~ @art) } @xml;
-#my @a_x = grep { not ($_ ~~ @xml) } @art;
 
 my @x_a = grep { not exists ($art->{$_}) } keys %$xml;
 my @a_x = grep { not exists ($xml->{$_}) } keys %$art;
+my @x_h = grep { not exists ($hst->{$_}) } keys %$xml;
+my @h_x = grep { not exists ($xml->{$_}) } keys %$hst;
 my @x_t = grep { not exists ($tez->{$_}) } keys %$xml;
 my @t_x = grep { not exists ($xml->{$_}) } keys %$tez;
 
@@ -62,6 +62,8 @@ $dbh->disconnect() or die "Ne eblis fermi la DB-on.\n";
 print $json_parser->encode({
   "xml-art" => \@x_a,
   "art-xml" => \@a_x,
+  "xml-hst" => \@x_h,
+  "hst-xml" => \@h_x,
   "xml-tez" => \@x_t,
   "tez-xml" => \@t_x,
   "tez-db"  => \@t_d,
