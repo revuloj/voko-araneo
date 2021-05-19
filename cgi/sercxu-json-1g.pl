@@ -29,7 +29,7 @@ my $json_parser = JSON->new->allow_nonref;
 #$| = 1;
 
 my $debug = 0;
-my $LIMIT_eo = 50;
+my $LIMIT_eo = 250;
 my $LIMIT_lng = 5;
 my $LIMIT_trd = 250;
 
