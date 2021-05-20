@@ -21,23 +21,25 @@ perllib=${host}:files/perllib
 release=1g
 
 # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-#scp -r revo/dlg/index-${release}.html ${revo}/dlg/
-#scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
-#scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+scp -r revo/dlg/index-${release}.html ${revo}/dlg/
+scp -r revo/dlg/titolo-${release}.html ${revo}/dlg/
+scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
+scp -r revo/dlg/404.html ${revo}/dlg/
+
 #scp revo/smb/revo.svg ${host}:/html/favicon.ico
 #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
 # cgi-bin/admin
 #scp cgi/admin/* ${cgibin}/admin/
 #scp cgi/admin/.ht* ${cgibin}/admin/
-scp cgi/admin/checkversioj.pl ${cgibin}/admin/
-scp cgi/perllib/art_db.pm ${perllib}/
+#scp cgi/admin/checkversioj.pl ${cgibin}/admin/
+#scp cgi/perllib/art_db.pm ${perllib}/
 
 #scp cgi/admin/up* ${cgibin}/admin/
 #scp cgi/admin/upviki.pl ${cgibin}/admin/
 #scp cgi/perllib/parse* ${perllib}/
 
-#scp cgi/sercxu-json-${release}.pl ${cgibin}/
+scp cgi/sercxu-json-${release}.pl ${cgibin}/
 #scp cgi/vokosubmx.pl ${cgibin}/
 #scp cgi/vokosubm-json.pl ${cgibin}/
 #scp cgi/admin/submeto.pl ${cgibin}/admin/
