@@ -43,8 +43,8 @@ my $hom = $dbh->selectall_arrayref(
     "SELECT DISTINCT a.kap, a.mrk, b.mrk FROM r3kap a, r3kap b "
     ."WHERE a.kap=b.kap AND SUBSTRING_INDEX(a.mrk,'.',1) <> SUBSTRING_INDEX(b.mrk,'.',1) "
     ."AND NOT EXISTS (SELECT * FROM r3ref r WHERE r.tip='hom' "
-    ."AND SUBSTRING_INDEX(r.mrk,'.',2) = SUBSTRING_INDEX(a.mrk,'.',2) "
-    ."AND SUBSTRING_INDEX(r.cel,'.',2) = SUBSTRING_INDEX(b.mrk,'.',2) "
+    ."AND SUBSTRING_INDEX(r.mrk,'.',1) = SUBSTRING_INDEX(a.mrk,'.',1) "
+    ."AND SUBSTRING_INDEX(r.cel,'.',1) = SUBSTRING_INDEX(b.mrk,'.',1) "
     .") ORDER BY a.kap LIMIT $limit");
 # anst. SUBSTRING_INDEX ...2 ankaŭ eblas testi kompletan entenon: 
 # and greatest(instr(r.mrk,a.mrk),instr(a.mrk,r.mrk))=1 
