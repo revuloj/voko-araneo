@@ -74,7 +74,7 @@ while ($ret =~ m/revo\/xml\/([^.\s]+)\.xml/gm) {
 # aktualigu la informojn pri la artikolo en la datumbazo
 my $dbh = revodb::connect();
 art_db::process($dbh,\@arts,$db_verbose);
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-fermo ne funkcias";
 
 chdir $htmldir or die "chdir html ne funkciis";
 
