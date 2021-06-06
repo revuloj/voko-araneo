@@ -79,8 +79,8 @@ ARG HTTP_DIR=/hp/af/ag/ri/www
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
-    perl-app-cpanminus perl-extutils-installpaths make \
-    sed curl wget unzip jq && rm -f /var/cache/apk/* \
+    perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined \
+    make sed curl wget unzip jq && rm -f /var/cache/apk/* \
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
 
