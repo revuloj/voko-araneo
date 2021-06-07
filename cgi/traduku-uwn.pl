@@ -219,6 +219,7 @@ sub process {
         }
     }
 
+    # NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
     sub epo_desc {
         my $s = shift;
         if ($s =~ /<span[^>]*>(.*?)<\/span/) {
