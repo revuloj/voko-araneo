@@ -119,8 +119,9 @@ sub process {
 
     if ($a =~ /<a\s+href="([^"]+)">(.*?)<\/a>/) {
         my $url = $1;
-        my $dsc = $2;
+        my $dsc = $2; 
         my $data = get_page($1);
+        $dsc =~ s/<[^>]+>/ /sg;
 
         #print "RES: $dsc $url\n";
         #print "DATA: $data\n\n\n";
@@ -141,7 +142,8 @@ sub process {
         my $s = shift;
         if ($s =~ /<span[^>]*>(.*?)<\/span/) {
             #print "DIF: $1\n";
-            push @$desc, $1;
+            my $d = $1; $d =~ s/<[^>]+>/ /sg;
+            push @$desc, $d;
         }
     }
 
