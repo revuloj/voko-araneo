@@ -19,29 +19,23 @@ my $json_parser = JSON->new->allow_nonref;
 
 my $uwn_url = 'http://www.lexvo.org';
 
-# multajn 3-signajn lingvokodojn ni povos simple mallongigi al 2-signaj
-# my $lng_3_2 = abk, aar, afr, aka, sqi, amh, ara, hye, asm, ava, aym, aze, bak, eus, bel, bis, bre,
-#     mya, cat, cha, nya, zho, cos, cre, hrv, dan, nld, dzo, eng, fin, fra, glg, kat, deu, ell,
-#     guj, hau, heb, hin, hun, isl, ita, kik, kor, kur, lat, lub, mkd, msa, nau, nde, nep, iii,
-#     oci, oji, ori, pan, fas, que, ron, rus, san, smo, srp, sna, sin, slv, som, sun, swa, ssw,
-#     tam, tel, tgk, tha, tir, bod, tso, twi, ukr, urd, uzb, ven, vie, vol, cym, wol, xho, yld,
-#     yid, yor, zha, zul;
-# my $lng_3_3 = ;
-my $lng32 = {arg => 'an', ave => 'ae', bam => 'bm', ben => 'bn', bih => 'bh', bos => 'bs',
-bul => 'bg', che => 'ce', chv => 'cv', cor => 'kw', ces => 'cs', alb => 'sq', arm => 'hy',
-baq => 'eu', bur => 'my', chi => 'zh', cze => 'cs', div => 'dv', dut => 'nl', epo => 'eo',
-est => 'et', ewe => 'ee', fao => 'fo', fij => 'fj', ful => 'ff', geo => 'ka', ger => 'de', 
-gre => 'el', grn => 'gn', hat => 'ht', her => 'hz', hmo => 'ho', ina => 'ia', ind => 'id',
-ile => 'ie', gle => 'ga', ibo => 'ig', ipk => 'ik', ido => 'io', ice => 'is', iku => 'iu',
-jpn => 'ja', jav => 'jv', kal => 'kl', kan => 'kn', kau => 'kr', kas => 'ks', kaz => 'kk',
-khm => 'km', kin => 'rw', kir => 'ky', kom => 'kv', kon => 'kg', kua => 'kj', ltz => 'lb',
-lug => 'lg', lin => 'ln', lao => 'lo', lit => 'lt', lav => 'lv', glv => 'gv', mlg => 'mg',
-mal => 'ml', mlt => 'mt', mri => 'mi', mar => 'mr', mah => 'mh', mon => 'mn', nav => 'nv',
-ndo => 'ng', nob => 'nb', nno => 'nm', nor => 'no', nbl => 'nr', chu => 'cu', orm => 'om',
-per => 'fa', pli => 'pi', pol => 'pl', pus => 'ps', por => 'pt', roh => 'rm', rum => 'ro',
-srd => 'sc', snd => 'sd', sme => 'se', sag => 'sg', gla => 'gd', slk => 'sk', sot => 'st',
-spa => 'es', swe => 'sv', tib => 'bo', tuk => 'tk', tgl => 'tl', tur => 'tr', tat => 'tt',
-tah => 'ty', uig => 'ug', wln => 'wa', fry => 'fy'};
+# la aliajn (krom preterviditajn) 3-signajn lingvokodojn ni povos simple mallongigi al 2-signaj
+my $lng32 = {ace => 'ace', ang => 'ang', arg => 'an', ave => 'ae', bam => 'bm', ben => 'bn', bih => 'bh', 
+bos => 'bs', bul => 'bg', che => 'ce', chv => 'cv', cmn => 'cmn', cor => 'kw', ces => 'cs', alb => 'sq', 
+arm => 'hy', baq => 'eu', bur => 'my', chi => 'zh', cze => 'cs', div => 'dv', dsb => 'dsb', dut => 'nl', 
+egy => 'egy', epo => 'eo', est => 'et', ewe => 'ee', fao => 'fo', fij => 'fj', ful => 'ff', fur => 'fur', 
+geo => 'ka', ger => 'de', grc => 'grc', gre => 'el', grn => 'gn', hat => 'ht', hbs => 'hbs', her => 'hz', 
+hmo => 'ho', hsb => 'hsb', ina => 'ia', ind => 'id', ile => 'ie', gle => 'ga', ibo => 'ig', ipk => 'ik', 
+ido => 'io', ice => 'is', iku => 'iu', jpn => 'ja', jav => 'jw', kal => 'kl', kan => 'kn', kau => 'kr', 
+kas => 'ks', kaz => 'kk', kha => 'kha', khm => 'km', kin => 'rw', kir => 'ky', kom => 'kv', kon => 'kg', 
+kua => 'kj', ltz => 'lb', lug => 'lg', lin => 'ln', lao => 'lo', lit => 'lt', lav => 'lv', lld => 'lld', 
+glv => 'gv', mlg => 'mg', mal => 'ml', mlt => 'mt', mri => 'mi', mar => 'mr', mah => 'mh', mon => 'mn', 
+nav => 'nv', ndo => 'ng', nob => 'nb', nno => 'nm', nor => 'no', nbl => 'nr', chu => 'cu', orm => 'om', 
+per => 'fa', pli => 'pi', pnb => 'pnb', pol => 'pl', pus => 'ps', por => 'pt', roh => 'rm', rum => 'ro', 
+scn => 'scn', srd => 'sc', snd => 'sd', sme => 'se', sag => 'sg', gla => 'gd', slk => 'sk', sot => 'st', 
+spa => 'es', swe => 'sv', syc => 'syc', tib => 'bo', tuk => 'tk', tgl => 'tl', tur => 'tr', tat => 'tt', 
+tah => 'ty', tcy => 'tcy', uig => 'ug', vro => 'vro', war => 'war', wln => 'wa', wym => 'wym', xal => 'xal', 
+xcl => 'xcl', yue => 'yue', fry => 'fy', ota => 'ota'};
 
 # wiktionary-serĉo eblas per:
 # http://www.lexvo.org/data/term/epo/kuri
