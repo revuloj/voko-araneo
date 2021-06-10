@@ -100,7 +100,7 @@ my $res = get_page("/uwn/entity/epo/$sercho");
 
 # en lexvo/uwn ŝajne ne eblas RDF, sed nur HTML, do ni devos serĉi rezultojn en la HTML
 #print "$result\n\n";
-$res =~ s/<td[^>]*>means<\/td>\s*<td>(.*?)<\/td>/process($1)/sieg;
+$res =~ s/<td[^>]*>means<\/td>\s*<td>(.*?)<\/td>/meaning($1)/sieg;
 
 print $json_parser->encode($results);
 
@@ -109,7 +109,7 @@ print $json_parser->encode($results);
 my $desc;
 my $lex;
 
-sub process {
+sub meaning {
     my $a = shift;
 
     #print "A: $a\n";
@@ -126,8 +126,7 @@ sub process {
         #print "RES: $dsc $url\n";
         #print "DATA: $data\n\n\n";
 
-        $data =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1)/sieg;
-        $data =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1)/sieg;
+        $data =~ s/<tbody(?:[^>]+"display:(none)")?>(.*?)<\/tbody>/tbody($1,$2)/sieg;
 
         my $r = (split /;/, $url)[0]; 
         $results->{$r} = {
@@ -137,22 +136,37 @@ sub process {
         }
     }
 
+    sub tbody {
+        my ($duba,$c) = @_;
+        #print "TBODY: $c\n\n";
+
+        $c =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1,$duba)/sieg;
+        $c =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1,$duba)/sieg;
+    }
+
     # NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
     sub epo_desc {
-        my $s = shift;
+        my ($s,$duba) = @_;
         if ($s =~ /<span[^>]*>(.*?)<\/span/) {
             #print "DIF: $1\n";
             my $d = $1; $d =~ s/<[^>]+>/ /sg;
+            $d = '?;'.$d if ($duba);
             push @$desc, $d;
         }
     }
 
     sub lex {
-        my $a = shift;
+        my ($a,$duba) = @_;
+
         if ($a =~ /<a\s+href="([^"]+)">([a-z]{3}):\s+<span[^>]*>([^<]+)<\//) {
             #print "$2: $3\n";
             my $l = $lng32->{$2} || substr($2,0,2);
-            $lex->{$l} = $3;
+            my $t = ($duba? '?;'.$3 : $3);
+            unless (defined $lex->{$l}) {
+                $lex->{$l} = [$t];
+            } else {
+                push @{$lex->{$l}}, $t
+            }
         }
     }
 }
