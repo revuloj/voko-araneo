@@ -58,15 +58,13 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Saluto al docker.pkg.github.com kaj preni 'voko-grundo'
+      - name: Saluto al ghcr.io kaj preni 'voko-grundo'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo $GITHUB_TOKEN | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-          docker pull "docker.pkg.github.com/revuloj/voko-grundo/voko-grundo:latest"
-          docker tag docker.pkg.github.com/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
-        #run: 
-        #  echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+          echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:latest"
+          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
 
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
@@ -74,7 +72,7 @@ jobs:
       - name: Push image
         run: |
           # ĉu eblus ankau nur /revuloj/ ($ORGANIZATION) ?
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
 
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
