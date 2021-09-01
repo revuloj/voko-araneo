@@ -68,11 +68,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks
-ARG VG_BRANCH=1f
+ARG VG_BRANCH=2a
 # por brancoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=1f
-ARG REVO_VER=1f
+ARG ZIP_SUFFIX=2a
+#ARG REVO_VER=2a
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
@@ -108,7 +108,7 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 # (Alternativa ebleco estus, preni nur la XML kaj rekrei la tutan
 # vortaron per voko-formiko, sed tio daŭras tro longe kaj Github 
 # jam faras tion ĉiunokte...)
-# Aliflanke nuntempe sargi ion el eldono de Github estas terure malrapida
+# Aliflanke okaze ŝargi ion el eldono de Github estas tre malrapida
 # laŭ la sekva artikoloj, tio okazas ekster Usono kaj VPN povus helpi
 # https://www.reddit.com/r/github/comments/ekvvff/extremely_slow_downloads_from_github/
 # https://github.com/PostgresApp/PostgresApp/issues/349
