@@ -26,8 +26,8 @@ release=1g
 ## scp -r revo/dlg/redakt*-${release}.html ${revo}/dlg/
 ## scp -r revo/dlg/404.html ${revo}/dlg/
 
-scp -r revo/index.html ${revo}/
-scp -r revo/index.html ${host}:www/
+#scp -r revo/index.html ${revo}/
+#scp -r revo/index.html ${host}:www/
 ## sendu malnovajn versiojn al la nova...
 #scp -r revo/index.html ${revo}/dlg/index-1c.html
 #scp -r revo/index.html ${revo}/dlg/index-1d.html
@@ -48,7 +48,7 @@ scp -r revo/index.html ${host}:www/
 #scp cgi/perllib/parse* ${perllib}/
 
 #scp cgi/sercxu-json-${release}.pl ${cgibin}/
-#scp cgi/vokosubmx.pl ${cgibin}/
+scp cgi/vokosubmx.pl ${cgibin}/
 #scp cgi/vokosubm-json.pl ${cgibin}/
 #scp cgi/admin/submeto.pl ${cgibin}/admin/
 #scp cgi/mrk_eraroj.pl ${cgibin}/
