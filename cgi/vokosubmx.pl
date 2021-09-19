@@ -186,7 +186,7 @@ if ($sxg_err) {
 if ($command eq 'forsendo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
-  # toleru ref-erarojn: #&& !@ref_err
+  #  ni toleru referenc-erarojn: # && !@ref_err
   unless ($redaktanto && $permeso && !$xml_err && !$sxg_err) {
     print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne submetis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
