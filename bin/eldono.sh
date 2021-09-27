@@ -106,10 +106,10 @@ servilo)
 docker)
     todir=/usr/local/apache2/htdocs/revo
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
-    docker cp revo/dlg/index-{"release"}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/titolo-{"release"}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktilo-{"release"}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktmenu-{"release"}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/index-${release}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
     docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
     ;;
 preparo)
