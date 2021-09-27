@@ -122,6 +122,15 @@ preparo)
     fi
 
     echo "Aktualigante skriptojn al nova eldono ${release}..."
+    # ŝanĝu la dosiernomojn
+    mv revo/dlg/index-??.html revo/dlg/index-${release}.html
+    mv revo/dlg/titolo-??.html revo/dlg/titolo-${release}.html 
+    mv revo/dlg/redaktilo-??.html revo/dlg/redaktilo-${release}.html 
+    mv revo/dlg/redaktmenu-??.html revo/dlg/redaktmenu-${release}.html 
+
+    mv cgi/sercxu-json-??.pl cgi/sercxu-json-${release}.pl 
+
+    # ŝanĝu la version / dosiernomoj en la skriptoj
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/index.html
     sed -i 's,/index-[1-9][a-z]\.,/index-'${release}'\.,g' revo/index.html
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/dlg/*
