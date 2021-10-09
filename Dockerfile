@@ -126,7 +126,8 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
      voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
   && rm ${VG_BRANCH}.zip \
   && mkdir -p ${HOME_DIR}/files \
-  && curl -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
+  # ni uzas provizore -k pro atestilo-problemo kun Let's Encrypt - okaze forigu post kiam refunkcias en Alpine+curl (2021-10-09)
+  && curl -k -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
 #  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
