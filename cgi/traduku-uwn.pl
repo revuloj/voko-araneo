@@ -4,7 +4,7 @@ use strict;
 #use Encode;
 use utf8; binmode STDOUT, ":utf8";
 
-use CGI qw(:standard escape);
+use CGI qw(-utf8 :standard escape);
 use CGI::Carp qw(fatalsToBrowser);
 
 use HTTP::Request;
