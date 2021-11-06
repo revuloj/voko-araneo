@@ -27,14 +27,16 @@ case $target in
 servilo)
 
     # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-    #scp revo/dlg/index-${release}.html ${revo}/dlg/
-    #scp revo/dlg/titolo-${release}.html ${revo}/dlg/
-    #scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
+    scp revo/dlg/index-${release}.html ${revo}/dlg/
+    scp revo/dlg/titolo-${release}.html ${revo}/dlg/
+    scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
     ### scp -r revo/dlg/404.html ${revo}/dlg/
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
 
-    scp revo/index.html ${revo}/
-    scp revo/index.html ${host}:www/
+    scp cgi/sercxu-json-${release}.pl ${cgibin}/
+    scp cgi/traduku-uwn.pl ${cgibin}/
+
+    #scp revo/index.html ${revo}/
+    #scp revo/index.html ${host}:www/
 
     ## sendu malnovajn versiojn al la nova...
     #scp revo/index.html ${revo}/dlg/index-1c.html
