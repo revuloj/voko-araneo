@@ -20,7 +20,8 @@ cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
 release=2b
 
-# ni komprenas preparo | docker | servilo kaj supozas "docker", se nenio donita argumente
+# ni komprenas preparo | docker | servilo |index
+# kaj supozas "docker", se nenio donita argumente
 target="${1:-docker}"
 
 case $target in
@@ -34,14 +35,6 @@ servilo)
 
     scp cgi/sercxu-json-${release}.pl ${cgibin}/
     scp cgi/traduku-uwn.pl ${cgibin}/
-
-    #scp revo/index.html ${revo}/
-    #scp revo/index.html ${host}:www/
-
-    ## sendu malnovajn versiojn al la nova...
-    #scp revo/index.html ${revo}/dlg/index-1c.html
-    #scp revo/index.html ${revo}/dlg/index-1d.html
-    #scp revo/index.html ${revo}/dlg/index-1e.html
 
 
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
@@ -104,6 +97,13 @@ servilo)
     #scp revo/dlg/titolo-${release}.html ${revo}/dlg/
     #scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
     #scp revo/dlg/404.html ${revo}/dlg/
+    ;;
+index)
+    scp revo/index.html ${revo}/
+    scp revo/index.html ${host}:www/
+
+    ## sendu malnovajn versiojn al la nova...
+    #scp revo/index.html ${revo}/dlg/index-2a.html
     ;;
 docker)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
