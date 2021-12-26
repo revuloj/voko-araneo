@@ -18,7 +18,7 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=2b
+release=2d
 
 # ni komprenas preparo | docker | servilo |index
 # kaj supozas "docker", se nenio donita argumente
@@ -116,7 +116,8 @@ docker)
     docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
 
     cgidir=/usr/local/apache2/cgi-bin
-    docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
+    docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
+    #docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     ;;
 preparo)

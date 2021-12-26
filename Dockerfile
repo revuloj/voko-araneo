@@ -8,7 +8,7 @@ FROM voko-grundo as grundo
 # kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
 #FROM ubuntu:focal as json-builder
 #LABEL maintainer=<diestel@steloj.de>
-#ARG VG_BRANCH=2b
+#ARG VG_BRANCH=2d
 #ARG DEBIAN_FRONTEND=noninteractive
 #
 #COPY bin/xml-json.pl bin/  
@@ -68,11 +68,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks
-ARG VG_BRANCH=2b
+ARG VG_BRANCH=2d
 # por brancoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=2b
-#ARG REVO_VER=2b
+ARG ZIP_SUFFIX=2d
+#ARG REVO_VER=2d
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
