@@ -37,8 +37,6 @@
     <div id="r:fs_toggle" class="tabs">
       <a class="aktiva" id="r:trd">tr<span class="eble_kasxita">a</span>d<span class="eble_kasxita">ukoj</span></a>
       <a id="r:ref">ref<span class="eble_kasxita">erencoj</span></a>
-      <a id="r:ind">ind<span class="eble_kasxita">ikiloj</span></a>
-      <a id="r:uzo">uzo<span class="eble_kasxita">j</span></a>
       <a id="r:ekz">ekz<span class="eble_kasxita">emploj</span></a>
       <a id="r:dif">dif<span class="eble_kasxita">inoj</span></a>
       <a id="r:chiuj"><span class="eble_kasxita">ĉiuj</span></a>
@@ -122,78 +120,11 @@
       <button class="help_btn" value="rnc#referenciloj-">❬❭</button>
     </span>
     </fieldset>
-
-    <fieldset id="r:fs_ind" class="collapsed">
-        <select name="ofc" title="Elektu indikon pri oficialeco" id="r:ofc">
-        <option selected="selected" value=""></option>
-        <option value="*">*</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-      </select>
-      <button
-        value="ofc" 
-        title="Indiko pri oficialeco">ofc</button>
-    &#x2005;  
-        <select name="gra" title="Elektu indikon pri gramatiko." id="r:gra">
-        <option selected="selected" value=""></option>
-        <option value="&lt;vspec&gt;tr&lt;/vspec&gt;">tr</option>
-        <option value="&lt;vspec&gt;ntr&lt;/vspec&gt;">ntr</option>
-        <option value="&lt;vspec&gt;x&lt;/vspec&gt;">tr/ntr</option>
-        <option value="&lt;vspec&gt;abs.&lt;/vspec&gt;">abs.</option>
-        <option value="&lt;vspec&gt;determinilo&lt;/vspec&gt;">determinilo</option>
-        <option value="&lt;vspec&gt;ekkrio&lt;/vspec&gt;">ekkrio</option>
-        <option value="&lt;vspec&gt;sonimito&lt;/vspec&gt;">sonimito</option>
-        <option value="&lt;vspec&gt;konjunkcio&lt;/vspec&gt;">konjunkcio</option>
-        <option value="&lt;vspec&gt;subordigilo&lt;/vspec&gt;">subordigilo</option>
-        <option value="neoficiala &lt;vspec&gt;prefikso&lt;/vspec&gt;">prefikso</option>
-        <option value="neoficiala &lt;vspec&gt;sufikso&lt;/vspec&gt;">sufikso</option>
-        <option value="&lt;vspec&gt;prepozicio&lt;/vspec&gt;">prepozicio</option>                            
-        <option value="&lt;vspec&gt;pronomo&lt;/vspec&gt;">pronomo</option>                            
-      </select>
-      <button
-        value="gra"
-        title="Indikon pri gramatiko">gra</button>
-    </fieldset>
-
-    <fieldset id="r:fs_uzo" class="collapsed">  
-      <select id="r:sfak" name="uzofak" title="Elektu fakon">
-        <option selected="selected" value=""></option>
-        <!-- plenigo per JS! -->
-      </select>
-      <button
-      value="uzo_fak"
-      title="Fako (elektu)">uzo<sub>fak</sub></button>
-    &#x2005;  
-      <select id="r:sstl" name="uzostl"  title="Elektu uzostilon.">
-        <option selected="selected" value=""></option>
-        <!-- plenigo per JS! -->
-      </select>
-      <button
-        value="uzo_stl"
-        title="Stilo (elektu)">uzo<sub>stl</sub></button>
-    <span class="right">
-      <button class="help_btn" value="manlibro#uzindikoj">?</button>
-      <button class="help_btn" value="rnc#uzo-">❬❭</button>
-    </span>
-    </fieldset>
-      
+     
     <fieldset id="r:fs_ekz" class="collapsed">
       <button
         value="ekz" 
         title="Ekzemplo">ekz</button>
-      <button
-        value="tld" 
-        title="Tildo (anstataŭas la radikon)">tld</button>
-      <button
-        value="klr_ppp" 
-        title="Ellaso/enŝovo en citita teksto">[&#x2026;]</button> 
       <button
         value="fnt" 
         title="Fonto (kun kelkaj informoj).">fnt</button>
@@ -201,15 +132,6 @@
       <button
         value="ind" 
         title="Tradukata parto de ekzemplo">ind</button> 
-      <button
-        value="nom" 
-        title="Nomo neesperantigita">nom</button> 
-      <button
-        value="nac" 
-        title="Nacilingva esprimo">nac</button> 
-      <button class="eble_kasxita"
-        value="esc" 
-        title="Escepta uzo de esperanto">esc</button> 
 
       <span class="right">
       <button class="help_btn" value="manlibro#ekzemploj">?</button>
@@ -230,13 +152,6 @@
       <button
         value="rim" 
         title="Rimarko">rim</button>  
-    &#x2005;
-      <button
-        value="nom" 
-        title="Nomo neesperantigita">nom</button> 
-      <button
-        value="nac" 
-        title="Nacilingva esprimo">nac</button> 
 
     <span class="right">
       <button class="help_btn" value="manlibro#deriva%C4%B5oj">?</button>
