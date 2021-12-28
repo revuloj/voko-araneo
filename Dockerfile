@@ -24,7 +24,8 @@ FROM voko-grundo as grundo
 #  && perl bin/xml-json.pl  
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.13 as builder
+FROM alpine:3.15 as builder
+   # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
 
 # build and install rxp
 RUN apk update \
@@ -35,7 +36,7 @@ RUN apk update \
       \
   # Install tools for building
   && apk add --no-cache --virtual .tool-deps \
-          curl coreutils autoconf g++ libtool make \
+          curl file coreutils autoconf g++ libtool make \
       \
   # Install  build dependencies
   && apk add --no-cache --virtual .build-deps \
@@ -49,6 +50,7 @@ RUN apk update \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
   && ./configure && make install
+
 
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
