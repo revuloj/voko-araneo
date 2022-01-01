@@ -105,21 +105,6 @@ index)
     ## sendu malnovajn versiojn al la nova...
     #scp revo/index.html ${revo}/dlg/index-2a.html
     ;;
-docker)
-    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
-
-    todir=/usr/local/apache2/htdocs/revo
-    docker cp revo/dlg/index-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
-    docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
-
-    cgidir=/usr/local/apache2/cgi-bin
-    docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
-    #docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
-    docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
-    ;;
 preparo)
     # kontrolu ĉu la branĉo kongruas kun la agordita versio
     branch=$(git symbolic-ref --short HEAD)
