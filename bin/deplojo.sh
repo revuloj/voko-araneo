@@ -33,8 +33,11 @@ docker)
     docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
 
     cgidir=/usr/local/apache2/cgi-bin
+    perllib=/usr/local/apache2/cgi-bin/perllib/
     docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
     #docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
+    docker cp cgi/perllib/revo/checkxml.pm ${araneo_id}:${perllib}/revo/
+
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     ;;
 esac
