@@ -46,6 +46,7 @@ print header(-type=>'application/json',-charset=>'utf-8');
 my $sercxata = param('sercxata');
 exit unless($sercxata);
 
+my @preferataj_lingvoj;
 my $pref_lng = preflng();
 #print $pref_lng; exit;
 
@@ -179,6 +180,7 @@ if ($@) {
 # eligu la rezultojn kiel JSON-strukturo
 print $json_parser->encode(
   {
+    lng => \@preferataj_lingvoj,
     eo => $trovoj_eo,
     max_eo => $LIMIT_eo,
     trd => $trovoj_trd,
@@ -194,7 +196,6 @@ exit;
 #### eltrovu preferatan lingvon de la uzanto laŭ la retumilo ####
 
 sub preflng {
-  my @preferataj_lingvoj;
   {
     my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
     for my $l (@a) {
