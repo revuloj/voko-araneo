@@ -37,7 +37,6 @@
     <div id="r:fs_toggle" class="tabs">
       <a class="aktiva" id="r:trd">tr<span class="eble_kasxita">a</span>d<span class="eble_kasxita">ukoj</span></a>
       <a id="r:ref">ref<span class="eble_kasxita">erencoj</span></a>
-      <a id="r:ekz">ekz<span class="eble_kasxita">emploj</span></a>
       <a id="r:dif">dif<span class="eble_kasxita">inoj</span></a>
       <a id="r:chiuj"><span class="eble_kasxita">ĉiuj</span></a>
       <a id="r:nov">nova</a>
@@ -114,7 +113,8 @@
       <button
         value="ref" 
         title="Referenco ene de grupo (sen tipo).">ref</button>
-      <input id="r:refmrk" type="text" name="refmrk" placeholder="celmarko"/>
+      <select id="r:refmrk" name="refmrk" placeholder="celmarko"></select>
+      <input type="hidden" id="r:refstr" name="refstr"></input>
     <span class="right">
       <button class="help_btn" value="manlibro#referencoj">?</button>
       <button class="help_btn" value="rnc#referenciloj-">❬❭</button>
@@ -122,17 +122,7 @@
     </fieldset>
      
     <fieldset id="r:fs_ekz" class="collapsed">
-      <button
-        value="ekz" 
-        title="Ekzemplo">ekz</button>
-      <button
-        value="fnt" 
-        title="Fonto (kun kelkaj informoj).">fnt</button>
-    &#x2005;
-      <button
-        value="ind" 
-        title="Tradukata parto de ekzemplo">ind</button> 
-
+...
       <span class="right">
       <button class="help_btn" value="manlibro#ekzemploj">?</button>
       <button class="help_btn" value="rnc#ekz-">❬❭</button>
@@ -146,9 +136,19 @@
       <button
         value="snc" 
         title="Nova senco">snc</button>  
+
+      &#x2005;
       <button
         value="dif" 
         title="Difino">dif</button>
+      <button
+        value="ekz" 
+        title="Ekzemplo">ekz</button>
+      <button
+        value="fnt" 
+        title="Fonto (kun kelkaj informoj).">fnt</button>
+
+    &#x2005;
       <button
         value="rim" 
         title="Rimarko">rim</button>  
@@ -188,14 +188,15 @@
         <li>Klavoj: STIR-Z malfaras agon, STIR-Y refaras kaj STIR-F ebligas ser&#265;i<br/></li>
         <li>Kelkajn butonojn oni povas premi depende de la operaciumo ekz. per ALT+⇧+substrekito aŭ
             STIR+⌥+substrekito</li>
-        <li>Post finredakto, iru al "preta", indiku viajn ŝanĝon kaj registritan retadreson kaj premu "sendu".</li>
-        <li>Por fini redaktadon sen submeti, iru al "preta" kaj premu "rezignu".</li>
-        <li>Post sendo de redakto, daŭras ordinare 1-2 horojn, ĝis la nova versio aperas. 
-            Nur tiam eblas denove redakti la saman artikolon.</li>
+        <li>Post finredakto, iru al "preta", indiku viajn ŝanĝon kaj registritan retadreson kaj premu "Submetu".</li>
+        <li>Por fini redaktadon sen submeti, iru al "preta" kaj premu "Rezignu".</li>
+        <li>Post sendo de redakto, daŭras ordinare 1-2 horojn, ĝis la nova eldono aperas 
+            (eble necesas refreŝigi la retpaĝon). Nur tiam eblas denove redakti 
+            la saman artikolon.</li>
         <li>Indeksoj aktualiĝas nur unufoje ĉiunokte eŭroptempe.</li>
-        <li>Por pli ampleksaj redaktoj ni provizas ankoraŭ
-            <a class="redakto" title="Alternativa redaktilo" target="_new"
-            href="https://revaj.steloj.de/">alternativan redaktilon</a></li>
+        <li>Por pli ampleksaj redaktoj ni provizas ankoraŭ la redaktilon
+            <a class="redakto" title="alternativa redaktilo" target="_new"
+            href="https://revaj.steloj.de/">Cetonio</a></li>
     </ul>
   </div>
   </details>
