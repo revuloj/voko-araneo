@@ -22,7 +22,7 @@ release=2d
 
 # ni komprenas preparo | docker | servilo |index
 # kaj supozas "docker", se nenio donita argumente
-target="${1:-docker}"
+target="${1}"
 
 case $target in
 servilo)
@@ -34,7 +34,7 @@ servilo)
     ### scp -r revo/dlg/404.html ${revo}/dlg/
 
     scp cgi/sercxu-json-${release}.pl ${cgibin}/
-    scp cgi/traduku-uwn.pl ${cgibin}/
+    #scp cgi/traduku-uwn.pl ${cgibin}/
 
 
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
@@ -79,7 +79,7 @@ servilo)
 
     #scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
     #scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
+    scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
     #scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
 
 
