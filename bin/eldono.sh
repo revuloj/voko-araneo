@@ -18,11 +18,11 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=2b
+release=2d
 
 # ni komprenas preparo | docker | servilo |index
 # kaj supozas "docker", se nenio donita argumente
-target="${1:-docker}"
+target="${1}"
 
 case $target in
 servilo)
@@ -34,7 +34,7 @@ servilo)
     ### scp -r revo/dlg/404.html ${revo}/dlg/
 
     scp cgi/sercxu-json-${release}.pl ${cgibin}/
-    scp cgi/traduku-uwn.pl ${cgibin}/
+    #scp cgi/traduku-uwn.pl ${cgibin}/
 
 
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
@@ -79,7 +79,7 @@ servilo)
 
     #scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
     #scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
+    scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
     #scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
 
 
@@ -104,20 +104,6 @@ index)
 
     ## sendu malnovajn versiojn al la nova...
     #scp revo/index.html ${revo}/dlg/index-2a.html
-    ;;
-docker)
-    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
-
-    todir=/usr/local/apache2/htdocs/revo
-    docker cp revo/dlg/index-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
-    docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
-
-    cgidir=/usr/local/apache2/cgi-bin
-    docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
-    docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     ;;
 preparo)
     # kontrolu ĉu la branĉo kongruas kun la agordita versio

@@ -8,7 +8,7 @@ FROM voko-grundo as grundo
 # kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
 #FROM ubuntu:focal as json-builder
 #LABEL maintainer=<diestel@steloj.de>
-#ARG VG_BRANCH=2b
+#ARG VG_BRANCH=2d
 #ARG DEBIAN_FRONTEND=noninteractive
 #
 #COPY bin/xml-json.pl bin/  
@@ -24,7 +24,8 @@ FROM voko-grundo as grundo
 #  && perl bin/xml-json.pl  
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.13 as builder
+FROM alpine:3.15 as builder
+   # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
 
 # build and install rxp
 RUN apk update \
@@ -35,7 +36,7 @@ RUN apk update \
       \
   # Install tools for building
   && apk add --no-cache --virtual .tool-deps \
-          curl coreutils autoconf g++ libtool make \
+          curl file coreutils autoconf g++ libtool make \
       \
   # Install  build dependencies
   && apk add --no-cache --virtual .build-deps \
@@ -49,6 +50,7 @@ RUN apk update \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
   && ./configure && make install
+
 
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
@@ -68,11 +70,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks
-ARG VG_BRANCH=2b
+ARG VG_BRANCH=2d
 # por brancoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=2b
-#ARG REVO_VER=2b
+ARG ZIP_SUFFIX=2d
+#ARG REVO_VER=2d
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
@@ -156,6 +158,7 @@ RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 #COPY sercho.xsl ${HOME_DIR}/files/xsl/sercho.xsl
 
 COPY revo/ /usr/local/apache2/htdocs/revo/
+COPY revo/index.html /usr/local/apache2/htdocs/
 
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...

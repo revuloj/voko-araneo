@@ -50,6 +50,7 @@ sub rxp_cmd {
       $err =~ s/ of <stdin>$//smg;
       $err =~ s/^ in unnamed entity//smg;
       $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata elementokomenco $1/smg;
+      $err =~ s/Undeclared attribute ([^ \n]*) for element/Nedeklarita atributo $1 por elemento/smg;
       $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 ĉi tie/smg;
       $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua elementofino: anstataŭ $1 troviĝis $2/smg;
       $err =~ s/^ at line (\d+) char (\d+)$/ ĉe pozicio $1:$2/smg;
@@ -63,6 +64,8 @@ sub rxp_cmd {
       $err =~ s/Illegal character ([^ \n]*) in attribute value/Malpermesita signo $1 en atributa valoro/smg;
       $err =~ s/Expected whitespace or tag end in start tag/Atendas spacon aŭ elementofinon en elementokomenco/smg;
       $err =~ s/Expected name, but got ([^ \n]*) for attribute/Atendas nomon, sed trovis $1 kiel atributo/smg;
+      $err =~ s/Expected ([^ \n]*) after attribute name, but got ([^ \n]*)/Atendas $1 post atributnomo, sed trovis $2/smg;
+      $err =~ s/Expected ([^ \n]*) after name in end tag, but got ([^ \n]*)/Atendas $1 post nomo en elementfino, sed trovis $2/smg;
       $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ID but contains a character which is not a name character/La atributo $1 de la elemento $2 enhavas malpermesitan karakteron./smg;
     }
 
