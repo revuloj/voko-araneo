@@ -6,10 +6,9 @@
 use strict;
 use utf8;
 
-#use CGI qw(:standard *table);
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
-use DBI();
+#use DBI();
 
 use IPC::Open3; # uzata de xml2html.pm
 use Encode;

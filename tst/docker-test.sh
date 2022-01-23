@@ -67,5 +67,27 @@ curl -fsI "http://$HPORT/$JS"
 echo ""; echo "Petante CSS-dosieron..."
 curl -fsI "http://$HPORT/$CSS"
 
+# vokohtmlx ne uzas la datumbazon, do per ĝi ni povas testi
+# iom, ĉu Perl/CGI/XSL estas ĝuste instalitaj
+echo ""; echo ""; echo "Testu antaŭrigardon, t.e. transformo de XML al HTML per XSL en CGI-skripto..."
+echo "Se bone funkcias en la rezulta HTML devus troviĝi la vorto Ekzercaro!"
+set +e
+read -r -d '' XML << '~~~~~'
+<?xml version="1.0"?><!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd"><vortaro>
+<art mrk="\$Id: kvin.xml,v 1.116 2021/06/22 19:02:35 revo Exp \$">
+<kap><ofc>*</ofc><rad>kvin</rad></kap>
+<drv mrk="kvin.0"><kap><tld/></kap>
+<snc><dif>Kvar kaj unu. Matematika simbolo 5:<ekz><tld/> kaj sep faras dek du
+<fnt><bib>F</bib><lok>&FE; 12</lok></fnt>;</ekz>
+</dif><ref tip="lst" cel="nombr.0o.MAT" lst="voko:nombroj" val="5">nombro</ref>
+</snc></drv></art></vortaro>
+~~~~~
+set -e
+#echo "$XML"
+
+HTML=$( curl -fs --data-urlencode "xmlTxt=$XML" "http://$HPORT/cgi-bin/vokohtmlx.pl" \
+            -H "Content-Type: application/x-www-form-urlencoded" )
+echo "$HTML" | grep "Ekzercaro"
+
 echo ""; echo "Forigi..."
 docker kill araneo-test
