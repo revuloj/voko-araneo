@@ -1,4 +1,4 @@
-name: procezumo voko-araneo
+name: procezujo voko-araneo
 # https://github.com/actions/starter-workflows/blob/master/ci/docker-push.yml
 
 on:
@@ -46,6 +46,33 @@ jobs:
 #           docker run $IMAGE_NAME $IMAGE_ENTRY inx-?
 #           docker run $IMAGE_NAME $IMAGE_ENTRY tez-?
 
+      - name: Saluto al ghcr.io kaj preni 'voko-grundo'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:latest"
+          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
+
+      - name: Kreo de ${{ env.IMAGE_NAME }}
+        run: |
+           docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Testoj de ${{ env.IMAGE_NAME }}
+        run: |
+          tst/docker-test.sh $IMAGE_NAME
+
+      - name: Arĥivo de ${{ env.IMAGE_NAME }}
+        run: |
+           docker image save -o ${IMAGE_NAME}.tar ${IMAGE_NAME}
+
+      - name: Konservo de ${{ env.IMAGE_NAME }} por la sekvonta tasko
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.IMAGE_NAME }}
+          path: ${{ env.IMAGE_NAME }}.tar
+
+
   # Push image to GitHub Package Registry.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
@@ -56,21 +83,23 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - uses: actions/checkout@v1
 
-      - name: Saluto al ghcr.io kaj preni 'voko-grundo'
+      - name: Reakiro de ${{ env.IMAGE_NAME }}
+        uses: actions/download-artifact@v1
+        with:
+          name: ${{ env.IMAGE_NAME }}
+          path: image
+
+      - name: Saluto al ghcr.io
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:latest"
-          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
-
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Push image
         run: |
+          docker image load -i image/${IMAGE_NAME}.tar
+
           # ĉu eblus ankau nur /revuloj/ ($ORGANIZATION) ?
           IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
 
