@@ -67,7 +67,7 @@ curl -fsI "http://$HPORT/$JS"
 echo ""; echo "Petante CSS-dosieron..."
 curl -fsI "http://$HPORT/$CSS"
 
-# vokohtmlx ne uzas la datumbazon, do per ĝi ni povas testi
+# cgi-bin/vokohtmlx.pl ne uzas la datumbazon, do per ĝi ni povas testi
 # iom, ĉu Perl/CGI/XSL estas ĝuste instalitaj
 echo ""; echo ""; echo "Testu antaŭrigardon, t.e. transformo de XML al HTML per XSL en CGI-skripto..."
 echo "Se bone funkcias en la rezulta HTML devus troviĝi la vorto Ekzercaro!"
