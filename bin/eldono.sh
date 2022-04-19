@@ -129,5 +129,10 @@ preparo)
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/dlg/*
 
     sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${release}'/' Dockerfile
-
+    ;;
+etikedo)
+    echo "Provizante la aktualan staton per etikedo (git tag) v${release}"
+    echo "kaj puŝante tiun staton al la centra deponejo"
+    git tag -f v${release} && git push && git push --tags -f
+    ;;
 esac
