@@ -50,9 +50,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # ni uzu la saman eldonon de voko-grundo kiel havas ĉi-branĉo de voko-araneo
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
           echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:latest"
-          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:latest voko-grundo:latest
+          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:$VERSION"
+          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:$VERSION voko-grundo:$VERSION
 
       - name: Kreo de ${{ env.IMAGE_NAME }}
         run: |
