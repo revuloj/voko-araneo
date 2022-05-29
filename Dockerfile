@@ -1,5 +1,6 @@
 ##### staĝo 1: certigu, ke vi antaŭe kompilis voko-grundo aŭ ŝargis de Github kiel pakaĵo
-FROM voko-grundo:2d as grundo 
+ARG VERSION=2f
+FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo 
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 
@@ -8,7 +9,7 @@ FROM voko-grundo:2d as grundo
 # kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
 #FROM ubuntu:focal as json-builder
 #LABEL maintainer=<diestel@steloj.de>
-#ARG VG_BRANCH=2d
+#ARG VG_BRANCH=2f
 #ARG DEBIAN_FRONTEND=noninteractive
 #
 #COPY bin/xml-json.pl bin/  
@@ -70,11 +71,11 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks
-ARG VG_BRANCH=2d
+ARG VG_BRANCH=2f
 # por branĉoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=2d
-#ARG REVO_VER=2d
+ARG ZIP_SUFFIX=2f
+#ARG REVO_VER=2f
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 

@@ -18,7 +18,7 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=2d
+release=2f
 
 # ni komprenas preparo | docker | servilo |index
 # kaj supozas "docker", se nenio donita argumente
@@ -128,6 +128,7 @@ preparo)
     sed -i 's,/index-[1-9][a-z]\.,/index-'${release}'\.,g' revo/index.html
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/dlg/*
 
+    #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${release}'/' Dockerfile
     sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${release}'/' Dockerfile
     ;;
 etikedo)
