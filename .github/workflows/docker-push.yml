@@ -1,6 +1,12 @@
 name: procezujo voko-araneo
 # https://github.com/actions/starter-workflows/blob/master/ci/docker-push.yml
 
+# SOLVENDA: ni bezonas la eldonon de voko-grundo respondan al la aktuala eldono de voko-araneo (docker pull...)
+# momente ni uzas la etikedon de la branĉo, ekz-e v2d -> :2d sed tio ne funkcias por la ĉefa branĉo (master)
+# pli bone estus enrigardi en iun dosieron (Dockerfile, eldono.sh a.s.) por eltrovi la ĝustan eldonon
+# aŭ uzi la eldono-skripton por aŭtomate sinkronigi la eldonon en ĉiuj dosieroj docker.push, Dockerfile ktp. per 
+# la komandoj en eldono.sh, t.e. sed///;
+
 on:
   push:
     # Publish `master` as Docker `latest` image.
