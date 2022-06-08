@@ -136,4 +136,9 @@ etikedo)
     echo "kaj puŝante tiun staton al la centra deponejo"
     git tag -f v${release} && git push && git push --tags -f
     ;;
+kreo)
+    echo "Kreante lokan procezujon (por docker) voko-araneo"
+    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${release}
+    docker build -t voko-araneo .
+    ;;
 esac
