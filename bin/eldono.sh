@@ -18,9 +18,16 @@ host=revo
 revo=${host}:www/revo
 cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
-release=2f
 
-# ni komprenas preparo | docker | servilo |index
+# Tio estas la eldono de voko-grundo kontraŭ kiu ni kompilas ĉion
+# ĝi devas ekzisti jam kiel git-tag (kaj sekve kiel kodarĥivo kaj procezujo) en Github
+# en celo "preparo" ni metas tiun eldonon ankaŭ por dosiernomoj kc. de voko-araneo
+# Ni ankaŭ supozas, ke nova eldono okazas en git-branĉo kun la sama nomo
+# Ĉe publikigo marku la kodstaton per etikedo (git-tag) v${eldono}.
+# Dum la realigo vi povas ŝovi la etikedon ĉiam per celo "etikedo".
+eldono=2f
+
+# ni komprenas preparo | docker | servilo | index
 # kaj supozas "docker", se nenio donita argumente
 target="${1}"
 
@@ -28,12 +35,12 @@ case $target in
 servilo)
 
     # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-    scp revo/dlg/index-${release}.html ${revo}/dlg/
-    scp revo/dlg/titolo-${release}.html ${revo}/dlg/
-    scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
+    scp revo/dlg/index-${eldono}.html ${revo}/dlg/
+    scp revo/dlg/titolo-${eldono}.html ${revo}/dlg/
+    scp revo/dlg/redakt*-${eldono}.html ${revo}/dlg/
     ### scp -r revo/dlg/404.html ${revo}/dlg/
 
-    scp cgi/sercxu-json-${release}.pl ${cgibin}/
+    scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/traduku-uwn.pl ${cgibin}/
 
 
@@ -50,7 +57,7 @@ servilo)
     #scp cgi/admin/upviki.pl ${cgibin}/admin/
     #scp cgi/perllib/parse* ${perllib}/
 
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
+    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/vokosubmx.pl ${cgibin}/
 
     #scp cgi/vokosubm-json.pl ${cgibin}/
@@ -62,7 +69,7 @@ servilo)
     ## # malnovaj
     ## 
     ## # novaj
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
+    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/vokoref-json.pl ${cgibin}/
     ## scp cgi/vokomailx.pl ${cgibin}/
     ## scp cgi/vokohtmlx.pl ${cgibin}/
@@ -84,7 +91,7 @@ servilo)
 
 
     ## # novaj
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
+    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/vokoref-json.pl ${cgibin}/
     ## scp cgi/vokomailx.pl ${cgibin}/
     # scp cgi/vokohtmlx.pl ${cgibin}/
@@ -93,9 +100,9 @@ servilo)
     #
 
 
-    #scp revo/dlg/index-${release}.html ${revo}/dlg/
-    #scp revo/dlg/titolo-${release}.html ${revo}/dlg/
-    #scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
+    #scp revo/dlg/index-${eldono}.html ${revo}/dlg/
+    #scp revo/dlg/titolo-${eldono}.html ${revo}/dlg/
+    #scp revo/dlg/redakt*-${eldono}.html ${revo}/dlg/
     #scp revo/dlg/404.html ${revo}/dlg/
     ;;
 index)
@@ -108,37 +115,38 @@ index)
 preparo)
     # kontrolu ĉu la branĉo kongruas kun la agordita versio
     branch=$(git symbolic-ref --short HEAD)
-    if [ "${branch}" != "${release}" ]; then
-        echo "Ne kongruas la branĉo (${branch}) kun la eldono (${release})"
-        echo "Agordu la variablon 'release' en tiu ĉi skripto por prepari novan eldonon."
+    if [ "${branch}" != "${eldono}" ]; then
+        echo "Ne kongruas la branĉo (${branch}) kun la eldono (${eldono})"
+        echo "Agordu la variablon 'eldono' en tiu ĉi skripto por prepari novan eldonon."
         exit 1
     fi
 
-    echo "Aktualigante skriptojn al nova eldono ${release}..."
+    echo "Aktualigante skriptojn al nova eldono ${eldono}..."
     # ŝanĝu la dosiernomojn
-    mv revo/dlg/index-??.html revo/dlg/index-${release}.html
-    mv revo/dlg/titolo-??.html revo/dlg/titolo-${release}.html 
-    mv revo/dlg/redaktilo-??.html revo/dlg/redaktilo-${release}.html 
-    mv revo/dlg/redaktmenu-??.html revo/dlg/redaktmenu-${release}.html 
+    mv revo/dlg/index-??.html revo/dlg/index-${eldono}.html
+    mv revo/dlg/titolo-??.html revo/dlg/titolo-${eldono}.html 
+    mv revo/dlg/redaktilo-??.html revo/dlg/redaktilo-${eldono}.html 
+    mv revo/dlg/redaktmenu-??.html revo/dlg/redaktmenu-${eldono}.html 
 
-    mv cgi/sercxu-json-??.pl cgi/sercxu-json-${release}.pl 
+    mv cgi/sercxu-json-??.pl cgi/sercxu-json-${eldono}.pl 
 
     # ŝanĝu la version / dosiernomoj en la skriptoj
-    sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/index.html
-    sed -i 's,/index-[1-9][a-z]\.,/index-'${release}'\.,g' revo/index.html
-    sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${release}'-min\.,g' revo/dlg/*
+    sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/index.html
+    sed -i 's,/index-[1-9][a-z]\.,/index-'${eldono}'\.,g' revo/index.html
+    sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/dlg/*
 
-    #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${release}'/' Dockerfile
-    sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${release}'/' Dockerfile
+    #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${eldono}'/' Dockerfile
+    #sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${eldono}'/' Dockerfile
     ;;
 etikedo)
-    echo "Provizante la aktualan staton per etikedo (git tag) v${release}"
+    echo "Provizante la aktualan staton per etikedo (git tag) v${eldono}"
     echo "kaj puŝante tiun staton al la centra deponejo"
-    git tag -f v${release} && git push && git push --tags -f
+    git tag -f v${eldono} && git push && git push --tags -f
     ;;
 kreo)
     echo "Kreante lokan procezujon (por docker) voko-araneo"
-    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${release}
-    docker build -t voko-araneo .
+    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
+    docker build --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
+        -t voko-araneo .
     ;;
 esac
