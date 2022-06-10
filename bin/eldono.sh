@@ -144,7 +144,7 @@ etikedo)
     git tag -f v${eldono} && git push && git push --tags -f
     ;;
 kreo)
-    echo "Kreante lokan procezujon (por docker) voko-araneo"
+    echo "Kreante lokan procezujon (por docker) voko-araneo por eldono ${eldono}..."
     docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
     docker build --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
         -t voko-araneo .
