@@ -36,7 +36,6 @@ servilo)
     scp cgi/sercxu-json-${release}.pl ${cgibin}/
     #scp cgi/traduku-uwn.pl ${cgibin}/
 
-
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
     #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
@@ -47,56 +46,15 @@ servilo)
     #scp cgi/perllib/art_db.pm ${perllib}/
 
     #scp cgi/admin/up* ${cgibin}/admin/
-    #scp cgi/admin/upviki.pl ${cgibin}/admin/
     #scp cgi/perllib/parse* ${perllib}/
 
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
     #scp cgi/vokosubmx.pl ${cgibin}/
-
     #scp cgi/vokosubm-json.pl ${cgibin}/
     #scp cgi/admin/submeto.pl ${cgibin}/admin/
     #scp cgi/mrk_eraroj.pl ${cgibin}/
-
     #scp cgi/admin/uprevo.pl ${cgibin}/admin/
+    #scp cgi/admin/upviki.pl ${cgibin}/admin/
 
-    ## # malnovaj
-    ## 
-    ## # novaj
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
-    #scp cgi/vokoref-json.pl ${cgibin}/
-    ## scp cgi/vokomailx.pl ${cgibin}/
-    ## scp cgi/vokohtmlx.pl ${cgibin}/
-    ## scp cgi/hazarda_art.pl ${cgibin}/
-    ## scp cgi/mx_trd.pl ${cgibin}/
-    #
-    # scp cgi/vokomail.pl ${cgibin}/
-    #scp cgi/sercxu.pl ${cgibin}/
-    #scp cgi/sercxu-vivo.pl ${cgibin}/
-    ## 
-
-
-    #scp cgi/perllib/*.pm ${perllib}/
-
-    #scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
-    scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
-
-
-    ## # novaj
-    #scp cgi/sercxu-json-${release}.pl ${cgibin}/
-    #scp cgi/vokoref-json.pl ${cgibin}/
-    ## scp cgi/vokomailx.pl ${cgibin}/
-    # scp cgi/vokohtmlx.pl ${cgibin}/
-    ## scp cgi/hazarda_art.pl ${cgibin}/
-    #scp cgi/mx_trd.pl ${cgibin}/
-    #
-
-
-    #scp revo/dlg/index-${release}.html ${revo}/dlg/
-    #scp revo/dlg/titolo-${release}.html ${revo}/dlg/
-    #scp revo/dlg/redakt*-${release}.html ${revo}/dlg/
-    #scp revo/dlg/404.html ${revo}/dlg/
     ;;
 index)
     scp revo/index.html ${revo}/
