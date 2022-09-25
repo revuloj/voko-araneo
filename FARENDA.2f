@@ -1,0 +1,28 @@
+# ankoraŭ por eldono 2f sendu diversajn dosierojn, sen eldonnumero en la nomo!:
+
+# al servilo reta-vortaro.de
+dtd/vokosgn.dtd
+dtd/vokourl.dtd
+dtd/vokoxml.dtd
+
+xsl/revo_dif.dtd
+xsl/revo_trd.dtd
+
+cgi/perllib/revo/voko_entities.pm
+
+### fine post testado:
+index.html
+
+
+
+# al redaktoservo retpoŝta:
+
+- fandu la ŝanĝojn de 2f al master
+- aktualigu sur la retpoŝta redaktoservo
+
+
+# en afido:
+
+post fando al 'master', ĉar afido ĝis nun ne
+havas eldonojn!
+- aktualigu kun aktualaj DTD-dosieroj
