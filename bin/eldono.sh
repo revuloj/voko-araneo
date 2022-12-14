@@ -107,4 +107,10 @@ kreo)
     docker build --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
         -t voko-araneo .
     ;;
+kreo-kompleta)
+    echo "Kreante lokan procezujon (por docker) voko-araneo por eldono ${eldono}..."
+    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
+    docker build --no-cache --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
+        -t voko-araneo .
+    ;;
 esac

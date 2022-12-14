@@ -26,6 +26,12 @@ docker)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
 
     todir=/usr/local/apache2/htdocs/revo
+    docker cp revo/manifest.json ${araneo_id}:${todir}/
+    docker cp revo/sw.js ${araneo_id}:${todir}/
+    docker cp revo/index.html ${araneo_id}:${todir}/
+    docker cp revo/index-malnova.html ${araneo_id}:${todir}/
+    docker cp revo/offline.html ${araneo_id}:${todir}/
+
     docker cp revo/dlg/index-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
