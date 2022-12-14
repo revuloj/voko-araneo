@@ -4,10 +4,10 @@
     "lang": "epo",
     "description": "Reta Vortaro kun difinoj, ekzemploj, tradukoj, indeksoj, tezaŭro kaj reta redaktado",
     "theme_color": "#FF8C00",
-    "background_color": "#FF8C00",
+    "background_color": "#DAA520",
     "display": "standalone",
-    "scope": "/",
-    "start_url": "https://reta-vortaro.de/",
+    "scope": "/revo/",
+    "start_url": "https://reta-vortaro.de/revo/",
     "icons": [
         {
             "src": "/revo/smb/revo64.png",
