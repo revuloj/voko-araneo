@@ -2,6 +2,9 @@ const cacheName = "retavortaro-2g";
 const preload_files = [
   "/offline.html",
   "/dlg/index-2g.html",
+  "/stl/revo-2g-min.css",
+  "/jsc/revo-2g-min.js",
+  "/dok/datumprotekto.html",
   "/dlg/redaktilo-2g.html",
   "/dlg/redaktmenu-2g.html",
   "/dlg/titolo-2g.html",
