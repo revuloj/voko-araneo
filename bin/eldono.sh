@@ -63,6 +63,11 @@ servilo)
     #scp cgi/admin/upviki.pl ${cgibin}/admin/
 
     ;;
+pwa)
+    scp revo/manifest.json ${revo}/
+    scp revo/offline.html ${revo}/
+    scp revo/sw.js ${revo}/
+    ;;
 index)
     scp revo/index.html ${revo}/
     scp revo/index.html ${host}:www/
