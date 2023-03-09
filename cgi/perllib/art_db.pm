@@ -228,7 +228,7 @@ sub process_trd {
       $text = substr($text,0,255); # limigu tro longajn tradukojn
       $ekz = substr($ekz,0,255); # limigu tro longajn tradukojn
 
-      if (length($ind) < 100) { # se ind estas tro longa verŝajne la traduko estas
+      if (length($ind) < 100) { # se $ind estas tro longa verŝajne la traduko estas
                                 # iel fuŝa kaj parto eble estu klarigo, aŭ aplikiĝu mll
                                 # por koncizigo - do ni ignoras ilin
                                 # se iam ni tamen volas tiom longajn - ekz-e pro ekz/trd

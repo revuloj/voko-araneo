@@ -37,8 +37,8 @@ $sth->execute();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
-# nun ni trakuras la referencojn kaj enmetas en la datumbazon
-# kelkaj markoj povas duobliĝi, ekz-e ni havas ambaŭ abrikotujo kaj abrikotarbo,
+# Nun ni trakuras la referencojn kaj enmetas ilin en la datumbazon.
+# Kelkaj markoj povas duobliĝi, ekz-e ni havas ambaŭ abrikotujo kaj abrikotarbo,
 # sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
 # per ON DUPLICATE...
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) " 

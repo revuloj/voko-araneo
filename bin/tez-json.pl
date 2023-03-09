@@ -16,7 +16,7 @@ my $tezdir = "$revodir/tez";
 my $xsltproc = "xsltproc $homedir/files/xsl/tez-json.xsl";
 
 
-# transformu ciujn XML-dosierojn al JSON
+# transformu ĉiujn XML-dosierojn al JSON
 my @arts;
 for $xml (glob "$revodir/xml/*.xml") {
     my $json = $xml;

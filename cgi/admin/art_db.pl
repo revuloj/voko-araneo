@@ -47,7 +47,7 @@ if (param('arts')) {
   }
 }
 
-# Konektiĝi kun la datumbazo kaj malplenigi la tabelon
+# Konektiĝi kun la datumbazo kaj plenigi la tabelojn
 my $dbh = revodb::connect();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
