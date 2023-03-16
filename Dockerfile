@@ -1,5 +1,8 @@
 ##### staĝo 1: certigu, ke vi antaŭe kompilis voko-grundo aŭ ŝargis de Github kiel pakaĵo
-FROM voko-grundo:2d as grundo 
+
+# VERSION povas esti ŝanĝita de ekstere per --build-arg, jam konsiderata en 'bin/eldono.sh kreo'
+ARG VERSION=latest
+FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo 
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 
@@ -8,7 +11,7 @@ FROM voko-grundo:2d as grundo
 # kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
 #FROM ubuntu:focal as json-builder
 #LABEL maintainer=<diestel@steloj.de>
-#ARG VG_BRANCH=2d
+#ARG VG_TAG=2f
 #ARG DEBIAN_FRONTEND=noninteractive
 #
 #COPY bin/xml-json.pl bin/  
@@ -16,10 +19,10 @@ FROM voko-grundo:2d as grundo
 #RUN apt-get update && apt-get install -y --no-install-recommends \
 #    ca-certificates curl unzip xsltproc perl \
 #	&& curl -Lo revo-fonto.zip https://github.com/revuloj/revo-fonto/archive/master.zip \
-#	&& curl -Lo voko-grundo.zip https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
+#	&& curl -Lo voko-grundo.zip https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
 #  && unzip -q revo-fonto.zip && unzip -q voko-grundo.zip \
 #  && ln -s revo-fonto-master revo-fonto \
-#  && ln -s voko-grundo-${VG_BRANCH} voko-grundo 
+#  && ln -s voko-grundo-${VG_TAG} voko-grundo 
 #RUN ls -l \
 #  && perl bin/xml-json.pl  
 
@@ -55,6 +58,7 @@ RUN apk update \
 ##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
+LABEL org.opencontainers.image.description DESCRIPTION
 
 # see:
 # https://hub.docker.com/_/httpd/
@@ -69,22 +73,23 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
-# normale: master aŭ v1e ks
-ARG VG_BRANCH=2d
-# por branĉoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
-# do se VG_BRANCH estas "v1e", ZIP_SUFFIX estu "1e"
-ARG ZIP_SUFFIX=2d
-#ARG REVO_VER=2d
+# normale: master aŭ v1e ks, 'bin/eldono.sh kreo' metas tion de ekstere per --build-arg
+ARG VG_TAG=master
+# por etikedoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
+# do se VG_TAG estas "v1e", ZIP_SUFFIX estu "1e", en 'bin/eldono.sh kreo' tio estas jam konsiderata
+ARG ZIP_SUFFIX=master
+#ARG REVO_VER=2f
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
-    perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined \
-    make sed curl wget unzip jq && rm -f /var/cache/apk/* \
+    perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
+    sed perl-dev make build-base \
     && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
-    && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd
+    && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
+    && apk del build-base sed make perl-dev && rm -f /var/cache/apk/*
 
 # ni bezonas GNU 'sed' por kompili CSS!
 
@@ -120,19 +125,19 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
-  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_BRANCH}.zip \
-  && unzip -l ${VG_BRANCH}.zip \
-  && unzip -q ${VG_BRANCH}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
+  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
+  && unzip -l ${VG_TAG}.zip \
+  && unzip -q ${VG_TAG}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
      voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
      # necesaj ankoraŭ por la malnova fasado:
      voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
-  && rm ${VG_BRANCH}.zip \
+  && rm ${VG_TAG}.zip \
   && mkdir -p ${HOME_DIR}/files \
   # ni uzas provizore -k pro atestilo-problemo kun Let's Encrypt - okaze forigu post kiam refunkcias en Alpine+curl (2021-10-09)
   && curl -k -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
 # tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
 # tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
-#  && cp voko-grundo-${VG_BRANCH}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
+#  && cp voko-grundo-${VG_TAG}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
   && cp voko-grundo-${ZIP_SUFFIX}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
   && cp -r voko-grundo-${ZIP_SUFFIX}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
   && mv voko-grundo-${ZIP_SUFFIX}/dtd /usr/local/apache2/htdocs/revo/ \
@@ -148,6 +153,7 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
 COPY --from=grundo build/smb/ /usr/local/apache2/htdocs/revo/smb/
 COPY --from=grundo build/jsc/ /usr/local/apache2/htdocs/revo/jsc/
 COPY --from=grundo build/stl/ /usr/local/apache2/htdocs/revo/stl/
+
 COPY --from=grundo build/xsl/ ${HOME_DIR}/files/xsl/
   
 #   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \

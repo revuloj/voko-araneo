@@ -167,7 +167,7 @@ $flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
 ### }
 
 if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
-  $sxg_err="Eraro: La ŝanĝoteksto enhavu ne-askiajn signojn: $sxangxo\n";
+  $sxg_err="Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo\n";
 
 } elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
   $sxg_err="Eraro: '--' estas malpermesita en komento: $sxangxo\n";

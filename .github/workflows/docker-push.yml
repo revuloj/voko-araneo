@@ -34,8 +34,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # https://github.com/actions/checkout
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
 #      - name: Run tests
 #        run: |
@@ -52,24 +53,13 @@ jobs:
 #           docker run $IMAGE_NAME $IMAGE_ENTRY inx-?
 #           docker run $IMAGE_NAME $IMAGE_ENTRY tez-?
 
-      - name: Saluto al ghcr.io kaj preni 'voko-grundo'
+      - name: Kreo de ${{ env.IMAGE_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # ni uzu la saman eldonon de voko-grundo kiel havas ĉi-branĉo de voko-araneo
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=latest
-
-          echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-          docker pull "ghcr.io/revuloj/voko-grundo/voko-grundo:$VERSION"
-          docker tag ghcr.io/revuloj/voko-grundo/voko-grundo:$VERSION voko-grundo:$VERSION
-
-      - name: Kreo de ${{ env.IMAGE_NAME }}
-        run: |
-           docker build . --file Dockerfile --tag $IMAGE_NAME
+          # ne plu necesa por legi: echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          # tio akiras voko-grundo kaj kompilas la procezujon voko-araneo
+          ./bin/eldono.sh kreo
 
       - name: Testoj de ${{ env.IMAGE_NAME }}
         run: |
@@ -79,8 +69,9 @@ jobs:
         run: |
            docker image save -o ${IMAGE_NAME}.tar ${IMAGE_NAME}
 
+      # https://github.com/actions/upload-artifact
       - name: Konservo de ${{ env.IMAGE_NAME }} por la sekvonta tasko
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.IMAGE_NAME }}
           path: ${{ env.IMAGE_NAME }}.tar
@@ -96,9 +87,9 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-
+      # https://github.com/actions/download-artifact
       - name: Reakiro de ${{ env.IMAGE_NAME }}
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.IMAGE_NAME }}
           path: image
