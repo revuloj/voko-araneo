@@ -25,7 +25,7 @@ perllib=${host}:files/perllib
 # Ni ankaŭ supozas, ke nova eldono okazas en git-branĉo kun la sama nomo
 # Ĉe publikigo marku la kodstaton per etikedo (git-tag) v${eldono}.
 # Dum la realigo vi povas ŝovi la etikedon ĉiam per celo "etikedo".
-eldono=2f
+eldono=2g
 
 # ni komprenas preparo | docker | servilo | index
 # kaj supozas "docker", se nenio donita argumente
@@ -43,7 +43,6 @@ servilo)
     scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/traduku-uwn.pl ${cgibin}/
 
-
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
     #scp revo/smb/revo64.png ${host}:/html/favicon.ico
 
@@ -54,56 +53,20 @@ servilo)
     #scp cgi/perllib/art_db.pm ${perllib}/
 
     #scp cgi/admin/up* ${cgibin}/admin/
-    #scp cgi/admin/upviki.pl ${cgibin}/admin/
     #scp cgi/perllib/parse* ${perllib}/
 
-    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/vokosubmx.pl ${cgibin}/
-
     #scp cgi/vokosubm-json.pl ${cgibin}/
     #scp cgi/admin/submeto.pl ${cgibin}/admin/
     #scp cgi/mrk_eraroj.pl ${cgibin}/
-
     #scp cgi/admin/uprevo.pl ${cgibin}/admin/
+    #scp cgi/admin/upviki.pl ${cgibin}/admin/
 
-    ## # malnovaj
-    ## 
-    ## # novaj
-    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
-    #scp cgi/vokoref-json.pl ${cgibin}/
-    ## scp cgi/vokomailx.pl ${cgibin}/
-    ## scp cgi/vokohtmlx.pl ${cgibin}/
-    ## scp cgi/hazarda_art.pl ${cgibin}/
-    ## scp cgi/mx_trd.pl ${cgibin}/
-    #
-    # scp cgi/vokomail.pl ${cgibin}/
-    #scp cgi/sercxu.pl ${cgibin}/
-    #scp cgi/sercxu-vivo.pl ${cgibin}/
-    ## 
-
-
-    #scp cgi/perllib/*.pm ${perllib}/
-
-    #scp cgi/perllib/revo/encodex.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/voko_entities.pm ${perllib}/revo/
-    scp cgi/perllib/revo/checkxml.pm ${perllib}/revo/
-    #scp cgi/perllib/revo/xml2html.pm ${perllib}/revo/
-
-
-    ## # novaj
-    #scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
-    #scp cgi/vokoref-json.pl ${cgibin}/
-    ## scp cgi/vokomailx.pl ${cgibin}/
-    # scp cgi/vokohtmlx.pl ${cgibin}/
-    ## scp cgi/hazarda_art.pl ${cgibin}/
-    #scp cgi/mx_trd.pl ${cgibin}/
-    #
-
-
-    #scp revo/dlg/index-${eldono}.html ${revo}/dlg/
-    #scp revo/dlg/titolo-${eldono}.html ${revo}/dlg/
-    #scp revo/dlg/redakt*-${eldono}.html ${revo}/dlg/
-    #scp revo/dlg/404.html ${revo}/dlg/
+    ;;
+pwa)
+    scp revo/manifest.json ${revo}/
+    scp revo/offline.html ${revo}/
+    scp revo/sw.js ${revo}/
     ;;
 index)
     scp revo/index.html ${revo}/
@@ -147,6 +110,12 @@ kreo)
     echo "Kreante lokan procezujon (por docker) voko-araneo por eldono ${eldono}..."
     docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
     docker build --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
+        -t voko-araneo .
+    ;;
+kreo-kompleta)
+    echo "Kreante lokan procezujon (por docker) voko-araneo por eldono ${eldono}..."
+    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
+    docker build --no-cache --build-arg VERSION=${eldono} --build-arg VG_TAG=v${eldono} --build-arg ZIP_SUFFIX=${eldono} \
         -t voko-araneo .
     ;;
 esac

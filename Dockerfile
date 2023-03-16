@@ -165,6 +165,8 @@ RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 
 COPY revo/ /usr/local/apache2/htdocs/revo/
 COPY revo/index.html /usr/local/apache2/htdocs/
+COPY revo/manifest.json /usr/local/apache2/htdocs/
+COPY revo/sw.js /usr/local/apache2/htdocs/
 
 # Ankoraŭ farenda
 # certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...

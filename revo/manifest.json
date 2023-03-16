@@ -1,0 +1,26 @@
+{
+    "name": "Reta Vortaro",
+    "short_name": "Revo",
+    "lang": "epo",
+    "description": "Reta Vortaro kun difinoj, ekzemploj, tradukoj, indeksoj, tezaŭro kaj reta redaktado",
+    "theme_color": "#FF8C00",
+    "background_color": "#DAA520",
+    "display": "standalone",
+    "scope": "/revo/",
+    "start_url": "/revo/",
+    "icons": [
+        {
+            "src": "/revo/smb/revo64.png",
+            "type": "image/png",
+            "sizes": "64x64"
+        },
+        {
+            "src": "/revo/smb/revo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+        
+    ],
+    "categories": ["education"]
+}
