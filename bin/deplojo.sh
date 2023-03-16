@@ -20,24 +20,69 @@ release=2d
 # kaj supozas "docker", se nenio donita argumente
 target="${1:-docker}"
 
+cgidir=/usr/local/apache2/cgi-bin
+perllib=/usr/local/apache2/cgi-bin/perllib
+revodir=/usr/local/apache2/htdocs/revo
+
 case $target in
 
 docker)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
 
-    todir=/usr/local/apache2/htdocs/revo
-    docker cp revo/dlg/index-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
-    docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
-    docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
+    revodir=/usr/local/apache2/htdocs/revo
+    docker cp revo/dlg/index-${release}.html ${araneo_id}:${revodir}/dlg/
+    docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${revodir}/dlg/
+    docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${revodir}/dlg/
+    docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${revodir}/dlg/
+    docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${revodir}/dlg"
 
-    cgidir=/usr/local/apache2/cgi-bin
-    perllib=/usr/local/apache2/cgi-bin/perllib/
     docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
     #docker cp cgi/traduku-uwn.pl ${araneo_id}:${cgidir}
     docker cp cgi/perllib/revo/checkxml.pm ${araneo_id}:${perllib}/revo/
 
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
+    ;;
+docker:cgi)
+    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
+
+    for file in cgi/*.pl; do
+        echo ${file}
+        docker cp ${file} ${araneo_id}:${cgidir}
+    done
+
+    for file in cgi/admin/*.pl; do
+        echo ${file}
+        docker cp ${file} ${araneo_id}:${cgidir}/admin
+    done
+
+    for file in cgi/perllib/*.pm; do
+        if [[ "${file}" != "cgi/perllib/revodb.pm" ]]; then
+            echo ${file}
+            docker cp ${file} ${araneo_id}:${perllib}
+        fi
+    done
+
+    for file in cgi/perllib/revo/*.pm; do
+        echo ${file}
+        docker cp ${file} ${araneo_id}:${perllib}/revo
+    done
+
+    docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
+    docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/admin/*.pl; chown root.root ${cgidir}/admin/*; ls -l ${cgidir}"
+    ;;
+docker:ofc)
+    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
+    # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
+    # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?
+    docker cp ../voko-cikado/steloj.de/fundamento/fundamento.json ${araneo_id}:${revodir}/inx
+    docker cp ../voko-cikado/steloj.de/ofcaldonoj/ofcaldonoj.json ${araneo_id}:${revodir}/inx
+
+    docker cp cgi/admin/upofc.pl ${araneo_id}:${cgidir}/admin
+    docker exec ${araneo_id} bash -c "perl ${cgidir}/admin/upofc.pl"
+    ;;
+docker:pwd)
+    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
+    echo "mysql pv:"
+    docker exec ${araneo_id} bash -c "cat /run/secrets/voko-abelo.mysql_password"
     ;;
 esac

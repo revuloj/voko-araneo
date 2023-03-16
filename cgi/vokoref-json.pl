@@ -1,7 +1,9 @@
 #!/usr/bin/perl 
 #
-# (c) 2021 ĉe Wolfram Diestel
+# (c) 2021-2023 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
+#
+# provizas referencojn de la tezaŭro el la datumbazo (por montro en la artikoloj/derivaĵoj)
 
 use strict;
 
