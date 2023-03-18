@@ -25,7 +25,7 @@ perllib=${host}:files/perllib
 # Ni ankaŭ supozas, ke nova eldono okazas en git-branĉo kun la sama nomo
 # Ĉe publikigo marku la kodstaton per etikedo (git-tag) v${eldono}.
 # Dum la realigo vi povas ŝovi la etikedon ĉiam per celo "etikedo".
-eldono=2g
+eldono=2h
 
 # ni komprenas preparo | docker | servilo | index
 # kaj supozas "docker", se nenio donita argumente
