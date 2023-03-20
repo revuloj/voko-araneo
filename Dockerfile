@@ -55,7 +55,7 @@ RUN apk update \
   && ./configure && make install
 
 
-##### staĝo 3: Nun ni havas ĉion por la fina procezumo kun Apache-httpd, Perl...
+##### staĝo 3: Nun ni havas ĉion por krei la finan procezujon kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 LABEL org.opencontainers.image.description DESCRIPTION

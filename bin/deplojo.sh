@@ -48,7 +48,7 @@ docker)
 
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     ;;
-docker:cgi)
+docker-cgi)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
 
     for file in cgi/*.pl; do
@@ -76,7 +76,7 @@ docker:cgi)
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/admin/*.pl; chown root.root ${cgidir}/admin/*; ls -l ${cgidir}"
     ;;
-docker:ofc)
+docker-ofc)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
     # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?
@@ -86,9 +86,11 @@ docker:ofc)
     docker cp cgi/admin/upofc.pl ${araneo_id}:${cgidir}/admin
     docker exec ${araneo_id} bash -c "perl ${cgidir}/admin/upofc.pl"
     ;;
-docker:pwd)
+docker:db)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
-    echo "mysql pv:"
-    docker exec ${araneo_id} bash -c "cat /run/secrets/voko-abelo.mysql_password"
+    echo "mysql sv: abelo"
+    echo "mysql un: s314802_3159000"
+    echo "mysql pv: "$(docker exec ${araneo_id} bash -c "cat /run/secrets/voko-abelo.mysql_password")
+    echo "mysql db: db314802x3159000"
     ;;
 esac

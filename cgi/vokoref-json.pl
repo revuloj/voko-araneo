@@ -37,7 +37,8 @@ print header(-type=>'application/json',-charset=>'utf-8');
 if ($art =~ /^[a-z0-9]+$/) {
     my $viki = viki_refs();
     my $tez = tez_refs();
-    print $json_parser->encode({viki=>$viki, tez=>$tez});
+    my $ofc = ofc_refs();
+    print $json_parser->encode({viki=>$viki, tez=>$tez, ofc=>$ofc});
 }
 
 # fino
@@ -49,6 +50,14 @@ exit;
 sub viki_refs {
     my $rows = $dbh->selectall_arrayref("SELECT vik_celref AS m, vik_artikolo AS v FROM r2_vikicelo "
         . "WHERE vik_celref = '$art' OR vik_celref LIKE '$art.%' LIMIT $LIMIT", { Slice=>{} }); #,{0=>'m',1=>'v'});
+        #'vik_celref');
+    return $rows;
+}
+
+
+sub ofc_refs {
+    my $rows = $dbh->selectall_arrayref("SELECT mrk AS m, skc AS s, fnt as f, CONCAT(dos,'.html#',ref) AS r FROM r3ofc "
+        . "WHERE mrk = '$art' OR mrk LIKE '$art.%' LIMIT $LIMIT", { Slice=>{} }); #,{0=>'m',1=>'v'});
         #'vik_celref');
     return $rows;
 }
