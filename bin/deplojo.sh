@@ -80,10 +80,10 @@ docker-ofc)
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
     # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?
-    docker cp ../voko-cikado/steloj.de/fundamento/fundamento.json ${araneo_id}:${revodir}/inx
-    docker cp ../voko-cikado/steloj.de/ofcaldonoj/ofcaldonoj.json ${araneo_id}:${revodir}/inx
+    docker cp -q ../voko-cikado/steloj.de/fundamento/fundamento.json ${araneo_id}:${revodir}/inx
+    docker cp -q ../voko-cikado/steloj.de/ofcaldonoj/ofcaldonoj.json ${araneo_id}:${revodir}/inx
 
-    docker cp cgi/admin/upofc.pl ${araneo_id}:${cgidir}/admin
+    docker cp -q cgi/admin/upofc.pl ${araneo_id}:${cgidir}/admin
     docker exec ${araneo_id} bash -c "perl ${cgidir}/admin/upofc.pl"
     ;;
 docker:db)

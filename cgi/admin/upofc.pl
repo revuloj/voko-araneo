@@ -72,6 +72,10 @@ if ($debug) {
     print "\nTEST - fruktaĵo: $test\n";
     my $test = ref_mrk("persvad'i","oa","oa_9");
     print "\nTEST - persvad'i: $test\n";
+    my $test = ref_mrk("aer'um'","fe","");
+    print "\nTEST - aer'um': $test\n";
+    my $test = ref_mrk("advent'","oa","oa_1");
+    print "\nTEST - advent': $test\n";
 }
 
 # traktu fundamentajn kaj poste oficialigitajn...
@@ -129,10 +133,11 @@ sub process {
 }
 
 sub inx_prep {
+    print "preparante indekson..." if ($debug);
+
     for my $ofc (keys(%$rv_inx)) {
         $lst = $rv_inx->{$ofc};
 
-        print "preparante indekson..." if ($debug);
 
         $inx_ofc->{$ofc} = {} if (! defined $inx_ofc->{$ofc});
 
@@ -162,19 +167,42 @@ sub ref_mrk {
 
     # normigu divid-strekojn
     $inx =~ s/[’'|\/]/'/g;
+    my $i1 = $inx;
 
     # trovu la indekseron en la oficialecoj de Revo
-    if (index($inx,"'") == length($inx)-1) {
+    if (index($i1,"'") == length($i1)-1) {
         # se inx havas solan finan apostrofon, temas pri radiko
-        $mrk = rv_rad($ofc,substr($inx,0,length($inx)-1));       
-    } elsif (index($inx,"'")<0) {
+        $mrk = rv_rad($ofc,substr($i1,0,length($i1)-1));       
+    } elsif (index($i1,"'") < 0) {
         # se inx havas neniun apostrofon, temas pri derivaĵo
-        $mrk = rv_drv($ofc,$inx);       
-    } elsif (rindex($inx,"'") == length($inx)-2) {
+        $mrk = rv_drv($ofc,$i1);       
+    } elsif (rindex($i1,"'") == length($i1)-2) {
         # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
-        $inx =~ s/'//g;
-        $mrk = rv_drv($ofc,$inx);       
+        $i1 =~ s/'//g;
+        $mrk = rv_drv($ofc,$i1);       
     }
+
+    # se mrk ne troviĝis ni povas provi ankoraŭ forigi aŭ aldoni finaĵon kaj reserĉi
+    if (! $mrk) {
+        my $i2 = $inx;
+        my $I2 = uc(substr($i2,0,1)).substr($i2,1);
+        $I2 =~ s/'//g;
+
+        if (rindex($i2,"'") == length($i2)-2) {
+            # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
+            $i2 =~ s/'[oaie]$//;
+            $i2 =~ s/'//g;
+            $mrk = rv_rad($ofc,$i2) || rv_rad($ofc,$I2);   
+        } elsif (rindex($i2,"'") == length($i2)-1) {
+            # se apostrofo estas lasta, ni povas provi alpendigi finaĵon por trovi drv-on
+            $i2 =~ s/'//g;
+            $mrk = rv_drv($ofc,$i2.'o') || rv_drv($ofc,$i2.'a')
+                || rv_drv($ofc,$i2.'i') || rv_drv($ofc,$i2.'e')
+                || rv_drv($ofc,$I2.'o') || rv_drv($ofc,$I2.'a')
+                || rv_drv($ofc,$I2.'i') || rv_drv($ofc,$I2.'e');
+        }
+    }
+    
 
     return $mrk;
 }
@@ -198,7 +226,7 @@ sub rv_rad {
 sub rv_drv {
     my ($ofc,$drv) = @_;
 
-    print "drv? $ofc $rad\n" if ("$debug");
+    print "drv? $ofc $drv\n" if ("$debug");
     #print join(' ',keys(%$inx_ofc)) if ($debug);
 
     # trovu indekseron por derivaĵo el Revo-listo (ofc: *, 1..9, 19xx)
