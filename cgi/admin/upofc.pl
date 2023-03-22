@@ -21,7 +21,8 @@ use utf8; binmode STDOUT, ":utf8";
 use revodb;
 use fileutil;
 
-$debug = 1;
+$debug = 0;
+$test = 1;
 
 my $homedir = "/hp/af/ag/ri";
 my $rv_json = "$homedir/www/revo/inx/inx_ofc.json";
@@ -29,6 +30,10 @@ my $fe_json = "$homedir/www/revo/inx/fundamento.json";
 my $oa_json = "$homedir/www/revo/inx/ofcaldonoj.json";
 # my $fe_prefix = "https://steloj.de/esperanto/fundamento/";
 # my $oa_prefix = "https://steloj.de/esperanto/ofcaldonoj/";
+
+my @sufiksoj = qw(ad aĵ at an ant ar ĉj ec ej eg em er et id ig iĝ il in ing int ist it nj obl on ont op ot uj um ul);
+my @prefiksoj = qw(bo dis ek mal ge pra re);
+my @finajhoj = qw(as is os us i u o a e n j);
 
 print header(-charset=>'utf-8'),
       start_html('aktualigu fde/oa-ligojn'),
@@ -65,7 +70,7 @@ my $sth_insert = $dbh->prepare("INSERT INTO r3ofc (inx, mrk, fnt, dos, ref, skc)
     ."VALUES (?,?,?,?,?,?)") or die;
 
 ## kelkaj testoj...
-if ($debug) {
+if ($test || $debug) {
     my $test = ref_mrk("absolut'","oa","oa_1");
     print "\nTEST - absolut': $test\n";
     my $test = ref_mrk("fruktaĵo","fe","UV");
@@ -76,6 +81,10 @@ if ($debug) {
     print "\nTEST - aer'um': $test\n";
     my $test = ref_mrk("advent'","oa","oa_1");
     print "\nTEST - advent': $test\n";
+    my $test = ref_mrk("dis-","fe","UV");
+    print "\nTEST - dis-': $test\n";
+    my $test = ref_mrk("ge","fe","UV");
+    print "\nTEST - ge: $test\n";
 }
 
 # traktu fundamentajn kaj poste oficialigitajn...
@@ -138,7 +147,6 @@ sub inx_prep {
     for my $ofc (keys(%$rv_inx)) {
         $lst = $rv_inx->{$ofc};
 
-
         $inx_ofc->{$ofc} = {} if (! defined $inx_ofc->{$ofc});
 
         for my $i (@$lst) {
@@ -174,7 +182,7 @@ sub ref_mrk {
         # se inx havas solan finan apostrofon, temas pri radiko
         $mrk = rv_rad($ofc,substr($i1,0,length($i1)-1));       
     } elsif (index($i1,"'") < 0) {
-        # se inx havas neniun apostrofon, temas pri derivaĵo
+        # se inx havas neniun apostrofon, verŝajne temas pri derivaĵo
         $mrk = rv_drv($ofc,$i1);       
     } elsif (rindex($i1,"'") == length($i1)-2) {
         # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
@@ -188,7 +196,21 @@ sub ref_mrk {
         my $I2 = uc(substr($i2,0,1)).substr($i2,1);
         $I2 =~ s/'//g;
 
-        if (rindex($i2,"'") == length($i2)-2) {
+        my $afks = $i2; $afks =~ s/'$//;
+        my ($suf) = grep { $sufiksoj[$_] ~~ $afks } 0 .. $#sufiksoj;
+        my ($pref) = grep { $prefiksoj[$_] ~~ $afks } 0 .. $#prefiksoj;
+        my ($fin) = grep { $finajhoj[$_] ~~ $afks } 0 .. $#finajhoj;
+
+        print "afikso? $suf $pref $fin\n" if ($debug);
+
+        if ($fnt eq 'fe' && $suf ne '') {
+            $mrk = rv_drv($ofc,'-'.$afks);
+        } elsif ($fnt eq 'fe' && $fin ne '') {
+            $mrk = rv_drv($ofc,'-'.$afks);
+        } elsif ($fnt eq 'fe' && $pref ne '') {
+            $mrk = rv_drv($ofc,$afks.'-');
+        } 
+        elsif (rindex($i2,"'") == length($i2)-2) {
             # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
             $i2 =~ s/'[oaie]$//;
             $i2 =~ s/'//g;
@@ -200,12 +222,21 @@ sub ref_mrk {
                 || rv_drv($ofc,$i2.'i') || rv_drv($ofc,$i2.'e')
                 || rv_drv($ofc,$I2.'o') || rv_drv($ofc,$I2.'a')
                 || rv_drv($ofc,$I2.'i') || rv_drv($ofc,$I2.'e');
+        } elsif ($i2 =~ /[aioe]$/) {
+            # se finiĝas je [eaio], ni provu forigi la finaĵon kaj serĉi la radikan parton
+            $i2 =~ s/[aioe]$//;
+            $mrk = rv_rad($ofc,$i2);
         }
     }
-    
+
+    unless ($mrk) {
+        warn "Ne povas trovi mrk por: $inx $fnt $dos\n";
+    }
 
     return $mrk;
 }
+
+
 
 sub rv_rad {
     my ($ofc,$rad) = @_;
