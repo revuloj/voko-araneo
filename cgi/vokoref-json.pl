@@ -57,7 +57,7 @@ sub viki_refs {
 
 sub ofc_refs {
     my $rows = $dbh->selectall_arrayref("SELECT mrk AS m, skc AS s, fnt as f, CONCAT(dos,'.html#',ref) AS r FROM r3ofc "
-        . "WHERE mrk = '$art' OR mrk LIKE '$art.%' LIMIT $LIMIT", { Slice=>{} }); #,{0=>'m',1=>'v'});
+        . "WHERE mrk = '$art' OR mrk LIKE '$art.%' ORDER BY dos LIMIT $LIMIT", { Slice=>{} }); #,{0=>'m',1=>'v'});
         #'vik_celref');
     return $rows;
 }
