@@ -55,20 +55,6 @@ die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos..
 my $inx_ofc = {};
 inx_prep();
 
-# Konektiĝi kun la datumbazo kaj malplenigi la tabelon
-my $dbh = revodb::connect();
-my $sth = $dbh->prepare("TRUNCATE TABLE r3ofc") or die;
-$sth->execute();
-$dbh->{'mysql_enable_utf8'}=1;
-$dbh->do("set names utf8");
-
-# Nun ni trakuras la referencojn kaj enmetas ilin en la datumbazon.
-# Kelkaj markoj povas duobliĝi, ekz-e ni havas ambaŭ abrikotujo kaj abrikotarbo,
-# sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
-# per ON DUPLICATE...
-my $sth_insert = $dbh->prepare("INSERT INTO r3ofc (inx, mrk, fnt, dos, ref, skc) " 
-    ."VALUES (?,?,?,?,?,?)") or die;
-
 ## kelkaj testoj...
 if ($test || $debug) {
     my $test = ref_mrk("absolut'","oa","oa_1");
@@ -85,7 +71,27 @@ if ($test || $debug) {
     print "\nTEST - dis-': $test\n";
     my $test = ref_mrk("ge","fe","UV");
     print "\nTEST - ge: $test\n";
+    my $test = ref_mrk("teokratri'o","oa","oa_2");
+    print "\nTEST - teokratri'o: $test\n";   
+    my $test = ref_mrk("epifani'o","oa","oa_2");
+    print "\nTEST - epifani'o: $test\n";       
+#exit;
 }
+
+# Konektiĝi kun la datumbazo kaj malplenigi la tabelon
+my $dbh = revodb::connect();
+my $sth = $dbh->prepare("TRUNCATE TABLE r3ofc") or die;
+$sth->execute();
+$dbh->{'mysql_enable_utf8'}=1;
+$dbh->do("set names utf8");
+
+# Nun ni trakuras la referencojn kaj enmetas ilin en la datumbazon.
+# Kelkaj markoj povas duobliĝi, ekz-e ni havas ambaŭ abrikotujo kaj abrikotarbo,
+# sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
+# per ON DUPLICATE...
+my $sth_insert = $dbh->prepare("INSERT INTO r3ofc (inx, mrk, fnt, dos, ref, skc) " 
+    ."VALUES (?,?,?,?,?,?)") or die;
+
 
 # traktu fundamentajn kaj poste oficialigitajn...
 process("fe",$fe_refs);
@@ -165,6 +171,38 @@ sub ref_mrk {
 
     print "\n$inx $fnt $dos\n" if ($debug); 
 
+    # specialaj kazoj
+    return 'auxgus1' if ($inx eq "Aŭgust'" && $dos eq 'oa_7');
+    return 'auxgus1' if ($inx eq "Aŭgusto" && $dos eq 'ekz_22');
+    return 'analog'  if ($inx eq "analog'");
+    return 'analog1' if ($inx eq "analogi'");
+    return 'koncen1' if ($inx eq "koncentr'");
+    return 'dekor' if ($inx eq "dekori");
+    return 'konvers' if ($inx eq "konversi");
+    return 'centr.sam0a' if ($inx eq "samcentra");
+    return 'arhxitekt' if ($inx eq "arĥitekt', arkitekt'");
+    return 'katehx2' if ($inx eq "kateĥiz', katekiz'");
+    return 'katehx1' if ($inx eq "kateĥist', katekist'");
+    return 'oligark' if ($inx eq "oligarĥ', oligark'");
+    return 'oligar' if ($inx eq "oligarĥi', oligarki'");
+    return 'hierar' if ($inx eq "hierarĥi', hierarki'");
+    return 'arkeol' if ($inx eq "arĥeolog', arkeolog'");
+    return 'arkeol1' if ($inx eq "arĥeologi', arkeologi'");
+    return 'anarhx' if ($inx eq "anarĥi', anarki'");
+    return 'arkipe' if ($inx eq "arĥipelag', arkipelag'");
+    return 'tehxnik' if ($inx eq "teĥnik', teknik'");
+    return 'mehxan1' if ($inx eq "mekanismo/meĥanismo" || $inx eq "meĥanism'o, mekanism'o");
+    return 'arhxiv' if ($inx eq "arĥiv', arkiv'");
+    return 'arhxaik' if ($inx eq "arĥaik', arkaik'");
+    return 'hxirur' if ($inx eq "kirurgi'o, (ĥirurgi'o)");
+    return 'hxirurg' if ($inx eq "kirurg'o, (ĥirurg'o)");
+    return 'monarh1' if ($inx eq "monarki'o, (monarĥi'o)" || $inx eq "monarĥio/monarkio");    
+    return 'gujav.0arbo' if ($inx eq "gujav'uj'o, gujav'arb'o");
+    return 'mang.0arbo' if ($inx eq "mang'uj'o, mang'arb'o");
+    return 'avokad.0ujo' if ($inx eq "avokad'uj'o, avokad'arb'o");
+    return 'mandar1.0arbo' if ($inx eq "mandarin'uj'o, mandarin'arb'o");
+    return 'zamenhof' if ($inx eq "Zamenhof");
+
     # en kiu parto (FdE, OA..) serĉi?
     if ($fnt eq 'fe') {
         $ofc = '*';
@@ -175,6 +213,7 @@ sub ref_mrk {
 
     # normigu divid-strekojn
     $inx =~ s/[’'|\/]/'/g;
+    $inx =~ s/!$//g;
     my $i1 = $inx;
 
     # trovu la indekseron en la oficialecoj de Revo
@@ -192,7 +231,7 @@ sub ref_mrk {
 
     # se mrk ne troviĝis ni povas provi ankoraŭ forigi aŭ aldoni finaĵon kaj reserĉi
     if (! $mrk) {
-        my $i2 = $inx;
+        my $i2 = lc($inx);
         my $I2 = uc(substr($i2,0,1)).substr($i2,1);
         $I2 =~ s/'//g;
 
@@ -209,11 +248,12 @@ sub ref_mrk {
             $mrk = rv_drv($ofc,'-'.$afks);
         } elsif ($fnt eq 'fe' && $pref ne '') {
             $mrk = rv_drv($ofc,$afks.'-');
-        } 
-        elsif (rindex($i2,"'") == length($i2)-2) {
+
+        } elsif (rindex($i2,"'") == length($i2)-2) {
             # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
             $i2 =~ s/'[oaie]$//;
             $i2 =~ s/'//g;
+            $I2 =~ s/[oaie]$//;
             $mrk = rv_rad($ofc,$i2) || rv_rad($ofc,$I2);   
         } elsif (rindex($i2,"'") == length($i2)-1) {
             # se apostrofo estas lasta, ni povas provi alpendigi finaĵon por trovi drv-on
