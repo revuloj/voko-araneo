@@ -75,6 +75,13 @@ index)
     ## sendu malnovajn versiojn al la nova...
     #scp revo/index.html ${revo}/dlg/index-2a.html
     ;;
+ofc)
+    # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
+    # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?
+    scp ../voko-cikado/steloj.de/fundamento/fundamento.json ${revo}/inx
+    scp ../voko-cikado/steloj.de/ofcaldonoj/ofcaldonoj.json ${revo}/inx
+    scp cgi/admin/upofc.pl ${cgibin}/admin
+    ;;
 preparo)
     # kontrolu ĉu la branĉo kongruas kun la agordita versio
     branch=$(git symbolic-ref --short HEAD)
