@@ -71,9 +71,15 @@ pwa)
 index)
     scp revo/index.html ${revo}/
     scp revo/index.html ${host}:www/
-
+    ;;
+index-mn)
     ## sendu malnovajn versiojn al la nova...
-    #scp revo/index.html ${revo}/dlg/index-2a.html
+    scp revo/index.html ${revo}/dlg/index-2a.html
+    scp revo/index.html ${revo}/dlg/index-2b.html
+    scp revo/index.html ${revo}/dlg/index-2d.html
+    scp revo/index.html ${revo}/dlg/index-2e.html
+    scp revo/index.html ${revo}/dlg/index-2f.html
+    # scp revo/index.html ${revo}/dlg/index-2g.html
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
