@@ -13,19 +13,20 @@
 # + ControlPersist 2m
 # http://blogs.perl.org/users/smylers/2011/08/ssh-productivity-tips.html
 
-# aldonu en /etc/hosts!
-host=revo
-revo=${host}:www/revo
-cgibin=${host}:www/cgi-bin
-perllib=${host}:files/perllib
-
 # Tio estas la eldono de voko-grundo kontraŭ kiu ni kompilas ĉion
 # ĝi devas ekzisti jam kiel git-tag (kaj sekve kiel kodarĥivo kaj procezujo) en Github
 # en celo "preparo" ni metas tiun eldonon ankaŭ por dosiernomoj kc. de voko-araneo
 # Ni ankaŭ supozas, ke nova eldono okazas en git-branĉo kun la sama nomo
 # Ĉe publikigo marku la kodstaton per etikedo (git-tag) v${eldono}.
 # Dum la realigo vi povas ŝovi la etikedon ĉiam per celo "etikedo".
-eldono=2h
+eldono=2i
+
+# aldonu en /etc/hosts!
+host=revo
+revo=${host}:www/revo
+cgibin=${host}:www/cgi-bin
+perllib=${host}:files/perllib
+
 
 # ni komprenas preparo | docker | servilo | index
 # kaj supozas "docker", se nenio donita argumente
