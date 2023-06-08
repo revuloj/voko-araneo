@@ -59,7 +59,7 @@ jobs:
         run: |
           # ne plu necesa por legi: echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
           # tio akiras voko-grundo kaj kompilas la procezujon voko-araneo
-          ./bin/eldono.sh kreo
+          ./sbin/eldono kreo
 
       - name: Testoj de ${{ env.IMAGE_NAME }}
         run: |

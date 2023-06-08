@@ -118,7 +118,7 @@ preparo)
 etikedo)
     echo "Provizante la aktualan staton per etikedo (git tag) v${eldono}"
     echo "kaj puŝante tiun staton al la centra deponejo"
-    git tag -f v${eldono} && git push && git push --tags -f
+    git tag -f v${eldono} && git push && git push origin v${eldono} -f
     ;;
 kreo)
     echo "Kreante lokan procezujon (por docker) voko-araneo por eldono ${eldono}..."
