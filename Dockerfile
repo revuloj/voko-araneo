@@ -6,26 +6,6 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 
-# tie ĉi ni kreas JSON-dosierojn el la XML-fontoj por poste plenigi la datumbazon
-# por havi pli aktualajn JSON-dosierojn ni devos aldoni la kreadon al la ĉiutaga eldono
-# kaj ŝargi el tiu anstatataŭe (vd revo_download_gh.sh malsupre)
-#FROM ubuntu:focal as json-builder
-#LABEL maintainer=<diestel@steloj.de>
-#ARG VG_TAG=2f
-#ARG DEBIAN_FRONTEND=noninteractive
-#
-#COPY bin/xml-json.pl bin/  
-## ni bezonas curl, unzip, perl, xsltproc por kompili la datumbazon el la XML-fontoj
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-#    ca-certificates curl unzip xsltproc perl \
-#	&& curl -Lo revo-fonto.zip https://github.com/revuloj/revo-fonto/archive/master.zip \
-#	&& curl -Lo voko-grundo.zip https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
-#  && unzip -q revo-fonto.zip && unzip -q voko-grundo.zip \
-#  && ln -s revo-fonto-master revo-fonto \
-#  && ln -s voko-grundo-${VG_TAG} voko-grundo 
-#RUN ls -l \
-#  && perl bin/xml-json.pl  
-
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
 FROM alpine:3.15 as builder
    # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
@@ -74,13 +54,15 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
 # normale: master aŭ v1e ks, 'bin/eldono.sh kreo' metas tion de ekstere per --build-arg
-ARG VG_TAG=master
+# ARG VG_TAG=master
 # por etikedoj kun nomo vXXX estas la problemo, ke GH en la ZIP-nomo kaj dosierujo forprenas la "v"
 # do se VG_TAG estas "v1e", ZIP_SUFFIX estu "1e", en 'bin/eldono.sh kreo' tio estas jam konsiderata
-ARG ZIP_SUFFIX=master
+#ARG ZIP_SUFFIX=master
 #ARG REVO_VER=2f
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
+ARG VOKO_TMP=/tmp/voko
+ARG REVO_DIR=/usr/local/apache2/htdocs/revo
 
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
@@ -110,6 +92,8 @@ COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
 COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 
+COPY --from=grundo build/ ${VOKO_TMP}/
+
 # Ni kopias la tutan Retan Vortaron de 
 # https://api.github.com/repos/revuloj/revo-fonto/releases/latest
 # (Alternativa ebleco estus, preni nur la XML kaj rekrei la tutan
@@ -125,23 +109,28 @@ COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
 RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
-  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
-  && unzip -l ${VG_TAG}.zip \
-  && unzip -q ${VG_TAG}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
-     voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
-     # necesaj ankoraŭ por la malnova fasado:
-     voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
-  && rm ${VG_TAG}.zip \
+#  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
+#  && unzip -l ${VG_TAG}.zip \
+#  && unzip -q ${VG_TAG}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
+#     voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
+#     # necesaj ankoraŭ por la malnova fasado:
+#     voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
+#  && rm ${VG_TAG}.zip \
   && mkdir -p ${HOME_DIR}/files \
   # ni uzas provizore -k pro atestilo-problemo kun Let's Encrypt - okaze forigu post kiam refunkcias en Alpine+curl (2021-10-09)
+  # && curl -k -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
   && curl -k -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
-# tion ni ne bezonos, post kiam korektiĝis eraro en voko-formiko, ĉar
-# tiam la vinjetoj GIF kaj PNG ankaŭ estos en la ĉiutaga revohtml-eldono  
-#  && cp voko-grundo-${VG_TAG}/smb/*.png /usr/local/apache2/htdocs/revo/smb/ \
-  && cp voko-grundo-${ZIP_SUFFIX}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
-  && cp -r voko-grundo-${ZIP_SUFFIX}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
-  && mv voko-grundo-${ZIP_SUFFIX}/dtd /usr/local/apache2/htdocs/revo/ \
-  && mv -f voko-grundo-${ZIP_SUFFIX}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
+  && cp ${VOKO_TMP}/smb/* ${REVO_DIR}/smb/ \
+  && cp -r ${VOKO_TMP}/cfg/* ${REVO_DIR}/cfg/ \
+  && cp ${VOKO_TMP}/dok/* ${REVO_DIR}/dok/ \
+  && cp ${VOKO_TMP}/stl/* ${REVO_DIR}/stl/ \
+  && mv ${VOKO_TMP}/dtd ${REVO_DIR}/ \
+  && mv ${VOKO_TMP}/jsc ${REVO_DIR}/ \
+  && mv ${VOKO_TMP}/xsl ${HOME_DIR}/files/xsl/ \
+#  && cp voko-grundo-${ZIP_SUFFIX}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
+#  && cp -r voko-grundo-${ZIP_SUFFIX}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
+#  && mv voko-grundo-${ZIP_SUFFIX}/dtd /usr/local/apache2/htdocs/revo/ \
+#  && mv -f voko-grundo-${ZIP_SUFFIX}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p ${HOME_DIR}/files/log && chown daemon.daemon ${HOME_DIR}/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
@@ -150,27 +139,16 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && chown -R ${DAEMON_UID} ${HTTP_DIR}/revo \
   && rm -rf /tmp/*
 
-COPY --from=grundo build/smb/ /usr/local/apache2/htdocs/revo/smb/
-COPY --from=grundo build/jsc/ /usr/local/apache2/htdocs/revo/jsc/
-COPY --from=grundo build/stl/ /usr/local/apache2/htdocs/revo/stl/
-
-COPY --from=grundo build/xsl/ ${HOME_DIR}/files/xsl/
-  
-#   && cp -r /usr/local/apache2/htdocs/revo/xsl/inc /usr/local/apache2/htdocs/revo/xsl/ \
-
 COPY sxangxoj.rdf ${HTTP_DIR}/
 RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 
 #COPY sercho.xsl ${HOME_DIR}/files/xsl/sercho.xsl
 
-COPY revo/ /usr/local/apache2/htdocs/revo/
+COPY revo/ {REVO_DIR}/
 COPY revo/index.html /usr/local/apache2/htdocs/
 COPY revo/manifest.json /usr/local/apache2/htdocs/
 COPY revo/sw.js /usr/local/apache2/htdocs/
 
-# Ankoraŭ farenda
-# certigu ke ne mankas dokumentoj en revo/dok - eble kreu per xsltproc + xsl ankoraŭ...
-# oni povas kunmeti COPY+ADD kaj ambaŭ RUN per redukti tavolojn
 
 # Basic Auth por cgi/admin
 # https://tecadmin.net/setup-apache-basic-authentication/
