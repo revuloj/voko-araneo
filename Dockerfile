@@ -144,7 +144,7 @@ RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 
 #COPY sercho.xsl ${HOME_DIR}/files/xsl/sercho.xsl
 
-COPY revo/ {REVO_DIR}/
+COPY revo/ ${REVO_DIR}/
 COPY revo/index.html /usr/local/apache2/htdocs/
 COPY revo/manifest.json /usr/local/apache2/htdocs/
 COPY revo/sw.js /usr/local/apache2/htdocs/
