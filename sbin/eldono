@@ -110,7 +110,7 @@ preparo)
     # ŝanĝu la version / dosiernomoj en la skriptoj
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/index.html
     sed -i 's,/index-[1-9][a-z]\.,/index-'${eldono}'\.,g' revo/index.html
-    sed -i 's,/-[1-9][a-z]\.,/-'${eldono}'\.,g' revo/sw.js
+    sed -i -r 's,-[1-9][a-z]([-.]),-'${eldono}'\1,g' revo/sw.js
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/dlg/*
 
     #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${eldono}'/' Dockerfile
