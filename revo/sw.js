@@ -1,13 +1,13 @@
-const cacheName = "retavortaro-2g";
+const cacheName = "retavortaro-2i";
 const preload_files = [
   "/revo/offline.html",
-  "/revo/dlg/index-2g.html",
-  "/revo/stl/revo-2g-min.css",
-  "/revo/jsc/revo-2g-min.js",
+  "/revo/dlg/index-2i.html",
+  "/revo/stl/revo-2i-min.css",
+  "/revo/jsc/revo-2i-min.js",
   "/revo/dok/datumprotekto.html",
-  "/revo/dlg/redaktilo-2g.html",
-  "/revo/dlg/redaktmenu-2g.html",
-  "/revo/dlg/titolo-2g.html",
+  "/revo/dlg/redaktilo-2i.html",
+  "/revo/dlg/redaktmenu-2i.html",
+  "/revo/dlg/titolo-2i.html",
   "/revo/dlg/titolo.jpg",
   "/revo/dlg/404.html",
   "/revo/dlg/zamenhof_legas.jpg",
