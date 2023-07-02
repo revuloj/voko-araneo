@@ -101,7 +101,7 @@ var checkResponse = function(request){
 
 var addToCache = function(request){
   return caches.open("offline").then(function (cache) {
-    return fetch(request).then(function (response) {
+    return fetch(request.clone()).then(function (response) {
       console.log(response.url + " estas konservita");
       return cache.put(request, response);
     });
