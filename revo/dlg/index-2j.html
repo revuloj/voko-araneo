@@ -2,14 +2,20 @@
 <html>
   <head>
     <meta charset="UTF-8">
+    <!--
     <script>
       if ("serviceWorker" in navigator && !navigator.serviceWorker.controller) {
           navigator.serviceWorker.register("/revo/sw.js").then(function(reg) {
               console.log("servofunkcio registrita por: " + reg.scope);
           });
       }
+      /* forigi:
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations[0].unregister();
+      });
+      */
     </script>
-
+    -->
     <link rel="preload" href="../stl/revo-2j-min.css" as="style">
     <link rel="preload" href="../jsc/revo-2j-min.js" as="script">
     <link rel="manifest" href="/revo/manifest.json">
