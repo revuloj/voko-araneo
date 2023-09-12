@@ -40,6 +40,9 @@ FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 LABEL org.opencontainers.image.description DESCRIPTION
 
+# REVO_FONTO povas esti ŝanĝita al revo-fonto-testo ekstere per --build-arg, jam konsiderata en 'bin/eldono.sh kreo-test'
+ARG REVO_FONTO=revo-fonto
+
 # see:
 # https://hub.docker.com/_/httpd/
 # https://github.com/docker-library/httpd/blob/b2e7d2868e2f92660469ac66187f8f83fe449c65/2.4/alpine/Dockerfile

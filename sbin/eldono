@@ -131,4 +131,9 @@ kreo-kompleta)
     docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
     docker build --no-cache --build-arg VERSION=${eldono} -t voko-araneo .
     ;;
+kreo-test)
+    echo "Kreante lokan procezujon (por docker) voko-araneo el revo-fonto-testo por eldono ${eldono}..."
+    docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
+    docker build --build-arg VERSION=${eldono} --build-arg REVO_FONTO=revo-fonto-testo -t voko-araneo .
+    ;;
 esac
