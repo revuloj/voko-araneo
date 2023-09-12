@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 
+## aktualigas la datumbazon el tez/*.json
+## por unuopaj artikoloj, aŭ donitaj per parametro art=... (unu)
+## aŭ arts=... (pluraj, maks. mil) aŭ prefix=... (ĉiuj komenciĝantaj tiel)
+## Unuopa artikolo estas en-db-igita per la funkcioj en perllib/art_db.pm
+
 #use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
