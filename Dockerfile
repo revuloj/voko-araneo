@@ -7,7 +7,7 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo
 
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.15 as builder
+FROM alpine:3.18 as builder
    # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
 
 # build and install rxp
