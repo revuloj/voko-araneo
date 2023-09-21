@@ -40,6 +40,7 @@ docker)
     docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/404.html ${araneo_id}:${todir}/dlg/
     docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
 
     docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
