@@ -5,6 +5,8 @@
 #
 # importado de referencoj al Fundamento de Esperanto kaj Oficialaj Aldonoj
 # el JSON-dosieroj al DB
+# Kreu ilin en voko-cikado per 'ant fundamento-json ofcaldonoj-json'
+# kaj poste enigu en DB per 'sbin/deplojo docker-ofc'
 
 #use strict;
 use CGI qw(:standard);

@@ -78,6 +78,7 @@ docker-cgi)
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/admin/*.pl; chown root.root ${cgidir}/admin/*; ls -l ${cgidir}"
     ;;
 docker-ofc)
+    # PLIBONIGU: tio pli bone sidus en voko-cikado/sbin/deplojo
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
     # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?
