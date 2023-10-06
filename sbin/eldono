@@ -75,12 +75,13 @@ index)
     ;;
 index-mn)
     ## sendu malnovajn versiojn al la nova...
-    scp revo/index.html ${revo}/dlg/index-2a.html
-    scp revo/index.html ${revo}/dlg/index-2b.html
     scp revo/index.html ${revo}/dlg/index-2d.html
     scp revo/index.html ${revo}/dlg/index-2e.html
     scp revo/index.html ${revo}/dlg/index-2f.html
-    # scp revo/index.html ${revo}/dlg/index-2g.html
+    scp revo/index.html ${revo}/dlg/index-2g.html
+    scp revo/index.html ${revo}/dlg/index-2h.html
+    scp revo/index.html ${revo}/dlg/index-2i.html
+    # scp revo/index.html ${revo}/dlg/index-2j.html
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
