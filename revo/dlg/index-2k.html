@@ -10,8 +10,8 @@
       }
     </script>
 
-    <link rel="preload" href="../stl/revo-2i-min.css" as="style">
-    <link rel="preload" href="../jsc/revo-2i-min.js" as="script">
+    <link rel="preload" href="../stl/revo-2k-min.css" as="style">
+    <link rel="preload" href="../jsc/revo-2k-min.js" as="script">
     <link rel="manifest" href="/revo/manifest.json">
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -26,13 +26,13 @@
     <script src="../jsc/malnova-1c.js"></script>
 
     <link rel="SHORTCUT ICON" href="../smb/revo.png">
-    <link rel="stylesheet" href="../stl/revo-2i-min.css">
+    <link rel="stylesheet" href="../stl/revo-2k-min.css">
     <link rel="search" type="application/opensearchdescription+xml" title="Revoserĉo" href="/revo/cfg/sercxo-revo.xml">
     <link rel="search" type="application/opensearchdescription+xml" title="Revoserĉo per Ecosia" href="/revo/cfg/sercxo-ecosia.xml">
     <link rel="search" type="application/opensearchdescription+xml" title="Revoserĉo per DuckDuckGo" href="/revo/cfg/sercxo-anaso.xml">
     <link rel="search" type="application/opensearchdescription+xml" title="Revoserĉo per Google" href="/revo/cfg/sercxo-google.xml">
 
-    <script src="../jsc/revo-2i-min.js"></script>
+    <script src="../jsc/revo-2k-min.js"></script>
 
         <!-- avoid unsafe-eval in CSP: 
             script type="text/x-mathjax-config">
@@ -89,7 +89,8 @@
     </form>    
     <div id="navigado" class="eble_kasxita"></div>
 </nav>
-<main> 
+<main>    
+  <article>
   <!-- enhavo -->
   <!--noscript-->
     <h1>Reta Vortaro</h1>
@@ -98,8 +99,64 @@
       per la <a href="/revo/index-malnova.html">malnova fasado</a>
       aŭ <a href="/revo/inx/_plena.html">tiu ĉi simpla paĝo</a>.
     </p>
-  <!--/noscript-->
+  <!--/noscript-->  
+  </article>
 </main>
 <aside id="console"></aside>
+
+  <!-- dialog por agordi lingvopreferojn -->
+  <dialog id="pref_dlg" class="overlay">
+    <h2>Lingvopreferoj</h2>
+    <div id="preferoj" class="preferoj">
+      <div id="w:ix_literoj" class="tabs">
+        <span>
+          <input name="pref_lingvoj" type="radio" id="a_b" checked="checked" value="a_b">
+          <label for="a_b">a..b</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="c_g" value="c_g">
+          <label for="c_g">c..g</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="h_j" value="h_j">
+          <label for="h_j">h..j</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="k_l" value="k_l">
+          <label for="k_l">k..l</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="m_o" value="m_o">
+          <label for="m_o">m..o</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="p_s" value="p_s">
+          <label for="p_s">p..s</label>
+        </span>
+        <span>
+          <input name="pref_lingvoj" type="radio" id="t_z" value="t_z">
+          <label for="t_z">t..z</label>
+        </span>
+        <button title="fermu preferojn" id="pref_dlg_preta">preta</button>
+      </div>
+      <h3>preferataj lingvoj</h3>
+      <h3>aldoneblaj lingvoj</h3>
+      <ul id="pref_lng"></ul>
+      <ul id="alia_lng"></ul>
+    </div>
+  </dialog>
+  <!-- dialog por redakti tradukojn -->
+  <dialog id="r:traduko_dlg" class="overlay">
+    <h2>Tradukoj</h2>  
+    <p id="traduko_error" class="ui-state-error ui-corner-all"></p>
+    <div id="traduko_tabelo" class="dlg_tab_div">
+      <table class="dlg_tabelo" id="traduko_table">
+        <thead><tr><th>eo</th><th><span id="traduko_lingvo"></span></th><th>pli</th></tr></thead>
+        <tbody id="traduko_tradukoj">
+        </tbody>
+      </table>
+    </div>
+    <div id="traduko_butonoj" class="butonoj">() ind baz</div>
+  </dialog>
 </body>
 </html>

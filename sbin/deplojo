@@ -14,7 +14,7 @@
 # http://blogs.perl.org/users/smylers/2011/08/ssh-productivity-tips.html
 
 # aldonu en /etc/hosts!
-release=2i
+release=2k
 
 # ni komprenas preparo | docker | servilo |index
 # kaj supozas "docker", se nenio donita argumente
@@ -40,6 +40,7 @@ docker)
     docker cp revo/dlg/titolo-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/redaktilo-${release}.html ${araneo_id}:${todir}/dlg/
     docker cp revo/dlg/redaktmenu-${release}.html ${araneo_id}:${todir}/dlg/
+    docker cp revo/dlg/404.html ${araneo_id}:${todir}/dlg/
     docker exec ${araneo_id} bash -c "chown root.root ${todir}/*; ls -l ${todir}/dlg"
 
     docker cp cgi/sercxu-json-${release}.pl ${araneo_id}:${cgidir}
@@ -77,6 +78,7 @@ docker-cgi)
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/admin/*.pl; chown root.root ${cgidir}/admin/*; ls -l ${cgidir}"
     ;;
 docker-ofc)
+    # PLIBONIGU: tio pli bone sidus en voko-cikado/sbin/deplojo
     araneo_id=$(docker ps --filter name=araneujo_araneo -q)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
     # eble prenu la JSON-dosierojn de pli kohera loko aŭ kreu ilin laŭbezone?

@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+## uzata por plenigi la datumbazon:
+## 1. transformas la artikolojn art/*.xml al tez/*.json
+## 2. uzas tiun ekstrakton por plenigi la tabelojn r3* de la datumbazo
+
 use File::stat;
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");

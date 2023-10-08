@@ -7,7 +7,7 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo
 
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.15 as builder
+FROM alpine:3.18 as builder
    # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
 
 # build and install rxp
@@ -39,6 +39,9 @@ RUN apk update \
 FROM httpd:2.4-alpine
 LABEL Author=<diestel@steloj.de>
 LABEL org.opencontainers.image.description DESCRIPTION
+
+# REVO_FONTO povas esti ŝanĝita al revo-fonto-testo ekstere per --build-arg, jam konsiderata en 'bin/eldono.sh kreo-test'
+ARG REVO_FONTO=revo-fonto
 
 # see:
 # https://hub.docker.com/_/httpd/
@@ -108,14 +111,7 @@ COPY --from=grundo build/ ${VOKO_TMP}/
 #
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
-RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
-#  && curl -LO https://github.com/revuloj/voko-grundo/archive/${VG_TAG}.zip \
-#  && unzip -l ${VG_TAG}.zip \
-#  && unzip -q ${VG_TAG}.zip voko-grundo-${ZIP_SUFFIX}/dok/* \
-#     voko-grundo-${ZIP_SUFFIX}/cfg/* voko-grundo-${ZIP_SUFFIX}/dtd/* \
-#     # necesaj ankoraŭ por la malnova fasado:
-#     voko-grundo-${ZIP_SUFFIX}/smb/*.gif \
-#  && rm ${VG_TAG}.zip \
+RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apache2/htdocs/ \
   && mkdir -p ${HOME_DIR}/files \
   # ni uzas provizore -k pro atestilo-problemo kun Let's Encrypt - okaze forigu post kiam refunkcias en Alpine+curl (2021-10-09)
   # && curl -k -Lo ${HOME_DIR}/files/eoviki.gz http://download.wikimedia.org/eowiki/latest/eowiki-latest-all-titles-in-ns0.gz \
@@ -127,10 +123,6 @@ RUN /usr/local/bin/revo_download_gh.sh && mv revo /usr/local/apache2/htdocs/ \
   && mv ${VOKO_TMP}/dtd ${REVO_DIR}/ \
   && mv ${VOKO_TMP}/jsc ${REVO_DIR}/ \
   && mv ${VOKO_TMP}/xsl ${HOME_DIR}/files/xsl/ \
-#  && cp voko-grundo-${ZIP_SUFFIX}/smb/*.gif /usr/local/apache2/htdocs/revo/smb/ \
-#  && cp -r voko-grundo-${ZIP_SUFFIX}/cfg/* /usr/local/apache2/htdocs/revo/cfg/ \
-#  && mv voko-grundo-${ZIP_SUFFIX}/dtd /usr/local/apache2/htdocs/revo/ \
-#  && mv -f voko-grundo-${ZIP_SUFFIX}/dok/* /usr/local/apache2/htdocs/revo/dok/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
   && mkdir -p ${HOME_DIR}/files/log && chown daemon.daemon ${HOME_DIR}/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
