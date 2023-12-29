@@ -233,7 +233,12 @@ sub process_trd {
                                 # por koncizigo - do ni ignoras ilin
                                 # se iam ni tamen volas tiom longajn - ekz-e pro ekz/trd
                                 # ni aŭ larĝigu la tabelon aŭ tranĉu la tradukon!
-        $trd_ins->execute($mrk,$lng,$ind,$text,$ekz);
+        eval {
+          $trd_ins->execute($mrk,$lng,$ind,$text,$ekz);
+        };
+        if ($@) {
+          warn($trd_ins->err . substr($@,0,81));
+        }
       } else {
         warn "Tro longa traduk-indeksero: \"$ind\" en $art!\n"
       }
