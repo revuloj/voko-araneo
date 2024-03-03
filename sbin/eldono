@@ -81,7 +81,8 @@ index-mn)
     scp revo/index.html ${revo}/dlg/index-2g.html
     scp revo/index.html ${revo}/dlg/index-2h.html
     scp revo/index.html ${revo}/dlg/index-2i.html
-    # scp revo/index.html ${revo}/dlg/index-2j.html
+    scp revo/index.html ${revo}/dlg/index-2j.html
+    scp revo/index.html ${revo}/dlg/index-2k.html    
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
