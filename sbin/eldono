@@ -28,8 +28,7 @@ cgibin=${host}:www/cgi-bin
 perllib=${host}:files/perllib
 
 
-# ni komprenas preparo | docker | servilo | index
-# kaj supozas "docker", se nenio donita argumente
+# Ni komprenas preparo | servilo | servilo | index | ofc...
 target="${1}"
 
 case $target in
@@ -138,4 +137,7 @@ kreo-test)
     docker pull ghcr.io/revuloj/voko-grundo/voko-grundo:${eldono}
     docker build --build-arg VERSION=${eldono} --build-arg REVO_FONTO=revo-fonto-testo -t voko-araneo .
     ;;
+*)
+    echo "Nevalida cel-argumento:"
+    echo "ni komprenas preparo | servilo | servilo | index | ofc..."
 esac
