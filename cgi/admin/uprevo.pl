@@ -14,14 +14,22 @@ use revodb;
 my $exitcode;
 my $db_verbose = 1;
 
+my $homedir = "/hp/af/ag/ri";
+my $htmldir = "$homedir/www";
+my $revodir = "$htmldir/revo";
+my $xmldir = "$revodir/xml";
+
+my $fname = param('fname');
+# kontrolu ĉu la malpakenda arĥivdosiero ekzistas
+if (! -s "$htmldir/alveno/$fname") {
+  print header(-status => '404 Not Found', -type => 'text/html');
+  exit;
+}
+
 print header,
       start_html('Sendu sxangxitajn pagxojn'),
       h1('fname='.param('fname'));
 
-
-my $fname = param('fname');
-
-my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
 open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush LOG 1;
@@ -30,16 +38,13 @@ $ret = `du -sh $homedir`;
 print LOG "du -> $exitcode\n$ret\n";
 print pre($ret);
 
-my $htmldir = "$homedir/www";
-my $revodir = "$htmldir/revo";
-my $xmldir = "$revodir/xml";
 
 $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
 $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
-print LOG "uprevo started at ".localtime()." with fname=$fname\n";
+print LOG "uprevo eko je ".localtime()." kun fname=$fname\n";
 unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d_\d\d\d\d\d\d\.tgz$/) {
   print LOG "Nevalidaj parametroj\n\n";
   print h1("Nevalidaj parametroj"), end_html;
