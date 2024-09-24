@@ -6,7 +6,9 @@
 # importado de referencoj al Fundamento de Esperanto kaj Oficialaj Aldonoj
 # el JSON-dosieroj al DB
 # Kreu ilin en voko-cikado per 'ant fundamento-json ofcaldonoj-json'
-# kaj poste enigu en DB per 'sbin/deplojo docker-ofc'
+# kune kun indekso el voko-formiko per 'ant -f ant/indekso.xml inx-oficialaj'
+# kaj poste enigu en DB per 'sbin/deplojo docker-ofc' 
+# resp. 'sbin/eldono ofc' kaj posta voko de https://reta-vortaro.de/cgi-bin/admin/upofc.pl
 
 #use strict;
 use CGI qw(:standard);
@@ -27,7 +29,9 @@ $debug = 0;
 $test = 1;
 
 my $homedir = "/hp/af/ag/ri";
+# el voko-formiko per 'ant -f ant/indekso.xml inx-oficialaj'
 my $rv_json = "$homedir/www/revo/inx/inx_ofc.json";
+# el voko-cikado per 'ant fundamento-json ofcaldonoj-json'
 my $fe_json = "$homedir/www/revo/inx/fundamento.json";
 my $oa_json = "$homedir/www/revo/inx/ofcaldonoj.json";
 # my $fe_prefix = "https://steloj.de/esperanto/fundamento/";
@@ -60,23 +64,25 @@ inx_prep();
 ## kelkaj testoj...
 if ($test || $debug) {
     my $test = ref_mrk("absolut'","oa","oa_1");
-    print "\nTEST - absolut': $test\n";
+    print "\nTEST - absolut': $test<br>\n";
     my $test = ref_mrk("fruktaĵo","fe","UV");
-    print "\nTEST - fruktaĵo: $test\n";
+    print "\nTEST - fruktaĵo: $test<br>\n";
     my $test = ref_mrk("persvad'i","oa","oa_9");
-    print "\nTEST - persvad'i: $test\n";
+    print "\nTEST - persvad'i: $test<br>\n";
+    my $test = ref_mrk("Acor'oj","oa","oa_10");
+    print "\nTEST - Acor'oj: $test<br>\n";
     my $test = ref_mrk("aer'um'","fe","");
-    print "\nTEST - aer'um': $test\n";
+    print "\nTEST - aer'um': $test<br>\n";
     my $test = ref_mrk("advent'","oa","oa_1");
-    print "\nTEST - advent': $test\n";
+    print "\nTEST - advent': $test<br>\n";
     my $test = ref_mrk("dis-","fe","UV");
-    print "\nTEST - dis-': $test\n";
+    print "\nTEST - dis-': $test<br>\n";
     my $test = ref_mrk("ge","fe","UV");
-    print "\nTEST - ge: $test\n";
+    print "\nTEST - ge: $test<br>\n";
     my $test = ref_mrk("teokratri'o","oa","oa_2");
-    print "\nTEST - teokratri'o: $test\n";   
+    print "\nTEST - teokratri'o: $test<br>\n";   
     my $test = ref_mrk("epifani'o","oa","oa_2");
-    print "\nTEST - epifani'o: $test\n";       
+    print "\nTEST - epifani'o: $test<br>\n";       
 #exit;
 }
 
@@ -209,11 +215,11 @@ sub ref_mrk {
     if ($fnt eq 'fe') {
         $ofc = '*';
     } else {
-        $dos =~ /oa_(\d)/;
+        $dos =~ /oa_(\d\d?)/;
         $ofc = $1;
     }
 
-    # normigu divid-strekojn
+    # normigu divid-strekojn, forigu evtl. finan krisignon
     $inx =~ s/[’'|\/]/'/g;
     $inx =~ s/!$//g;
     my $i1 = $inx;
@@ -302,7 +308,7 @@ sub rv_drv {
     print "drv? $ofc $drv\n" if ("$debug");
     #print join(' ',keys(%$inx_ofc)) if ($debug);
 
-    # trovu indekseron por derivaĵo el Revo-listo (ofc: *, 1..9, 19xx)
+    # trovu indekseron por derivaĵo el Revo-listo (ofc: *, 1..10, 19xx)
     my $r = $inx_ofc->{$ofc};
     my $mrk = $r->{$drv};
     #print "\nr: @{$r->[0]}\n" if ($debug);
