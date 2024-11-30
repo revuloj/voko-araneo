@@ -18,7 +18,7 @@ sub timestamp {
 
 
 print header,
-      start_html('Sendu sxangxitajn arkivojn'),
+      start_html('Servila tempo'),
       h1('timestamp='.timestamp),
       h1('date='.`date`);
 

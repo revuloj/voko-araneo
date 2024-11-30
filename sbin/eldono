@@ -73,7 +73,10 @@ index)
     scp revo/index.html ${host}:www/
     ;;
 index-mn)
-    ## sendu malnovajn versiojn al la nova...
+    ## sendu el malnovaj URL-oj al la aktuala eldono...
+    scp revo/index.html ${revo}/dlg/index-2a.html
+    scp revo/index.html ${revo}/dlg/index-2b.html
+    scp revo/index.html ${revo}/dlg/index-2c.html
     scp revo/index.html ${revo}/dlg/index-2d.html
     scp revo/index.html ${revo}/dlg/index-2e.html
     scp revo/index.html ${revo}/dlg/index-2f.html
@@ -82,6 +85,7 @@ index-mn)
     scp revo/index.html ${revo}/dlg/index-2i.html
     scp revo/index.html ${revo}/dlg/index-2j.html
     scp revo/index.html ${revo}/dlg/index-2k.html    
+    scp revo/index.html ${revo}/dlg/index-2l.html    
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
