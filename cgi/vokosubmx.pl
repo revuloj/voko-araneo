@@ -109,7 +109,7 @@ unless ($redaktanto) {
 
   if (!$permeso) {    
     print "<div id=\"red_err\" class=\"eraroj\">Averto: Vi ($redaktanto) ne estas registrita kiel redaktanto! ".
-          "Bv. legi la informpaĝojn <a href=\"$revuloj_url/redinfo.html\">pri la redaktoservo ".
+          "Bv. legi la informpaĝojn <a href=\"$revuloj_url\">pri la redaktoservo ".
           "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>\n";
   }
 }
