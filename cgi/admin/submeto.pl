@@ -94,6 +94,8 @@ sub listigu_novajn {
                 print join(';',@$submeto),"\n";
             } else {
                 my $id = $submeto->[0];
+                # $id el la unua kolumno ni anstataŭiugas per HTML-referenco por porivizi la enhavon
+                # ĉe klako
                 print qq(<a href="submeto.pl?id=$id">$id</a>;),join(';',splice @$submeto,1),"\n";
             }
             $submeto = $select->fetchrow_arrayref();

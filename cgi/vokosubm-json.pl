@@ -38,7 +38,7 @@ sub redakto_statoj {
 
     eval { 
 
-        # elprenu unu submeton kun stato=nov aŭ stato=ignor (por testo ni prenas 'ignor'...)
+        # elprenu $max_results submetojn de redaktanto kun retadreso $email
         my $select = $dbh->prepare("SELECT JSON_OBJECT('id', sub_id, 'fname', sub_fname, 'state', sub_state, 'time', "
             ."sub_time, 'desc', sub_desc,'result', sub_result) AS subm "
             ."FROM submeto WHERE sub_email=? ORDER BY sub_time DESC LIMIT ?");
@@ -59,7 +59,7 @@ sub redakto_statoj {
             } else {
                 $first = 0;
             }
-            # ial mysql aldonas en la linirompojn en la bas64-kodita kampo "results"
+            # ial mysql aldonas linirompojn en la bas64-kodita kampo "results"
             $submeto->[0] =~ s/\n//g;
             print $submeto->[0];
             $submeto = $select->fetchrow_arrayref();
