@@ -124,7 +124,7 @@ RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apach
   && mv ${VOKO_TMP}/jsc ${REVO_DIR}/ \
   && mv ${VOKO_TMP}/xsl ${HOME_DIR}/files/xsl/ \
   && chmod 755 /usr/local/apache2/cgi-bin/*.pl && chmod 755 /usr/local/apache2/cgi-bin/admin/*.pl \
-  && mkdir -p ${HOME_DIR}/files/log && chown daemon.daemon ${HOME_DIR}/files/log \
+  && mkdir -p ${HOME_DIR}/files/log && chown daemon:daemon ${HOME_DIR}/files/log \
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
   && ln -sT /usr/local/apache2/htdocs ${HTTP_DIR} \
   && mkdir -p ${HTTP_DIR}/tmp \
