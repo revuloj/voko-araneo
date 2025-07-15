@@ -2,12 +2,12 @@
 
 # VERSION povas esti ŝanĝita de ekstere per --build-arg, jam konsiderata en 'bin/eldono.sh kreo'
 ARG VERSION=latest
-FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} as grundo 
+FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo 
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.19 as builder
+FROM alpine:3.19 AS builder
    # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
 
 # build and install rxp

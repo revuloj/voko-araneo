@@ -629,27 +629,27 @@ sub encode2 {
   $str =~ s/\x{0171}/&udblac;/g;
 
   # <!-- latvaj -->
-  $str =~ s/\x{257;}/&amacro;/g;
-  $str =~ s/\x{#275}/&emacr;/g;
-  $str =~ s/\x{291;}/&gcommaaccen;/g;
-  $str =~ s/\x{299;}/&imacro;/g;
-  $str =~ s/\x{311;}/&kcommaaccen;/g;
-  $str =~ s/\x{#316}/&lcommaacce;/g;
-  $str =~ s/\x{326;}/&ncommaaccen;/g;
-  $str =~ s/\x{333;}/&omacro;/g;
-  $str =~ s/\x{343;}/&rcommaaccen;/g;
-  $str =~ s/\x{363;}/&umacro;/g;
-
-  $str =~ s/\x{#256}/&Amacr;/g;
-  $str =~ s/\x{#274}/&Emacr;/g;
-  $str =~ s/\x{#290}/&Gcommaacce;/g;
-  $str =~ s/\x{#298}/&Imacr;/g;
-  $str =~ s/\x{#310}/&Kcommaacce;/g;
-  $str =~ s/\x{#315}/&Lcommaacce;/g;
-  $str =~ s/\x{#325}/&Ncommaacce;/g;
-  $str =~ s/\x{#332}/&Omacr;/g;
-  $str =~ s/\x{#342}/&Rcommaacce;/g;
-  $str =~ s/\x{#362}/&Umacr;/g;
+  #$str =~ s/\x{257;}/&amacro;/g;
+  #$str =~ s/\x{#275}/&emacr;/g;
+  #$str =~ s/\x{291;}/&gcommaaccen;/g;
+  #$str =~ s/\x{299;}/&imacro;/g;
+  #$str =~ s/\x{311;}/&kcommaaccen;/g;
+  #$str =~ s/\x{#316}/&lcommaacce;/g;
+  #$str =~ s/\x{326;}/&ncommaaccen;/g;
+  #$str =~ s/\x{333;}/&omacro;/g;
+  #$str =~ s/\x{343;}/&rcommaaccen;/g;
+  #$str =~ s/\x{363;}/&umacro;/g;
+#
+  #$str =~ s/\x{#256}/&Amacr;/g;
+  #$str =~ s/\x{#274}/&Emacr;/g;
+  #$str =~ s/\x{#290}/&Gcommaacce;/g;
+  #$str =~ s/\x{#298}/&Imacr;/g;
+  #$str =~ s/\x{#310}/&Kcommaacce;/g;
+  #$str =~ s/\x{#315}/&Lcommaacce;/g;
+  #$str =~ s/\x{#325}/&Ncommaacce;/g;
+  #$str =~ s/\x{#332}/&Omacr;/g;
+  #$str =~ s/\x{#342}/&Rcommaacce;/g;
+  #$str =~ s/\x{#362}/&Umacr;/g;
 
   # <!-- kimraj -->
   $str =~ s/\x{0176}/&Ycirc;/g;
