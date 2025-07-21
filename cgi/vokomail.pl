@@ -547,7 +547,7 @@ if ($errline) {
   }
   close IN;
 
-  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)">/smg) {
+  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)"/smg) {
     if (!exists($lng{$2})) {
       $checklng = "Nekonata lingvo $2.";
       $ne_konservu = 10;
