@@ -8,13 +8,14 @@ use JSON;
 use HTTP::Request;
 use LWP::UserAgent;
 
-my $json_parser = JSON->new->allow_nonref;
+my $json_parser = JSON->new->pretty; #allow_nonref;
 
-my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-1f.pl';
-#my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-1f.pl';
+my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-2o.pl';
+#my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-2o.pl';
 #my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/admin/perltest.pl';
 my $header = ['Accept' => 'application/json', 'Accept-Language' => 'en,de,fr,nl'];
-my $request = HTTP::Request->new(GET=>"$sercxu_url?sercxata=kubo",$header);
+#my $request = HTTP::Request->new(GET=>"$sercxu_url?sercxata=kubo",$header);
+my $request = HTTP::Request->new(GET=>"$sercxu_url?sercxata=sen%",$header);
 
 my $ua = LWP::UserAgent->new();
 my $response = $ua->request($request);

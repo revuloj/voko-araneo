@@ -35,12 +35,12 @@ case $target in
 servilo)
 
     # poste la plusendan index.html ni havu ankaŭ rekte sub /revo...
-##    scp revo/dlg/index-${eldono}.html ${revo}/dlg/
-##    scp revo/dlg/titolo-${eldono}.html ${revo}/dlg/
-##    scp revo/dlg/redakt*-${eldono}.html ${revo}/dlg/
+    scp revo/dlg/index-${eldono}.html ${revo}/dlg/
+    scp revo/dlg/titolo-${eldono}.html ${revo}/dlg/
+    scp revo/dlg/redakt*-${eldono}.html ${revo}/dlg/
+    scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
 ##    ### scp -r revo/dlg/404.html ${revo}/dlg/
 ##
-##    scp cgi/sercxu-json-${eldono}.pl ${cgibin}/
     #scp cgi/traduku-uwn.pl ${cgibin}/
 
     #scp revo/smb/revo.svg ${host}:/html/favicon.ico
@@ -55,8 +55,8 @@ servilo)
     #scp cgi/admin/up* ${cgibin}/admin/
     #scp cgi/perllib/parse* ${perllib}/
 
-    scp cgi/vokosubmx.pl ${cgibin}/
-    scp cgi/vokomailx.pl ${cgibin}/
+    ## scp cgi/vokosubmx.pl ${cgibin}/
+    ## scp cgi/vokomailx.pl ${cgibin}/
     #scp cgi/vokosubm-json.pl ${cgibin}/
     #scp cgi/admin/submeto.pl ${cgibin}/admin/
     #scp cgi/mrk_eraroj.pl ${cgibin}/
@@ -87,6 +87,8 @@ index-mn)
     scp revo/index.html ${revo}/dlg/index-2j.html
     scp revo/index.html ${revo}/dlg/index-2k.html    
     scp revo/index.html ${revo}/dlg/index-2l.html    
+    scp revo/index.html ${revo}/dlg/index-2m.html    
+    #scp revo/index.html ${revo}/dlg/index-2n.html    
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
@@ -118,6 +120,8 @@ preparo)
     sed -i 's,/index-[1-9][a-z]\.,/index-'${eldono}'\.,g' revo/index.html
     sed -i 's,/-[1-9][a-z]\.,/-'${eldono}'\.,g' revo/sw.js
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/dlg/*
+
+    sed -i 's,/sercxu-json-[1-9][a-z]\.,/sercxu-json-'${eldono}'\.,g' tst/test_sercxu.pl
 
     #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${eldono}'/' Dockerfile
     #sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${eldono}'/' Dockerfile
