@@ -33,11 +33,19 @@ my $LIMIT_eo = 250; # 50 x $LIMIT_lng
 my $LIMIT_lng = 5;
 my $LIMIT_trd = 250;
 
-#print "Content-type: text/html; charset=utf-8\n\n";
-
 # testu ekz. per:
-# perl sercxu-json.pl "sercxata=test%&cx=1&moktesto=0"
+# perl sercxu-json.pl "sercxata=test%&sxlosilo=<unua_jaro>&cx=1&moktesto=0"
 
+# kontrolu paskodon
+my $sxlosilo = param('sxlosilo');
+if ( ! param('sxlosilo') || param('sxlosilo') != '1887') {
+    print header(
+        -status => '400 Bad Request',
+        -type   => 'application/json'
+    );
+    print '{msg: "400 Malbona serĉopeto\nMankas ŝlosila parametro"}';
+    exit;
+}
 
 # komenco
 print header(-type=>'application/json',-charset=>'utf-8');
