@@ -63,6 +63,8 @@ docker-cgi)
     done
 
     for file in cgi/perllib/*.pm; do
+        # ni ne kopias cgi/perllib/revodb.pm, ĉar por docker
+        # ni havas apartan en ./revodb.pm
         if [[ "${file}" != "cgi/perllib/revodb.pm" ]]; then
             echo ${file}
             docker cp ${file} ${araneo_id}:${perllib}
@@ -76,6 +78,13 @@ docker-cgi)
 
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/*.pl; chown root.root ${cgidir}/*; ls -l ${cgidir}"
     docker exec ${araneo_id} bash -c "chmod 755 ${cgidir}/admin/*.pl; chown root.root ${cgidir}/admin/*; ls -l ${cgidir}"
+    ;;
+docker-dbi)  
+    araneo_id=$(docker ps --filter name=araneujo_araneo -q)
+    echo "# ./revodb.pm"
+    docker cp ./etc/revodb.pm ${araneo_id}:${perllib}
+    docker cp ./etc/my.cnf ${araneo_id}:/etc/
+    docker cp ./bin/setup_mysql_ca.sh ${araneo_id}:/usr/local/bin/
     ;;
 docker-ofc)
     # PLIBONIGU: tio pli bone sidus en voko-cikado/sbin/deplojo

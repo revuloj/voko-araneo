@@ -7,8 +7,8 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
 
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
-FROM alpine:3.19 AS builder
-   # atentu: alpine:3.15 bezonas almenaŭ docker 20.10!
+FROM alpine:3.23 AS builder
+  # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
 
 # build and install rxp
 RUN apk update \
@@ -25,10 +25,10 @@ RUN apk update \
   && apk add --no-cache --virtual .build-deps \
           linux-headers \
       \
-  # Download and prepare Postfix sources
+  # Download and prepare rxp sources
   && curl -fL -o /tmp/rxp.tar.gz \
-          http://deb.debian.org/debian/pool/main/r/rxp/rxp_1.5.0.orig.tar.gz \
-  && (echo "	5f6c4cd741bbeaf77b5a5918cb26df2f  /tmp/rxp.tar.gz" \
+    https://www.inf.ed.ac.uk/research/isddarch/admin/rxp-1.5.2.tar.gz \
+  && (echo "	b2a7dbe5350b15078979c63904157f42  /tmp/rxp.tar.gz" \
           | md5sum -c -) \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
@@ -67,14 +67,22 @@ ARG HTTP_DIR=/hp/af/ag/ri/www
 ARG VOKO_TMP=/tmp/voko
 ARG REVO_DIR=/usr/local/apache2/htdocs/revo
 
-RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
+    
+
+# mysql TLS atestilo problemo kun: perl-dbd-mysql
+RUN apk --update --update-cache --upgrade add bash mysql-client mariadb-connector-c fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
-    sed perl-dev make build-base \
-    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
+    sed perl-dev mariadb-connector-c-dev zlib-dev openssl-dev make build-base openssl ca-certificates \
+    && update-ca-certificates \
+    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS 
+
+RUN (cpanm --notest DBD::mysql@4.051 \
+    || (cat /root/.cpanm/work/*/build.log && exit 1 )) \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
-    && apk del build-base sed make perl-dev && rm -f /var/cache/apk/*
+    && apk del build-base sed make perl-dev mariadb-connector-c-dev zlib-dev openssl-dev \
+    && rm -f /var/cache/apk/* && rm -rf /root/.cpanm/work/*
 
 # ni bezonas GNU 'sed' por kompili CSS!
 
@@ -93,7 +101,7 @@ COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 #ADD . ./
 COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
-COPY revodb.pm /usr/local/apache2/cgi-bin/perllib/
+COPY etc/revodb.pm /usr/local/apache2/cgi-bin/perllib/
 
 COPY --from=grundo build/ ${VOKO_TMP}/
 
