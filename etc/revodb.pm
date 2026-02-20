@@ -57,9 +57,13 @@ sub connect {
 
   #my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306;mysql_ssl_optional=1;mysql_ssl_verify_server_cert=0;mysql_ssl_ca=/dev/null",
   #my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306;mysql_ssl=1;mysql_ssl_ca=/usr/local/share/ca-certificates/mysql-server-2.crt;mysql_ssl_verify_server_cert=0",
-my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306;mysql_ssl_optional=1;mysql_ssl_ca_file=/usr/local/share/ca-certificates/mysql-ca.crt;mysql_ssl_verify_server_cert=0",  
+#my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306;mysql_ssl_optional=1;mysql_ssl_ca_file=/usr/local/share/ca-certificates/mysql-ca.crt;mysql_ssl_verify_server_cert=0",  
 # ;mysql_ssl=0
-#my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306",
+
+# problemo estis en https://gitlab.alpinelinux.org/alpine/aports/-/issues/17798
+# solvita nun per medivariablo MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+
+my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306",
                          "s314802_3159000", $mysql_password,
                          {
                           'RaiseError' => 1

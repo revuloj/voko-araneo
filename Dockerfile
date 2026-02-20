@@ -65,9 +65,7 @@ ARG DAEMON_UID=13731
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 ARG VOKO_TMP=/tmp/voko
-ARG REVO_DIR=/usr/local/apache2/htdocs/revo
-
-    
+ARG REVO_DIR=/usr/local/apache2/htdocs/revo   
 
 # mysql TLS atestilo problemo kun: perl-dbd-mysql
 RUN apk --update --update-cache --upgrade add bash mysql-client mariadb-connector-c fcgi libxslt \
@@ -149,13 +147,19 @@ COPY revo/index.html /usr/local/apache2/htdocs/
 COPY revo/manifest.json /usr/local/apache2/htdocs/
 COPY revo/sw.js /usr/local/apache2/htdocs/
 
-
 # Basic Auth por cgi/admin
 # https://tecadmin.net/setup-apache-basic-authentication/
 # https://dzone.com/articles/apache-http-24-how-to-build-a-docker-image-for-ssl
 # https://devops.ionos.com/tutorials/set-up-basic-authentication-in-apache-using-htaccess-on-centos-7/
 
-
 USER root
+
+# problemo en Apline 3.23 mysql-client,
+# vd. https://gitlab.alpinelinux.org/alpine/aports/-/issues/17798
+# kaj https://github.com/brianmario/mysql2/issues/1379
+# por provizora solvo do:
+ENV MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["httpd-foreground"]
