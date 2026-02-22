@@ -1,27 +1,31 @@
 #!/usr/bin/perl
 
 use strict;
-#use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; # default for JSON: binmode STDOUT, ":utf8";
 use JSON;
 
 use HTTP::Request;
 use LWP::UserAgent;
+use URL::Encode qw(url_encode);
+
+my $sercxata = url_encode(shift @ARGV || 'sen%');
+#$sercxata =~ s/%/%25/g;
+
 
 my $json_parser = JSON->new->pretty; #allow_nonref;
 
-my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-2p.pl';
-#my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-2p.pl';
+#my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-2p.pl';
+my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-2p.pl';
 #my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/admin/perltest.pl';
 my $header = ['Accept' => 'application/json', 'Accept-Language' => 'en,de,fr,nl'];
-#my $request = HTTP::Request->new(GET=>"$sercxu_url?sercxata=kubo",$header);
-my $request = HTTP::Request->new(GET=>"$sercxu_url?sercxata=sen%",$header);
+#my $request = HTTP::Request->new(GET=>"$sercxu_url?sxlosilo=1887&sercxata=kubo",$header);
+my $request = HTTP::Request->new(GET=>"$sercxu_url?sxlosilo=1887&sercxata=$sercxata",$header);
 
 my $ua = LWP::UserAgent->new();
 my $response = $ua->request($request);
 
 if ($response->is_success) {
-    print $response->decoded_content;
+    #print $response->decoded_content;
     my $hashref = $json_parser->decode($response->decoded_content);
 
     # nun ni povas uzi $hashref kiel kutime en Perlo:
@@ -30,6 +34,7 @@ if ($response->is_success) {
 
     # tamen por la testo ni retradukas al JSON kaj skribas tiel:
     print $json_parser->encode($hashref);
+    print "\n";
 }
 else {
     die $response->status_line;
