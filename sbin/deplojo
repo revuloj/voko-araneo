@@ -20,6 +20,7 @@ release=2p
 # kaj supozas "docker", se nenio donita argumente
 target="${1:-docker}"
 
+bindir=/usr/local/bin
 cgidir=/usr/local/apache2/cgi-bin
 perllib=/usr/local/apache2/cgi-bin/perllib
 revodir=/usr/local/apache2/htdocs/revo
@@ -85,6 +86,7 @@ docker-dbi)
     docker cp ./etc/revodb.pm ${araneo_id}:${perllib}
     docker cp ./etc/my.cnf ${araneo_id}:/etc/
     docker cp ./bin/setup_mysql_ca.sh ${araneo_id}:/usr/local/bin/
+    docker cp ./tst/mysql_konektotesto.pl ${araneo_id}:${bindir}/
     ;;
 docker-ofc)
     # PLIBONIGU: tio pli bone sidus en voko-cikado/sbin/deplojo

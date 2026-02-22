@@ -67,36 +67,23 @@ ARG HTTP_DIR=/hp/af/ag/ri/www
 ARG VOKO_TMP=/tmp/voko
 ARG REVO_DIR=/usr/local/apache2/htdocs/revo   
 
-# mysql TLS atestilo problemo kun: perl-dbd-mysql
-RUN apk --update --update-cache --upgrade add bash mysql-client mariadb-connector-c fcgi libxslt \
+# mysql TLS atestilo problemo kun:  
+# mariadb-connector-c perl-dev mariadb-connector-c-dev zlib-dev openssl-dev
+RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
-    perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
-    sed perl-dev mariadb-connector-c-dev zlib-dev openssl-dev make build-base openssl ca-certificates \
+    perl-app-cpanminus perl-extutils-installpaths perl-http-message \
+    perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
+    sed perl-dev make build-base openssl ca-certificates \
     && update-ca-certificates \
-    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS 
-
-RUN (cpanm --notest DBD::mysql@4.051 \
-    || (cat /root/.cpanm/work/*/build.log && exit 1 )) \
+    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
-    && apk del build-base sed make perl-dev mariadb-connector-c-dev zlib-dev openssl-dev \
+    && apk del build-base sed make perl-dev \
     && rm -f /var/cache/apk/* && rm -rf /root/.cpanm/work/*
-
-# ni bezonas GNU 'sed' por kompili CSS!
-
-# aldonu memkompilitan "rxp" de Alpine. Vd.:
-# http://www.cogsci.ed.ac.uk/~richard/rxp.html
-# http://www.inf.ed.ac.uk/research/isdd/admin/package?view=1&id=145
-# https://packages.debian.org/source/jessie/rxp
-#
-# alternative oni povus uzi https://pkgs.alpinelinux.org/package/edge/testing/x86/xerces-c
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
-#COPY --from=json-builder json/* ${HTTP_DIR}/revo/tez/
-#COPY --from=metapost --chown=root:root voko-grundo-master/build/smb/*.svg /tmp/svg/
 
-#ADD . ./
 COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
 COPY etc/revodb.pm /usr/local/apache2/cgi-bin/perllib/
@@ -145,7 +132,7 @@ RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 COPY revo/ ${REVO_DIR}/
 COPY revo/index.html /usr/local/apache2/htdocs/
 COPY revo/manifest.json /usr/local/apache2/htdocs/
-COPY revo/sw.js /usr/local/apache2/htdocs/
+#COPY revo/sw.js /usr/local/apache2/htdocs/
 
 # Basic Auth por cgi/admin
 # https://tecadmin.net/setup-apache-basic-authentication/
