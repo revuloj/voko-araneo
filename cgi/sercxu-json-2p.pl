@@ -94,19 +94,35 @@ if ($sercxata =~ /[\.\^\$\[\(\|+\?{\\]/) {
   $komparo = 'LIKE';
 };
 
+# serĉante laŭ vortkomenco ni devos ankaŭ
+# serĉi la ekzaktan vorton, ĉar foje ĝi elfalas pro la
+# limigita nombro (ekz. 'sen%' ne trovas 'sen')
+my $EQU = '';
+
+if ($sercxata =~ /^[^%_']+[%_]$/) {
+  my $ekzakta = substr($sercxata,0,-1);
+  $EQU = "(SELECT * FROM ( "
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
+    ."FROM v3esperanto  WHERE kap = '$ekzakta' AND (ekz = '' OR ekz IS NULL) "
+  ."UNION "
+    ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, '' AS lng, NULL AS ind, NULL AS trd "
+    ."FROM r3kap WHERE kap = '$ekzakta' "    
+  .") AS u0 WHERE lng = '' OR lng IN $pref_lng LIMIT $LIMIT_eo) UNION "
+}
 
 ### serĉu esperantajn vortojn ###
 my ($sth);
 
-# la unua SELECT trovas ĉiujn *kapvortojn kun tradukoj* en la preferataj lingvoj
-# per la dua SELECT ni certigos, ke ni enlistigas la *kapvorton, eĉ se ĝi ne havas tradukojn* de tiuj lingvoj
-# PLIBONIGU: Fakte pli bone ni devus filtri la lingvojn ne en WHERE, sed en ON por inkluzivi kapvortojn sen
-# koncernaj tradukoj! 
-# la tria SELECT trovas *ekzemplojn kun ties tradukoj*. 
+# 1) la unua SELECT trovas ĉiujn *kapvortojn kun tradukoj* en la preferataj lingvoj
+# 2) per la dua SELECT ni certigos, ke ni enlistigas la *kapvorton, eĉ se ĝi ne havas tradukojn* de tiuj lingvoj
+#   PLIBONIGU: Fakte pli bone ni devus filtri la lingvojn ne en WHERE, sed en ON de v3esperanto 
+#   por inkluzivi kapvortojn sen
+#   koncernaj tradukoj! 
+# 3) la tria SELECT trovas *ekzemplojn kun ties tradukoj*. 
 # Ĉi-kaze ni rezigas listigi ilin, se mankas traduko! 
 # Ĉu ni tamen montru ĝin...? - se jes ni bezonus kvaran SELECT
-my $QUERY =
-   "SELECT DISTINCT * FROM ( "
+my $QUERY = $EQU.
+   "(SELECT * FROM ( "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
     ."FROM v3esperanto  WHERE kap $komparo ? AND (ekz = '' OR ekz IS NULL) "
   ."UNION "
@@ -115,7 +131,7 @@ my $QUERY =
   ."UNION "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, ekz AS kap, lng, ind, trd "
     ."FROM v3traduko WHERE ekz $komparo ? "
-  .") AS u WHERE lng = '' OR lng IN $pref_lng LIMIT $LIMIT_eo";
+  .") AS u WHERE lng = '' OR lng IN $pref_lng LIMIT $LIMIT_eo)";
 
 $sth = $dbh->prepare($QUERY);
 
