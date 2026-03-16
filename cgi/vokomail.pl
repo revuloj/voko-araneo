@@ -492,7 +492,7 @@ EOD
   $xml2 = revo::encode::encode2($xml, 20);
 } elsif ($art) {
 #  $debugmsg .= "open\n";
-  open $in, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
+  open my $in, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
   $xml = join '', <$in>;
   close $in;
 
@@ -539,7 +539,7 @@ if ($errline) {
   }
 } else {
   my %lng;
-  open $in, '<', "$revo_base/cfg/lingvoj.xml" 
+  open my $in, '<', "$revo_base/cfg/lingvoj.xml" 
         or die "ne povas malfermi lingvoj.xml";
   while (<$in>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
@@ -673,7 +673,7 @@ EOD
 my (%fak, %stl);
 if ($art) {
   %fak = ('' => '');
-  open $in, '<', "$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
+  open my $in, '<', "$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
   while (<$in>) {
     if (/<fako kodo="([^"]+)"[^>]*>([^<]+)<\/fako>/i) {
 #      $debugmsg .= "fak $1 -> $2\n";
@@ -684,7 +684,7 @@ if ($art) {
   close $in;
 
   %stl = ('' => '');
-  open $in, '<', "$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
+  open my $in, '<', "$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
   while (<$in>) {
     if (/<stilo kodo="([^"]+)"[^>]*>([^<]+)<\/stilo>/i) {
 #      $debugmsg .= "stl $1 -> $2\n";
@@ -734,7 +734,7 @@ EOD
   revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
 #  $html = Encode::decode($enc, $html);
   if ($html and $debug) {
-    open $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "open write html";
+    open my $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "open write html";
 	  print $ht $html;
     close $ht;
   }
@@ -937,7 +937,7 @@ EOD
 		#my $smlog = "$homedir/logfiles/sendmail.log";
 
         # konektu al retposxtservilo
-        open $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
+        open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
             or print LOG "ne povas sendmail\n";
         print $sendmail <<End_of_Mail;
 From: $name <$from>
@@ -956,7 +956,7 @@ End_of_Mail
         print "sendita al $to";
           
         if (-s $smlog) {
-            open $log, "<", $smlog;
+            open my $log, "<", $smlog;
             my $ltxt = join "", <$log>;
             close $log;
             print pre("sendmail.log: $ltxt");

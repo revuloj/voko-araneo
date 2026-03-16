@@ -289,7 +289,7 @@ sub send_xml {
   my $subject = "Revo redaktu.pl $art";
   
   # konektiĝu al retpoŝtservo
-  unless (open $sendmail, '|-', "$mail_cmd 2>&1 >$smlog") {
+  unless (open my $sendmail, '|-', "$mail_cmd 2>&1 >$smlog") {
     warn("Ne povas voki $mail_cmd\n");
     return 0;
   } 

@@ -35,7 +35,7 @@ print header,
       h1('fname='.param('fname'));
 
 #print h1("homedir = $homedir");
-open $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush $log 1;
 
 $ret = `du -sh $homedir`;
@@ -103,7 +103,7 @@ $exitcode = $?;
 print $log "pwd -> $exitcode\n$ret";
 #print pre($ret);
 
-if (open $in, '<', "bv_forigu_tiujn.lst") {
+if (open my $in, '<', "bv_forigu_tiujn.lst") {
 #  print h2("open true");
   my $count = 0;
   while (<$in>) {

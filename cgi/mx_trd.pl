@@ -47,7 +47,7 @@ unless ($lng) {
 
   # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
   # utila eble estus ankaŭ JSON anst. XML-dosiero
-  open $in, '<', "$revo_dir/cfg/lingvoj.xml"
+  open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
     or die "ne povas malfermi dosieron lingvoj.xml";
 
   while (<$in>) {

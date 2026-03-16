@@ -26,7 +26,7 @@ if (!$senkadroj) {
   print "Content-type: text/html\n\n";
 
   # anstataŭigu la enhavo de la kadraro (HTML frameset)
-  open $in, '<', "$revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
+  open my $in, '<', "$revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
   while (<$in>) {
     s/src="inx\/_eo.html"/src="hazarda_art.pl?senkadroj=1"/;
     s/src="titolo.html"/src="hazarda_art.pl?senkadroj=2#toptop"/;
@@ -70,7 +70,7 @@ if ($senkadroj == 2 && $art)
 {
   print header(-charset=>'utf-8');
 
-  open $in, '<', "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
+  open my $in, '<', "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
   while (<$in>) {
 #    s/<\/title>/<\/title><script type="text\/javascript"><!--\nscroll(0,0);\n\/\/--><\/script>/;
      s/(\[<a class="redakto" href="\/cgi-bin\/vokomail)(\.pl\?art=[a-z0-9]+">)(redakti)(\.\.\.<\/a>\])/$1\l$2$3$4\n$1\l2$2traduki$4/;

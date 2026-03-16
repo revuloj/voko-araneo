@@ -26,7 +26,7 @@ sub konv {
 
 #  print "<pre>xml ".(ref $xml)."</pre>\n";
   if (not ref $xml) {
-    open $in, "<", $xml or die;
+    open my $in, "<", $xml or die;
     my $xmltmp = join "", <$in>;
     $xml = \$xmltmp;
     close $in;

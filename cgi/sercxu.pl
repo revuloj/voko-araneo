@@ -63,7 +63,7 @@ if ($kadroj) {
   $sercxata .= "&trd=".uri_escape(param('trd')) if param('trd');
 
   # kopiu index.html  
-  open $in, '<', "../revo/index.html" 
+  open my $in, '<', "../revo/index.html" 
     or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'";
   while (<$in>) {
     s/src="inx\/_eo.html"/src="sercxu.pl?cx=1&sercxata=$sercxata"/;

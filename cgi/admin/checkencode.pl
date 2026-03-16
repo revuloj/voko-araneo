@@ -84,7 +84,7 @@ sub checkencode {
 #    print "fname = $fname<br>\n";
     $num++;
 
-    open $in, "<", $fname or die "open";
+    open my $in, "<", $fname or die "open";
     my $xml = join('', <$in>);
     close $in;
 

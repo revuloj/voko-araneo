@@ -25,7 +25,7 @@ print header,
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
       
-open $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush $log 1;
 
 my $fname = param('fname');
