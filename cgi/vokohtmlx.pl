@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # 2008 Wieland Pusch
-# 2020-2021 Wolfram Diestel
+# 2020-2026 Wolfram Diestel
 
 use strict;
 use utf8;
@@ -39,8 +39,9 @@ unless ($xmlTxt) {
   exit;
 }    
 
+use open ':std', ':encoding(UTF-8)';
+## binmode STDOUT, ":utf8";
 
-binmode STDOUT, ":utf8";
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache');
 
@@ -66,10 +67,10 @@ sub konv {
   my ($xml, $html, $err, $debug) = @_;
 
   if (not ref $xml) {
-    open IN, "<", $xml or die;
-    my $xmltmp = join "", <IN>;
+    open $in, "<", $xml or die;
+    my $xmltmp = join "", <$in>;
     $xml = \$xmltmp;
-    close IN;
+    close $in;
   }
   
   my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,

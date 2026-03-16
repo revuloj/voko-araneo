@@ -1,8 +1,14 @@
 #!/usr/bin/perl
 
+# (c) laŭ permesilo GPL 2.0
+# 2021-2026 Wolfram Diestel
+
 use strict;
 #use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; 
+use open ':std', ':encoding(UTF-8)';
+
+##binmode STDOUT, ":utf8";
 
 use CGI qw(-utf8 :standard escape);
 use CGI::Carp qw(fatalsToBrowser);
@@ -103,6 +109,43 @@ print $json_parser->encode($results);
 my $desc;
 my $lex;
 
+
+# tri helpfuncioj por sub meaning()
+
+sub tbody {
+    my ($duba,$c) = @_;
+    #print "TBODY: $c\n\n";
+
+    $c =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1,$duba)/sieg;
+    $c =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1,$duba)/sieg;
+}
+
+# NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
+sub epo_desc {
+    my ($s,$duba) = @_;
+    if ($s =~ /<span[^>]*>(.*?)<\/span/) {
+        #print "DIF: $1\n";
+        my $d = $1; $d =~ s/<[^>]+>/ /sg;
+        $d = '?;'.$d if ($duba);
+        push @$desc, $d;
+    }
+}
+
+sub lex {
+    my ($a,$duba) = @_;
+
+    if ($a =~ /<a\s+href="([^"]+)">([a-z]{3}):\s+<span[^>]*>([^<]+)<\//) {
+        #print "$2: $3\n";
+        my $l = $lng32->{$2} || substr($2,0,2);
+        my $t = ($duba? '?;'.$3 : $3);
+        unless (defined $lex->{$l}) {
+            $lex->{$l} = [$t];
+        } else {
+            push @{$lex->{$l}}, $t
+        }
+    }
+}
+
 sub meaning {
     my $a = shift;
 
@@ -127,40 +170,6 @@ sub meaning {
             dsc => $dsc,
             dif => $desc,
             trd => $lex
-        }
-    }
-
-    sub tbody {
-        my ($duba,$c) = @_;
-        #print "TBODY: $c\n\n";
-
-        $c =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1,$duba)/sieg;
-        $c =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1,$duba)/sieg;
-    }
-
-    # NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
-    sub epo_desc {
-        my ($s,$duba) = @_;
-        if ($s =~ /<span[^>]*>(.*?)<\/span/) {
-            #print "DIF: $1\n";
-            my $d = $1; $d =~ s/<[^>]+>/ /sg;
-            $d = '?;'.$d if ($duba);
-            push @$desc, $d;
-        }
-    }
-
-    sub lex {
-        my ($a,$duba) = @_;
-
-        if ($a =~ /<a\s+href="([^"]+)">([a-z]{3}):\s+<span[^>]*>([^<]+)<\//) {
-            #print "$2: $3\n";
-            my $l = $lng32->{$2} || substr($2,0,2);
-            my $t = ($duba? '?;'.$3 : $3);
-            unless (defined $lex->{$l}) {
-                $lex->{$l} = [$t];
-            } else {
-                push @{$lex->{$l}}, $t
-            }
         }
     }
 }

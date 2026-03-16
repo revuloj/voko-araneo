@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # 2008 Wieland Pusch
-# 2020 Wolfram Diestel
+# 2020-2026 Wolfram Diestel
 
 
 use strict;
@@ -60,7 +60,9 @@ my $redaktanto = param('redaktanto');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 my $command = param('command');
 
-binmode STDOUT, ":utf8";
+use open ':std', ':encoding(UTF-8)';
+##binmode STDOUT, ":utf8";
+
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
       start_html(
@@ -116,8 +118,8 @@ unless ($redaktanto) {
 my $xml=normigu_xml($xmlTxt);
 
 ## kontrolu, ĉu la XML havas ĝustan sintakson
-my $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
-#$xml_err =~ s/\n/<br>\n/sg;
+my $xml_err = '';
+$xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
 $xml_err =~ s/</&lt;/sg;
 $xml_err =~ s/>/&gt;/sg;
 $xml_err =~ s/\n(Atentu:|Eraro:)/<br>\n$1/sg;
@@ -287,11 +289,11 @@ sub send_xml {
   my $subject = "Revo redaktu.pl $art";
   
   # konektiĝu al retpoŝtservo
-  unless (open SENDMAIL, "| $mail_cmd 2>&1 >$smlog") {
-    print LOG "Ne povas voki $mail_cmd\n";
+  unless (open $sendmail, '|-', "$mail_cmd 2>&1 >$smlog") {
+    warn("Ne povas voki $mail_cmd\n");
     return 0;
   } 
-  print SENDMAIL <<END_OF_MAIL;
+  print $sendmail <<END_OF_MAIL;
 From: $name <$mail_from>
 To: $to
 Reply-To: $redaktanto
@@ -303,5 +305,5 @@ $red_cmd
 $$xml
 END_OF_MAIL
 
-  close SENDMAIL;
+  close $sendmail;
 }

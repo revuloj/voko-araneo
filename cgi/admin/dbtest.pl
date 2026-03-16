@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 use ExtUtils::Installed;
@@ -11,7 +15,6 @@ print header(-charset=>'utf-8');
 
 my $installed = ExtUtils::Installed->new();
 my @modules = $installed->modules();
-
 
 print "<pre>";
 print "# PERL: ".$]."\n";
@@ -47,7 +50,7 @@ $dbh->{'mysql_enable_utf8'}=1;
     "show session variables",
 );
 
-for $sql (@SQL) {
+for my $sql (@SQL) {
     print "\n# $sql\n";
 
     if ($sql =~ /^set/i) {

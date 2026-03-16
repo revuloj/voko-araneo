@@ -5,7 +5,7 @@
 # 
 # (c) laŭ permesilo GPL 2.0
 # 2007 Wieland Pusch
-# 2021 Wolfram Diestel
+# 2021-2026 Wolfram Diestel
 
 use strict;
 
@@ -44,14 +44,13 @@ unless ($lng) {
   my %pref;
 
   print h2("Elektu la lingvon:"),br;
-  #open IN, "<../revo/cfg/lingvoj.xml" 
 
   # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
   # utila eble estus ankaŭ JSON anst. XML-dosiero
-  open IN, "< $revo_dir/cfg/lingvoj.xml"
+  open $in, '<', "$revo_dir/cfg/lingvoj.xml"
     or die "ne povas malfermi dosieron lingvoj.xml";
 
-  while (<IN>) {
+  while (<$in>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
 #      print "lng $1 -> $2".br."\n";
       if ($1 ne "eo") {
@@ -63,7 +62,7 @@ unless ($lng) {
       }
     }
   }
-  close IN;
+  close $in;
 
   foreach (sort keys %pref) {
     print a({href=>"?lng=$pref{$_}"}, "$_").br."\n";

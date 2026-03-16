@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (c) 2023 ĉe Wolfram Diestel
+# (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 #
 # importado de referencoj al Fundamento de Esperanto kaj Oficialaj Aldonoj
@@ -10,7 +10,7 @@
 # kaj poste enigu en DB per 'sbin/deplojo docker-ofc' 
 # resp. 'sbin/eldono ofc' kaj posta voko de https://reta-vortaro.de/cgi-bin/admin/upofc.pl
 
-#use strict;
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
@@ -19,9 +19,11 @@ use IO::Handle;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-#use Unicode::String qw(utf8);
 use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; 
+use open ':std', ':encoding(UTF-8)';
+## binmode STDOUT, ":utf8";
+
 use revodb;
 use fileutil;
 
@@ -114,7 +116,7 @@ print end_html;
 sub process {
     my ($fnt, $refs) = @_;
 
-    for $r (keys %$refs) {
+    for my $r (keys %$refs) {
         my $irefs = $refs->{$r};
         # ial json_parser ne aŭtomate supozas UTF8!?
         my $inx = decode('UTF-8', $r);

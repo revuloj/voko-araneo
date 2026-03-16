@@ -4,7 +4,7 @@
 # redaktu.pl
 # 
 # 2008-10-30 Wieland Pusch
-#
+# 2026 Wolfram Diestel
 
 use strict;
 use utf8;
@@ -451,8 +451,9 @@ if ($xmlTxt) {
   $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
 #  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
 }
-my $xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
-#$xml2 = Encode::decode($enc, $xml2);
+my $xml2 = '';
+$xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+
 my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
 my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
 
@@ -491,9 +492,9 @@ EOD
   $xml2 = revo::encode::encode2($xml, 20);
 } elsif ($art) {
 #  $debugmsg .= "open\n";
-  open IN, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
-  $xml = join '', <IN>;
-  close IN;
+  open $in, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
+  $xml = join '', <$in>;
+  close $in;
 
 #  $debugmsg .= "xml=\n$xml" if $debug;
 #  $xml = Encode::decode($enc, $xml);
@@ -538,14 +539,15 @@ if ($errline) {
   }
 } else {
   my %lng;
-  open IN, "<$revo_base/cfg/lingvoj.xml" or die "ne povas malfermi lingvoj.xml";
-  while (<IN>) {
+  open $in, '<', "$revo_base/cfg/lingvoj.xml" 
+        or die "ne povas malfermi lingvoj.xml";
+  while (<$in>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
 #      $debugmsg .= "lng $1 -> $2\n";
       $lng{$1} = 1;
     }
   }
-  close IN;
+  close $in;
 
   while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)"/smg) {
     if (!exists($lng{$2})) {
@@ -628,7 +630,9 @@ textarea {
 .kuketoaverto FORM { text-align:center }
 EOD
 
-binmode STDOUT, ":utf8";
+use open ':std', ':encoding(UTF-8)';
+## binmode STDOUT, ":utf8";
+
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache',
              -cookie=>\@cookies),
@@ -669,26 +673,26 @@ EOD
 my (%fak, %stl);
 if ($art) {
   %fak = ('' => '');
-  open IN, "<$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
-  while (<IN>) {
+  open $in, '<', "$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
+  while (<$in>) {
     if (/<fako kodo="([^"]+)"[^>]*>([^<]+)<\/fako>/i) {
 #      $debugmsg .= "fak $1 -> $2\n";
 #      print "fak $1 $2<br>\n";
       $fak{$1} = Encode::decode($enc, "$1-$2");
     }
   }
-  close IN;
+  close $in;
 
   %stl = ('' => '');
-  open IN, "<$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
-  while (<IN>) {
+  open $in, '<', "$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
+  while (<$in>) {
     if (/<stilo kodo="([^"]+)"[^>]*>([^<]+)<\/stilo>/i) {
 #      $debugmsg .= "stl $1 -> $2\n";
 #      print "stl $1 $2<br>\n";
       $stl{$1} = Encode::decode($enc, "$1-$2");
     }
   }
-  close IN;
+  close $in;
 }
 
 # ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
@@ -730,9 +734,9 @@ EOD
   revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
 #  $html = Encode::decode($enc, $html);
   if ($html and $debug) {
-    open HTML, ">:utf8", "../art2/$art.html" or die "open write html";
-	print HTML $html;
-    close HTML;
+    open $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "open write html";
+	  print $ht $html;
+    close $ht;
   }
 
   $html =~ s#href="../stl/#href="/revo/stl/#smg;
@@ -933,8 +937,9 @@ EOD
 		#my $smlog = "$homedir/logfiles/sendmail.log";
 
         # konektu al retposxtservilo
-        open SENDMAIL, "| /usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
-        print SENDMAIL <<End_of_Mail;
+        open $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
+            or print LOG "ne povas sendmail\n";
+        print $sendmail <<End_of_Mail;
 From: $name <$from>
 To: $to
 Reply-To: $redaktanto
@@ -946,16 +951,16 @@ $sxangxo2
 $xml2
 End_of_Mail
 
-        close SENDMAIL;
+        close $sendmail;
 
         print "sendita al $to";
-		
-	if (-s $smlog) {
-		  open L, "<", $smlog;
-		  my $ltxt = join "", <L>;
-		  close L;
-		  print pre("sendmail.log: $ltxt");
-	}
+          
+        if (-s $smlog) {
+            open $log, "<", $smlog;
+            my $ltxt = join "", <$log>;
+            close $log;
+            print pre("sendmail.log: $ltxt");
+        }
 	
       } else {
         print "ne sendita, elektu adreson sube";

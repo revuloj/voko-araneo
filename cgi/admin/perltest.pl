@@ -1,15 +1,19 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
-#use lib("/var/www/vhosts/web277.cyberwebserver-21.de/files/perllib");
+#use lib("/hp/af/ag/ri/files/perllib");
 
 print header(-charset=>'utf-8');
 
 print "<pre>\n";
 print "# PERL: ".$];
 print "\n# CGI ENV\n";
-foreach $key (sort keys(%ENV)) {
+foreach my $key (sort keys(%ENV)) {
   print "$key = $ENV{$key}\n";
 }
 

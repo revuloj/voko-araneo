@@ -5,7 +5,7 @@
 # 
 # 2006-2007 Wieland Pusch
 # 2006 Bart Demeyere
-# 2021 Wolfram Diestel
+# 2021-2026 Wolfram Diestel
 #
 # (c) laŭ permesilo GPL 2.0
 
@@ -35,7 +35,13 @@ my $LIMIT_rec = 100;
 #} 
 
 
-my $sercxata = param('sercxata') if param('sercxata'); utf8::decode($sercxata);
+my $sercxata = '';
+
+if param('sercxata') {
+  $sercxata = param('sercxata'); 
+  utf8::decode($sercxata);
+}
+
 my $lng = param('lng') || ''; # serĉlingvo
 my @lingvoj = ();
 my $trdlng = trdlng(); # aldonaj traduklingvoj ('en','fr'...) aŭ ('')

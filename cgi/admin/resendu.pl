@@ -15,6 +15,6 @@ print header(-type=>'text/plain', -charset=>'utf-8');
 
 chdir("../../revo");
 
-while (<art/*.html>) {
+while (glob('art/*.html')) {
   print "$_\n" if -z $_;
 }

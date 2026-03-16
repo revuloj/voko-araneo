@@ -1,8 +1,6 @@
-
 use strict;
 
-package eosort;
-
+package eosort_new;
 
 use feature 'unicode_strings';
 sub utf8 { return shift; } # dummy to replace Unicode::String utf8
@@ -39,10 +37,10 @@ my @_order_ci = (
 ['p', 'P'],
 ['q', 'Q'],
 ['r', 'R'],
-['s', 'S', '\u00DF'],  # s S ß
+['s', 'S', '\u00DF'],  # s S ï¿½
 ['\u015D', '\u015C'],  # sx SX
 ['t', 'T'],
-['u', 'U', '\u00F9', '\u00D9', '\u00FB', '\u00DB', '\u00FC', '\u00DC'],  # u U . . . . ü Ü
+['u', 'U', '\u00F9', '\u00D9', '\u00FB', '\u00DB', '\u00FC', '\u00DC'],  # u U . . . . ï¿½ ï¿½
 ['\u016D', '\u016C'],  # ux, UX
 ['v', 'V'],
 ['w', 'W'],

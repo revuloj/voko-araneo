@@ -1,7 +1,12 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
 # Tiu-ĉi skripto listigas la enhavon de la aktualigaj tar-arĥivoj, kiujn ni sendas (tar -tv ...)
 # sen malpaki la enhavon
+
+use strict;
 
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
@@ -20,8 +25,8 @@ print header,
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
       
-open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush LOG 1;
+open $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+autoflush $log 1;
 
 my $fname = param('fname');
 
@@ -37,9 +42,9 @@ my $htmldir = "$homedir/www";
 $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
-print LOG "uprevo started at ".localtime()." with fname=$fname\n";
+print $log "uprevo started at ".localtime()." with fname=$fname\n";
 unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d\.tgz$/) {
-  print LOG "Nevalidaj parametroj\n\n";
+  print $log "Nevalidaj parametroj\n\n";
   print h1("Nevalidaj parametroj"), end_html;
   exit 1;
 }
@@ -65,13 +70,13 @@ chdir $htmldir or die "chdir ne funkciis";
 $ret = `tar -tvzf alveno/$fname revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif 2>&1`;
 $exitcode = $?;
 print h2("tar -tv revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif -> $exitcode");
-print LOG "tar -tv -> $exitcode\n$ret";
+print $log "tar -tv -> $exitcode\n$ret";
 print pre($ret);
 
 $ret = `tar -tvzf alveno/$fname 2>&1`;
 $exitcode = $?;
 print h2("tar -tv -> $exitcode");
-print LOG "tar -tv -> $exitcode\n$ret";
+print $log "tar -tv -> $exitcode\n$ret";
 print pre($ret);
 
 
@@ -79,18 +84,18 @@ if (0 and !$exitcode) {
   $ret = `rm alveno/$fname 2>&1`;
   $exitcode = $?;
   print h2("rm -> $exitcode");
-  print LOG "rm -> $exitcode\n";
-  print LOG "$ret\n" if $exitcode;
+  print $log "rm -> $exitcode\n";
+  print $log "$ret\n" if $exitcode;
   print pre($ret);
 #  if ($exitcode) {
-#    print LOG "$ret\n";
+#    print $log "$ret\n";
 #    exit 1;
 #  }
 }
 
-print LOG "normala fino de uprevotv.pl\n\n";
+print $log "normala fino de uprevotv.pl\n\n";
 print end_html;
 
-close LOG;
+close $log;
 
 1;

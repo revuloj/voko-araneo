@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
@@ -31,8 +35,8 @@ print header,
       h1('fname='.param('fname'));
 
 #print h1("homedir = $homedir");
-open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush LOG 1;
+open $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+autoflush $log 1;
 
 $ret = `du -sh $homedir`;
 print LOG "du -> $exitcode\n$ret\n";
@@ -44,16 +48,16 @@ $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
-print LOG "uprevo eko je ".localtime()." kun fname=$fname\n";
+print $log "uprevo eko je ".localtime()." kun fname=$fname\n";
 unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d_\d\d\d\d\d\d\.tgz$/) {
-  print LOG "Nevalidaj parametroj\n\n";
+  print $log "Nevalidaj parametroj\n\n";
   print h1("Nevalidaj parametroj"), end_html;
   exit 1;
 }
 
 my $dbfname = $fname;
 $dbfname =~ s/^revo-(.*)_\d\d\d\d\d\d\.tgz$/revodb-$1.sql.gz/;
-print LOG "dbfname -> $dbfname\n";
+print $log "dbfname -> $dbfname\n";
 
 my $ret;
 
@@ -66,7 +70,7 @@ print LOG "rm bv_forigu_tiujn.lst -> $exitcode\n";
 $ret = `tar -xvzf alveno/$fname revo/eta revo/dtd revo/art revo/hst tgz revo/xml revo/xsl revo/cfg revo/tez revo/bld revo/stl revo/jsc revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("tar -xv -> $exitcode");
-print LOG "tar -xv -> $exitcode\n$ret";
+print $log "tar -xv -> $exitcode\n$ret";
 print pre($ret);
 # revorss::write($ret, $htmldir, -1, 0);
 
@@ -90,45 +94,45 @@ chdir $htmldir or die "chdir html ne funkciis";
 $ret = `ls -l bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 #print h2("ls -> $exitcode");
-print LOG "forigi: ls -> $exitcode\n$ret";
+print $log "forigi: ls -> $exitcode\n$ret";
 #print pre($ret);
 
 $ret = `pwd 2>&1`;
 $exitcode = $?;
 #print h2("pwd -> $exitcode");
-print LOG "pwd -> $exitcode\n$ret";
+print $log "pwd -> $exitcode\n$ret";
 #print pre($ret);
 
-if (open IN, "<bv_forigu_tiujn.lst") {
+if (open $in, '<', "bv_forigu_tiujn.lst") {
 #  print h2("open true");
   my $count = 0;
-  while (<IN>) {
+  while (<$in>) {
     chomp;
     if ((/^revo\// or /^tgz\//) and not /\.\./ and not / / and not /\*/ and not /\?/ and not /^$/) {
       print h2("forigi $_");
-      print LOG "forigi $_\n";
+      print $log "forigi $_\n";
       my $ret = unlink $_;
       $count += $ret;
       print h2("forigi $_ malsukcesis") if !$ret;
-      print LOG "forigi $_ malsukcesis\n" if !$ret;
+      print $log "forigi $_ malsukcesis\n" if !$ret;
     } else {
       print h2("nelegala $_");
-      print LOG "nelegala $_\n";
+      print $log "nelegala $_\n";
     }
   }
   print h2("forigis: $count");
-  print LOG "forigis: $count\n";
-  close IN;
+  print $log "forigis: $count\n";
+  close $in;
 
 }
 
 $ret = `cat bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 #print h2("cat -> $exitcode");
-print LOG "cat -> $exitcode\n$ret";
+print $log "cat -> $exitcode\n$ret";
 print pre($ret);
 
-print LOG "date: ".`date`."\n";
+print $log "date: ".`date`."\n";
 
 $ret = `du -sh $homedir`;
 #print h2("du -> $exitcode");
@@ -136,19 +140,19 @@ print pre($ret);
 
 my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
 $ret = `find $findargs`;
-print LOG "find $findargs -> \n$ret\n";
+print $log "find $findargs -> \n$ret\n";
 $ret = `find $findargs | xargs rm`;
-print LOG "find rm -> \n$ret\n";
+print $log "find rm -> \n$ret\n";
 
 $findargs = "$htmldir/alveno -mtime +2 -name revodb\\*gz";
 $ret = `find $findargs`;
-print LOG "find $findargs -> \n$ret\n",
+print $log "find $findargs -> \n$ret\n",
 $ret = `find $findargs | xargs rm`;
-print LOG "find rm -> \n$ret\n";
+print $log "find rm -> \n$ret\n";
 
-print LOG "normala fino de uprevo.pl\n\n";
+print $log "normala fino de uprevo.pl\n\n";
 print end_html;
 
-close LOG;
+close $log;
 
 1;

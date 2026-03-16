@@ -6,7 +6,7 @@
 # (c) laŭ permesilo GPL 2.0
 # 2006-2007 Wieland Pusch
 # 2006 Bart Demeyere
-# 2021 Wolfram Diestel
+# 2021-2026 Wolfram Diestel
 #
 
 use strict;
@@ -18,12 +18,7 @@ use DBI();
 use URI::Escape;
 
 use utf8;
-#use feature 'unicode_strings';
 use open ':std', ':encoding(UTF-8)';
-
-#use open ':utf8';
-#binmode STDOUT, ":utf8";
-#binmode STDOUT, ':encoding(UTF-8)';
 
 #$| = 1;
 
@@ -68,13 +63,14 @@ if ($kadroj) {
   $sercxata .= "&trd=".uri_escape(param('trd')) if param('trd');
 
   # kopiu index.html  
-  open IN, "<../revo/index.html" or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'";
-  while (<IN>) {
+  open $in, '<', "../revo/index.html" 
+    or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'";
+  while (<$in>) {
     s/src="inx\/_eo.html"/src="sercxu.pl?cx=1&sercxata=$sercxata"/;
     s/src="titolo.html"/src="..\/revo\/titolo.html"/;
     print;
   }
-  close IN;
+  close $in;
   exit 1;
 }
 

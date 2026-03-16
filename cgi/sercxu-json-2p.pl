@@ -4,7 +4,7 @@
 # 
 # (c) permesilo: GPL 2.0
 # 2006-2007 __ Wieland Pusch, Bart Demeyere
-# 2012-2021 __ Wolfram Diestel
+# 2012-2026 __ Wolfram Diestel
 
 use strict;
 
@@ -20,8 +20,8 @@ use revodb;
 #use eosort;
 
 use utf8;
-#use open ':std', ':encoding(UTF-8)';
-binmode(STDOUT, ":utf8");
+use open ':std', ':encoding(UTF-8)';
+##binmode(STDOUT, ":utf8");
 
 use JSON;
 my $json_parser = JSON->new->allow_nonref;

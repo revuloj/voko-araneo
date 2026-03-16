@@ -4,7 +4,7 @@
 # checkencode.pl
 # 
 # 2008-03-24 Wieland Pusch
-#
+# ..2026 Wolfram Diestel
 
 use strict;
 
@@ -84,9 +84,9 @@ sub checkencode {
 #    print "fname = $fname<br>\n";
     $num++;
 
-    open IN, "<", $fname or die "open";
-    my $xml = join('', <IN>);
-    close $xml;
+    open $in, "<", $fname or die "open";
+    my $xml = join('', <$in>);
+    close $in;
 
     my $xml2 = revo::decode::rvdecode($xml);
 

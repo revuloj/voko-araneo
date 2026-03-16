@@ -17,7 +17,7 @@ use HTML::Entities;
 use CGI qw(:standard); 	# nur por verbose
 
 ######################################################################
-sub encode($$;$) {
+sub encode {
   my $str = shift @_;
   my $verbose = shift @_;
   return encode2($str, 0, $verbose);

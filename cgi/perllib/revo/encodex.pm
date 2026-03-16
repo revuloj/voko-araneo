@@ -4,7 +4,7 @@
 # revo::encode.pm
 # 
 # 2008-02-09 Wieland Pusch
-#
+# ..2026 Wolfram Diestel
 
 use strict;
 #use warnings;
@@ -20,7 +20,7 @@ use revo::voko_entities;
 use CGI qw(:standard); 	# nur por verbose
 
 ######################################################################
-sub encode($$;$) {
+sub encode {
   my $str = shift @_;
   my $verbose = shift @_;
   return encode2($str, 0, $verbose);

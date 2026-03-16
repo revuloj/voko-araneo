@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
-#use strict;
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
@@ -9,9 +12,12 @@ use IO::Handle;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-#use Unicode::String qw(utf8);
+
 use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; 
+use open ':std', ':encoding(UTF-8)';
+##binmode STDOUT, ":utf8";
+
 use revodb;
 use fileutil;
 
@@ -44,7 +50,7 @@ $dbh->do("set names utf8");
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) " 
     ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") or die;
 
-for $ref (@$refs) {
+for my $ref (@$refs) {
     # ial json_parser ne aŭtomate supozas UTF8!?
     my $v = decode('UTF-8', $ref->[0]);
     my $r = decode('UTF-8', $ref->[1]);

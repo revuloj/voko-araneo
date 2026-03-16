@@ -1,9 +1,13 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
 # La aktualigaj tar-arĥivoj, kiujn ni sendas el redaktoservo (formiko) enhavas
 # liston de dosieroj forigendajn: bv_forigu_tiujn.lst
 # tiu-ĉi skripto malpkas nur tiun liston kaj forigas la listigitajn dosierojn
 
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
@@ -21,8 +25,8 @@ print header,
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
       
-open LOG, ">>$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush LOG 1;
+open $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+autoflush $log 1;
 
 my $fname = param('fname');
 
@@ -31,9 +35,9 @@ my $htmldir = "$homedir/www";
 
 $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 
-print LOG "uprevorm started at ".localtime()." with fname=$fname\n";
+print $log "uprevorm started at ".localtime()." with fname=$fname\n";
 unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d\.tgz$/) {
-  print LOG "Nevalidaj parametroj\n\n";
+  print $log "Nevalidaj parametroj\n\n";
   print h1("Nevalidaj parametroj"), end_html;
   exit 1;
 }
@@ -55,19 +59,19 @@ print pre($ret);
 $ret = `ls -l bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("ls -> $exitcode");
-#print LOG "cat -> $exitcode\n$ret";
+#print $log "cat -> $exitcode\n$ret";
 print pre($ret);
 
 $ret = `pwd 2>&1`;
 $exitcode = $?;
 print h2("pwd -> $exitcode");
-#print LOG "cat -> $exitcode\n$ret";
+#print $log "cat -> $exitcode\n$ret";
 print pre($ret);
 
-if (open IN, "<bv_forigu_tiujn.lst") {
+if (open $in, '<', "bv_forigu_tiujn.lst") {
 #  print h2("open true");
   my $count;
-  while (<IN>) {
+  while (<$in>) {
     chomp;
     if ((/^revo\// or /^tgz\//) and not /\.\./ and not / / and not /\*/ and not /\?/ and not /^$/) {
       print h2("forigi $_");
@@ -83,19 +87,19 @@ if (open IN, "<bv_forigu_tiujn.lst") {
     }
   }
   print h2("forigis $count");
-  close IN;
+  close $in;
 
 }
 
 $ret = `cat bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("cat -> $exitcode");
-print LOG "cat -> $exitcode\n$ret";
+print $log "cat -> $exitcode\n$ret";
 print pre($ret);
 
-print LOG "normala fino de uprevorm.pl\n\n";
+print $log "normala fino de uprevorm.pl\n\n";
 print end_html;
 
-close LOG;
+close $log;
 
 1;

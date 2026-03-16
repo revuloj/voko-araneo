@@ -26,10 +26,10 @@ sub konv {
 
 #  print "<pre>xml ".(ref $xml)."</pre>\n";
   if (not ref $xml) {
-    open IN, "<", $xml or die;
-    my $xmltmp = join "", <IN>;
+    open $in, "<", $xml or die;
+    my $xmltmp = join "", <$in>;
     $xml = \$xmltmp;
-    close IN;
+    close $in;
   }
 #  print "<pre>xml= $xml\n</pre>\n";
   

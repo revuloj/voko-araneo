@@ -8,22 +8,15 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
 
 ##### staĝo 2: Ni devas mem kompili rxp por Alpine
 FROM alpine:3.23 AS builder
-  # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
-
-COPY cgi/ /tmp/cgi/
 
 # build and install rxp
+# malnova debian-fonto: http://deb.debian.org/debian/pool/main/r/rxp/rxp_1.5.0.orig.tar.gz
+# ne plu kompiliĝas ekde alpine:3.21, do ni prenas la fonton de Edinburgo
 RUN apk update \
   && apk upgrade \
   && apk add --no-cache \
           ca-certificates \
   && update-ca-certificates \
-      \
-  # Install and process perl-cirtic
-  && apk add --no-cache --virtual .tool-deps perl-critic \
-  && perlcritic /tmp/cgi/admin \
-  && perlcritic /tmp/cgi/perllib \
-  && perlcritic /tmp/cgi/*.pl \
       \
   # Install tools for building
   && apk add --no-cache --virtual .tool-deps \
@@ -33,7 +26,6 @@ RUN apk update \
   && apk add --no-cache --virtual .build-deps \
           linux-headers \
       \
-  # Download and prepare rxp sources
   && curl -fL -o /tmp/rxp.tar.gz \
     https://www.inf.ed.ac.uk/research/isddarch/admin/rxp-1.5.2.tar.gz \
   && (echo "	b2a7dbe5350b15078979c63904157f42  /tmp/rxp.tar.gz" \
@@ -41,7 +33,6 @@ RUN apk update \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
   && ./configure && make install
-
 
 ##### staĝo 3: Nun ni havas ĉion por krei la finan procezujon kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine
@@ -73,22 +64,23 @@ ARG DAEMON_UID=13731
 ARG HOME_DIR=/hp/af/ag/ri
 ARG HTTP_DIR=/hp/af/ag/ri/www
 ARG VOKO_TMP=/tmp/voko
-ARG REVO_DIR=/usr/local/apache2/htdocs/revo   
+ARG REVO_DIR=/usr/local/apache2/htdocs/revo
 
-# mysql TLS atestilo problemo kun: perl-dbd-mysql
-RUN apk --update --update-cache --upgrade add bash mysql-client mariadb-connector-c fcgi libxslt \
+RUN apk --update --update-cache --upgrade add bash mariadb-client fcgi libxslt \
     perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths perl-http-message perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
-    sed perl-dev mariadb-connector-c-dev zlib-dev openssl-dev make build-base openssl ca-certificates \
-    && update-ca-certificates \
-    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS 
+    sed perl-dev make build-base ca-certificates \
+    && update-ca-certificates
 
-RUN (cpanm --notest DBD::mysql@4.051 \
-    || (cat /root/.cpanm/work/*/build.log && exit 1 )) \
+RUN \
+    cpanm DBD::MariaDB Email::Sender::Simple Email::Sender::Transport::SMTPS 
+
+RUN \  
+    echo "EDIT PASSWD" \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
-    && apk del build-base sed make perl-dev mariadb-connector-c-dev zlib-dev openssl-dev \
-    && rm -f /var/cache/apk/* && rm -rf /root/.cpanm/work/*
+    && echo "CLEANUP" \
+    && apk del build-base sed make perl-dev && rm -f /var/cache/apk/*
 
 # ni bezonas GNU 'sed' por kompili CSS!
 
@@ -107,7 +99,11 @@ COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 #ADD . ./
 COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
-COPY etc/revodb.pm /usr/local/apache2/cgi-bin/perllib/
+
+# problemo TLS-atestilo ne akcetiĝas de DBI, verŝajne pro devia nomo aŭ "memfarita" atestilo
+# https://github.com/perl5-dbi/DBD-mysql/issues/110
+# https://stackoverflow.com/questions/55189991/ssl-connection-works-with-mysql-client-but-not-perl-dbimariadb
+COPY cfg/revodb.pm /usr/local/apache2/cgi-bin/perllib/
 
 COPY --from=grundo build/ ${VOKO_TMP}/
 
@@ -152,22 +148,16 @@ RUN chown ${DAEMON_UID} ${HTTP_DIR}/sxangxoj.rdf
 
 COPY revo/ ${REVO_DIR}/
 COPY revo/index.html /usr/local/apache2/htdocs/
-COPY revo/manifest.json /usr/local/apache2/htdocs/
-COPY revo/sw.js /usr/local/apache2/htdocs/
+#COPY revo/manifest.json /usr/local/apache2/htdocs/
+#COPY revo/sw.js /usr/local/apache2/htdocs/
+
 
 # Basic Auth por cgi/admin
 # https://tecadmin.net/setup-apache-basic-authentication/
 # https://dzone.com/articles/apache-http-24-how-to-build-a-docker-image-for-ssl
 # https://devops.ionos.com/tutorials/set-up-basic-authentication-in-apache-using-htaccess-on-centos-7/
 
+
 USER root
-
-# problemo en Apline 3.23 mysql-client,
-# vd. https://gitlab.alpinelinux.org/alpine/aports/-/issues/17798
-# kaj https://github.com/brianmario/mysql2/issues/1379
-# por provizora solvo do:
-ENV MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
-
-
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["httpd-foreground"]

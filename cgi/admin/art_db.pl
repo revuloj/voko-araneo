@@ -1,11 +1,14 @@
 #!/usr/bin/perl
 
+# (c) 2023-2026 ĉe Wolfram Diestel
+# laŭ permesilo GPL 2.0
+
 ## aktualigas la datumbazon el tez/*.json
 ## por unuopaj artikoloj, aŭ donitaj per parametro art=... (unu)
 ## aŭ arts=... (pluraj, maks. mil) aŭ prefix=... (ĉiuj komenciĝantaj tiel)
 ## Unuopa artikolo estas en-db-igita per la funkcioj en perllib/art_db.pm
 
-#use strict;
+use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
@@ -14,9 +17,11 @@ use IO::Handle;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-#use Unicode::String qw(utf8);
+
 use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; ##binmode STDOUT, ":utf8";
+use open ':std', ':encoding(UTF-8)';
+
 use revodb;
 use art_db; # perllib/art_db.pm
 
@@ -44,7 +49,7 @@ if (param('arts')) {
   my $prefix = param('prefix');
 
   if ($prefix =~ /^[a-z0-9\[\]\-]{1,10}$/) {
-    for $file (glob "$tezdir/$prefix*.json") {
+    for my $file (glob "$tezdir/$prefix*.json") {
       $file =~ /\/([a-z0-9]+)\.json/;
       print pre("glob: $1") if ($verbose);
       push @arts, $1;

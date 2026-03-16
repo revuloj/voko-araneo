@@ -13,12 +13,17 @@ use DBI();
 #use URI::Escape;
 use JSON;
 
+# (c) laŭ permesilo GPL 2.0
+# 2021-2026 Wolfram Diestel
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 #use Unicode::String qw(utf8);
 use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; 
+use open ':std', ':encoding(UTF-8)';
+## binmode STDOUT, ":utf8";
+
 use revodb;
 
 my $debug = 0;

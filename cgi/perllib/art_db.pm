@@ -14,9 +14,12 @@ use IO::Handle;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-#use Unicode::String qw(utf8);
+
 use Encode;
-use utf8; binmode STDOUT, ":utf8";
+use utf8; 
+use open ':std', ':encoding(UTF-8)';
+##binmode STDOUT, ":utf8";
+
 use revodb;
 use fileutil;
 

@@ -4,7 +4,7 @@
 # hazarda_art.pl
 # 
 # 2008-01-__ Wieland Pusch
-#
+# ...2026 Wolfram Diestel
 
 use strict;
 
@@ -15,7 +15,7 @@ use URI::Escape;
 
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-binmode(STDOUT, ":utf8");
+## binmode(STDOUT, ":utf8");
 
 $| = 1;
 
@@ -26,13 +26,13 @@ if (!$senkadroj) {
   print "Content-type: text/html\n\n";
 
   # anstataŭigu la enhavo de la kadraro (HTML frameset)
-  open IN, "< $revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
-  while (<IN>) {
+  open $in, '<', "$revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
+  while (<$in>) {
     s/src="inx\/_eo.html"/src="hazarda_art.pl?senkadroj=1"/;
     s/src="titolo.html"/src="hazarda_art.pl?senkadroj=2#toptop"/;
     print;
   }
-  close IN;
+  close $in;
   exit 1;
 }
 
@@ -70,8 +70,8 @@ if ($senkadroj == 2 && $art)
 {
   print header(-charset=>'utf-8');
 
-  open IN, "<", "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
-  while (<IN>) {
+  open $in, '<', "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
+  while (<$in>) {
 #    s/<\/title>/<\/title><script type="text\/javascript"><!--\nscroll(0,0);\n\/\/--><\/script>/;
      s/(\[<a class="redakto" href="\/cgi-bin\/vokomail)(\.pl\?art=[a-z0-9]+">)(redakti)(\.\.\.<\/a>\])/$1\l$2$3$4\n$1\l2$2traduki$4/;
     s/="\.\.\//="..\/revo\//g;
@@ -79,7 +79,7 @@ if ($senkadroj == 2 && $art)
     s/(href=")([^#.\/](?!ttp:\/\/))/$1..\/revo\/art\/$2/g;
     print;
   }
-  close IN;
+  close $in;
   exit 1;
 }
 

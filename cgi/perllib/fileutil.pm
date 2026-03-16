@@ -45,11 +45,11 @@ sub read_json_file {
 # legi dosieron
 sub read_file {
 	my $file = shift;
-	unless (open FILE, $file) {
+	unless (open $infile, '<', $file) {
 		warn("Ne povis malfermi '$file': $!\n"); return;
 	}
-	my $text = join('',<FILE>);
-	close FILE;
+	my $text = join('',<$infile>);
+	close $infile;
 	return $text;
 }
 

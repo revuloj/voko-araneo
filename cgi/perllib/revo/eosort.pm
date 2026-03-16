@@ -1211,7 +1211,9 @@ sub sortval_lng
     $str2 = undef;
   }
   my ($kap_ci, $unua) = $self->remap_ci_lng($lng, $str);
-  my ($kap_ci2) = $self->remap_ci_lng($lng, $str2) if $str2;
+  my ($kap_ci2) = '';
+  ($kap_ci2) = $self->remap_ci_lng($lng, $str2) if $str2;
+
   print "sortval_lng: str=$str, kap_ci=$kap_ci, unua=$unua\n" if $self->{dbg};
 
   return ($kap_ci, $unua, $kap_ci2);
