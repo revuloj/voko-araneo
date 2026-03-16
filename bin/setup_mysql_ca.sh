@@ -1,5 +1,9 @@
 #!/bin/bash
-set -x
+
+# aldonu tiun ĉi skripton al docker-entrypoint.sh
+# se vi volas kontroli la CA, kaj tiukaze ankaŭ forigu la
+# variablon MARIADB_TLS_DISABLE_PEER_VERIFICATION en Dockerfile
+#set -x
 
 echo q | openssl s_client -starttls mysql -connect abelo:3306 -showcerts 2>/dev/null \
        | openssl x509 -outform PEM > cert0.pem
