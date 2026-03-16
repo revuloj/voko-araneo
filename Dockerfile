@@ -154,7 +154,8 @@ USER root
 # kaj https://github.com/brianmario/mysql2/issues/1379
 # por provizora solvo do:
 ENV MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
-
+# aldone en bin/setup_cgi_user.sh ni certigas aldonante 
+# PassEnv-agordon en httpd.con, ke la CGI-skripto vidas ĝin
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["httpd-foreground"]

@@ -10,4 +10,6 @@ if [ ! -e ${htpasswd} ]; then
 
   chown ${DAEMON_UID} ${htpasswd}
   chmod 0660 ${htpasswd}
-fi  
+fi
+
+echo -e "\nPassEnv MARIADB_TLS_DISABLE_PEER_VERIFICATION\n" >> /usr/local/apache2/conf/httpd.conf
