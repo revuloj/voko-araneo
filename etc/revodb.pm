@@ -2,15 +2,16 @@
 
 #
 # revodb.pm
-# 
+# laŭ permesilo GPL 2.0
 # 2006-09-__ Wieland Pusch
 # 2008-10-__ Wieland Pusch
-# 2019-26 - Wolfram Diestel
+# 2019 - 2026 ĉ€ Wolfram Diestel
 
 # revodb.pm - por konekti al la mysql-servilo ene de Docker-medio
 # por la publika servilo, adaptu la samnoman dosieron en cgi/perllib/
 
-use strict;
+use warnings; use strict;
+
 package revodb;
 use DBI();
 
@@ -21,7 +22,8 @@ my $mysql_password = <$fh>;
 chomp $mysql_password;
 close $fh;
 
-######################################################################
+###################################################
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub connect {
   # konekto al la datumbazo, agordu host=... en la publika servilo, 
   # tls-parametroj vd. https://github.com/perl5-dbi/DBD-mysql/issues/110
@@ -36,12 +38,21 @@ my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306
   $dbh->do("set names utf8");
   return $dbh;
 }
-######################################################################
+##################################################
 
 sub pop3login {
   return ("XXX", "XXX");
 }
-######################################################################
+
+sub mail_from {
+  return 'XXX';
+}
+
+sub mail_to {
+  return 'XXX';
+}
+
+##################################################
 
 sub mysqldump {
   open(my $fh,'<','/run/secrets/voko-abelo.mysql_root_password')
@@ -51,15 +62,6 @@ sub mysqldump {
   close $fh;
 
   return "mysqldump --user=root --password=$mysql_root_password --databases db314802x3159000";
-}
-######################################################################
-
-sub mail_from {
-  return 'XXX';
-}
-
-sub mail_to {
-  return 'XXX';
 }
 
 1;

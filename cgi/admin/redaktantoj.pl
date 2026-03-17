@@ -4,9 +4,9 @@
 # redaktantoj.pl
 # 
 # 2008-03-28 Wieland Pusch
-#
+# ...2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
 use CGI qw(:standard);
 #use CGI::Carp qw(fatalsToBrowser);

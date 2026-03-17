@@ -3,22 +3,14 @@
 # 2008 Wieland Pusch
 # 2020-2026 Wolfram Diestel
 
+use warnings; use strict; use utf8;
 
-use strict;
-use utf8;
-
-#use CGI qw(:standard *table);
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
-#use Encode;
-#use Text::Tabs;
-#use POSIX qw(strftime);
 
 # propraj perl moduloj estas en:
-use lib("/hp/af/ag/ri/files/perllib");
 # por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
-
+use lib("/hp/af/ag/ri/files/perllib");
 use revo::decode;
 use revo::encode;
 use revo::checkxml;
@@ -45,9 +37,9 @@ my $smlog       = "$homedir/files/log/sendmail.log"; #"$xml_dir/sendmail.log";
 my $mail_from   = 'noreply@retavortaro.de';
 my $mail_to     = 'revo@retavortaro.de';
 
-$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
-$ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
-$ENV{'LOCPATH'} = "$homedir/files/locale";
+local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+local $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
+local $ENV{'LOCPATH'} = "$homedir/files/locale";
 #autoEscape(0);
 
 my $enc = "utf-8";
@@ -267,6 +259,7 @@ sub normigu_xml {
 
   # kodigu ne-askiajn signojn per literunuoj...
   return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+  return;
 }
 
 sub send_xml {
@@ -287,13 +280,8 @@ sub send_xml {
 
   my $to = join(', ', @to);
   my $subject = "Revo redaktu.pl $art";
-  
-  # konektiĝu al retpoŝtservo
-  unless (open my $sendmail, '|-', "$mail_cmd 2>&1 >$smlog") {
-    warn("Ne povas voki $mail_cmd\n");
-    return 0;
-  } 
-  print $sendmail <<END_OF_MAIL;
+
+  my $mailtext = <<END_OF_MAIL;
 From: $name <$mail_from>
 To: $to
 Reply-To: $redaktanto
@@ -304,6 +292,13 @@ $red_cmd
 
 $$xml
 END_OF_MAIL
-
+  
+  # konektiĝu al retpoŝtservo
+  open my $sendmail, '|-', "$mail_cmd 2>&1 >$smlog" or do {
+    warn("Ne povas voki $mail_cmd\n");
+    return 0;
+  } 
+  print {$sendmail} $mailtext;
   close $sendmail;
+  return;
 }

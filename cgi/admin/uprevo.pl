@@ -3,9 +3,8 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
@@ -35,17 +34,19 @@ print header,
       h1('fname='.param('fname'));
 
 #print h1("homedir = $homedir");
+
+## no critic (InputOutput::RequireBriefOpen)
 open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush $log 1;
 
 $ret = `du -sh $homedir`;
-print LOG "du -> $exitcode\n$ret\n";
+print $log "du -> $exitcode\n$ret\n";
 print pre($ret);
 
 
-$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
-$ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
+local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
 print $log "uprevo eko je ".localtime()." kun fname=$fname\n";
@@ -65,7 +66,7 @@ chdir $htmldir or die "chdir ne funkciis";
 
 $ret = `rm bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
-print LOG "rm bv_forigu_tiujn.lst -> $exitcode\n";
+print $log "rm bv_forigu_tiujn.lst -> $exitcode\n";
 
 $ret = `tar -xvzf alveno/$fname revo/eta revo/dtd revo/art revo/hst tgz revo/xml revo/xsl revo/cfg revo/tez revo/bld revo/stl revo/jsc revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
@@ -120,10 +121,10 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
       print $log "nelegala $_\n";
     }
   }
-  print h2("forigis: $count");
-  print $log "forigis: $count\n";
   close $in;
 
+  print h2("forigis: $count");
+  print $log "forigis: $count\n";
 }
 
 $ret = `cat bv_forigu_tiujn.lst 2>&1`;

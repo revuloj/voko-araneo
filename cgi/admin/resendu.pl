@@ -6,7 +6,7 @@
 # 2018-02-07 Wieland Pusch
 #
 
-use strict;
+use warnings; use strict;
 
 use CGI qw(:standard);
 #use CGI::Carp qw(fatalsToBrowser);

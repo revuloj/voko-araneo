@@ -6,27 +6,20 @@
 # 2006-2007 __ Wieland Pusch, Bart Demeyere
 # 2012-2026 __ Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
-#use URI::Escape;
 
 # propraj perl moduloj estas en:
 #use lib ("./perllib");
 use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
-#use eosort;
 
-use utf8;
-use open ':std', ':encoding(UTF-8)';
-##binmode(STDOUT, ":utf8");
+use utf8; use open ':std', ':encoding(UTF-8)';
 
 use JSON;
 my $json_parser = JSON->new->allow_nonref;
-
-#$| = 1;
 
 my $debug = 0;
 my $LIMIT_eo = 250; # 50 x $LIMIT_lng
@@ -226,7 +219,7 @@ sub preflng {
       #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
       $l =~ s/^([a-z]{2,3}).*$/$1/;
       #unless (grep(/$l/,@preferataj_lingvoj)) { 
-      push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
+      push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
       #}
 
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;

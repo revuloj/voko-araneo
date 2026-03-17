@@ -1,25 +1,21 @@
 #!/usr/bin/perl
 
-# (c) 2021 ĉe Wolfram Diestel
+# (c) 2021 - 2026 ĉe Wolfram Diestel
 # laŭ GPL 2.0
 
-use strict;
+use warnings; use strict;
 use utf8;
 
-use CGI qw(:standard *pre *table);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard *pre *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 # propraj perl moduloj estas en:
-use lib("/hp/af/ag/ri/files/perllib");
 # por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
-
+use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 
 my $debug = 0; #0|1;
 my $max_age = 200; # post kiom da tagoj ni forigos malnovajn per forigu_malnovajn()
-
-#binmode STDOUT, ":utf8";
 
 # uzu prefere POST ol GET
 # listo: sen parametro
@@ -107,6 +103,7 @@ sub listigu_novajn {
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
     } 
+    return;
 }
 
 sub forigu_malnovajn {    
@@ -125,6 +122,7 @@ sub forigu_malnovajn {
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
     } 
+    return;
 }
 
 sub pluku_submeton {
@@ -171,6 +169,7 @@ sub pluku_submeton {
         eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
     } 
+    return;
 }
 
 sub submeto_rezulto {
@@ -200,6 +199,7 @@ sub submeto_rezulto {
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
     } 
+    return;
 }
 
 sub redakto_statoj {
@@ -245,5 +245,6 @@ sub redakto_statoj {
         warn "Datumbaza eraro: $@"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    } 
+    }
+    return;
 }

@@ -1,7 +1,6 @@
-use strict;
-
 package eosort;
 
+use warnings; use strict;
 use feature 'unicode_strings';
 #use Unicode::String qw(utf8);
 use utf8;
@@ -188,8 +187,7 @@ my @_order_ci2 = (
 ##############################################
 sub new
 {
-  my $type = shift;
-  my %params = @_;
+  my ($type, %params) = @_;
   my $self = {dbg=>$params{dbg}};
   my %mapper_ci;
 	
@@ -261,6 +259,7 @@ sub new
 
   $self->{mapper_ci}  = \%mapper_ci;
   bless $self, $type;
+  return;
 }
 
 sub remap_ci
@@ -300,5 +299,7 @@ sub remap_ci_lng
   my $u = utf8(shift);
   my $lng = shift;
   print "remap_ci_lng (".$u->utf8().", $lng)\n" if $self->{dbg};
-
+  return;
 }
+
+1;

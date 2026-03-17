@@ -3,9 +3,8 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 use ExtUtils::Installed;
 
 use lib("/hp/af/ag/ri/files/perllib");

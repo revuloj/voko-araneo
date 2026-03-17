@@ -9,10 +9,9 @@
 # drv@mrk tri- aŭ plipartaj
 # snc@mrk, subsnc@mrk kiuj ne havas drv@mrk kiel prefikson
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(header);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(header); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 # propraj perl moduloj estas en:

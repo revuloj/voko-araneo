@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use warnings; use strict;
 package art_db;
 
 # legu la datumojn el artikollisto sub tez/*.json, 
@@ -93,6 +93,7 @@ sub process_ref_json {
       process_ref($art,$json->{$art});
       process_trd($art,$json->{$art});
     }
+    return;
 }
 
 sub process_kap {
@@ -118,6 +119,7 @@ sub process_kap {
       $counter->{kap}++;
     }
   }
+  return;
 }
 
 sub process_mrk {
@@ -173,6 +175,7 @@ sub process_mrk {
       $counter->{mrk}++;
     }
   }
+  return;
 }
 
 sub process_ref {
@@ -200,6 +203,7 @@ sub process_ref {
       $counter->{ref}++;
     }
   }
+  return;
 }
 
 
@@ -249,6 +253,7 @@ sub process_trd {
       $counter->{trd}++;
     }
   }
+  return;
 }
 
 1;

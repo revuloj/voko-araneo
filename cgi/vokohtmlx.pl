@@ -3,17 +3,13 @@
 # 2008 Wieland Pusch
 # 2020-2026 Wolfram Diestel
 
-use strict;
-use utf8;
+use warnings; use strict; use utf8;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
-#use DBI();
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 
 use IPC::Open3; # uzata de xml2html.pm
 use Encode;
 
-#$| = 1;
 my $debug = 0;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /hp/af/ag/ri/www
@@ -23,16 +19,15 @@ my $revo_base  = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
 
 my $xsltproc = "xsltproc --path $revo_base/cfg $homedir/files/xsl/revohtml.xsl -";
+
 # ni uzas meminstalitan xsltproc, kiu bezonas trovi siajn partojn
 # laŭ apartaj padoj:
-$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
-$ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
-$ENV{'LOCPATH'} = "$homedir/files/locale";
-#autoEscape(0);
+local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+local $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
+local $ENV{'LOCPATH'} = "$homedir/files/locale";
 
 ## parametroj...
 my $xmlTxt = param('xmlTxt');
-#my $mrk = param('mrk');
 
 # ne servu ion ajn, se mankas la XML-teksto...
 unless ($xmlTxt) {

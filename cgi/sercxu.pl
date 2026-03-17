@@ -9,25 +9,19 @@
 # 2021-2026 Wolfram Diestel
 #
 
-use strict;
+use warnings; use strict;
 
-#use CGI qw(:standard *table -utf8);
-use CGI qw(:standard *table);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
-use utf8;
-use open ':std', ':encoding(UTF-8)';
-
-#$| = 1;
+use utf8; use open ':std', ':encoding(UTF-8)';
 
 my $LIMIT_eo = 50;
 my $LIMIT_trd = 250;
 
 my $verbose=0; # 1 = debugging...
 
-#print "Content-type: text/html\n\n";
 
 #### preparu stirantajn parametrojn  ####
 
@@ -425,4 +419,5 @@ sub Sercxu
       }
     }
   }
+  return;
 }

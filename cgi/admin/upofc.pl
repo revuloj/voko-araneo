@@ -10,20 +10,14 @@
 # kaj poste enigu en DB per 'sbin/deplojo docker-ofc' 
 # resp. 'sbin/eldono ofc' kaj posta voko de https://reta-vortaro.de/cgi-bin/admin/upofc.pl
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
-#use JSON;
-#use Data::Dumper;
+
+use Encode; use utf8;  use open ':std', ':encoding(UTF-8)';
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-use Encode;
-use utf8; 
-use open ':std', ':encoding(UTF-8)';
-## binmode STDOUT, ":utf8";
-
 use revodb;
 use fileutil;
 
@@ -155,6 +149,7 @@ sub process {
         }
         print pre("$inx\n") if ($debug);
     }
+    return;
 }
 
 sub inx_prep {
@@ -173,6 +168,7 @@ sub inx_prep {
             $inx_ofc->{$ofc}->{$v} = $i->[0];
         }
     }
+    return;
 }
 
 sub ref_mrk {
@@ -286,8 +282,6 @@ sub ref_mrk {
     return $mrk;
 }
 
-
-
 sub rv_rad {
     my ($ofc,$rad) = @_;
 
@@ -302,6 +296,7 @@ sub rv_rad {
     return $mrk if (
         index($mrk,'.') < 0 # radikreferenco ne enhavu punkton
     );
+    return;
 }
 
 sub rv_drv {
@@ -318,5 +313,6 @@ sub rv_drv {
     return $mrk if (
         index($mrk,'.') >= 0 # drv-referenco enhavu punkton
     );
+    return;
 }
 

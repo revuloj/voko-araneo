@@ -8,20 +8,14 @@
 ## aŭ arts=... (pluraj, maks. mil) aŭ prefix=... (ĉiuj komenciĝantaj tiel)
 ## Unuopa artikolo estas en-db-igita per la funkcioj en perllib/art_db.pm
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
-#use JSON;
-#use Data::Dumper;
+
+use Encode; use utf8; use open ':std', ':encoding(UTF-8)';
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-
-use Encode;
-use utf8; ##binmode STDOUT, ":utf8";
-use open ':std', ':encoding(UTF-8)';
-
 use revodb;
 use art_db; # perllib/art_db.pm
 

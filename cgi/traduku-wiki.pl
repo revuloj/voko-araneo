@@ -3,13 +3,11 @@
 # (c) laŭ permesilo GPL 2.0
 # 2021-2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
 use open ':std', ':encoding(UTF-8)';
-## use utf8; binmode STDOUT, ":utf8";
 
-use CGI qw(:standard escape);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard escape); use CGI::Carp qw(fatalsToBrowser);
 
 use HTTP::Request;
 use LWP::UserAgent;

@@ -6,18 +6,18 @@
 # 2008-01-__ Wieland Pusch
 # ...2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard *table);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
-use utf8;
-use open ':std', ':encoding(UTF-8)';
-## binmode(STDOUT, ":utf8");
+use utf8; use open ':std', ':encoding(UTF-8)';
 
-$| = 1;
+use IO::Handle;
+STDOUT->autoflush(1);
+
+# $| = 1;
 
 my $revo_dir = '/hp/af/ag/ri/www/revo';
 

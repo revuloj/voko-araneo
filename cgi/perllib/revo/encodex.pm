@@ -1,15 +1,13 @@
 #!/usr/bin/perl
+package revo::encodex;
 
-#
+
 # revo::encode.pm
 # 
 # 2008-02-09 Wieland Pusch
 # ..2026 Wolfram Diestel
 
-use strict;
-#use warnings;
-
-package revo::encodex;
+use warnings; use strict;
 
 use utf8;
 use Encode;
@@ -21,16 +19,13 @@ use CGI qw(:standard); 	# nur por verbose
 
 ######################################################################
 sub encode {
-  my $str = shift @_;
-  my $verbose = shift @_;
+  my ($str, $verbose) = @_;
   return encode2($str, 0, $verbose);
 }
 
 ######################################################################
 sub encode2 {
-  my $str = shift @_;
-  my $flag = shift @_;
-  my $verbose = shift @_;
+  my ($str, $flag, $verbose) = @_;
 
   my $enc = "utf-8";
   # $str = Encode::decode($enc, $str) unless Encode::is_utf8($str);

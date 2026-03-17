@@ -7,9 +7,8 @@
 # liston de dosieroj forigendajn: bv_forigu_tiujn.lst
 # tiu-ĉi skripto malpkas nur tiun liston kaj forigas la listigitajn dosierojn
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
@@ -24,7 +23,8 @@ print header,
 
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
-      
+
+## no critic (InputOutput::RequireBriefOpen)     
 open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush $log 1;
 
@@ -33,7 +33,7 @@ my $fname = param('fname');
 
 my $htmldir = "$homedir/www";
 
-$ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
+local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 
 print $log "uprevorm started at ".localtime()." with fname=$fname\n";
 unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d\.tgz$/) {
@@ -86,9 +86,9 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
       print h2("nelegala $_");
     }
   }
-  print h2("forigis $count");
   close $in;
 
+  print h2("forigis $count");
 }
 
 $ret = `cat bv_forigu_tiujn.lst 2>&1`;

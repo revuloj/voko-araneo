@@ -7,18 +7,15 @@
 # 2007 Wieland Pusch
 # 2021-2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
-
-#$| = 1;
 
 my $revo_dir = "/hp/af/ag/ri/www/revo";
 my $redaktilo = "/cgi-bin/vokomail.pl?art=";
@@ -47,8 +44,9 @@ unless ($lng) {
 
   # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
   # utila eble estus ankaŭ JSON anst. XML-dosiero
+  ## no critic (InputOutput::RequireBriefOpen)
   open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
-    or die "ne povas malfermi dosieron lingvoj.xml";
+    or { die "ne povas malfermi dosieron lingvoj.xml"; }
 
   while (<$in>) {
     if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
@@ -198,6 +196,7 @@ sub print_nav {
   }
 
   print br;
+  return;
 }
 
 sub preflng {
@@ -207,8 +206,8 @@ sub preflng {
     for my $l (@a) {
       #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
       $l =~ s/^([a-z]{2,3}).*$/$1/;
-      unless (grep(/$l/,@preferataj_lingvoj)) {
-        push @preferataj_lingvoj, ($l) if ( $l && $l ne 'eo' && not $l ~~ @preferataj_lingvoj );
+      unless (grep {/$l/} @preferataj_lingvoj) {
+        push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
       }
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
       # last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);

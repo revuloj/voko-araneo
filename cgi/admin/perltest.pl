@@ -3,9 +3,8 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 #use lib("/hp/af/ag/ri/files/perllib");
 
 print header(-charset=>'utf-8');

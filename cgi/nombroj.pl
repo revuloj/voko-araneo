@@ -7,10 +7,9 @@
 
 # redonas la nombron de kapvortoj kaj de tradukoj
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(header);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(header); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 # propraj perl moduloj estas en:

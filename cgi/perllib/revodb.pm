@@ -5,15 +5,16 @@
 # 
 # 2006-09-__ Wieland Pusch
 # 2008-10-__ Wieland Pusch
-#
+# ...2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
 package revodb;
 
 use DBI();
 
 ######################################################################
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub connect {
   # Connect to the database.
   #  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=127.0.0.1",
@@ -28,16 +29,6 @@ sub connect {
 sub pop3login {
   return ("XXX", "XXX");
 }
-######################################################################
-
-sub mysqldump {
-#  return "mysqldump --user=XXX --password=XXX --databases XXX";
-  my $db="db314802x3159000";
-  my $usr="<user>";
-  my $pwd="<pwd>";
-  return "mysqldump --user='$usr' --password='$pwd' --ignore-table=$db.r2_vikititolo --ignore-table=$db.email --ignore-table=$db.redaktanto --ignore-table=$db.submeto --databases $db";
-}
-######################################################################
 
 sub mail_from {
   return 'XXX';
@@ -45,6 +36,14 @@ sub mail_from {
 
 sub mail_to {
   return 'revuloj@groups.io'; # povas esti pluraj dividitaj per komo
+}
+
+sub mysqldump {
+#  return "mysqldump --user=XXX --password=XXX --databases XXX";
+  my $db="db314802x3159000";
+  my $usr="<user>";
+  my $pwd="<pwd>";
+  return "mysqldump --user='$usr' --password='$pwd' --ignore-table=$db.r2_vikititolo --ignore-table=$db.email --ignore-table=$db.redaktanto --ignore-table=$db.submeto --databases $db";
 }
 
 1;

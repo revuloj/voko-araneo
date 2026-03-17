@@ -6,15 +6,14 @@
 # Tiu-ĉi skripto listigas la enhavon de la aktualigaj tar-arĥivoj, kiujn ni sendas (tar -tv ...)
 # sen malpaki la enhavon
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
 # propraj perl moduloj estas en:
-use lib("/hp/af/ag/ri/files/perllib");
+##use lib("/hp/af/ag/ri/files/perllib");
 
 my $exitcode;
 
@@ -24,7 +23,8 @@ print header,
 
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
-      
+
+## no critic (InputOutput::RequireBriefOpen)    
 open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
 autoflush $log 1;
 
@@ -39,7 +39,7 @@ my $htmldir = "$homedir/www";
 
 #$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
-$ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
+local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
 print $log "uprevo started at ".localtime()." with fname=$fname\n";
@@ -80,7 +80,7 @@ print $log "tar -tv -> $exitcode\n$ret";
 print pre($ret);
 
 
-if (0 and !$exitcode) {
+if (0 && !$exitcode) {
   $ret = `rm alveno/$fname 2>&1`;
   $exitcode = $?;
   print h2("rm -> $exitcode");

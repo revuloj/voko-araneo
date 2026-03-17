@@ -1,9 +1,6 @@
-
-use strict;
-
 package revo::eosort;
 
-
+use warnings; use strict;
 
 use Encode;
 use CGI qw(escapeHTML);   # nur por trovi erarojn
@@ -1127,8 +1124,7 @@ my %_order_ci = (
 ##############################################
 sub new
 {
-  my $type = shift;
-  my %params = @_;
+  my ($type, %params) = @_;
   my $self = {dbg=>$params{dbg}};
   my %mapper_ci;
   my %ignoru;
@@ -1197,6 +1193,8 @@ sub new
   $self->{ignoru}     = \%ignoru;
   $self->{spacigu}    = \%spacigu;
   bless $self, $type;
+
+  return;
 }
 
 sub sortval_lng

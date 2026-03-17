@@ -3,20 +3,15 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-use strict;
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use warnings; use strict;
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
+
 use IO::Handle;
-#use JSON;
-#use Data::Dumper;
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 
-use Encode;
-use utf8; 
-use open ':std', ':encoding(UTF-8)';
-##binmode STDOUT, ":utf8";
+use Encode; use utf8; use open ':std', ':encoding(UTF-8)';
 
 use revodb;
 use fileutil;

@@ -1,6 +1,6 @@
-use strict;
-
 package revo::wrap;
+
+use warnings; use strict;
 
 sub wrap {
   my $t = shift;

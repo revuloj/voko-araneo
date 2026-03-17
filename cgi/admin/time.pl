@@ -1,9 +1,8 @@
 #!/usr/bin/perl
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 
 sub timestamp {
   my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
@@ -15,7 +14,6 @@ sub timestamp {
   $sec = sprintf("%02d", $sec);
   return "$mday.$mon.$year $hour:$min:$sec";
 }
-
 
 print header,
       start_html('Servila tempo'),

@@ -9,22 +9,17 @@
 #
 # (c) laŭ permesilo GPL 2.0
 
-use strict;
+use warnings; use strict;
 
-#use CGI qw(:standard *table -utf8);
-use CGI qw(:standard *table);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 use URI::Escape;
 
-use utf8;
-#use feature 'unicode_strings';
-use open ':std', ':encoding(UTF-8)';
+use utf8; use open ':std', ':encoding(UTF-8)';
 
 my $LIMIT_lng = 7;
 my $LIMIT_rec = 100;
 
-#$| = 1;
 ## my $verbose=1; # 1 = debugging...
 
 #if ($formato eq "txt") {
@@ -183,6 +178,7 @@ sub skribu_linion {
   }
 
   print join('|',$ref->{kap}.', '.$href,@trd_lst), "\n";
+  return;
 }
 
 sub trdlng {

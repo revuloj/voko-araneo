@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+package revo::checkxml;
 
 #
 # revo::checkxml.pm
@@ -7,15 +8,10 @@
 # 2021 Wolfram Diestel
 #
 
-use strict;
-#use warnings;
+use strict; use warnings;
 
 use utf8;
 use IPC::Open3;
-
-#use CGI qw(pre escapeHTML autoEscape);
-
-package revo::checkxml;
 
 my $rxp_cmd_line = 'rxp -Vs >/dev/null';
 my $red_url = '/revo/dlg/redaktilo.html';

@@ -1,29 +1,20 @@
 #!/usr/bin/perl 
 #
-# (c) 2021-2023 ĉe Wolfram Diestel
+# (c) 2021-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 #
 # provizas referencojn de la tezaŭro el la datumbazo (por montro en la artikoloj/derivaĵoj)
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
-#use URI::Escape;
 use JSON;
 
-# (c) laŭ permesilo GPL 2.0
-# 2021-2026 Wolfram Diestel
+use Encode; use utf8; use open ':std', ':encoding(UTF-8)';
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
-#use Unicode::String qw(utf8);
-use Encode;
-use utf8; 
-use open ':std', ':encoding(UTF-8)';
-## binmode STDOUT, ":utf8";
-
 use revodb;
 
 my $debug = 0;

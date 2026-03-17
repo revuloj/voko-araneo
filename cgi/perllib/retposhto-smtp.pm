@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use warnings; use strict;
 
 # https://stackoverflow.com/questions/3945583/how-can-i-conditionally-use-a-module-in-perl
 

@@ -4,10 +4,10 @@
 # redaktantoj.pl
 # 
 # 2008 Wieland Pusch
-# 2020 Wolfram Diestel
-#
+# 2020 - 2026 Wolfram Diestel
+# laŭ permesilo GPL 2.0
 
-use strict;
+use warnings; use strict;
 
 use CGI qw(:standard);
 #use CGI::Carp qw(fatalsToBrowser);

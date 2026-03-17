@@ -1,15 +1,13 @@
 #!/usr/bin/perl
+package revo::xml2html;
 
 #
 # revo::xml2html.pm
 # 
 # 2009 Wieland Pusch
-# 2021 Wolfram Diestel
+# 2021 - 2026 Wolfram Diestel
 
-use strict;
-#use warnings;
-
-package revo::xml2html;
+use warnings; use strict;
 
 use CGI qw(:standard);  # por trovi erarojn (escapeHTML)
 use Encode;

@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+package revo::decode;
 
 #
 # revo::decode.pm
@@ -6,10 +7,7 @@
 # 2008-02-13 Wieland Pusch
 #
 
-use strict;
-#use warnings;
-
-package revo::decode;
+use strict; use warnings;
 
 use utf8;
 use Encode;
@@ -17,8 +15,9 @@ use HTML::Entities;
 
 ######################################################################
 sub rvdecode {
+  my ($str) = @_;
+
   my $enc = "utf-8";
-  my $str = shift @_;
 #  print "decode $str\n";
   $str = Encode::decode($enc, $str);
 

@@ -6,21 +6,19 @@
 # 2008-10-30 Wieland Pusch
 # 2026 Wolfram Diestel
 
-use strict;
-use utf8;
+use warnings; use strict; use utf8;
 
-use CGI qw(:standard *table);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
+
 use IPC::Open3;
 use Encode;
 use Text::Tabs;
 use POSIX qw(strftime);
 
 # propraj perl moduloj estas en:
-use lib("/hp/af/ag/ri/files/perllib");
 # por testi loke vi povas aldoni simbolan ligon: ln -s /home/revo/voko/cgi/perllib /hp/af/ag/ri/files/
-
+use lib("/hp/af/ag/ri/files/perllib");
 use revo::decode;
 use revo::encode;
 use revo::xml2html;
@@ -28,7 +26,9 @@ use revo::checkxml;
 use revo::wrap;
 use revodb;
 
-$| = 1;
+use IO::Handle;
+STDOUT->autoflush(1);
+# $| = 1;
 
 # por testi vi povas aldoni simbolan ligon:  ln -s /home/revo /hp/af/ag/ri/www
 my $homedir = "/hp/af/ag/ri";
@@ -37,9 +37,9 @@ my $revo_base    = "$homedir/www/revo";
 my $xml_dir    = "$revo_base/xml";
 my $smlog = "$homedir/files/log/sendmail.log";
 
-$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
-$ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
-$ENV{'LOCPATH'} = "$homedir/files/locale";
+local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+local $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
+local $ENV{'LOCPATH'} = "$homedir/files/locale";
 autoEscape(0);
 
 my $xml_max_len = 500000;
@@ -520,9 +520,9 @@ my $ne_konservu;
 if ($errline) {
   $errline--;
   $errchar--;
-  if ($xml =~ m/^([^\n]*\n){$errline}[^\n]{$errchar}/smg) {
-    my @prelines = split "\n", $&;
-    $postlines = split "\n", $';
+  if ($xml =~ m/^([^\n]*\n){$errline}[^\n]{$errchar}/smgp) {
+    my @prelines = split "\n", ${^MATCH};
+    $postlines = split "\n", ${^POSTMATCH};
 
     my @pre = Text::Tabs::expand(@prelines);
     $pos = length(join "\n", @pre);
@@ -549,13 +549,13 @@ if ($errline) {
   }
   close $in;
 
-  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)"/smg) {
+  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)"/smgp) {
     if (!exists($lng{$2})) {
       $checklng = "Nekonata lingvo $2.";
       $ne_konservu = 10;
 #      $debugmsg .= "lng = $2\n";
       my @prelines = split "\n", "$`$1$2";
-      $postlines = split "\n", $';
+      $postlines = split "\n", ${^POSTMATCH};
 
       my @pre = Text::Tabs::expand(@prelines);
       $pos = length(join "\n", @pre);
@@ -566,7 +566,7 @@ if ($errline) {
     }
   }
 
-  if (!$pos and $xml =~ m/<(snc|drv)( mrk="$mrk".*?)(\n?\s*<\/\1>)/smg) {
+  if (!$pos && $xml =~ m/<(snc|drv)( mrk="$mrk".*?)(\n?\s*<\/\1>)/smg) {
     my @prelines = split "\n", "$`$1$2";
     $postlines = split "\n", "$3$'";
 
@@ -936,10 +936,7 @@ EOD
         my $subject = "Revo redaktu.pl $art";
 		#my $smlog = "$homedir/logfiles/sendmail.log";
 
-        # konektu al retposxtservilo
-        open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
-            or print LOG "ne povas sendmail\n";
-        print $sendmail <<End_of_Mail;
+        my $mailtext = <<End_of_Mail;
 From: $name <$from>
 To: $to
 Reply-To: $redaktanto
@@ -951,6 +948,13 @@ $sxangxo2
 $xml2
 End_of_Mail
 
+        # konektu al retposxtservilo
+        open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
+            or do {
+              print LOG "ne povas sendi per 'sendmail'\n";
+              return;
+            }
+        print {$sendmail} $mailtext; 
         close $sendmail;
 
         print "sendita al $to";

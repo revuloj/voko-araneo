@@ -9,10 +9,9 @@
 # komparas XML-/JSON-dosierojn kaj datumbazon por detekti korektendajn diferencojn
 # 
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 # use Array::Utils qw(:all);
 

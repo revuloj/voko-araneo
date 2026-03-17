@@ -3,11 +3,9 @@
 # (c) 2021 ĉe Wolfram Diestel
 # laŭ GPL 2.0
 
-use strict;
-use utf8;
+use warnings; use strict; use utf8;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 # propraj perl moduloj estas en:
@@ -71,5 +69,7 @@ sub redakto_statoj {
         warn "Datumbaza eraro: $@"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    } 
+    }
+
+    return;
 }

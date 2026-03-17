@@ -3,15 +3,11 @@
 # (c) laŭ permesilo GPL 2.0
 # 2021-2026 Wolfram Diestel
 
-use strict;
-#use Encode;
-use utf8; 
-use open ':std', ':encoding(UTF-8)';
+use warnings; use strict;
 
-##binmode STDOUT, ":utf8";
+use utf8; use open ':std', ':encoding(UTF-8)';
 
-use CGI qw(-utf8 :standard escape);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(-utf8 :standard escape); use CGI::Carp qw(fatalsToBrowser);
 
 use HTTP::Request;
 use LWP::UserAgent;
@@ -118,6 +114,7 @@ sub tbody {
 
     $c =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1,$duba)/sieg;
     $c =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1,$duba)/sieg;
+    return $c;
 }
 
 # NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
@@ -129,6 +126,7 @@ sub epo_desc {
         $d = '?;'.$d if ($duba);
         push @$desc, $d;
     }
+    return;
 }
 
 sub lex {
@@ -144,6 +142,7 @@ sub lex {
             push @{$lex->{$l}}, $t
         }
     }
+    return;
 }
 
 sub meaning {
@@ -172,6 +171,7 @@ sub meaning {
             trd => $lex
         }
     }
+    return;
 }
 
 

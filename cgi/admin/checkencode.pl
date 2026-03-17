@@ -6,10 +6,9 @@
 # 2008-03-24 Wieland Pusch
 # ..2026 Wolfram Diestel
 
-use strict;
+use warnings; use strict;
 
-use CGI qw(:standard);
-use CGI::Carp qw(fatalsToBrowser);
+use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 print header(-charset=>'utf-8'),
@@ -41,9 +40,9 @@ my $start_time = time();
 
 my $xmldir = "$homedir/www/revo/xml";
 
-$ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
+local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 #print h1("LD_LIBRARY_PATH = ".$ENV{'LD_LIBRARY_PATH'});
-$ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
+local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
 # propraj perl moduloj estas en:
@@ -80,7 +79,7 @@ sub checkencode {
   my $num;
   print "art=$art xmldir=$xmldir<br>\n";
 
-  foreach my $fname (<$xmldir/$art.xml>) {
+  foreach my $fname (glob("$xmldir/$art.xml")) {
 #    print "fname = $fname<br>\n";
     $num++;
 

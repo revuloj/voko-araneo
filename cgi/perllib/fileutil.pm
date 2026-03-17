@@ -8,7 +8,7 @@
 #
 # funkcioj por enlegi kompletan dosiero, JSON-dosieron...
 
-use strict;
+use warnings; use strict;
 package fileutil;
 
 use JSON;
@@ -45,8 +45,9 @@ sub read_json_file {
 # legi dosieron
 sub read_file {
 	my $file = shift;
-	unless (open my $infile, '<', $file) {
-		warn("Ne povis malfermi '$file': $!\n"); return;
+	open my $infile, '<', $file or do {
+		warn("Ne povis malfermi '$file': $!\n"); 
+		return;
 	}
 	my $text = join('',<$infile>);
 	close $infile;
