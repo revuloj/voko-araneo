@@ -10,20 +10,24 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
 FROM alpine:3.23 AS builder
   # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
 
+# kiom strikte ni kontrolu Perl-kodon 
+# 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
+ARG SEVER=4
 COPY cgi/ /tmp/cgi/
 
 # build and install rxp
 RUN apk update \
   && apk upgrade \
-  && apk add --no-cache \
+  # instali kaj ruli perlcritic
+  && apk add --no-cache --virtual .tool-deps perl-critic \
+  && perlcritic --severity=${SEVER} /tmp/cgi/admin \
+  && perlcritic --severity=${SEVER} /tmp/cgi/perllib \
+  && perlcritic --severity=${SEVER} /tmp/cgi/*.pl
+
+RUN apk add --no-cache \
           ca-certificates \
   && update-ca-certificates \
       \
-  # Install and process perl-cirtic
-  && apk add --no-cache --virtual .tool-deps perl-critic \
-  && perlcritic /tmp/cgi/admin \
-  && perlcritic /tmp/cgi/perllib \
-  && perlcritic /tmp/cgi/*.pl \
       \
   # Install tools for building
   && apk add --no-cache --virtual .tool-deps \
