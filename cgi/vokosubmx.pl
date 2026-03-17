@@ -334,7 +334,7 @@ END_OF_MAIL
   open my $sendmail, '|-', "$mail_cmd 2>&1 >$smlog" or do {
     warn "Ne povas voki $mail_cmd\n";
     return 0;
-  }
+  };
 
   print {$sendmail} $mail;
   close $sendmail;

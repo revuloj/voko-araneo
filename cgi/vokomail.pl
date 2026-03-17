@@ -953,7 +953,7 @@ End_of_Mail
             or do {
               print LOG "ne povas sendi per 'sendmail'\n";
               return;
-            }
+            };
         print {$sendmail} $mailtext; 
         close $sendmail;
 

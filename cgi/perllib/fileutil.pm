@@ -48,7 +48,7 @@ sub read_file {
 	open my $infile, '<', $file or do {
 		warn("Ne povis malfermi '$file': $!\n"); 
 		return;
-	}
+	};
 	my $text = join('',<$infile>);
 	close $infile;
 	return $text;
