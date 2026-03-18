@@ -5,8 +5,9 @@
 
 PC=/usr/bin/perlcritic
 SVR=4
+VRB=8
 
-${PC} --severity ${SVR} cgi/admin
-${PC} --severity ${SVR} cgi/perllib
-${PC} --severity ${SVR} cgi/*.pl
-${PC} --severity ${SVR} etc/*.pm
+${PC} --verbose ${VRB} --severity ${SVR} cgi/admin
+${PC} --verbose ${VRB} --severity ${SVR} cgi/perllib
+${PC} --verbose ${VRB} --severity ${SVR} cgi/*.pl
+${PC} --verbose ${VRB} --severity ${SVR} etc/*.pm

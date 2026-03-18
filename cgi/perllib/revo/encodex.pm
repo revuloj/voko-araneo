@@ -18,13 +18,13 @@ use revo::voko_entities;
 use CGI qw(:standard); 	# nur por verbose
 
 ######################################################################
-sub encode {
+sub xencode {
   my ($str, $verbose) = @_;
-  return encode2($str, 0, $verbose);
+  return xencode2($str, 0, $verbose);
 }
 
 ######################################################################
-sub encode2 {
+sub xencode2 {
   my ($str, $flag, $verbose) = @_;
 
   my $enc = "utf-8";

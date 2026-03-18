@@ -70,6 +70,7 @@ sub konv {
   
   my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
                       "$xsltproc");
+  binmode(CHLD_IN, ":encoding(UTF-8)");               
   print CHLD_IN $$xml;
   close CHLD_IN;
 

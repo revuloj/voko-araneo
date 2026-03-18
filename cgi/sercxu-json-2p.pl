@@ -163,7 +163,7 @@ if ($@) {
 
 ### serĉu tradukojn ###
 
-my $QUERY = 
+$QUERY = 
    "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
   ."FROM v3traduko "
   ."WHERE ind $komparo ? AND lng IN $pref_lng "

@@ -3,10 +3,12 @@
 # 2008 Wieland Pusch
 # 2020-2026 Wolfram Diestel
 
-use warnings; use strict; use utf8;
+use warnings; use strict;
 
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
+
+use Encode qw(is_utf8);
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
@@ -52,8 +54,9 @@ my $redaktanto = param('redaktanto');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 my $command = param('command');
 
+use utf8;
 use open ':std', ':encoding(UTF-8)';
-## binmode STDOUT, ":utf8";
+##binmode(STDOUT, ":encoding(UTF-8)");
 
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
@@ -251,7 +254,9 @@ sub normigu_xml {
 
   if ($xmlTxt) {
     # normigu kodigon
-    $xmlTxt = Encode::decode($enc, $xmlTxt);
+    unless (is_utf8($xmlTxt)) {
+      $xmlTxt = Encode::decode($enc, $xmlTxt);
+    };
     $xmlTxt =~ s/\r\n/\n/g;
     #$debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
 
@@ -269,7 +274,7 @@ sub normigu_xml {
   }
 
   # kodigu ne-askiajn signojn per literunuoj...
-  return revo::encodex::encode2($xmlTxt, 20) if $xmlTxt;
+  return revo::encodex::xencode2($xmlTxt, 20) if $xmlTxt;
   return;
 }
 

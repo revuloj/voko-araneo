@@ -215,9 +215,9 @@ sub process_trd {
   for my $trd (@{$json->{trd}}) {
     my $mrk = $trd->[0];
     my $lng = $trd->[1];
-    my $ind = decode('UTF-8',$trd->[2]);
-    my $text = decode('UTF-8',$trd->[3]); # ? $trd->[3]: undef;
-    my $ekz = decode('UTF-8',$trd->[4]); # ? $trd->[3]: undef;
+    my $ind =  decode('UTF-8',$trd->[2])||'';
+    my $text = decode('UTF-8',$trd->[3])||''; # ? $trd->[3]: undef;
+    my $ekz =  decode('UTF-8',$trd->[4])||''; # ? $trd->[3]: undef;
 
     print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text, ekz: $ekz\n") if ($debug);
 
