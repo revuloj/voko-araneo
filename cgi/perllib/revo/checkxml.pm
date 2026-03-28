@@ -19,6 +19,20 @@ my $red_url = '/revo/dlg/redaktilo.html';
 sub check_xml {
     my ($teksto, $xml_dir) = @_;
     chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+    my @rez = rxp_cmd($teksto);
+    return $rez[1];
+}
+
+sub check_xml_rc {
+    my ($teksto, $xml_dir) = @_;
+    chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+    my @rez = rxp_cmd($teksto);
+    return $rez[0];
+}
+
+sub check_xml_2 {
+    my ($teksto, $xml_dir) = @_;
+    chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
     return rxp_cmd($teksto);
 }
 
@@ -28,9 +42,14 @@ sub rxp_cmd {
                     $rxp_cmd_line);
     print CHLD_IN $teksto;
     close CHLD_IN;
-    my $err = join('', <CHLD_ERR>);
+
+    my $err = do { local $/; <CHLD_ERR> };
+    #my $err = join('', <CHLD_ERR>);
     close CHLD_ERR;
     close CHLD_OUT;
+
+    waitpid($pid, 0);
+    my $exit_code = $? >> 8;
 
     ### rxp raportas erarojn en tiu formo:
     # Warning: Content model for art does not allow element rad here
@@ -46,6 +65,7 @@ sub rxp_cmd {
       $err =~ s/ of <stdin>$//smg;
       $err =~ s/^ in unnamed entity//smg;
       $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata elementokomenco $1/smg;
+      $err =~ s/End tag ([^\n]*) outside of any element/Elementofino $1 ekster iu elemento/smg;
       $err =~ s/Undeclared attribute ([^ \n]*) for element/Nedeklarita atributo $1 por elemento/smg;
       $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 ĉi tie/smg;
       $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua elementofino: anstataŭ $1 troviĝis $2/smg;
@@ -65,7 +85,7 @@ sub rxp_cmd {
       $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ID but contains a character which is not a name character/La atributo $1 de la elemento $2 enhavas malpermesitan karakteron./smg;
     }
 
-    return $err;
+    return ($exit_code,$err);
 }
 
 sub check_ref_cel {
@@ -74,11 +94,6 @@ sub check_ref_cel {
 
     my $sth = $dbh->prepare(
         "SELECT mrk FROM r3mrk WHERE mrk = ?");
-    #    "SELECT count(*) FROM art WHERE art_amrk = ?");
-    #my $sth2 = $dbh->prepare(
-    #    "SELECT drv_mrk FROM drv WHERE drv_mrk = ? ".
-    #    "UNION SELECT snc_mrk FROM snc WHERE snc_mrk = ? ".
-    #    "UNION SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
     
     for my $ref (@refs) {
         # por abel.0ujo.HOR - ni havas la tri argumentojn:
@@ -95,31 +110,6 @@ sub check_ref_cel {
             push @ref_err, "Referenco celas al marko \"$mrk\", kiu ne ekzistas.\n";
             #      $ne_konservu = 7;
         }
-        # ĉu la markoj en la celata artikolo ekzistas
-        #} elsif ($pkt) {
-#
-        #    $sth2->execute($mrk, $mrk, $mrk);
-        #    my ($mrk_ekzistas) = $sth2->fetchrow_array();
-#
-        #    # se la marko ne celas konatan drv, snc, rim
-        #    # eble ĝi referencas subsnc - ni ne havas en la datumbazo,
-        #    # do ni devas malfermi la XML por rigardi...
-        #    # FARENDA: estonte ni havu ĉiujn ref-cel/mrk en la datumbazo
-        #    # por eviti malfermi nombron da XML-dosieroj sur la servilo!
-        #    if (! $mrk_ekzistas) {
-        #        #        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
-        #        # eble temas pri marko de subsenco?
-        #        open IN, "<", "$xml_dir/$art.xml";
-        #        my $celxml = join '', <IN>;
-        #        close IN;
-#
-        #        if ($celxml !~ /<(?:sub)?snc\s+mrk="$mrk">/) {
-        #            push @ref_err, "Referenco celas al \"$mrk\", kiu ne ekzistas en artikolo "
-        #            ."<a download=\"download\" href=\"/revo/xml/$art.xml\">$art</a>\n";
-        ##          $ne_konservu = 8;
-        #        }
-        #    }
-        #}
     }
 
     return @ref_err;
