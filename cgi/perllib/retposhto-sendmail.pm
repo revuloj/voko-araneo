@@ -9,9 +9,11 @@ sub sendu {
 #    open $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" or print LOG "ne povas sendmail\n";
     open my $sendmail, '|-', "/usr/sbin/sendmail -t" 
         or die "Ne povas malfermi la programon 'sendmail': $!\n";
-    while (my ($header, $value) = each %hash) {
-        print {$sendmail} "$header: $value\n";
-    }
+    #while (my ($head, $val) = each %$header) {
+    #    print {$sendmail} "$head: $val\n";
+    #} 
+    
+    print {$sendmail} $header; 
     print {$sendmail} "\n";
     print {$sendmail} $body;
     close $sendmail;

@@ -41,11 +41,13 @@ print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache');
 
 # konvertu XML al HTML por la antaŭrigardo...
-chdir($xml_dir) or die "Mi ne povas atingi dosierujon ".$xml_dir;
+chdir($xml_dir) or die "Mi ne povas atingi dosierujon $xml_dir: $!\n";
 my ($html,$err);
 konv(\$xmlTxt, \$html, \$err, $debug);
 
-$err =~ s/^Warning[^\n]+\n//mg;
+$err =~ s{
+  ^Warning[^\n]+\n
+}{}mgx;
 
 if ($err) { # ???
   print "<html><body><div>";
@@ -59,11 +61,11 @@ if ($err) { # ???
 ###################################################################
 
 sub konv {
-  my ($xml, $html, $err, $debug) = @_;
+  my ($xml, $html_, $err_, $dbg) = @_;
 
   if (not ref $xml) {
-    open my $in, "<", $xml or die;
-    my $xmltmp = join "", <$in>;
+    open my $in, "<", $xml or die "Ne povis malfermi $xml: $!\n";
+    my $xmltmp = do { local $/ = undef; <$in> };
     $xml = \$xmltmp;
     close $in;
   }
@@ -76,13 +78,13 @@ sub konv {
 
 #  binmode CHLD_OUT, ":utf8";
   my $enc = "utf-8";
-  $$html = Encode::decode($enc, join('', <CHLD_OUT>));
+  $$html_ = Encode::decode($enc, do { local $/ = undef; <CHLD_OUT>});
   close CHLD_OUT;
-  $$err = join('', <CHLD_ERR>);
+  $$err_ = do { local $/ = undef; <CHLD_ERR>};
   close CHLD_ERR;
 
   {
-    $$html =~ s#<!DOCTYPE .*?>##sm;
+    $$html_ =~ s{<!DOCTYPE\s+.*?>}{}smx;
   }
   
   return 1;

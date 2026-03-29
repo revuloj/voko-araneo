@@ -70,7 +70,10 @@ sub process {
   };  
 
   for my $art (@$arts) {
-    if ($art =~ /^[a-z0-9]{1,30}$/) {
+    if ($art =~ m{^
+      [a-z0-9]{1,30}
+      $}x) {
+        
       print pre("$art..."),"\n" if ($verbose);
       process_ref_json($art);
       $counter->{art}++;
@@ -109,9 +112,16 @@ sub process_kap {
     print pre("KAP art: $art, kap: $kap, mrk: $mrk, var: $var\n") if ($debug);
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $kap =~ /^[\pL\d\*\(\-][-'\(\),!\.\h\pL]*$/ && 
-      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
-      (!$var || $var =~ /^[\pL\d ]+$/) )
+      $kap =~ m{^
+        [\pL\d\*\(\-]
+        [-'\(\),!\.\h\pL]*
+        $}x 
+      && $mrk =~ m{^
+        \.[a-z0-9A-Z_\.]+
+        $}x 
+      && (!$var || $var =~ m{^
+        [\pL\d ]+
+        $}x) )
     {
       $mrk = "$art$mrk";
       $kap_ins->execute($kap,$mrk,$var,''); # ofc: ni devos aldoni ankoraŭ en JSON!
@@ -141,7 +151,9 @@ sub process_mrk {
       print pre("MRK art: $art, mrk: $mrk\n") if ($debug);
 
       if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ )
+        $mrk =~ m{^
+          \.[a-z0-9A-Z_\.]+
+          $}x )
       {
         $mrk = "$art$mrk";
         $mrk_ins->execute($mrk,'drv','',$mrk); # ofc: ni devos aldoni ankoraŭ en JSON!
@@ -156,17 +168,19 @@ sub process_mrk {
     my $mrk = $m->[0];
     my $ele = $m->[1];
     my $num = $m->[2]?$m->[2]:'';
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
     my $drv = (split /\./, $mrk)[1];
+    ## use critic
 
     print pre("MRK art: $art, mrk: $mrk, ele: $ele, num: $num, drv: $drv\n") if ($debug);
 
     # subart@mrk ni ignoras... ĉar ni nur kolektas kapvortojn de drv kaj ĉio ene de drv...
 
     if ( # kiel unua litero ni permesas ankaŭ ciferojn kaj * pro *-malforta, 3-dimensia...
-      $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
-      $ele =~ /^(subdrv|snc|subsnc|ekz|bld|rim)$/ &&
-      $drv =~ /^[a-z0-9A-Z_]+$/ &&
-      (!$num || $num =~ /^[0-9\.a-z]+$/) )
+      $mrk =~ m/^\.[a-z0-9A-Z_\.]+$/x &&
+      $ele =~ m/^(subdrv|snc|subsnc|ekz|bld|rim)$/x &&
+      $drv =~ m/^[a-z0-9A-Z_]+$/x &&
+      (!$num || $num =~ m/^[0-9\.a-z]+$/x) )
     {
       $mrk = "$art$mrk";
       $drv = "$art.$drv";
@@ -192,10 +206,23 @@ sub process_ref {
     print pre("REF art: $art, mrk: $mrk, tip: $tip, cel: $cel, lst: $lst\n") if ($debug);
 
     if (
-        $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
-        $cel =~ /^[a-z0-9A-Z_\.]+$/ &&
-        (!$tip || $tip =~ /^(dif|sin|ant|hom|vid|super|sub|prt|malprt|ekz|lst)$/) &&
-        (!$lst || $lst =~ /^\pL[\pL_]+$/) )
+        $mrk =~ 
+          m{^
+          \.[a-z0-9A-Z_\.]+
+          $}x 
+        && $cel =~ 
+          m{^
+          [a-z0-9A-Z_\.]+
+          $}x 
+        && (!$tip || $tip =~ 
+          m{^
+          (dif|sin|ant|hom|vid|super|sub|prt|malprt|ekz|lst)
+          $}x) 
+        && (!$lst || $lst =~ 
+          m{^
+          \pL
+          [\pL_]+
+          $}x) )
     {
       $mrk = "$art$mrk";
       $ref_ins->execute($mrk,$tip,$cel,$lst);
@@ -221,6 +248,7 @@ sub process_trd {
 
     print pre("TRD art: $art, mrk: $mrk, lng: $lng, ind: $ind, trd: $text, ekz: $ekz\n") if ($debug);
 
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
     if (
         $mrk =~ /^\.[a-z0-9A-Z_\.]+$/ &&
         $lng =~ /^[a-z]{2,3}$/ )
@@ -242,16 +270,17 @@ sub process_trd {
                                 # ni aŭ larĝigu la tabelon aŭ tranĉu la tradukon!
         eval {
           $trd_ins->execute($mrk,$lng,$ind,$text,$ekz);
+        } or do {
+          carp($trd_ins->err . substr($@,0,81));
         };
-        if ($@) {
-          warn($trd_ins->err . substr($@,0,81));
-        }
+
       } else {
         warn "Tro longa traduk-indeksero: \"$ind\" en $art!\n"
       }
 
       $counter->{trd}++;
     }
+    ## use critic
   }
   return;
 }

@@ -24,8 +24,9 @@ sub konv {
 
 #  print "<pre>xml ".(ref $xml)."</pre>\n";
   if (not ref $xml) {
-    open my $in, "<", $xml or die;
-    my $xmltmp = join "", <$in>;
+    open my $in, "<", $xml 
+      or die "Ne povas legi $xml: $!\n";
+    my $xmltmp = do { local $/ = undef; <$in>};
     $xml = \$xmltmp;
     close $in;
   }
@@ -38,10 +39,10 @@ sub konv {
   close CHLD_IN;
 #  binmode CHLD_OUT, ":utf8";
   my $enc = "utf-8";
-  $$html = Encode::decode($enc, join('', <CHLD_OUT>));
+  $$html = Encode::decode($enc, do { local $/ = undef; <CHLD_OUT>});
   close CHLD_OUT;
 #  print "<pre>html= ".escapeHTML($$html)."\n</pre>\n" if $debug;
-  $$err = join('', <CHLD_ERR>);
+  $$err = do { local $/ = undef;  <CHLD_ERR> };
   print "<pre>err=$$err</pre>\n" if $$err and $debug;
   close CHLD_ERR;
 
@@ -50,35 +51,22 @@ sub konv {
 #  close IN;
 
   {
-    $$html =~ s#<!DOCTYPE .*?>##sm;
-    #my $sth = $dbh->prepare("SELECT count(*) FROM r2_tezauro WHERE tez_fontref = ? or #(tez_celref = ? and tez_tipo in ('sin','vid'))");
-    #while ($$html =~ m#<!--\[\[\s*ref="(.*?)"\s*\]\]-->\s*#smg) {
-    #  my $ref = $1;
-    #  $sth->execute($1,$1);
-    #  my ($tez_ekzistas) = $sth->fetchrow_array();
-	  #print "<pre>tez=$1 $tez_ekzistas</pre>\n" if $debug;
-    #  if ($tez_ekzistas) {
-  	#    $ref =~ tr/./_/;
-    #    $$html =~ s##<a href="/revo/tez/tz_$ref.html" target="indekso"><img src="../smb/tezauro.#png" alt="TEZ" title="al la tezauro" border="0"></a>#;
-	  #} else {
-    #    $$html =~ s###;
-	  #}
-	  #}
+    $$html =~ s{<!DOCTYPE.*?>}{}smx;
   }
   
   # nur por beligi
-  $$html =~ s#</title>\n<script#</title><script#sm;
-  $$html =~ s#</script>\n</head>#</script></head>#sm;
-  $$html =~ s#<(h1|h2|dl|dd)>\n<#<$1><#smg;
-  $$html =~ s#</(h1|h2|h3)>\s+#</$1>#smg;
-  $$html =~ s#</(span)>\s+<#</$1><#smg;
-  $$html =~ s#</(dd|dl)>\s+<a#</$1><a#smg;
-  $$html =~ s#\n(       <a href="\#lng_)#\n   $1#sm;
-  $$html =~ s#<br>\n</div>#<br></div>#sm;
-  $$html =~ s#</pre>\n</div>#</pre></div>#sm;
-  $$html =~ s#<hr>\n<span class="redakto">#<hr><span class="redakto">#sm;
-  $$html =~ s#<br>\s+</body>#<br></body>#sm;
-  $$html =~ s#</html>\n#</html>#sm;
+  $$html =~ s{</title>\n<script}{</title><script}smx;
+  $$html =~ s{</script>\n</head>}{</script></head>}smx;
+  $$html =~ s{<(h1|h2|dl|dd)>\n<}{<$1><}smxg;
+  $$html =~ s{</(h1|h2|h3)>\s+}{</$1>}smxg;
+  $$html =~ s{</(span)>\s+<}{</$1><}smxg;
+  $$html =~ s{</(dd|dl)>\s+<a}{</$1><a}smxg;
+  $$html =~ s{\n(\ +<a\s+href="\#lng_)}{\n   $1}smx;
+  $$html =~ s{<br>\n</div>}{<br></div>}smx;
+  $$html =~ s{</pre>\n</div>}{</pre></div>}smx;
+  $$html =~ s{<hr>\n<span\s+class="redakto">}{<hr><span class="redakto">}smx;
+  $$html =~ s{<br>\s+</body>}{<br></body>}smx;
+  $$html =~ s{</html>\n}{</html>}smx;
 
   return 1;
 } 

@@ -31,7 +31,7 @@ my $LIMIT_trd = 250;
 
 # kontrolu paskodon
 my $sxlosilo = param('sxlosilo');
-if ( ! param('sxlosilo') || param('sxlosilo') != '1887') {
+if ( ! param('sxlosilo') || param('sxlosilo') ne '1887') {
     print header(
         -status => '400 Bad Request',
         -type   => 'application/json'
@@ -80,19 +80,27 @@ my $komparo = '=';
   # se enestas iuj specialsignoj kiel: . ^ + ? aŭ malferma krampo
   # ni supozas regulesprimon!
   # ni ne testas *, ĉu ni aldonu?
-if ($sercxata =~ /[\.\^\$\[\(\|+\?{\\]/) {
+if ($sercxata =~ m{
+      [\.\^\$\[\(\|+\?{\\] # la serĉesprimo enhavas iun el regulesprimaj signoj .^$[(|+?{\ ..(malkonfuzu sintakskolorilon: }})
+    }x) {
   $komparo = 'REGEXP'
   # se enestas % aŭ _ ni interpretas ilin kiel ĵokeroj kun LIKE
-} elsif ($sercxata =~ /[%_]/) {
+}
+## no critic (RegularExpressions::RequireExtendedFormatting)
+elsif ($sercxata =~ /[%_]/) {
   $komparo = 'LIKE';
 };
+## use critic
 
 # serĉante laŭ vortkomenco ni devos ankaŭ
 # serĉi la ekzaktan vorton, ĉar foje ĝi elfalas pro la
 # limigita nombro (ekz. 'sen%' ne trovas 'sen')
 my $EQU = '';
 
-if ($sercxata =~ /^[^%_']+[%_]$/) {
+if ($sercxata =~ m{^
+    [^%_']+ # serĉesprimo ne havas ĵokersignon '%' aŭ '_'
+    [%_]    # sed ja finiĝas per unu el tiuj ĵokeroj
+  $}x) {
   my $ekzakta = substr($sercxata,0,-1);
   $EQU = "(SELECT * FROM ( "
     ."SELECT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd "
@@ -141,25 +149,24 @@ eval {
   #print "\n\n$QUERY\n" if ($debug);
   #print "serĉu: $sercxata\n" if ($debug);
   $sth->execute($sercxata,$sercxata,$sercxata);
-};
-
-# kontrolu kaj eldonu erarojn, aliokaze la rezultojn
-# FARENDA: necesas adapti por json
-if ($@) {
+  1;
+} or do {
+  # kontrolu kaj eldonu erarojn, aliokaze la rezultojn
+  # FARENDA: necesas adapti por json
+  #if ($@) {
   print $json_parser->encode({
     eraro => $sth->err,
     msg => substr($@,0,81)
   });
-  goto FINO;
 
   #if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
   #  print "Eraro: La rektaj krampoj ([ ]) ne paras.<br>\n";
   #} else {
   #  print "Err ".$sth->err." - $@";
-  #}
-} else {
-  $trovoj_eo = $sth->fetchall_arrayref(); 
-}
+  #}  
+  goto FINO;
+};
+$trovoj_eo = $sth->fetchall_arrayref(); 
 
 ### serĉu tradukojn ###
 
@@ -175,10 +182,10 @@ eval {
   #print "\n\n$QUERY\n" if ($debug);
   #print "serĉu: $sercxata\n" if ($debug);
   $sth->execute($sercxata);
-};
-
-# TODO: eligon de eraro adaptu por JSON...
-if ($@) {
+  1;
+} or do {
+  # TODO: eligon de eraro adaptu por JSON...
+  #if ($@) {
   print $json_parser->encode({
     eraro => $sth->err,
     msg => substr($@,0,81)
@@ -189,10 +196,9 @@ if ($@) {
   #} else {
   #  print "Err ".$sth->err." - $@";
   #}
+};
 
-} else {
-  $trovoj_trd = $sth->fetchall_arrayref();
-}
+$trovoj_trd = $sth->fetchall_arrayref();
 
 # eligu la rezultojn kiel JSON-strukturo
 print $json_parser->encode(
@@ -207,7 +213,7 @@ print $json_parser->encode(
 
 FINO:
 # fermu la datumbazon
-$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
+$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis.\n";
 exit;
 
 #### eltrovu preferatan lingvon de la uzanto laŭ la retumilo ####
@@ -217,7 +223,10 @@ sub preflng {
     my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
     for my $l (@a) {
       #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
-      $l =~ s/^([a-z]{2,3}).*$/$1/;
+      $l =~ s{^
+        ([a-z]{2,3}).* # ĉiu lingvo-indiko komencu per du aŭ tri latinaj minuskloj, reston ni ignoras, ekz-e de_AT
+      $}
+      {$1}x;
       #unless (grep(/$l/,@preferataj_lingvoj)) { 
       push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
       #}

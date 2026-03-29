@@ -58,10 +58,12 @@ if ($kadroj) {
 
   # kopiu index.html  
   open my $in, '<', "../revo/index.html" 
-    or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'";
+    or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'\n";
   while (<$in>) {
-    s/src="inx\/_eo.html"/src="sercxu.pl?cx=1&sercxata=$sercxata"/;
-    s/src="titolo.html"/src="..\/revo\/titolo.html"/;
+    s{src="inx/_eo.html"}
+      {src="sercxu.pl?cx=1&sercxata=$sercxata"}x;
+    s{src="titolo.html"}
+      {src="../revo/titolo.html"}x;
     print;
   }
   close $in;
@@ -71,7 +73,7 @@ if ($kadroj) {
 #utf8::decode($sercxata);
 
 #### Javoskripto por la serĉormularo ####
-my $JSCRIPT=<<END;
+my $JSCRIPT=<<'END';
 function xAlUtf8(t, nomo) {
   if (document.getElementById("x").checked) {
     t = t.replace(/c[xX]/g, "\\u0109");
@@ -103,8 +105,10 @@ my $preferata_lingvo;
 {
   my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
   $preferata_lingvo = shift @a;
-  $preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
-  $preferata_lingvo =~ s/^([^;-]+).*/$1/;
+  $preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/x;
+  $preferata_lingvo =~ s{^
+    ([^;-]+).*
+  }{$1}x;
 #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
 }
 
@@ -135,11 +139,11 @@ print start_table(-cellspacing=>0),
           ]
           );
 
-print <<EOD;
+print <<'EOD';
 <tr><td colspan="4" class="enhavo">
 EOD
 
-  print <<EOD;
+  print <<'EOD';
 <form method="post" action="" target="indekso" name="f">
 <input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" 
   onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata"  placeholder="Ĵokeroj: % (pluraj) kaj _ (unu)">
@@ -148,18 +152,18 @@ EOD
 EOD
 
   if (!param('cx')) {
-    print <<EOD;
+    print <<'EOD';
 <script type="text/javascript">
 document.write("<input type=\\\"checkbox\\\" id=\\\"x\\\" name=\\\"x\\\" onClick=\\\"xAlUtf8(document.f.sercxata.value,'sercxata')\\\" $cx2cx>anstata&#365;igu cx, gx, ..., ux");</script>
 <noscript><input type="hidden" id="cx" name="cx" value="1"></noscript>
 EOD
   } else {
-    print <<EOD;
+    print <<'EOD';
 <input type="hidden" id="cx" name="cx" value="1">
 EOD
  }
 
-  print <<EOD;
+  print <<'EOD';
 </form>
 EOD
 
@@ -174,7 +178,7 @@ if ($sercxata eq "%") {
   exit;
 }
 
-print <<EOD if $formato ne "txt" and $formato ne "idx";
+print <<'EOD' if $formato ne "txt" and $formato ne "idx";
 <script type="text/javascript">
 document.write("<div id=\\\"atendu\\\" style=\\\"position:absolute; z-index:1\\\"><br><br><br><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Atendu iomete...</big><layer></layer></div>");
 </script>
@@ -192,6 +196,7 @@ use revodb;
 
 my $sercxata_eo = $sercxata;
 if (param('cx')) {
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
   $sercxata_eo =~ s/c[xX]/ĉ/g;
   $sercxata_eo =~ s/g[xX]/ĝ/g;
   $sercxata_eo =~ s/h[xX]/ĥ/g;
@@ -204,6 +209,7 @@ if (param('cx')) {
   $sercxata_eo =~ s/J[xX]/Ĵ/g;
   $sercxata_eo =~ s/S[xX]/Ŝ/g;
   $sercxata_eo =~ s/U[xX]/Ŭ/g;
+  ## use critic
 }
 
 # Connect to the database.
@@ -214,8 +220,11 @@ $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
 my %trovitajPagxoj;
-my $regulira = $sercxata =~ /[.^$\[\(\|+?{\\]/;
+my $regulira = $sercxata =~ m{
+    [.^$\[\(\|+?{\\] #..}
+  }x;
 
+## no critic (RegularExpressions::RequireExtendedFormatting)
 if ($regulira) {
   Sercxu('REGEXP', $sercxata, $sercxata_eo, $preferata_lingvo);
 } elsif ($sercxata =~ /[%_]/) {
@@ -223,6 +232,7 @@ if ($regulira) {
 } else {
   Sercxu('=', $sercxata, $sercxata_eo, $preferata_lingvo);
 }
+## use critic
 
 # se vi trovis nur unu rezulton, tuj malfermu gxin
 if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
@@ -238,14 +248,13 @@ if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
   print '</script>' . "\n";
 }
 
-$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
+$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis.\n";
   
 #print h1("Fino.");
   print "<br>" if $neniu_trafo and $formato ne "txt";
   print "Neniu trafo..." if $neniu_trafo;
 
-  print <<EOD if $formato ne "txt" and $formato ne "idx";
-
+  print <<'EOD' if $formato ne "txt" and $formato ne "idx";
 <script type="text/javascript">
 <!--
 var browserType;
@@ -281,7 +290,7 @@ exit;
 
 sub Sercxu
 {
-  my ($komparo, $sercxata2, $sercxata2_eo, $preferata_lingvo) = @_;
+  my ($komparo, $sercxata2, $sercxata2_eo, $pref_lng) = @_;
   my $addqry = "";
   my $sth;
 
@@ -291,7 +300,7 @@ sub Sercxu
 
   if ($param_lng eq 'eo' or $param_lng eq '') {
 
-    if (not $preferata_lingvo) {
+    if (not $pref_lng) {
       $sth = $dbh->prepare(
         "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2), kap FROM ( "
           ."SELECT mrk,kap "
@@ -304,11 +313,13 @@ sub Sercxu
 
       eval {
         $sth->execute($sercxata2_eo, $sercxata2_eo);
-      };   
+      } or do {
+        warn "Ne eblis elekti datumojn el v3esperanto kaj v3traduko.\n"
+      };
 
     } else {
       # ni devas iom truki, por ricevi ankaŭ kapvortojn, kiuj ne havas tradukon
-      # en $preferata_lingvo:
+      # en $pref_lng:
       # PLIBONIGU: ni devos movi la lingvo-filtradon el WHERE al ON, rezignante pri v3esperanto
       # por inkluzvi kapvortojn sen koncernaj tradukoj!
       $sth = $dbh->prepare(
@@ -329,15 +340,17 @@ sub Sercxu
         .") AS u GROUP BY drvmrk,kap,ekz,lng LIMIT $LIMIT_eo");
 
       eval {
-        $sth->execute($sercxata2_eo, $preferata_lingvo, $sercxata2_eo, $preferata_lingvo,
-          $preferata_lingvo, $sercxata2_eo, $preferata_lingvo, $sercxata2_eo);
-      };        
+        $sth->execute($sercxata2_eo, $pref_lng, $sercxata2_eo, $pref_lng,
+          $pref_lng, $sercxata2_eo, $pref_lng, $sercxata2_eo);
+      } or do {
+        warn "Ne eblis elekti datumojn el v3esperanto kaj v3traduko.\n"
+      };
 
     }
 
     if ($@) {
       # $sth->err and $DBI::err will be true if error was from DBI
-      if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
+      if ($sth->err == 1139) { # eraro 1139: "Got error 'brackets ([ ]) not balanced"
         print "Eraro: La rektaj krampoj ([ ]) ne kongruas.<br>\n";
       } else {
         print "Err ".$sth->err." - $@";
@@ -347,8 +360,8 @@ sub Sercxu
       my $first = 1;
       while (my $ref = $sth->fetchrow_hashref()) {
         if ($first) {
-          if ($preferata_lingvo) {
-            my $pnomo = $lingvoj->{$preferata_lingvo}->{lng_nomo} || $preferata_lingvo;
+          if ($pref_lng) {
+            my $pnomo = $lingvoj->{$pref_lng}->{lng_nomo} || $pref_lng;
             print "<h1>esperanta ($pnomo)</h1>\n";
           } else {
             print "<h1>esperanta</h1>\n";
@@ -356,7 +369,11 @@ sub Sercxu
           $first = 0;
         };
 
-        my $href = $ref->{drvmrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
+        my $href = $ref->{drvmrk}; 
+        $href =~ s{^
+          ([a-z0-9]+)\.
+          }{/revo/art/$1.html#$1.}x;
+
         my $kap = $ref->{ekz}? $ref->{ekz} : $ref->{kap};
         my $klr = $ref->{trd}? ' ('.$ref->{trd}.')' : '';
         print a({href=>"$href", target=>"precipa"}, $kap), $klr, br();
@@ -369,8 +386,8 @@ sub Sercxu
 
   if ($param_lng ne 'eo') {
 
-    if ($param_lng) {	# nur unu lingvo
-	    $preferata_lingvo = $param_lng;
+    if ($param_lng) {  # nur unu lingvo
+	    $pref_lng = $param_lng;
       $sth = $dbh->prepare(
          "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
         ."FROM v3traduko "
@@ -378,22 +395,24 @@ sub Sercxu
         ."ORDER BY lng, ind, kap "
         ."LIMIT $LIMIT_trd");
 
-	  } else {			# cxiuj lingvojn
+	  } else {  # cxiuj lingvojn
       $sth = $dbh->prepare(
          "SELECT DISTINCT SUBSTRING_INDEX(mrk,'.',2) AS drvmrk, kap, lng, ind, trd, ekz "
         ."FROM v3traduko "
         ."WHERE ind $komparo ? "
         ."ORDER BY ABS(STRCMP(lng, ?)), lng, ind, kap "
         ."LIMIT $LIMIT_trd");
-	}
+	  }
 
     eval {
-      $sth->execute($sercxata2, $preferata_lingvo);
+      $sth->execute($sercxata2, $pref_lng);
+    } or do {
+      warn "Ne eblis elekti datumojn de v3traduko\n";
     };
 
     if ($@) {
       # $sth->err and $DBI::err will be true if error was from DBI
-      if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
+      if ($sth->err == 1139) { # eraro 1139: "Got error 'brackets ([ ]) not balanced"
       } else {
         print "Err ".$sth->err." - $@";
       }
@@ -410,7 +429,11 @@ sub Sercxu
         print "<h1>$lng_nomo</h1>\n" if $lng ne $last_lng;
         $last_lng = $lng;
 
-        my $href = $ref->{drvmrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
+        my $href = $ref->{drvmrk}; 
+        $href =~ s{^
+          ([a-z0-9]+)\.
+        }{/revo/art/$1.html#$1.}x;
+
         my $klr = $ref->{ekz}? ' ('.$ref->{ekz}.')' : ($ref->{kap}? ' ('.$ref->{kap}.')' : '');
         my $trd = $ref->{trd}? $ref->{trd} : $ref->{ind};
         print a({href=>"$href\&lng=$lng", target=>"precipa"}, $trd), $klr, br();

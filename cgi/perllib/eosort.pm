@@ -193,7 +193,8 @@ sub new
 	
   my $count = $#_order_ci;
   print "count = $count\n" if $self->{dbg};
-  die "Ne suficxe da kodoj" if $#_order_kodoj < $count;
+  die "Ne sufiĉe da kodoj\n" if $#_order_kodoj < $count;
+  
   for my $i (0..$count) {
     my $aref = $_order_ci[$i];
     print "i = $i\n" if $self->{dbg};
@@ -201,7 +202,7 @@ sub new
     print "kodo = $kodo\n" if $self->{dbg};
     foreach (@$aref) {
       my $u = $_;
-      if (/^\\[u](....)$/) {
+      if (m{^\\[u](....)$}x) {
         print "u $1\n" if $self->{dbg};
 #        $u->hex($1);
       }
@@ -213,7 +214,7 @@ sub new
     print "\n" if $self->{dbg};
   }
 
-  my $count = $#_order_ci2;
+  $count = $#_order_ci2;
   print "count = $count\n" if $self->{dbg};
   for my $i (0..$count) {
     my $aref = $_order_ci2[$i];
@@ -221,7 +222,7 @@ sub new
     my $start_val;
     foreach (@$aref) {
       my $u = $_;
-      if (/^\\[u](....)$/) {
+      if (m{^\\[u](....)$}x) {
         print "u $1 " if $self->{dbg};
 #        $u->hex($1);
       }
@@ -236,27 +237,6 @@ sub new
     print "\n" if $self->{dbg};
   }
 
-#  my $count = $#_order_ci3;
-#  print "ci3 count = $count\n" if $self->{dbg};
-#  for my $i (0..$count) {
-#    my $aref = $_order_ci3[$i];
-#    print "$i: " if $self->{dbg};
-#
-#    my $u = utf8($$aref[0]);
-#    if ($$aref[0] =~ /^\\[u](....)$/) {
-#      print "u $1 " if $self->{dbg};
-#      $u->hex($1);
-#    }
-#    my @lit = $u->unpack('U*');
-#    die "pli ol unu unikodo letero: ".$u->utf8() if $#lit > 0;
-#    print "$lit[0] -> $$aref[1] " if $self->{dbg};
-#    my @a = utf8($$aref[1])->unpack('U*');
-#    print join("-", map {$mapper_ci{$_}} @a) if $self->{dbg};
-#    $mapper_ci{$lit[0]} = join("", map {$mapper_ci{$_}} @a);
-#
-#    print "\n" if $self->{dbg};
-#  }
-
   $self->{mapper_ci}  = \%mapper_ci;
   bless $self, $type;
   return;
@@ -266,7 +246,7 @@ sub remap_ci
 {
   my $self = shift;
   my $u = shift;
-  $u =~ s/[- ]//g;
+  $u =~ s/[- ]//xg;
 #  $u = utf8($u);
   print "remap_ci ($u)\n" if $self->{dbg};
   print "$_ len=".$u->length()."\n" if $self->{dbg};

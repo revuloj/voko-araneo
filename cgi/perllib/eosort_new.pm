@@ -176,16 +176,6 @@ my @_order_ci2 = (
   '\u0621'], # hamza
 );
 
-###################################################
-# cxio unua litero egalas al la teksto en dua loko
-###################################################
-#my @_order_ci3 = (
-#[ '\u0153', 'oe' ], # oe lig
-#[ '\u0152', 'oe' ], # OE lig
-#[ '\u00E6', 'ae' ], # ae lig
-#[ '\u00C6', 'ae' ], # ae lig
-#);
-
 ##############################################
 sub new
 {
@@ -195,7 +185,8 @@ sub new
 	
   my $count = $#_order_ci;
   print "count = $count\n" if $self->{dbg};
-  die "Ne suficxe da kodoj" if $#_order_kodoj < $count;
+  die "Ne sufiĉe da kodoj\n" if $#_order_kodoj < $count;
+
   for my $i (0..$count) {
     my $aref = $_order_ci[$i];
     print "i = $i\n" if $self->{dbg};
@@ -203,34 +194,28 @@ sub new
     print "kodo = $kodo\n" if $self->{dbg};
     
     foreach (@$aref) {
+
       my $u = utf8($_);
 
       my @lit;
-      if (/^\\[u](....)$/) {
-	print "u $1\n" if $self->{dbg};
-	  
-##	$u->hex($1);
-##	@lit = unpack('C0U*',$u);
-	$lit[0] = hex($1);
-#	print "c $u\n" if $self->{dbg};
-#exit;	
+      if (m{^\\[u](....)$}x) {
+        print "u $1\n" if $self->{dbg};
+        
+        $lit[0] = hex($1);
       } else {
-#      my @lit = $u->unpack('U*');
-	  @lit = unpack('C0U*',$u);
+        @lit = unpack('C0U*',$u);
       }
       print "-> ".join(',',@lit)."\n" if $self->{dbg};
       
-      die "pli ol unu unikodo-litero: $u" if $#lit > 0;
+      die "pli ol unu unikodo-litero: $u\n" if $#lit > 0;
       print "lit = $lit[0], lit = $_\n" if $self->{dbg};
       $mapper_ci{$lit[0]} = $kodo;
-
-#      use open ':std', ':encoding(UTF-8)';
-#      print "map: $lit[0] => $kodo\n" if $self->{dbg};
     }
+
     print "\n" if $self->{dbg};
   }
 #exit;
-  my $count = $#_order_ci2;
+  $count = $#_order_ci2;
   print "count = $count\n" if $self->{dbg};
   for my $i (0..$count) {
     my $aref = $_order_ci2[$i];
@@ -240,7 +225,7 @@ sub new
       my @lit;
       my $u = utf8($_);
       
-      if (/^\\[u](....)$/) {
+      if (m{^\\[u](....)$}x) {
         print "u $1 " if $self->{dbg};
        # $u->hex($1);
 	$lit[0] = hex($1);
@@ -251,7 +236,7 @@ sub new
 #      print "-> ".join(',',@lit)."\n" if $self->{dbg};
       }
       
-      die "pli ol unu unikodo letero: ".$u->utf8() if $#lit > 0;
+      die "pli ol unu unikodo letero: ".$u->utf8()."\n" if $#lit > 0;
       $start_val = $lit[0] unless $start_val;
       print "$lit[0] -> $start_val \n" if $self->{dbg};
 
@@ -266,28 +251,6 @@ sub new
     }
     print "\n" if $self->{dbg};
   }
-#exit;
-  
-#  my $count = $#_order_ci3;
-#  print "ci3 count = $count\n" if $self->{dbg};
-#  for my $i (0..$count) {
-#    my $aref = $_order_ci3[$i];
-#    print "$i: " if $self->{dbg};
-#
-#    my $u = utf8($$aref[0]);
-#    if ($$aref[0] =~ /^\\[u](....)$/) {
-#      print "u $1 " if $self->{dbg};
-#      $u->hex($1);
-#    }
-#    my @lit = $u->unpack('U*');
-#    die "pli ol unu unikodo letero: ".$u->utf8() if $#lit > 0;
-#    print "$lit[0] -> $$aref[1] " if $self->{dbg};
-#    my @a = utf8($$aref[1])->unpack('U*');
-#    print join("-", map {$mapper_ci{$_}} @a) if $self->{dbg};
-#    $mapper_ci{$lit[0]} = join("", map {$mapper_ci{$_}} @a);
-#
-#    print "\n" if $self->{dbg};
-#  }
 
   $self->{mapper_ci}  = \%mapper_ci;
   bless $self, $type;
@@ -298,7 +261,7 @@ sub remap_ci
 {
   my $self = shift;
   my $u = shift;
-  $u =~ s/[- ]//g;
+  $u =~ s/[- ]//xg;
 #  $u = utf8($u);
   print "remap_ci ($u)\n" if $self->{dbg};
 #  print "$_ len=".$u->length()."\n" if $self->{dbg};
@@ -319,8 +282,6 @@ sub remap_ci
       $_ = $$mapref{$_} 
     } else {
       print "noexist: $_\n" if $self->{dbg};
-#           $u->chr($_);
-#            $_ = $u->utf8();
       $u = chr($_);
       $_ = $u;
       print "lit = -> $_\n" if $self->{dbg};

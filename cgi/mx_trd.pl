@@ -46,10 +46,15 @@ unless ($lng) {
   # utila eble estus ankaŭ JSON anst. XML-dosiero
   ## no critic (InputOutput::RequireBriefOpen)
   open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
-    or { die "ne povas malfermi dosieron lingvoj.xml"; }
+    or { die "ne povas malfermi dosieron lingvoj.xml\n"; }
 
   while (<$in>) {
-    if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
+    if (m{
+      <lingvo\s+
+      kodo="([^"]+)"
+      >([^<]+)
+      </lingvo>
+    }x) {
 #      print "lng $1 -> $2".br."\n";
       if ($1 ne "eo") {
         if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
@@ -79,7 +84,9 @@ unless ($lng) {
   exit 0;
 }
 
-$lng =~ /^[a-z]+$/ or die "Ne valida lingvo $lng";
+$lng =~ m{^
+  [a-z]+
+$}x or die "Ne valida lingvo $lng\n";
 
 print h2("mankantaj tradukoj [$lng]");
 
@@ -136,7 +143,11 @@ for my $row (@$rows) {
 
   my $text = $row->{kap}.($row->{num}?sup(i($row->{num})):'');
   my $mrk = $row->{mrk};
-  $mrk =~ /^([^\.]+)\./; my $art = $1;
+
+  my $art = '';
+  if ($mrk =~ m{^([^\.]+)\.}x) {
+    $art = $1;
+  } 
 
   print a({
     href => "$xml_px/$art.xml",
@@ -152,7 +163,7 @@ for my $row (@$rows) {
     }, $text), br;
 }
 
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias.\n";
   
 print_nav($de,$ghis,0);
 print "</article>";
@@ -161,15 +172,15 @@ print end_html();
 #########################################################
 
 sub print_nav {
-  my ($de,$ghis,$head) = @_;
+  my ($de_,$ghis_,$head) = @_;
 
   print a({
-    href => "?lng=$lng&ghis=$ghis"
+    href => "?lng=$lng&ghis=$ghis_"
     }, 
     '<<<'), 
     ' ',
     a({
-      href => "?lng=$lng&de=$de"}, 
+      href => "?lng=$lng&de=$de_"}, 
       '>>>'), 
       ' ';
 
@@ -180,11 +191,14 @@ sub print_nav {
       };
 
     for my $l ('a'..'z') {
+      ## no critic (RegularExpressions::RequireExtendedFormatting)
       if ('qwxy' !~ /$l/) {
         print a({
           href => "?lng=$lng&de=$l"
         }, "$l ")
       }
+      ## use critic
+
       # ĉ, ĝ...
       if ($super->{$l}) {
         my $lx = $l.'x';
@@ -204,21 +218,19 @@ sub preflng {
   {
     my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
     for my $l (@a) {
-      #$preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/;
-      $l =~ s/^([a-z]{2,3}).*$/$1/;
+      $l =~ s{^
+        ([a-z]{2,3})
+        .*
+      $}{$1}x;
+      ## no critic (RegularExpressions::RequireExtendedFormatting)
       unless (grep {/$l/} @preferataj_lingvoj) {
         push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
       }
+      ## use critic
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;
-      # last if (($#preferataj_lingvoj + 1) == $LIMIT_lng);
-    #  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
     }
   }
 
   #print "DEBUG ".join(',',@preferataj_lingvoj);
-  #@preferataj_lingvoj = ('en') unless (@preferataj_lingvoj); 
   return @preferataj_lingvoj;
 }
-
-
-

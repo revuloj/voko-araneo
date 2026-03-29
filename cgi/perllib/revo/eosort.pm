@@ -1140,7 +1140,7 @@ sub new
 #    print "lingvo = $lingvo\n" if $self->{dbg};
     my $count = $#$lingvo;
 #    print "count = $count\n" if $self->{dbg};
-    die "Ne suficxe da kodoj max $#_order_kodoj" if $#_order_kodoj < $count;
+    die "Ne sufiĉe da kodoj max $#_order_kodoj\n" if $#_order_kodoj < $count;
 
     for my $i (0..$count) {
 #$self->{dbg} = ($lng eq "eo");
@@ -1174,7 +1174,7 @@ sub new
         my $enc = "utf-8";
         my $u = Encode::decode($enc, @$aref[$i]);
         my @lit = unpack 'U*', $u;
-        die "pli ol $$litparam{'n'} unikodo letero: $u" if $#lit >= $$litparam{'n'};
+        die "pli ol $$litparam{'n'} unikodo letero: $u\n" if $#lit >= $$litparam{'n'};
 #        print "lit = ".(join ',', @lit).", lit = @$aref[$i], kodo=$kodo\n" if $self->{dbg};
         $mapper_ci{$lng}->[0]->{join(',', @lit)} = $i;
         $mapper_ci{$lng}->[$$litparam{'n'}]->{join(',', @lit)} = $kodo;
@@ -1242,19 +1242,12 @@ sub remap_ci_lng
     print "remap spacigu re\n" if $self->{dbg};
     print "remap_ci_lng (".encode('UTF-8', $u).", $lng)\n" if $self->{dbg};
   }
-#  if ($lng eq "zh") {
-#    return ($u, '?', '?', undef);
-#  }
 
-#  $u->utf8() =~ s/[- ]//g;
-#  print "remap_ci ($u)\n";# if $self->{dbg};
-#  print "$_ len=".$u->length()."\n" if $self->{dbg};
-#  my @lit = $u->unpack('U*');
   my @lit = unpack 'U*', $u;
 #  print "lit1 = ".join('-', @lit)."\n" if $self->{dbg};
   for (my $i = $#lit; $i >= 0; $i--) {
 #    print "test $i: $lit[$i]\n" if $self->{dbg};
-    splice(@lit,$i,1) if $lit[$i] == ord('(') or $lit[$i] == ord(')');  # or $lit[$i] == ord(' ')	 # or $lit[$i] == ord('-') 
+    splice(@lit,$i,1) if $lit[$i] == ord('(') or $lit[$i] == ord(')');  # or $lit[$i] == ord(' ')  # or $lit[$i] == ord('-') 
   }
   my $mapref = $self->{mapper_ci}->{$lng};
   $mapref = $self->{mapper_ci}->{'utf'} unless $mapref;

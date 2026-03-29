@@ -3,6 +3,12 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
+############################################
+# Ŝanĝitaj / forigendaj dosieroj sendiĝas de Formiko (voko-formiko/ant/spegulo.xml)
+# kiel tgz-arĥivo. Poste ĝi vokas per HTTP tiun ĉi skripton por malpaki ĉiujn kaj
+# eventuale forigi dosierojn en listo bv_forigu_tiujn.lst
+# En la fino ni ankoraŭ forigos ĉiujn arĥivojn pli malnovajn ol 7 tagojn
+
 use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
@@ -186,6 +192,7 @@ $ret = `du -sh $homedir`;
 #print h2("du -> $exitcode");
 print pre($ret);
 
+### forigu arĥivojn malnovajn je pli ol 7 tagoj
 my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
 $ret = `find $findargs`;
 $log->info("find $findargs -> \n$ret\n");
@@ -193,12 +200,14 @@ $log->info("find $findargs -> \n$ret\n");
 $ret = `find $findargs | xargs rm`;
 $log->info("find rm -> \n$ret\n");
 
-$findargs = "$htmldir/alveno -mtime +2 -name revodb\\*gz";
-$ret = `find $findargs`;
-$log->info("find $findargs -> \n$ret\n");
-
-$ret = `find $findargs | xargs rm`;
-$log->info("find rm -> \n$ret\n");
+### forigu arĥivojn revodb*.gz malnovajn je pli ol 3 tagoj
+# (tio ne plu devus okazi!)
+#$findargs = "$htmldir/alveno -mtime +2 -name revodb\\*gz";
+#$ret = `find $findargs`;
+#$log->info("find $findargs -> \n$ret\n");
+#
+#$ret = `find $findargs | xargs rm`;
+#$log->info("find rm -> \n$ret\n");
 
 $log->info("<<< FINO de uprevo.pl\n\n");
 print end_html;

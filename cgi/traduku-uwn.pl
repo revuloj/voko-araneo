@@ -54,7 +54,9 @@ my $art = param('art');
 
 if ($art) {
 
-    exit 1 unless ($art =~ /^[a-z0-9]{1,50}$/);
+    exit 1 unless ($art =~ m{^
+        [a-z0-9]{1,50}
+    $}x);
 
     # ni elprenu la kapvortojn en la datumbazo
     my $dbh = revodb::connect();
@@ -62,8 +64,11 @@ if ($art) {
     $dbh->{'mysql_enable_utf8'}=1;
     $dbh->do("set names utf8");
 
-    my $sth = $dbh->prepare("select kap,mrk from r3kap where mrk like ?");
-    eval { $sth->execute($art.'.%'); };
+    my $sth = $dbh->prepare("SELECT kap,mrk FROM r3kap WHERE mrk LIKE ?");
+    eval { $sth->execute($art.'.%'); }
+        or do {
+            warn "Ne eblis elekti datumojn el r3kap\n"
+        };
 
     if ($@) {
         print $json_parser->encode({
@@ -71,19 +76,21 @@ if ($art) {
             msg => substr($@,0,81)
         });
         # fermu la datumbazon
-        $dbh->disconnect() or die "Fermo de la datumbazo ne funkciis";
+        $dbh->disconnect() or die "Fermo de la datumbazo ne funkciis.\n";
         exit;
     } else {
         $kapj = $sth->fetchall_arrayref();
     }    
     # fermu la datumbazon
-    $dbh->disconnect() or die "Fermo de la datumbazo ne funkciis";
+    $dbh->disconnect() or die "Fermo de la datumbazo ne funkciis.\n";
 
 } else {
     my $s = param('sercho');
     # ni kontrolu la serĉatan vorton, sed ja permesu kelkajn apartajn signojn por
     # permesi ion kiel (n,p)-matrico ks:
-    exit 1 unless ($s =~ /^[\pL\-\+]{0,50}$/);
+    exit 1 unless ($s =~ m{^
+        [\pL\-\+]{0,50}
+    $}x);
     $kapj = [[$s,'']];
 }
 
@@ -96,7 +103,15 @@ my $res = get_page("/uwn/entity/epo/$sercho");
 
 # en lexvo/uwn ŝajne ne eblas RDF, sed nur HTML, do ni devos serĉi rezultojn en la HTML
 #print "$result\n\n";
-$res =~ s/<td[^>]*>means<\/td>\s*<td>(.*?)<\/td>/meaning($1)/sieg;
+$res =~ s{
+    <td[^>]*>
+       means
+    </td>
+    \s*
+    <td>
+      (.*?)
+    </td>
+    }{meaning($1)}siegx;
 
 print $json_parser->encode($results);
 
@@ -112,17 +127,40 @@ sub tbody {
     my ($duba,$c) = @_;
     #print "TBODY: $c\n\n";
 
-    $c =~ s/<td[^>]*>has gloss<\/td>\s*<td>epo:\s*(.*?)<\/td>/epo_desc($1,$duba)/sieg;
-    $c =~ s/<td[^>]*>lexicalization<\/td>\s*<td>(.*?)<\/td>/lex($1,$duba)/sieg;
+    $c =~ s{
+        <td[^>]*>
+          has\s+gloss
+        </td>
+        \s*
+        <td>
+          epo:\s*(.*?)
+        </td>
+    }{epo_desc($1,$duba)}siegx;
+    $c =~ s{
+        <td[^>]*>
+          lexicalization
+        </td>
+        \s*
+        <td>
+          (.*?)
+        </td>
+    }{lex($1,$duba)}siegx;
     return $c;
 }
 
 # NOTO: ne ĉiam enestas epo-priskribo apud la angla, ĉu rigardi ankaŭ pri alilingvaj?
 sub epo_desc {
     my ($s,$duba) = @_;
-    if ($s =~ /<span[^>]*>(.*?)<\/span/) {
+    if ($s =~ m{
+        <span[^>]*>
+        (.*?)
+        <\/span
+    }x) {
         #print "DIF: $1\n";
-        my $d = $1; $d =~ s/<[^>]+>/ /sg;
+        ## no critic (RegularExpressions::RequireExtendedFormatting)
+        my $d = $1; 
+        $d =~ s/<[^>]+>/ /sg;      
+        ## use critic  
         $d = '?;'.$d if ($duba);
         push @$desc, $d;
     }
@@ -132,7 +170,14 @@ sub epo_desc {
 sub lex {
     my ($a,$duba) = @_;
 
-    if ($a =~ /<a\s+href="([^"]+)">([a-z]{3}):\s+<span[^>]*>([^<]+)<\//) {
+    if ($a =~ m{
+        <a\s+href="([^"]+)"> # html-referenco
+        ([a-z]{3})
+        :\s+
+        <span[^>]*>
+        ([^<]+)
+        </
+    }x) {
         #print "$2: $3\n";
         my $l = $lng32->{$2} || substr($2,0,2);
         my $t = ($duba? '?;'.$3 : $3);
@@ -153,18 +198,34 @@ sub meaning {
     $desc = [];
     $lex = {};
 
-    if ($a =~ /<a\s+href="([^"]+)">(.*?)<\/a>/) {
+    if ($a =~ m{
+        <a\s+
+        href="([^"]+)"
+        >(.*?)
+        <\/a>
+    }x) {
+
         my $url = $1;
         my $dsc = $2; 
         my $data = get_page($1);
+        ## no critic (RegularExpressions::RequireExtendedFormatting)
         $dsc =~ s/<[^>]+>/ /sg;
+        ## use critic
 
         #print "RES: $dsc $url\n";
         #print "DATA: $data\n\n\n";
 
-        $data =~ s/<tbody(?:[^>]+"display:(none)")?>(.*?)<\/tbody>/tbody($1,$2)/sieg;
+        $data =~ s{
+            <tbody
+            (?:[^>]+
+            "display:(none)"
+            )?>(.*?)
+            <\/tbody>
+        }{tbody($1,$2)}siegx;
 
+        ## no critic (RegularExpressions::RequireExtendedFormatting)
         my $r = (split /;/, $url)[0]; 
+        ## use critic
         $results->{$r} = {
             dsc => $dsc,
             dif => $desc,
@@ -185,6 +246,6 @@ sub get_page {
     if ($response->is_success) {
         return $response->decoded_content;
     } else {
-        die $response->status_line;
+        croak $response->status_line;
     }
 }

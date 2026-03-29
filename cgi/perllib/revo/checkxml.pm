@@ -18,21 +18,21 @@ my $red_url = '/revo/dlg/redaktilo.html';
 
 sub check_xml {
     my ($teksto, $xml_dir) = @_;
-    chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+    chdir($xml_dir) or die "mi ne povas atingi dosierujon $xml_dir\n";
     my @rez = rxp_cmd($teksto);
     return $rez[1];
 }
 
 sub check_xml_rc {
     my ($teksto, $xml_dir) = @_;
-    chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+    chdir($xml_dir) or die "mi ne povas atingi dosierujon $xml_dir\n";
     my @rez = rxp_cmd($teksto);
     return $rez[0];
 }
 
 sub check_xml_2 {
     my ($teksto, $xml_dir) = @_;
-    chdir($xml_dir) or die "mi ne povas atingi dosierujon ".$xml_dir;
+    chdir($xml_dir) or die "mi ne povas atingi dosierujon $xml_dir\n";
     return rxp_cmd($teksto);
 }
 
@@ -42,9 +42,7 @@ sub rxp_cmd {
                     $rxp_cmd_line);
     print CHLD_IN $teksto;
     close CHLD_IN;
-
-    my $err = do { local $/; <CHLD_ERR> };
-    #my $err = join('', <CHLD_ERR>);
+    my $err = do { local $/ = undef; <CHLD_ERR> };
     close CHLD_ERR;
     close CHLD_OUT;
 
@@ -59,31 +57,122 @@ sub rxp_cmd {
     # Error: Mismatched end tag: expected </art>, got </kap>
     #  in unnamed entity at line 8 char 6 of {file:///...xml|<stdin>}
 
+    ## no critic (RegularExpressions::ProhibitComplexRegexes)
     if ($err) {
-      $err =~ s/^Warning: /Atentu: /smg;
-      $err =~ s/^Error: /Eraro: /smg;
-      $err =~ s/ of <stdin>$//smg;
-      $err =~ s/^ in unnamed entity//smg;
-      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata elementokomenco $1/smg;
-      $err =~ s/End tag ([^\n]*) outside of any element/Elementofino $1 ekster iu elemento/smg;
-      $err =~ s/Undeclared attribute ([^ \n]*) for element/Nedeklarita atributo $1 por elemento/smg;
-      $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 ĉi tie/smg;
-      $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua elementofino: anstataŭ $1 troviĝis $2/smg;
-      $err =~ s/^ at line (\d+) char (\d+)$/ ĉe pozicio $1:$2/smg;
-      $err =~ s/Document contains multiple elements/Artikolo enhavas pli ol unu elementon (kaj tio devas esti <vortaro>)/smg;
-      $err =~ s/Root element is ([^ ,\n]*), should be ([^ \n]*)/Radika elemento estas $1, devus esti $2/smg;
-      $err =~ s/Content model for ([^ \n]*) does not allow PCDATA/Kruda teksto kiel enhavo de elemento $1 estas malpermesita/smg;
-      $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ENUMERATION but is empty/La atributo $1 de la elemento $2 mankas/smg;
-      $err =~ s/In the attribute ([^ \n]*) of element ([^ \n]*), ([^ \n]*) is not one of the allowed values/Ĉe la atributo $1 de la elemento $2, $3 ne estas permesata./smg;
-      $err =~ s/Document ends too soon/Dokumento finiĝis antaŭ kompletiĝo/smg;
-      $err =~ s/Value of attribute is unquoted/Mankas citiloj por la valoro de la atributo/smg;
-      $err =~ s/Illegal character ([^ \n]*) in attribute value/Malpermesita signo $1 en atributa valoro/smg;
-      $err =~ s/Expected whitespace or tag end in start tag/Atendas spacon aŭ elementofinon en elementokomenco/smg;
-      $err =~ s/Expected name, but got ([^ \n]*) for attribute/Atendas nomon, sed trovis $1 kiel atributo/smg;
-      $err =~ s/Expected ([^ \n]*) after attribute name, but got ([^ \n]*)/Atendas $1 post atributnomo, sed trovis $2/smg;
-      $err =~ s/Expected ([^ \n]*) after name in end tag, but got ([^ \n]*)/Atendas $1 post nomo en elementfino, sed trovis $2/smg;
-      $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ID but contains a character which is not a name character/La atributo $1 de la elemento $2 enhavas malpermesitan karakteron./smg;
+      $err =~ s{^Warning:\s}
+        {Atentu: }xsmg;
+      $err =~ s{^Error:\s}
+        {Eraro: }xsmg;
+      $err =~ s{\sof\s<stdin>$}
+        {}xsmg;
+      $err =~ s{^\sin\sunnamed\sentity}
+        {}xsmg;
+      $err =~ s{
+            Start\stag\sfor\sundeclared\selement\s
+            ([^\n]*)
+        }
+        {Ne konata elementokomenco $1}xsmg;
+      $err =~ s{
+            End\stag\s
+            ([^\n]*)\s
+            outside\sof\sany\selement
+        }
+        {Elementofino $1 ekster iu elemento}xsmg;
+      $err =~ s{
+            Undeclared\sattribute\s
+            ([^\s\n]*)\s
+            for\selement
+        }
+        {Nedeklarita atributo $1 por elemento}xsmg;
+      $err =~ s{
+            Content\smodel\sfor\s
+            ([^\s\n]*)\s
+            does\snot\sallow\selement\s
+            ([^\s\n]*)\s
+            here$
+        }
+        {Reguloj por $1 malpermesas $2 ĉi tie}xsmg;
+      $err =~ s{
+            Mismatched\send\stag:\sexpected\s
+            ([^,\n]*),\sgot\s
+            ([^\s\n]*)$
+        }
+        {Malkongrua elementofino: anstataŭ $1 troviĝis $2}xsmg;
+      $err =~ s{^
+            \sat\sline\s
+            (\d+)\s
+            char\s
+            (\d+)$
+        }
+        { ĉe pozicio $1:$2}xsmg;
+      $err =~ s{Document\scontains\smultiple\selements}
+        {Artikolo enhavas pli ol unu elementon (kaj tio devas esti <vortaro>)}xsmg;
+      $err =~ s{
+            Root\selement\sis\s
+            ([^\s,\n]*),\sshould\sbe\s
+            ([^\s\n]*)
+        }
+        {Radika elemento estas $1, devus esti $2}xsmg;
+      $err =~ s{
+            Content\smodel\sfor\s
+            ([^\s\n]*)\s
+            does\snot\sallow\sPCDATA
+        }
+        {Kruda teksto kiel enhavo de elemento $1 estas malpermesita}xsmg;
+      $err =~ s{
+            The\sattribute\s
+            ([^\s\n]*)\sof\selement\s
+            ([^\s\n]*)\sis\sdeclared\sas\s
+            ENUMERATION\sbut\sis\sempty
+        }
+        {La atributo $1 de la elemento $2 mankas}xsmg;
+      $err =~ s{
+            In\sthe\sattribute\s
+            ([^\s\n]*)\sof\selement\s
+            ([^\s\n]*),\s([^\s\n]*)\s
+            is\snot\sone\sof\sthe\sallowed\svalues
+        }
+        {Ĉe la atributo $1 de la elemento $2, $3 ne estas permesata.}xsmg;
+      $err =~ s{Document\sends\stoo\ssoon}
+        {Dokumento finiĝis antaŭ kompletiĝo}xsmg;
+      $err =~ s{Value\sof\sattribute\sis\sunquoted}
+        {Mankas citiloj por la valoro de la atributo}xsmg;
+      $err =~ s{
+            Illegal\scharacter\s
+            ([^\s\n]*)\s
+            in\sattribute\svalue
+        }
+        {Malpermesita signo $1 en atributa valoro}xsmg;
+      $err =~ s{Expected\swhitespace\sor\stag\send\sin\sstart\stag}
+        {Atendas spacon aŭ elementofinon en elementokomenco}xsmg;
+      $err =~ s{
+            Expected\sname,\sbut\sgot\s
+            ([^\s\n]*)\s
+            for\sattribute
+        }
+        {Atendas nomon, sed trovis $1 kiel atributo}xsmg;
+      $err =~ s{
+            Expected\s([^\s\n]*)\s
+            after\sattribute\sname,\sbut\s
+            got\s([^\s\n]*)
+        }
+        {Atendas $1 post atributnomo, sed trovis $2}xsmg;
+      $err =~ s{
+            Expected\s([^\s\n]*)\s
+            after\sname\sin\send\stag,\sbut\s
+            got\s([^\s\n]*)
+        }
+        {Atendas $1 post nomo en elementfino, sed trovis $2}xsmg;
+      $err =~ s{
+            The\sattribute\s([^\s\n]*)\s
+            of\selement\s([^\s\n]*)\s
+            is\sdeclared\sas\sID\sbut\scontains\s
+            a\scharacter\swhich\sis\s
+            not\sa\sname\scharacter
+        }
+        {La atributo $1 de la elemento $2 enhavas malpermesitan karakteron.}xsmg;
     }
+    ## use critic
 
     return ($exit_code,$err);
 }

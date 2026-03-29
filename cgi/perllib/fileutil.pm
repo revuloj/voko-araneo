@@ -38,7 +38,7 @@ sub read_json_file {
 		die("Ne eblis analizi enhavon de JSON-dosiero '$file': $error\n");
 	};
 
-	return $parsed;	  
+	return $parsed;
 }
 
 
@@ -49,7 +49,7 @@ sub read_file {
 		warn("Ne povis malfermi '$file': $!\n"); 
 		return;
 	};
-	my $text = join('',<$infile>);
+	my $text = do { local $/ = undef, <$infile>};
 	close $infile;
 	return $text;
 }

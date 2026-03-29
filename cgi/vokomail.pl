@@ -440,15 +440,15 @@ my $xml;
 my $xmlTxt = param('xmlTxt');
 if ($xmlTxt) {
   $xmlTxt = Encode::decode($enc, $xmlTxt);
-  $xmlTxt =~ s/\r\n/\n/g;
+  $xmlTxt =~ s{\r\n}{\n}xg;
   $debugmsg .= "vor wrap -> $xmlTxt\n <- end wrap\n";
   my $id;
-  if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
+  if ($xmlTxt =~ s{"\$(Id:.*?)\$"}{"\$Id:\$"}x) {
     $debugmsg .= "ID: $1-\n";
     $id = $1;
   }
   $xmlTxt = revo::wrap::wrap($xmlTxt);
-  $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
+  $xmlTxt =~ s{"\$Id:\$"}{"\$$id\$"}x if $id;
 #  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
 }
 my $xml2 = '';
@@ -463,7 +463,7 @@ if ($xml2) {
   $xml = $xmlTxt;
 #  $debugmsg .= "1 xml=\n$xml" if $debug;
 } elsif (param('button') eq 'kreu') {
-  $xml = <<"EOD";
+  $xml = <<'EOD';
 <?xml version="1.0"?>
 <!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
 
@@ -492,18 +492,13 @@ EOD
   $xml2 = revo::encode::encode2($xml, 20);
 } elsif ($art) {
 #  $debugmsg .= "open\n";
-  open my $in, "<", "$homedir/www/revo/xml/$art.xml" or die "open";
-  $xml = join '', <$in>;
+  open my $in, "<", "$homedir/www/revo/xml/$art.xml" 
+    or die "Ne povas legi $art.xml: $!\n";
+  $xml = do { local $/ = undef; <$in>};
   close $in;
 
-#  $debugmsg .= "xml=\n$xml" if $debug;
-#  $xml = Encode::decode($enc, $xml);
-#  $debugmsg .= "xml=\n$xml" if $debug;
   $xml = revo::decode::rvdecode($xml);
   $xml = Encode::decode($enc, $xml);
-#  $xml = Encode::decode($enc, $xml);
-#  $xml = Encode::encode($enc, $xml);
-#  $debugmsg .= "xml=\n$xml" if $debug;
 }
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 $debugmsg .= "sxangxo=$sxangxo" if $debug;
@@ -520,7 +515,12 @@ my $ne_konservu;
 if ($errline) {
   $errline--;
   $errchar--;
-  if ($xml =~ m/^([^\n]*\n){$errline}[^\n]{$errchar}/smgp) {
+  if ($xml =~ m{^
+    ([^\n]*\n)
+    {$errline}
+    [^\n]
+    {$errchar}
+  }xsmgp) {
     my @prelines = split "\n", ${^MATCH};
     $postlines = split "\n", ${^POSTMATCH};
 
@@ -540,16 +540,22 @@ if ($errline) {
 } else {
   my %lng;
   open my $in, '<', "$revo_base/cfg/lingvoj.xml" 
-        or die "ne povas malfermi lingvoj.xml";
+        or die "Ne povas malfermi dosieron lingvoj.xml\n";
   while (<$in>) {
-    if (/<lingvo kodo="([^"]+)">([^<]+)<\/lingvo>/) {
-#      $debugmsg .= "lng $1 -> $2\n";
+    if (m{
+      <lingvo\s+
+      kodo="([^"]+)"
+      >[^<]+</lingvo>
+    }x) {
       $lng{$1} = 1;
     }
   }
   close $in;
 
-  while ($xml =~ m/(<(?:trd|trdgrp) lng=")(.*?)"/smgp) {
+  while ($xml =~ m{
+    (<(?:trd|trdgrp)
+    \s+lng=")(.*?)"
+  }xsmgp) {
     if (!exists($lng{$2})) {
       $checklng = "Nekonata lingvo $2.";
       $ne_konservu = 10;
@@ -566,7 +572,11 @@ if ($errline) {
     }
   }
 
-  if (!$pos && $xml =~ m/<(snc|drv)( mrk="$mrk".*?)(\n?\s*<\/\1>)/smg) {
+  if (!$pos && $xml =~ m{
+    <(snc|drv)
+    (\s+mrk="$mrk".*?)
+    (\n?\s*<\/\1>)
+  }xsmg) {
     my @prelines = split "\n", "$`$1$2";
     $postlines = split "\n", "$3$'";
 
@@ -586,8 +596,7 @@ $line = $lastline if $line > $lastline;
 $lastline = 1 unless $lastline;
 #$debugmsg .= "line = $line\n";
 
-my $mycss = <<EOD;
-
+my $mycss = <<'EOD';
 a.butono1 {
   background-color: LightGray;
   font-family: monospace;
@@ -673,22 +682,30 @@ EOD
 my (%fak, %stl);
 if ($art) {
   %fak = ('' => '');
-  open my $in, '<', "$revo_base/cfg/fakoj.xml" or die "ne povas malfermi fakoj.xml";
+  open my $in, '<', "$revo_base/cfg/fakoj.xml" 
+    or die "Ne povas malfermi dosieron fakoj.xml\n";
   while (<$in>) {
-    if (/<fako kodo="([^"]+)"[^>]*>([^<]+)<\/fako>/i) {
-#      $debugmsg .= "fak $1 -> $2\n";
-#      print "fak $1 $2<br>\n";
+    if (m{
+        <fako\s+
+        kodo="([^"]+)"
+        [^>]*
+        >([^<]+)</fako>
+      }xi) {
       $fak{$1} = Encode::decode($enc, "$1-$2");
     }
   }
   close $in;
 
   %stl = ('' => '');
-  open my $in, '<', "$revo_base/cfg/stiloj.xml" or die "ne povas malfermi stiloj.xml";
+  open my $in, '<', "$revo_base/cfg/stiloj.xml" 
+    or die "Ne povas malfermi dosieron stiloj.xml\n";
   while (<$in>) {
-    if (/<stilo kodo="([^"]+)"[^>]*>([^<]+)<\/stilo>/i) {
-#      $debugmsg .= "stl $1 -> $2\n";
-#      print "stl $1 $2<br>\n";
+    if (m{
+      <stilo\s+
+      kodo="([^"]+)"
+      [^>]*
+      >([^<]+)</stilo>
+    }xi) {
       $stl{$1} = Encode::decode($enc, "$1-$2");
     }
   }
@@ -704,11 +721,17 @@ check(length(param('xmlTxt')) < $xml_max_len, "xmlTxt");
 check(length(param('art')) < $art_max_len, "art");
 check(length(param('sxangxo')) < $sxg_max_len, "sxangxo");
 check(length(param('redaktanto')) < $red_max_len, "redaktanto");
-check(param('art') =~ /^[a-z0-9]+$/, "art rx");
+check(param('art') =~ m{^[a-z0-9]+$}x, "art rx");
 
 # tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
 # la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! param('redaktanto') || param('redaktanto') =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/, "red rx"); 
+check(! param('redaktanto') 
+  || param('redaktanto') =~ m{^
+    [\w\.-]+
+    @[\w\.-]+
+    \.\w{2,12}
+  $}x, 
+  "red rx"); 
 
 # Connect to the database.
 my $dbh = revodb::connect();
@@ -728,22 +751,22 @@ EOD
 #    print pre(escapeHTML("xml2=\n$xml2"));
 #    autoEscape(0);
 #  }
-  chdir($revo_base."/xml") or die "chdir";
+  chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";
   
   my ($html, $err);
   revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
 #  $html = Encode::decode($enc, $html);
   if ($html and $debug) {
-    open my $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "open write html";
+    open my $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "Ne povas skribi al $art.html: $!\n";
 	  print $ht $html;
     close $ht;
   }
 
-  $html =~ s#href="../stl/#href="/revo/stl/#smg;
-  $html =~ s#src="../smb/#src="/revo/smb/#smg;
-  $html =~ s#src="../bld/#src="/revo/bld/#smg;
-  $html =~ s#<span class="redakto">.*$##sm;
-  $html =~ s#href="(?!http://)([a-z])#href="/revo/art/\1#smg;
+  $html =~ s{href="../stl/}{href="/revo/stl/}smgx;
+  $html =~ s{src="../smb/}{src="/revo/smb/}smgx;
+  $html =~ s{src="../bld/}{src="/revo/bld/}smgx;
+  $html =~ s{<span\s+class="redakto">.*$}{}smx;
+  $html =~ s{href="(?!http://)([a-z])}{href="/revo/art/$1}smgx;
 
   print $html;
 #  print pre('close xalan') if $debug;
@@ -761,23 +784,37 @@ EOD
 
   print $checklng.br.br."\n" if $checklng;
 
-  { my $x = $xml2;		# cxu cxio trd havas lng aux estas en trdgrp kun lng?
+  { my $x = $xml2;  # cxu cxio trd havas lng aux estas en trdgrp kun lng?
     autoEscape(1);
 #    print pre(escapeHTML("x=$x\n"));
-    $x =~ s/<trdgrp\s+lng\s*=.*?<\/trdgrp>\s*//smig;	# forigo de bonaj trdgrpoj
-    $x =~ s/<trd\s+lng\s*=.*?<\/trd>\s*//smig;		    # forigo de bonaj trdoj
+    $x =~ s{
+      <trdgrp\s+
+      lng\s*=.*?
+      </trdgrp>\s*
+      }{}xsmig;   # forigo de bonaj trdgrpoj
+    $x =~ s{
+      <trd\s+
+      lng\s*=.*?
+      </trd>\s*
+    }{}xsmig;   # forigo de bonaj trdoj
 #    print pre(escapeHTML("x=$x\n"));
-	if ($x =~ /(<trd.*?<\/trd>)/) {					# se restas trd, estas malbona
+	if ($x =~ m{
+      (<trd.*?</trd>)
+      }x) {   # se restas trd, estas malbona
 	  print escapeHTML("Traduko $1")." ne havas lingvon.<br>\n";
       $ne_konservu = 11;
 	}
     autoEscape(0);
   }
   
-  while ($xml2 =~ /<ref([^g>][^>]*)>/gi) {
+  while ($xml2 =~ m{
+    <ref([^g>][^>]*)>
+  }xgi) {
     my $ref = $1;
 #    print "ref = $ref<br>\n" if $debug;
-    if ($ref !~ /cel\s*=\s*"([^"]+?)"/i) {
+    if ($ref !~ m{
+      cel\s*=\s*"[^"]+"
+    }xi) {
       autoEscape(1);
       print escapeHTML("Referenco <ref$ref>")." ne havas cel a&#365; la celo estas malplena.<br>\n";
       autoEscape(0);
@@ -786,42 +823,17 @@ EOD
     }
   }
 
-##  my $sth = $dbh->prepare("SELECT count(*) FROM art WHERE art_amrk = ?");
-##  my $sth2 = $dbh->prepare("SELECT drv_mrk FROM drv WHERE drv_mrk = ? union SELECT snc_mrk FROM snc WHERE snc_mrk = ? ##union SELECT rim_mrk FROM rim WHERE rim_mrk = ?");
-##
-##  while ($xml2 =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
-##    my ($art, $mrk) = ($1, "$1$2$3");
-##    $sth->execute($art);
-##    my ($art_ekzistas) = $sth->fetchrow_array();
-##    if (!$art_ekzistas) {
-###      print "ref = $1-$2 $art-$mrk<br>\n" if $debug;
-##      print "Referenco celas al dosiero \"$art.xml\", kiu ne ekzistas.<br>\n";
-###      $ne_konservu = 7;
-##    } elsif ($2) {
-##      $sth2->execute($mrk, $mrk, $mrk);
-##      my ($mrk_ekzistas) = $sth2->fetchrow_array();
-##      if (!$mrk_ekzistas) {
-###        print "ref: art=$art mrk=$mrk<br>\n" if $debug;
-##        # eble temas pri marko de subsenco?
-##        open IN, "<", "$homedir/html/revo/xml/$art.xml";
-##        my $celxml = join '', <IN>;
-##        close IN;
-##        if ($celxml !~ /<subsnc\s+mrk="$mrk">/) {
-##          print "Referenco celas al \"$mrk\", kiu ne ekzistas en dosiero \"".a({href=>"?art=$art"}, "$art.xml")."\".##<br>\n";
-###          $ne_konservu = 8;
-##        }
-##      }
-##    }
-##  }
-##  $sth->finish;
-
   my @ref_err;
 
   #if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
   my @refs;
-  while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
-    my ($art,$p,$rest) = ($1,$2,$3);
-    push @refs, [$art,$p,$rest];
+  while ($xml =~ m{
+    <ref\s+[^>]*?
+    cel="([^".]*)(\.)([^"]*?)"
+    >}xgi
+  ) {
+    my ($art_,$p,$rest) = ($1,$2,$3);
+    push @refs, [$art_,$p,$rest];
   }
 
   if (@refs) {
@@ -833,7 +845,11 @@ EOD
   }
 
 
-  while ($xml2 =~ /<uzo tip="fak">(.*?)<\/uzo>/gi) {
+  while ($xml2 =~ m{
+    <uzo\s+
+    tip="fak"
+    >(.*?)</uzo>}xgi
+  ) {
     my $fako = $1;
     if (! exists($fak{$fako})) {
       print "Fako $fako estas nekonata.<br>\n";
@@ -841,15 +857,23 @@ EOD
     }
   }
 
-  while ($xml2 =~ /<(drv|snc) mrk="(.*?)">/gi) {
-    my $mrk = $2;
-    if ($mrk !~ /^$art\.[^.0]*0/) {
+  while ($xml2 =~ m{
+      <(drv|snc)\s+
+      mrk="(.*?)"
+      >}xgi
+  ) {
+    $mrk = $2;
+    if ($mrk !~ m{
+        ^$art\.
+        [^.0]*0
+      }x) {
       print "La marko \"$mrk\" ne komenciĝas per \"$art.\" a&#365; poste ne havas 0.<br>\n";
       $ne_konservu = 5;
     }
   }
 
   my $flag = 0;
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
   $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
   $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
   $flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
@@ -862,15 +886,23 @@ EOD
   $flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
   $flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
   $flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
+  ## use critic
+
   if ($flag) {
     print "Esperantaj signoj en ŝanĝoteksto malunikoditaj.<br>\n";
   }
-  if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
+  if ($sxangxo =~ s{
+      ([\x{80}-\x{10FFFF}]+) 
+      }{<span style="color:red">$1<\/span>}xg) { # ruĝigu ne-askiajn signojn
     print "Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo".br."\n";
     $ne_konservu = 3;
-  } elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
+
+  } elsif ($sxangxo =~ s{
+    (--)
+    }{<span style="color:red">$1<\/span>}xg) {  # ruĝigu '--'
     print "Eraro: '--' estas malpermesita en komento: $sxangxo".br."\n";
     $ne_konservu = 3;
+
   } elsif (!param('nova')) {
     if ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
       print "Ŝanĝoteksto en ordo: $sxangxo".br."\n";
@@ -886,13 +918,19 @@ EOD
 
 if ($redaktanto) {
   # cxu iu redaktanto havas tiun retadreson? Kiu?
-  my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-  $sth->execute($redaktanto);
+
+  $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+  eval { $sth->execute($redaktanto) }
+    or do { warn "Ne povis elekti datumojn el tabelo 'email'\n"};
+
   my ($permeso, $red_id) = $sth->fetchrow_array();
   $sth->finish;
+
   # Kiel nomigxas la redaktanto?
-  my $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-  $sth->execute($red_id);
+  $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+  eval { $sth->execute($red_id) }
+    or do { warn "Ne povis elekti datumojn el tabelo 'redaktanto'\n"};
+
   my ($red_nomo) = $sth->fetchrow_array();
 #  print "red_nomo=$red_nomo\n";
   $sth->finish;
@@ -900,7 +938,7 @@ if ($redaktanto) {
   if (!$permeso) {
     $ne_konservu = 2;
 
-    print <<"EOD";
+    print <<'EOD';
 <div class="averto">
 Vi ($redaktanto) ne estas registrita kiel redaktanto !<br>
 Legu <a href="http://www.reta-vortaro.de/revo/dok/redinfo.html">&#265;i tie</a> kaj 
@@ -922,7 +960,8 @@ EOD
     } else {
       my $from    = 'noreply@retavortaro.de';
       my $name    = "\"Revo redaktu.pl $redaktanto\"";
-	  $name =~ s/\@/_/g;
+
+	    $name =~ s/\@/_/xg;
       my (@to, $sxangxo2);
       push @to, $redaktanto; # if param('sendu_al_tio');
       push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
@@ -936,7 +975,7 @@ EOD
         my $subject = "Revo redaktu.pl $art";
 		#my $smlog = "$homedir/logfiles/sendmail.log";
 
-        my $mailtext = <<End_of_Mail;
+        my $mailtext = <<'End_of_Mail';
 From: $name <$from>
 To: $to
 Reply-To: $redaktanto
@@ -960,8 +999,8 @@ End_of_Mail
         print "sendita al $to";
           
         if (-s $smlog) {
-            open my $log, "<", $smlog;
-            my $ltxt = join "", <$log>;
+            open my $log, "<", $smlog or warn "Ne povas legi $smlog: $!\n";
+            my $ltxt = do { local $/ = undef, <$log>};
             close $log;
             print pre("sendmail.log: $ltxt");
         }
@@ -979,20 +1018,16 @@ EOD
 $dbh->disconnect() if $dbh;
 
 # por ke la formulara ne konvertas &lt; al < ktp.
+## no critic (RegularExpressions::RequireExtendedFormatting)
 $xml =~ s/&lt;/&amp;lt;/g;
 $xml =~ s/&gt;/&amp;gt;/g;
+## use critic
 
 #$xml = Encode::encode($enc, $xml) if $xml2;
 if (param('xmlTxt')) {
   param(-name=>'xmlTxt', -value => $xml);
 }
 param(-name=>'sxangxo', -value => $sxangxo);
-
-#if ($debug) {
-#  autoEscape(1);
-#  print pre(escapeHTML("6 xml=\n$xml"));
-#  autoEscape(0);
-#}
 
 print start_form(-id => "f", -name => "f");
 
@@ -1203,60 +1238,92 @@ print end_html();
 
 sub checkxml {
     my $teksto = shift;
-    my ($err, $konteksto, $line, $char);
+    my ($err, $konteksto, $ln, $char);
 
-#    # enmetu Log se ankorau mankas...
-#    unless ($teksto =~ /<!--\s+\044Log/s) {
-#	$teksto =~ s/(<\/vortaro>)/\n<!--\n\044Log\044\n-->\n$1/s;
-#    }
-#
-#    # mallongigu Log al 20 linioj
-#    $teksto =~ s/(<!--\s+\044Log(?:[^\n]*\n){20})(?:[^\n]*\n)*(-->)/$1$2/s;
-
-    chdir($revo_base."/xml") or die "chdir";
+    chdir($revo_base."/xml") 
+      or die "chdir al xml/ ne funkciis\n";
 #    $debugmsg .= "checkxml: teksto = $teksto\n";
     my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
                     'rxp -Vs >/dev/null');
     print CHLD_IN $teksto;
     close CHLD_IN;
-    my $err = join('', <CHLD_ERR>);
+    
+    $err = do { local $/ = undef; <CHLD_ERR>};
 #    $debugmsg .= "checkxml: err = $err\n";
     close CHLD_ERR;
     close CHLD_OUT;
-
-    # legu la erarojn
-#    open ERR,"$tmp/xml.err";
-#    $err=join('',<ERR>);
-#    close ERR;
-#    unlink("$tmp/xml.err");
 
     if ($err) {
       $ne_konservu = 1;
       my $ret = "XML kontrolo malsukcesis - Eraro";
 
-      $err =~ s/^Warning: /Atentu: /smg;
-      $err =~ s/^Error: /Eraro: /smg;
-      $err =~ s/ of <stdin>$//smg;
-      $err =~ s/^ in unnamed entity//smg;
-      $err =~ s/Start tag for undeclared element ([^\n]*)/Ne konata komencokodero $1/smg;
-      $err =~ s/Content model for ([^ \n]*) does not allow element ([^ \n]*) here$/Reguloj por $1 malpermesas $2 cxi tie/smg;
-      $err =~ s/Mismatched end tag: expected ([^,\n]*), got ([^ \n]*)$/Malkongrua finokodero: atendis $1, trovis $2/smg;
-      $err =~ s/^ at line (\d+) char (\d+)$/ cxe linio $1 pozicio $2/smg;
-      $err =~ s/Document contains multiple elements/Artikolo enhavas pli ol unu elemento (kaj tio devas esti <vortaro>)/smg;
-      $err =~ s/Root element is ([^ ,\n]*), should be ([^ \n]*)/Radika elemento estas $1, devus esti $2/smg;
-      $err =~ s/Content model for ([^ \n]*) does not allow PCDATA/Enhavo de elemento $1 estas malpermesita/smg;
-      $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ENUMERATION but is empty/La atributo $1 de la kodero $2 mankas/smg;
-      $err =~ s/In the attribute ([^ \n]*) of element ([^ \n]*), ([^ \n]*) is not one of the allowed values/Cxe la atributo $1 de la kodero $2, $3 ne estas permesata./smg;
-      $err =~ s/Document ends too soon/Dokumento finis, sed mankis finkodero/smg;
-      $err =~ s/Value of attribute is unquoted/Mankas citiloj por la valoro de la atributo/smg;
-      $err =~ s/Illegal character ([^ \n]*) in attribute value/Malpermesita signo $1 en atributa valoro/smg;
-      $err =~ s/Expected whitespace or tag end in start tag/Atendas spacon aux koderfinon en komencokodero/smg;
-      $err =~ s/Expected name, but got ([^ \n]*) for attribute/Atendas nomon, sed trovis $1 kiel atributo/smg;
-      $err =~ s/The attribute ([^ \n]*) of element ([^ \n]*) is declared as ID but contains a character which is not a name character/La atributo $1 de la kodero $2 enhavas malpermesitan karakteron./smg;
-
+      ## no critic (RegularExpressions::ProhibitComplexRegexes)
+      $err =~ s{^Warning:\s}
+        {Atentu: }xsmg;
+      $err =~ s{^Error:\s}
+        {Eraro: }xsmg;
+      $err =~ s{\sof\s<stdin>$}
+        {}xsmg;
+      $err =~ s{^\sin\sunnamed\sentity}
+        {}xsmg;
+      $err =~ s{Start\stag\sfor\sundeclared\selement\s([^\n]*)}
+        {Ne konata komencokodero $1}xsmg;
+      $err =~ s{
+        Content\smodel\sfor\s([^\s\n]*)
+        \sdoes\snot\sallow\selement\s([^\s\n]*)\shere$}
+        {Reguloj por $1 malpermesas $2 cxi tie}xsmg;
+      $err =~ s{
+        Mismatched\send\stag: expected\s([^,\n]*),
+        \sgot\s([^\s\n]*)$}
+          {Malkongrua finokodero: atendis $1, trovis $2}xsmg;
+      $err =~ s{^\sat\sline\s(\d+)\schar\s(\d+)$}
+        { ĉe linio $1 pozicio $2}xsmg;
+      $err =~ s{Document\scontains\smultiple\selements}
+        {Artikolo enhavas pli ol unu elemento (kaj tio devas esti <vortaro>)}xsmg;
+      $err =~ s{Root\selement\sis\s([^\s,\n]*),\sshould\sbe\s([^\s\n]*)}
+        {Radika elemento estas $1, devus esti $2}xsmg;
+      $err =~ s{Content\smodel\sfor ([^\s\n]*)\sdoes\snot\sallow\sPCDATA}
+        {Enhavo de elemento $1 estas malpermesita}xsmg;
+      $err =~ s{
+        The\sattribute\s([^\s\n]*)
+        \sof\selement\s([^\s\n]*)
+        \sis\sdeclared\sas
+        \sENUMERATION\sbut\sis\sempty
+      }
+        {La atributo $1 de la kodero $2 mankas}xsmg;
+      $err =~ s{
+        In\sthe\sattribute
+        \s([^\s\n]*)\sof\selement
+        \s([^\s\n]*),
+        \s([^\s\n]*)
+        \sis\snot\sone\sof
+        \sthe\sallowed\svalues
+      }
+        {Ĉe la atributo $1 de la kodero $2, $3 ne estas permesata.}xsmg;
+      $err =~ s{Document\sends\stoo\ssoon}
+        {Dokumento finis, sed mankis finkodero}xsmg;
+      $err =~ s{Value\sof\sattribute\sis\sunquoted}
+        {Mankas citiloj por la valoro de la atributo}xsmg;
+      $err =~ s{Illegal\scharacter\s([^\s\n]*)\sin\sattribute\svalue}
+        {Malpermesita signo $1 en atributa valoro}xsmg;
+      $err =~ s{Expected\swhitespace\sor\stag\send\sin\sstart\stag}
+        {Atendas spacon aux koderfinon en komencokodero}xsmg;
+      $err =~ s{Expected\sname,\sbut\sgot ([^\s\n]*)\sfor\sattribute}
+        {Atendas nomon, sed trovis $1 kiel atributo}xsmg;
+      $err =~ s{
+        The\sattribute
+        \s([^\s\n]*)\sof
+        \selement\s([^\s\n]*)
+        \sis\sdeclared\sas\sID
+        \sbut\scontains\sa\scharacter
+        \swhich\sis\snot
+        \sa\sname\scharacter
+      }
+        {La atributo $1 de la kodero $2 enhavas malpermesitan karakteron.}xsmg;
+      ## use critic
 
       autoEscape(1);
-      ($konteksto, $line, $char) = xml_context($err, $teksto);
+      ($konteksto, $ln, $char) = xml_context($err, $teksto);
       $err .= "kunteksto de unua eraro:\n$konteksto";
       $ret .= pre(escapeHTML("XML-eraroj:\n$err\n")); # if ($verbose);
       autoEscape(0);
@@ -1265,33 +1332,37 @@ sub checkxml {
     } else {
       $err = "XML en ordo</b></span></p>\n";
     }
-    return ("Kontrolo</b></span></p>\n$err", $line, $char);
+    return ("Kontrolo</b></span></p>\n$err", $ln, $char);
 }
-
 
 sub xml_context {
     my ($err, $teksto) = @_;
-    my ($line, $char, $result, $n, $txt);
+    my ($ln, $char, $result);
 
-    if ($err =~ /linio\s+([0-9]+)\s+pozicio\s+([0-9]+)\s+/s) {
-      $line = $1;
+    if ($err =~ m{
+        linio\s+
+        ([0-9]+)\s+
+        pozicio\s+
+        ([0-9]+)\s+
+      }sx) {
+      $ln = $1;
       $char = $2;
 #      $debugmsg .= "context: line = $line, char = $char, err = $err\n";
 
       my @a = split "\n", $teksto;
 
       # la linio antaux la eraro
-      if ($line > 1) {
-          $result .= ($line-1).": $a[$line - 2]\n";
+      if ($ln > 1) {
+          $result .= ($ln-1).": $a[$ln - 2]\n";
       }
-      $result .= "$line: $a[$line - 1]\n";
-      $result .= "-" x ($char + length($line) + 1) . "^\n";
+      $result .= "$ln: $a[$ln - 1]\n";
+      $result .= "-" x ($char + length($ln) + 1) . "^\n";
 
-      if (exists($a[$line])) {
-          $result .= ($line+1).": $a[$line]";
+      if (exists($a[$ln])) {
+          $result .= ($ln+1).": $a[$ln]";
       }
 
-      return ($result, $line, $char);
+      return ($result, $ln, $char);
     }
 
     return ('', 0, 0);

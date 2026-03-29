@@ -31,4 +31,4 @@ my ($kap) = $dbh->selectrow_arrayref("SELECT COUNT(*) FROM r3kap");
 my ($trd) = $dbh->selectrow_arrayref("SELECT COUNT(*) FROM r3trd");
 
 print $json_parser->encode({kap=>$kap, trd=>$trd});
-$dbh->disconnect() or die "DB-malkonekto ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias\n";

@@ -50,5 +50,5 @@ my $hom = $dbh->selectall_arrayref(
 # and greatest(instr(r.cel,b.mrk),instr(b.mrk,r.cel))=1) 
 
 print $json_parser->encode({drv=>$drv, snc=>$snc, hom=>$hom});
-$dbh->disconnect() or die "DB-malkonekto ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias\n";
 

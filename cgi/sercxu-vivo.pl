@@ -71,13 +71,16 @@ $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set names utf8");
 $dbh->do('SET SESSION group_concat_max_len = 4048');
 
-my $regulira = $sercxata =~ /[.^$\[\(\|+?{\\]/;
+# serĉesprimo enhavas iujn regulesprimajn signojn
+my $regulira = $sercxata =~ m{
+    [.^$\[\(\|+?{\\]  #..}
+  }x;
 my $komparo = '=';
 
 if ($regulira) {
   $komparo = 'REGEXP';
 
-} elsif ($sercxata =~ /[%_]/) {
+} elsif ($sercxata =~ /[%_]/x) {
   $komparo = 'LIKE';
 }
 
@@ -99,7 +102,9 @@ if ($lng eq 'eo' or $lng eq '') {
     eval {
       #print $trdlng;
       $sth->execute($sercxata);
-    };      
+    } or do {
+      warn "Ne eblis elekti datumojn el r3kap: $1\n"
+    };   
 
 # $lng != eo...
 } else {
@@ -115,12 +120,14 @@ if ($lng eq 'eo' or $lng eq '') {
 
     eval {
       $sth->execute($lng,$sercxata);
-    };      
+    } or do {
+      warn "Ne eblis elekti datumojn el v3traduko: $1\n"
+    };
 }
 
 if ($@) {
   # $sth->err and $DBI::err will be true if error was from DBI
-  if ($sth->err == 1139) {	# Got error 'brackets ([ ]) not balanced
+  if ($sth->err == 1139) { # eraro 1139: "Got error 'brackets ([ ]) not balanced'"
     print "Eraro: La rektaj krampoj ([ ]) ne kongruas.\n";
   } else {
     print "Err ".$sth->err." - $@";
@@ -138,7 +145,7 @@ if ($@) {
 
 }
 
-$dbh->disconnect() or die "Ni ne povis fermi la datumbazon!";
+$dbh->disconnect() or die "Ni ne povis fermi la datumbazon!\n";
 exit;
 
 
@@ -153,7 +160,9 @@ sub skribu_linion {
   my $tradukoj = {};
 
   # transformu mrk al href
-  my $href = $ref->{mrk}; $href =~ s|^([a-z0-9]+)\.|/revo/art/$1.html#$1.|;
+  my $href = $ref->{mrk}; $href =~ s{
+    ^([a-z0-9]+)\.
+    }{/revo/art/$1.html#$1.}x;
 
   # kunkolektu la unuopajn tradukoj laŭ lingvo
   if ($ref->{eo}) {
@@ -186,7 +195,10 @@ sub trdlng {
   {
     my @a = split ",", param('trd');
     for my $l (@a) {
-      $l =~ s/^([a-z]{2,3}).*$/$1/;
+      $l =~ s{^
+        ([a-z]{2,3})
+        .*
+      $}{$1}x;
       #unless (grep(/$l/,@preferataj_lingvoj)) {
       push @lingvoj, ($l);
       #}

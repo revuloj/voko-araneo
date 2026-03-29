@@ -1,4 +1,4 @@
-use warnings; use strict; package revo::voko_entities; use utf8;
+package revo::voko_entities; use warnings; use strict; use utf8;
 #  kreita per voko-grundo/js_util/vokosgn2x.js:write_pm()
 my %voko_entities; sub entities { return \%voko_entities; }
 %voko_entities = (

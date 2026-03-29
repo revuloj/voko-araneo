@@ -81,11 +81,18 @@ check(length($xmlTxt) < $xml_max_len, "xmlTxt");
 check(length($art) < $art_max_len, "art");
 check(length($sxangxo) < $sxg_max_len, "sxangxo");
 check(length($redaktanto) < $red_max_len, "redaktanto");
-check($art =~ /^[a-z0-9]+$/, "art rx");
+check($art =~ m{^
+    [a-z0-9]+
+  $}x, "art rx");
 
 # tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
 # la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! $redaktanto || $redaktanto =~ /^[\w\.-]+@[\w\.-]+\.\w{2,12}$/, "red rx"); 
+check(! $redaktanto 
+  || $redaktanto =~ m{^
+    [\w\.-]+
+    @[\w\.-]+
+    \.\w{2,12}
+  $}x, "red rx"); 
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
@@ -112,9 +119,11 @@ my $xml=normigu_xml($xmlTxt);
 ## kontrolu, ĉu la XML havas ĝustan sintakson
 my $xml_err = '';
 $xml_err = revo::checkxml::check_xml($xml,$xml_dir) if $xml;
+## no critic (RegularExpressions::RequireExtendedFormatting)
 $xml_err =~ s/</&lt;/sg;
 $xml_err =~ s/>/&gt;/sg;
 $xml_err =~ s/\n(Atentu:|Eraro:)/<br>\n$1/sg;
+## use critic
 print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 
 # FARENDA:
@@ -124,25 +133,28 @@ print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
 my @ref_err;
 
-#if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
-  my @refs;
-  while ($xml =~ /<ref [^>]*?cel="([^".]*)(\.)([^"]*?)">/gi) {
-    my ($art,$p,$rest) = ($1,$2,$3);
-    push @refs, [$art,$p,$rest];
-  }
+my @refs;
+while ($xml =~ m{
+    <ref\s+[^>]*?
+    cel="([^".]*)(\.)([^"]*?)"
+    >
+  }xgi) {
+  my ($art_,$p,$rest) = ($1,$2,$3);
+  push @refs, [$art_,$p,$rest];
+}
 
-  if (@refs) {
-    @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
-  }
+if (@refs) {
+  @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
+}
 
-  print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
-#}
+print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
 
 # FARENDA: fakte kun la transiro al Git ni povas toleri
 # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
 # kontroli processmail.pl antaŭ forigi tie ĉi
 my $flag = 0;
 my $sxg_err;
+## no critic (RegularExpressions::RequireExtendedFormatting)
 $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
 $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
 $flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
@@ -155,18 +167,20 @@ $flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
 $flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
 $flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
 $flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
-### if ($flag) {
-###   $sxg_err =  "Esperantaj signoj en ŝanĝoteksto malunikoditaj.\n";
-### }
+## use critic
 
-if ($sxangxo =~ s/([\x{80}-\x{10FFFF}]+)/<span style="color:red">$1<\/span>/g) { # forigu ne-askiajn signojn
+if ($sxangxo =~ s{
+    ([\x{80}-\x{10FFFF}]+)
+  }
+  {<span style="color:red">$1</span>}xg) { # ruĝigu ne-askiajn signojn
   $sxg_err="Eraro: La ŝanĝoteksto enhavu ne-askiajn signojn: $sxangxo\n";
 
-} elsif ($sxangxo =~ s/(--)/<span style="color:red">$1<\/span>/g) { # forigu '--'
+} elsif ($sxangxo =~ s{(--)}{<span style="color:red">$1</span>}xg) { # ruĝigu '--'
   $sxg_err="Eraro: '--' estas malpermesita en komento: $sxangxo\n";
 
-} elsif (!param('nova')) {
-  unless ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
+} elsif (!param('nova')) {  
+  my $sxangxo_tajpita = ($sxangxo ne "klarigo de la sxangxo");
+  unless ($sxangxo and $sxangxo_tajpita)) {
     $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
   }
 }
@@ -179,9 +193,11 @@ if ($sxg_err) {
 if ($command eq 'forsendo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
-  unless ($redaktanto && $permeso && !$xml_err && !@ref_err && !$sxg_err) {
+  my $neniu_eraro = !$xml_err && !@ref_err && !$sxg_err;
+  unless ($redaktanto && $permeso && $neniu_eraro) {
     print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
+
   } else {
     if (send_xml($redaktanto,$art,$sxangxo,\$xml)) {
       print "<div id=\"konfirmo\">Bone: Via ŝanĝo sendiĝis al la redaktoservo.</div>\n";
@@ -212,19 +228,19 @@ sub check {
 }   
 
 sub check_redaktanto {
-  my ($dbh,$redaktanto) = @_;
-  my ($permeso, $red_id);
+  my ($dbh_,$red_anto) = @_;
+  my ($permes_, $red_id);
 
-  if ($redaktanto) {
+  if ($red_anto) {
       # ĉu iu redaktanto havas tiun retadreson? Kiu?
-      my $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-      $sth->execute($redaktanto);
-      ($permeso, $red_id) = $sth->fetchrow_array();
+      my $sth = $dbh_->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+      $sth->execute($red_anto);
+      ($permes_, $red_id) = $sth->fetchrow_array();
       $sth->finish;
 
       # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
       # Kiel nomigxas la redaktanto?
-      #$sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+      #$sth = $dbh_->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
       #$sth->execute($red_id);
       #my ($red_nomo) = $sth->fetchrow_array();
       ##  print "red_nomo=$red_nomo\n";
@@ -232,65 +248,65 @@ sub check_redaktanto {
 
   }
 
-  return $permeso;
+  return $permes_;
 }
 
 sub normigu_xml {
-  my $xmlTxt = shift;
+  my $xml_txt = shift;
 
-  if ($xmlTxt) {
+  if ($xml_txt) {
     # normigu kodigon
-    $xmlTxt = Encode::decode($enc, $xmlTxt);
-    $xmlTxt =~ s/\r\n/\n/g;
-    #$debugmsg .= "before wrap -> $xmlTxt\n <- end wrap\n";
+    $xml_txt = Encode::decode($enc, $xml_txt);
+    $xml_txt =~ s/\r\n/\n/xg;
+    #$debugmsg .= "before wrap -> $xml_txt\n <- end wrap\n";
 
     # trovu la identigilon de la artikolo,
     # se ĝi rompiĝos ni devos restarigi gin malsupre...
     my $id;
-    if ($xmlTxt =~ s/"\$(Id: .*?)\$"/"\$Id:\$"/) {
+    if ($xml_txt =~ s{"\$(Id:.*?)\$"}{"\$Id:\$"}x) {
       #$debugmsg .= "ID: $1-\n";
       $id = $1;
     }
 
     # rompu tro longajn liniojn kaj restarigu $Id...
-    $xmlTxt = revo::wrap::wrap($xmlTxt);
-    $xmlTxt =~ s/"\$Id:\$"/"\$$id\$"/ if $id;
+    $xml_txt = revo::wrap::wrap($xml_txt);
+    $xml_txt =~ s{"\$Id:\$"}{"\$$id\$"}x if $id;
   }
 
   # kodigu ne-askiajn signojn per literunuoj...
-  return revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+  return revo::encode::encode2($xml_txt, 20) if $xml_txt;
   return;
 }
 
 sub send_xml {
-  my ($redaktanto,$art,$sxangxo,$xml) = @_;
+  my ($red_anto,$art_,$sxangx_,$xml_) = @_;
 
-  my $name    = "\"Revo redaktu.pl $redaktanto\"";
-  $name =~ s/\@/_/g;
+  my $name    = "\"Revo redaktu.pl $red_anto\"";
+  $name =~ s/\@/_/xg;
   my (@to, $red_cmd);
-  push @to, $redaktanto; 
+  push @to, $red_anto; 
   push @to, $mail_to; 
 
   # unua linio de retpoŝto
   if (param('nova')) {
-    $red_cmd = "aldono: $art";
+    $red_cmd = "aldono: $art_";
   } else {
-    $red_cmd = "redakto: $sxangxo";
+    $red_cmd = "redakto: $sxangx_";
   }
 
   my $to = join(', ', @to);
-  my $subject = "Revo redaktu.pl $art";
+  my $subject = "Revo redaktu.pl $art_";
 
-  my $mailtext = <<END_OF_MAIL;
+  my $mailtext = <<'END_OF_MAIL';
 From: $name <$mail_from>
 To: $to
-Reply-To: $redaktanto
+Reply-To: $red_anto
 Subject: $subject
 X-retadreso: $ENV{REMOTE_ADDR}
 
 $red_cmd
 
-$$xml
+$$xml_
 END_OF_MAIL
   
   # konektiĝu al retpoŝtservo

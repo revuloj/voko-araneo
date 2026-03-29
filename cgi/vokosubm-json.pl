@@ -27,7 +27,7 @@ if (param('email')) {
     redakto_statoj();
 } 
 
-$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
+$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis: $!\n";
 
 
 sub redakto_statoj {
@@ -58,18 +58,16 @@ sub redakto_statoj {
                 $first = 0;
             }
             # ial mysql aldonas linirompojn en la bas64-kodita kampo "results"
-            $submeto->[0] =~ s/\n//g;
+            $submeto->[0] =~ s/\n//gx;
             print $submeto->[0];
             $submeto = $select->fetchrow_arrayref();
         }
         print "\n]\n";
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
+    } or do {     
+        warn "Datumbaza eraro: $@\n"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    }
+    };
 
     return;
 }

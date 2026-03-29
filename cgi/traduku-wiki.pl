@@ -21,7 +21,10 @@ print header(-type=>'application/json',-charset=>'utf-8');
 
 # ni kontrolu la serĉatan vorton, sed ja permesu kelkajn apartajn signojn por
 # permesi ion kiel (n,p)-matrico ks:
-unless ($s =~ /^[\pL\d\*\(\-][-'\(\),!\.\h\pL]{0,50}$/) {
+unless ($s =~ m{^
+    [\pL\d\*\(\-]
+    [-'\(\),!\.\h\pL]{0,50}
+$}x) {
     exit 1;
 }
 
@@ -38,7 +41,7 @@ if ($response->is_success) {
     print $response->decoded_content;
     # jam estas en JSON... my $hashref = $json_parser->decode($response->decoded_content);
 } else {
-    die $response->status_line;
+    croak $response->status_line;
 }
 
 

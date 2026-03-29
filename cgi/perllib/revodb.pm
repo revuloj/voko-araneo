@@ -20,7 +20,7 @@ sub connect {
   #  my $dbh = DBI->connect("DBI:mysql:database=usr_web277_1;host=127.0.0.1",
   my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=0.0.0.0;port=3366",
                          "root", "sekreto",
-                         {'RaiseError' => 1}) or die "DB ne funkcias";
+                         {'RaiseError' => 1}) or die "DB ne funkcias\n";
   $dbh->do("set names utf8");
   return $dbh;
 }

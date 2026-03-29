@@ -30,7 +30,7 @@ $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
 print header(-type=>'application/json',-charset=>'utf-8');
-if ($art =~ /^[a-z0-9]+$/) {
+if ($art =~ m{^[a-z0-9]+$}x) {
     my $viki = viki_refs();
     my $tez = tez_refs();
     my $ofc = ofc_refs();
@@ -38,7 +38,7 @@ if ($art =~ /^[a-z0-9]+$/) {
 }
 
 # fino
-$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis";
+$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis: $!\n";
 exit;
 
 ###########

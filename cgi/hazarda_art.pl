@@ -22,17 +22,27 @@ STDOUT->autoflush(1);
 my $revo_dir = '/hp/af/ag/ri/www/revo';
 
 my $senkadroj = param('senkadroj');
-if (!$senkadroj) {
+unless ($senkadroj) {
   print "Content-type: text/html\n\n";
 
-  # anstataŭigu la enhavo de la kadraro (HTML frameset)
-  open my $in, '<', "$revo_dir/index.html" or die "hazarda artikolo ne eblas cxar mankas indekso";
+  # anstataŭigu la enhavon de la kadraro (HTML frameset)
+  ## no critic (InputOutput::RequireBriefOpen)
+  open my $in, '<', "$revo_dir/index.html" 
+    or die "Hazarda artikolo ne eblas pro manko de indekso.\n";
   while (<$in>) {
-    s/src="inx\/_eo.html"/src="hazarda_art.pl?senkadroj=1"/;
-    s/src="titolo.html"/src="hazarda_art.pl?senkadroj=2#toptop"/;
+    s{
+      src="inx/_eo.html"
+    }
+    {src="hazarda_art.pl?senkadroj=1"}x;
+
+    s{
+      src="titolo.html"
+    }
+    {src="hazarda_art.pl?senkadroj=2#toptop"}x;
     print;
   }
   close $in;
+  ## use critic
   exit 1;
 }
 
@@ -51,8 +61,14 @@ my $cnt = $dbh->selectrow_hashref("SELECT count(*) AS c FROM r3kap");
 my $rno = int(rand($cnt->{c}));
 my ($hazarda_mrk) = $dbh->selectrow_array("SELECT mrk FROM r3kap LIMIT $rno,1");
 
-$hazarda_mrk =~ m/^([a-z0-9]+)\./;
-my $art = $1;
+my $art = '';
+if ($hazarda_mrk =~ 
+  m{^
+    ([a-z0-9]+)
+    \.
+  }x) {
+   $art = $1;
+}
 
 # my $sth = $dbh->prepare("SELECT floor(rand() * count(*)) FROM art");
 # $sth->execute();
@@ -70,46 +86,69 @@ if ($senkadroj == 2 && $art)
 {
   print header(-charset=>'utf-8');
 
-  open my $in, '<', "$revo_dir/art/$art.html" or die "ne povas malfermi: '$art' ";
+  ## no critic (InputOutput::RequireBriefOpen)
+  open my $in, '<', "$revo_dir/art/$art.html" 
+    or die "Ne eblas malfermi: '$art'\n";
+
   while (<$in>) {
-#    s/<\/title>/<\/title><script type="text\/javascript"><!--\nscroll(0,0);\n\/\/--><\/script>/;
-     s/(\[<a class="redakto" href="\/cgi-bin\/vokomail)(\.pl\?art=[a-z0-9]+">)(redakti)(\.\.\.<\/a>\])/$1\l$2$3$4\n$1\l2$2traduki$4/;
-    s/="\.\.\//="..\/revo\//g;
-#    s/(href=")(#)/$1..\/revo\/art\/$art.html$2/g;
-    s/(href=")([^#.\/](?!ttp:\/\/))/$1..\/revo\/art\/$2/g;
+    ## no critic (RegularExpressions::ProhibitComplexRegexes)
+    s{
+      (\[<a\s+
+        class="redakto"\s+
+        href="/cgi-bin/vokomail)
+      (\.pl
+       \?art=[a-z0-9]+">)
+      (redakti)
+      (\.\.\.<\/a>\])
+    }
+    {$1\l$2$3$4\n$1\l2$2traduki$4}x;
+    ## use critic 
+
+    s{
+      ="\.\./ #"
+    }
+    {="../revo/}xg; #"
+
+    s{
+      (href=")
+      ([^#./](?!ttp://))
+    }
+    {$1../revo/art/$2}xg;
+
     print;
   }
   close $in;
+  ## use critic
   exit 1;
 }
 
-my $JSCRIPT=<<END;
+my $JSCRIPT=<<'END';
 top.document.title = "Reta Vortaro, hazarda artikolo";
 END
 
 print header(-charset=>'utf-8'),
-      start_html(-style=>{-src=>'/revo/stl/indeksoj.css'},
-                   -script=>$JSCRIPT
+  start_html(-style=>{-src=>'/revo/stl/indeksoj.css'},
+             -script=>$JSCRIPT
 );
 
 print start_table(-cellspacing=>0),
-           Tr(
-           [
-              td({-class=>'aktiva'}, a({-href=>'/revo/inx/_eo.html'}, 'Esperanto')).
-              td({-class=>'fona'}, [a({-href=>'/revo/inx/_lng.html'}, 'Lingvoj'),
-				    a({-href=>'/revo/inx/_fak.html'}, 'Fakoj'),
-				    a({-href=>'/revo/inx/_ktp.html'}, 'ktp.')]),
-           ]
-           );
+  Tr(
+  [
+    td({-class=>'aktiva'}, a({-href=>'/revo/inx/_eo.html'}, 'Esperanto')).
+    td({-class=>'fona'}, [a({-href=>'/revo/inx/_lng.html'}, 'Lingvoj'),
+  a({-href=>'/revo/inx/_fak.html'}, 'Fakoj'),
+  a({-href=>'/revo/inx/_ktp.html'}, 'ktp.')]),
+  ]
+  );
 
 #
-print <<EOD;
+print <<'EOD';
 <td colspan="4" class="enhavo">
 <a href="/revo/art/$art.html" target="precipa">Hazarda artikolo.</a>
 </td>
 EOD
 
-print <<"EOD";
+print <<'EOD';
 <script type="text/javascript">
 <!--
 open('/revo/art/$art.html', 'precipa');
@@ -117,7 +156,7 @@ open('/revo/art/$art.html', 'precipa');
 </script>
 EOD
 
-$dbh->disconnect() or die "DB-malkonekto ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias.\n";
   
 print end_table();
 print end_html();

@@ -24,6 +24,7 @@ sub rvdecode {
 #  print "encode ".Encode::encode($enc, $str)."\n";
 
   # <!-- e-aj literoj -->
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
   $str =~ s/&Ccirc;/\x{0108}/smg;
   $str =~ s/&ccirc;/\x{0109}/smg;
   $str =~ s/&Gcirc;/\x{011c}/smg;
@@ -38,19 +39,9 @@ sub rvdecode {
   $str =~ s/&ubreve;/\x{016d}/smg;
 
   # <!-- francaj k.a. -->
-#  $str =~ s/\x{0152}/&OElig;/g;
-#  $str =~ s/\x{0153}/&oelig;/g;
-#  $str =~ s/\x{00c1}/&Aacute;/g;
-#  $str =~ s/\x{00e1}/&aacute;/g;
-#  $str =~ s/\x{00c9}/&Eacute;/g;
   $str =~ s/&eacute;/\x{00e9}/smg;
-#  $str =~ s/\x{00cd}/&Iacute;/g;
-#  $str =~ s/\x{00ed}/&iacute;/g;
   $str =~ s/&Oacute;/\x{00d3}/smg;
   $str =~ s/&oacute;/\x{00f3}/smg;
-#  $str =~ s/\x{00da}/&Uacute;/g;
-#  $str =~ s/\x{00fa}/&uacute;/g;
-#
   $str =~ s/&Agrave;/\x{00c0}/g;
   $str =~ s/&agrave;/\x{00e0}/g;
   $str =~ s/&Egrave;/\x{00c8}/g;
@@ -95,24 +86,9 @@ sub rvdecode {
   # <!-- diversaj -->
   $str =~ s/&#60;/&lt;/g;
   $str =~ s/&#62;/&gt;/g;
-#  $str =~ s/</&lt;/g;
-#  $str =~ s/>/&gt;/g;
-#  $str =~ s/'/&apos;/g;
-##  $str =~ s/'/&minute;/g;
-#  $str =~ s/"/&quot;/g;
-##  $str =~ s/\x{0034}/&second;/g;
   $str =~ s/&leftquot;/\x{201e}/smg;
   $str =~ s/&rightquot;/\x{201c}/smg;
-##  $str =~ s/\x{00b0}/&ring;/g;
-#  $str =~ s/\x{00b0}/&deg;/g;
-#  $str =~ s/\x{00b2}/&quadrat;/g;
-#  $str =~ s/\x{00b3}/&cubic;/g;
-#  $str =~ s/\x{00B6}/&para;/g;
-#  $str =~ s/&FE;/\x{00A7}/g;
-#  $str =~ s/\x{2015}/&dash;/g;
   $str =~ s/&mdash;/\x{2014}/g;
-#  $str =~ s/\x{2013}/&ndash;/g;
-#  $str =~ s/\x{00a0}/&nbsp;/g;
 
   $str =~ s/&Euml;/\x{00cb}/g;
   $str =~ s/&euml;/\x{00eb}/g;
@@ -616,29 +592,6 @@ sub rvdecode {
   $str =~ s/&Udblac;/\x{0170}/g;
   $str =~ s/&udblac;/\x{0171}/g;
 
-  # <!-- latvaj -->
-#  $str =~ s/\x{257;}/&amacro;/g;
-#  $str =~ s/\x{#275}/&emacr;/g;
-#  $str =~ s/\x{291;}/&gcommaaccen;/g;
-#  $str =~ s/\x{299;}/&imacro;/g;
-#  $str =~ s/\x{311;}/&kcommaaccen;/g;
-#  $str =~ s/\x{#316}/&lcommaacce;/g;
-#  $str =~ s/\x{326;}/&ncommaaccen;/g;
-#  $str =~ s/\x{333;}/&omacro;/g;
-#  $str =~ s/\x{343;}/&rcommaaccen;/g;
-#  $str =~ s/\x{363;}/&umacro;/g;
-#
-#  $str =~ s/\x{#256}/&Amacr;/g;
-#  $str =~ s/\x{#274}/&Emacr;/g;
-#  $str =~ s/\x{#290}/&Gcommaacce;/g;
-#  $str =~ s/\x{#298}/&Imacr;/g;
-#  $str =~ s/\x{#310}/&Kcommaacce;/g;
-#  $str =~ s/\x{#315}/&Lcommaacce;/g;
-#  $str =~ s/\x{#325}/&Ncommaacce;/g;
-#  $str =~ s/\x{#332}/&Omacr;/g;
-#  $str =~ s/\x{#342}/&Rcommaacce;/g;
-#  $str =~ s/\x{#362}/&Umacr;/g;
-
   # <!-- kimraj -->
   $str =~ s/&Ycirc;/\x{0176}/g;
   $str =~ s/&ycirc;/\x{0177}/g;
@@ -889,12 +842,14 @@ sub rvdecode {
   $str =~ s/&fa_zwnj;/\x{200C}/g;
   $str =~ s/&fa_zwj;/\x{200D}/g;
 
-  
   $str =~ s/&amp;/&/g;
+  ## use critic
 
+  ## no critic (Variables::ProhibitPackageVars)
   delete $HTML::Entities::entity2char{quot};
   delete $HTML::Entities::entity2char{lt};
   delete $HTML::Entities::entity2char{gt};
+  ## use critic
   $str = HTML::Entities::decode_entities($str);
 #  print "encode -> ".Encode::encode($enc, $str)."\n";
   return Encode::encode($enc, $str);

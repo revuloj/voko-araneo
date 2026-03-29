@@ -15,7 +15,7 @@ use HTML::Entities;
 use lib("/hp/af/ag/ri/files/perllib");
 use revo::voko_entities;
 
-use CGI qw(:standard); 	# nur por verbose
+use CGI qw(:standard);  # nur por verbose
 
 ######################################################################
 sub xencode {
@@ -32,11 +32,13 @@ sub xencode2 {
 
   # <!-- diversaj -->
   if ($flag<10) {
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
     $str =~ s/</&lt;/g;
     $str =~ s/>/&gt;/g;
   #  $str =~ s/'/&apos;/g;
   #  $str =~ s/'/&minute;/g;
     $str =~ s/"/&quot;/g;
+    ## use critic
   }
 
   my @res = split('', $str);

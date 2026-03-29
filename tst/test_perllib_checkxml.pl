@@ -97,7 +97,6 @@ is($rc,$NEBONFORMA,'nebonforma XML artefakt...')
 && like($lines[3], qr/^\s*ĉe pozicio 36:10$/, 'eraro ĉe 36:10 en artefakt...')
   or diag("redonita: ".$err);
 
-
 sub xml_test {
   my $xml = shift;
   my ($rc,$err) = revo::checkxml::check_xml_2($xml,$xml_dir);
