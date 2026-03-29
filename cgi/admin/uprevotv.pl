@@ -12,10 +12,13 @@ use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
+use Log::Dispatch; use Log::Dispatch::FileRotate;
+
 # propraj perl moduloj estas en:
 ##use lib("/hp/af/ag/ri/files/perllib");
 
 my $exitcode;
+my $loglevel = 'info';
 
 print header,
       start_html('Sendu sxangxitajn pagxojn'),
@@ -24,12 +27,27 @@ print header,
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
 
-## no critic (InputOutput::RequireBriefOpen)    
-open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush $log 1;
+
+my $log = Log::Dispatch->new(
+    outputs => [
+        #[ 'File', min_level => $loglevel, filename => "$homedir/files/log/uprevo.log" ]
+        #[ 'Screen', min_level => $loglevel ],
+    ],
+);
+$log->add(Log::Dispatch::FileRotate->new(
+    name      => 'uprevo.log',
+    min_level => $loglevel,
+    filename  => "$homedir/files/log/uprevo.log",
+    mode      => 'append' ,
+    TZ        => 'UTC',
+    DatePattern => 'yyyy-dd-HH'),
+    max       => 31,
+    size      => 10 * 1024 * 1024
+) or die("Ne eblas skribi protokolon 'uprevo.log'\n");
 
 my $fname = param('fname');
 
+## no critic (InputOutput::ProhibitBacktickOperators)
 
 $ret = `du -sh $homedir`;
 print h2("du -> $exitcode");
@@ -42,50 +60,39 @@ my $htmldir = "$homedir/www";
 local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
-print $log "uprevo started at ".localtime()." with fname=$fname\n";
-unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d\.tgz$/) {
-  print $log "Nevalidaj parametroj\n\n";
+$log->info(">>> EKO uprevotv.pl je ".localtime()." with fname=$fname\n");
+unless ($fname =~ m{^
+    revo-
+    \d{8} # dato
+    \.tgz$
+  }x) {
+  $log->error("Nevalidaj parametroj\n");
   print h1("Nevalidaj parametroj"), end_html;
   exit 1;
 }
 
 my $ret;
 
-chdir $htmldir or die "chdir ne funkciis";
-
-#$ret = `ln -s revo . 2>&1`;
-#print h2("ln -s -> $exitcode");
-#print pre($ret);
-
-#$ret = `rm revo . 2>&1`;
-#print h2("rm -> $exitcode");
-#print pre($ret);
-
-#$ret = `tar --help 2>&1`;
-#print h2("tar -tv -> $exitcode");
-#print pre($ret);
-
-#print h1("cwd=".cwd());
+chdir $htmldir or die "'chdir $htmldir' ne funkciis: $!\n";
 
 $ret = `tar -tvzf alveno/$fname revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif 2>&1`;
 $exitcode = $?;
 print h2("tar -tv revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif -> $exitcode");
-print $log "tar -tv -> $exitcode\n$ret";
+$log->info("tar -tv -> $exitcode\n$ret");
 print pre($ret);
 
 $ret = `tar -tvzf alveno/$fname 2>&1`;
 $exitcode = $?;
 print h2("tar -tv -> $exitcode");
-print $log "tar -tv -> $exitcode\n$ret";
+$log->info("tar -tv -> $exitcode\n$ret");
 print pre($ret);
-
 
 if (0 && !$exitcode) {
   $ret = `rm alveno/$fname 2>&1`;
   $exitcode = $?;
   print h2("rm -> $exitcode");
-  print $log "rm -> $exitcode\n";
-  print $log "$ret\n" if $exitcode;
+  $log->info("rm -> $exitcode\n");
+  $log->info("$ret\n" if $exitcode);
   print pre($ret);
 #  if ($exitcode) {
 #    print $log "$ret\n";
@@ -93,7 +100,7 @@ if (0 && !$exitcode) {
 #  }
 }
 
-print $log "normala fino de uprevotv.pl\n\n";
+$log->info("<<< FINO de uprevotv.pl\n");
 print end_html;
 
 close $log;

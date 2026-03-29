@@ -43,6 +43,7 @@ unless(param('id') || param('forigo') || param('email')) {
 my $dbh = revodb::connect();
 $dbh->{mysql_enable_utf8} = 1;
 
+## no critic (ControlStructures::ProhibitCascadingIfElse)
 if (param('id') && param('result') && param('state')) {
     submeto_rezulto();
 } elsif (param('id')) {
@@ -56,6 +57,7 @@ if (param('id') && param('result') && param('state')) {
     listigu_novajn();
     print end_pre() unless (param('format') eq 'text');
 };
+## use critic
 
 $dbh->disconnect() if $dbh;
 
@@ -81,10 +83,12 @@ sub listigu_novajn {
             #if ($debug) { print "id:".$submeto->[0]."\n" };
             # protektu specialajn signojn en desc
             my $desc=4;
+            ## no critic (RegularExpressions::RequireExtendedFormatting)
             $submeto->[$desc] =~ s/\n/\\n/g;
             $submeto->[$desc] =~ s/\r/\\r/g;
             $submeto->[$desc] =~ s/\t/\\t/g;
             $submeto->[$desc] =~ s/"/""/g;
+            ## use critic
             $submeto->[$desc] = '"'.$submeto->[$desc].'"';
             if (param('format') eq 'text') {
                 print join(';',@$submeto),"\n";
@@ -96,13 +100,11 @@ sub listigu_novajn {
             }
             $submeto = $select->fetchrow_arrayref();
         }
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
+    } or do {   
+        warn "Datumbaza eraro: $@\n"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    } 
+    };
     return;
 }
 
@@ -115,13 +117,11 @@ sub forigu_malnovajn {
         my $del = $dbh->prepare("DELETE FROM submeto WHERE TIMESTAMPDIFF(DAY,sub_time,NOW()) > ?;");
         my $rv = $del->execute($max_age);
         print "$rv\n" # 1..999 = tiom da forigitaj, 0E0 = neniu
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
+    } or do { 
+        warn "Datumbaza eraro: $@\n"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    } 
+    };
     return;
 }
 
@@ -162,13 +162,11 @@ sub pluku_submeton {
         }
 
         $dbh->commit(); 
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
-        eval { $dbh->rollback() }; # in case rollback() fails 
+    } or do { 
+        warn "Datumbaza eraro: $@\n"; 
+        eval { $dbh->rollback() } or do { warn "Malfaro de transago ne funkciis: $@\n"}; # in case rollback() fails 
         # cleanup here 
-    } 
+    };
     return;
 }
 
@@ -192,13 +190,11 @@ sub submeto_rezulto {
 
         my $rv = $upd->execute($state,$result,$id);
         print "$rv\n" # 1 = aktualigita, 0E0 = ne aktualigita, pro nekongruo de sub_id aŭ sub_state
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
+    } or do { 
+        warn "Datumbaza eraro: $@\n"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    } 
+    };
     return;
 }
 
@@ -239,12 +235,10 @@ sub redakto_statoj {
         }
 
         print end_table();
-    }; 
-    
-    if ($@) { 
-        warn "Datumbaza eraro: $@"; 
+    } or do { 
+        warn "Datumbaza eraro: $@\n"; 
         # eval { $dbh->rollback() }; # in case rollback() fails 
         # cleanup here 
-    }
+    };
     return;
 }

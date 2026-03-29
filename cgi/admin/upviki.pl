@@ -29,11 +29,13 @@ print header(-charset=>'utf-8'),
 my $refs = fileutil::read_json_file($vikiref);
 #print Dumper $refs if ($debug);
 my $count = scalar(@{$refs});
-die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos...\n" unless ($count > 10000);
+
+# sekurkontrolo: ĉu ni ricevas sufiĉe da viki-eroj
+die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos...\n" if ($count < 10000);
 
 # Konektiĝi kun la datumbazo kaj malplenigi la tabelon
 my $dbh = revodb::connect();
-my $sth = $dbh->prepare("TRUNCATE TABLE r2_vikicelo") or die;
+my $sth = $dbh->prepare("TRUNCATE TABLE r2_vikicelo") or die "Ne eblis malplinigi tabelon r2_vikicelo: $!\n";
 $sth->execute();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
@@ -43,7 +45,7 @@ $dbh->do("set names utf8");
 # sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
 # per ON DUPLICATE...
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) " 
-    ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") or die;
+    ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") or  "Ne eblis prepari enig-komandon por r2_vikicelo\n";
 
 for my $ref (@$refs) {
     # ial json_parser ne aŭtomate supozas UTF8!?
@@ -54,7 +56,7 @@ for my $ref (@$refs) {
 }
 
 $sth_insert->finish();
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias\n";
 
-print pre("daŭro: ".(time - $^T)." sekundoj por $count referencoj");	
+print pre("daŭro: ".(time - $^T)." sekundoj por $count referencoj");
 print end_html;

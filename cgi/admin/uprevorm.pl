@@ -12,40 +12,62 @@ use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
+use Log::Dispatch; use Log::Dispatch::FileRotate;
+
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 
 my $exitcode;
+my $loglevel = 'info';
 
 print header,
-      start_html('Sendu sxangxitajn pagxojn'),
+      start_html('Sendu shanghitajn paghojn'),
       h1('fname='.param('fname'));
 
 my $homedir = "/hp/af/ag/ri";
 #print h1("homedir = $homedir");
 
-## no critic (InputOutput::RequireBriefOpen)     
-open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
-autoflush $log 1;
+my $log = Log::Dispatch->new(
+    outputs => [
+        #[ 'File', min_level => $loglevel, filename => "$homedir/files/log/uprevo.log" ]
+        #[ 'Screen', min_level => $loglevel ],
+    ],
+);
+$log->add(Log::Dispatch::FileRotate->new(
+    name      => 'uprevo.log',
+    min_level => $loglevel,
+    filename  => "$homedir/files/log/uprevo.log",
+    mode      => 'append' ,
+    TZ        => 'UTC',
+    DatePattern => 'yyyy-dd-HH'),
+    max       => 31,
+    size      => 10 * 1024 * 1024
+) or die("Ne eblas skribi protokolon 'uprevo.log'\n");
+
+#open my $log, '>>', "$homedir/files/log/uprevo.log" or die("ne eblas skribi log");	
+#autoflush $log 1;
 
 my $fname = param('fname');
-
-
 my $htmldir = "$homedir/www";
 
 local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 
-print $log "uprevorm started at ".localtime()." with fname=$fname\n";
-unless ($fname =~ /^revo-\d\d\d\d\d\d\d\d\.tgz$/) {
-  print $log "Nevalidaj parametroj\n\n";
+$log->info(">>> EKO DE uprevorm.pl je ".localtime()." with fname=$fname\n");
+unless ($fname =~ m{^
+    revo-
+    \d{8} # dato
+    \.tgz
+  $}x) {
+  $log->error("Nevalidaj parametroj\n");
   print h1("Nevalidaj parametroj"), end_html;
   exit 1;
 }
 
 my $ret;
 
-chdir $htmldir or die "chdir ne funkciis";
+chdir $htmldir or die "'chdir $htmldir' ne funkciis\n";
 
+## no critic (InputOutput::ProhibitBacktickOperators)
 $ret = `rm bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("rm -> $exitcode");
@@ -71,21 +93,32 @@ print pre($ret);
 if (open my $in, '<', "bv_forigu_tiujn.lst") {
 #  print h2("open true");
   my $count;
+
+  ## no critic(RegularExpressions::RequireExtendedFormatting)
   while (<$in>) {
     chomp;
-    if ((/^revo\// or /^tgz\//) and not /\.\./ and not / / and not /\*/ and not /\?/ and not /^$/) {
+    if (
+      m{^(?:revo|tgz)/}x 
+    and not 
+      m{
+        (?:\.\.|[\s\*\?])
+      }x 
+    and not m{^$}) {
+
       print h2("forigi $_");
 
       $ret = `ls -l "$_" 2>&1`;
       print pre($ret);
 
-      my $ret = unlink $_;
-      $count += $ret;
-      print h2("forigi $_ malsucesis") if !$ret;
+      my $for = unlink $_;
+      $count += $for;
+      print h2("forigi $_ malsukcesis") if !$for;
+
     } else {
-      print h2("nelegala $_");
+      print h2("ne permesita $_");
     }
   }
+  ## use critic
   close $in;
 
   print h2("forigis $count");
@@ -94,10 +127,10 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
 $ret = `cat bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 print h2("cat -> $exitcode");
-print $log "cat -> $exitcode\n$ret";
+$log->info("cat -> $exitcode\n$ret");
 print pre($ret);
 
-print $log "normala fino de uprevorm.pl\n\n";
+$log->info("<<< FINO de uprevorm.pl\n");
 print end_html;
 
 close $log;

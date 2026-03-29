@@ -52,6 +52,7 @@ $dbh->{'mysql_enable_utf8'}=1;
 for my $sql (@SQL) {
     print "\n# $sql\n";
 
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
     if ($sql =~ /^set/i) {
         $dbh->do($sql)
     } else {   
@@ -64,8 +65,9 @@ for my $sql (@SQL) {
             print "\n";
         }
     }
+    ## use critic
 }
 
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-adiaŭo ne funkcias\n";
 
 print "</pre>";

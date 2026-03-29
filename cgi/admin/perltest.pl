@@ -17,6 +17,7 @@ foreach my $key (sort keys(%ENV)) {
 }
 
 print "\n\n";
+## no critic (InputOutput::ProhibitBacktickOperators)
 print qx/find $_ -name "*.pm"/ foreach ( @INC );
 
 print "</pre>\n";

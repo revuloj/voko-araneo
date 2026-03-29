@@ -29,10 +29,12 @@ my $tezdir = "$homedir/www/revo/tez";
 my $hstdir = "$homedir/www/revo/hst";
 
 my ($xml,$art,$hst,$tez);
-for (glob "$xmldir/*.xml") { /([^\/]+)\.xml$/; $xml->{$1} = 1 };
-for (glob "$artdir/*.html") { /([^\/]+)\.html$/; $art->{$1} = 1 };
-for (glob "$hstdir/*.html") { /([^\/]+)\.html$/; $hst->{$1} = 1 };
-for (glob "$tezdir/*.json") { /([^\/]+)\.json$/; $tez->{$1} = 1 };
+## no critic (RegularExpressions::RequireExtendedFormatting)
+for (glob "$xmldir/*.xml" ) { if (/([^\/]+)\.xml$/ ) {$xml->{$1} = 1} };
+for (glob "$artdir/*.html") { if (/([^\/]+)\.html$/) {$art->{$1} = 1} };
+for (glob "$hstdir/*.html") { if (/([^\/]+)\.html$/) {$hst->{$1} = 1} };
+for (glob "$tezdir/*.json") { if (/([^\/]+)\.json$/) {$tez->{$1} = 1} };
+## use critic
 
 my @x_a = grep { not exists ($art->{$_}) } keys %$xml;
 my @a_x = grep { not exists ($xml->{$_}) } keys %$art;

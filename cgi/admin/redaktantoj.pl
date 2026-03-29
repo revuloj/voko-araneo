@@ -34,5 +34,5 @@ while (my ($id, $nomo) = $sth->fetchrow_array()){
   print "\n";
 }
 
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias\n";
 

@@ -33,7 +33,9 @@ print header(-charset=>'utf-8'),
 # ekstraktu la artikolojn el la parametro(j)
 my @arts;
 if (param('arts')) {
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
   @arts = sort split /\s+/,param('arts');
+  ## use critic
   die "Tro multaj artikoloj, maks. 1000\n" if ($#arts > 1000);
 
 } elsif (param('art')) {
@@ -42,11 +44,19 @@ if (param('arts')) {
 } elsif (param('prefix')) {
   my $prefix = param('prefix');
 
-  if ($prefix =~ /^[a-z0-9\[\]\-]{1,10}$/) {
+  if ($prefix =~ m{^
+      [a-z0-9\[\]\-]{1,10}
+    $}x) {
     for my $file (glob "$tezdir/$prefix*.json") {
-      $file =~ /\/([a-z0-9]+)\.json/;
-      print pre("glob: $1") if ($verbose);
-      push @arts, $1;
+      if($file =~ m{
+        /([a-z0-9]+)
+        \.json
+      }x) 
+      {
+        my $fn = $1;
+        print pre("glob: $fn") if ($verbose);
+        push @arts, $fn;
+      };
     }
   }
 }
@@ -61,5 +71,5 @@ my $cnt = art_db::process($dbh,\@arts,$verbose);
 $dbh->disconnect() or die "Malkonektiĝi de DB ne funkciis.\n";
 
 print pre("daŭro: ".(time - $^T)."s\nart: $cnt->{art}\nkap: $cnt->{kap}\n"
-         ."mrk: $cnt->{mrk}\nref: $cnt->{ref}\ntrd: $cnt->{trd}\n");	
+         ."mrk: $cnt->{mrk}\nref: $cnt->{ref}\ntrd: $cnt->{trd}\n");
 print end_html;

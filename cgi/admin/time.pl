@@ -15,6 +15,7 @@ sub timestamp {
   return "$mday.$mon.$year $hour:$min:$sec";
 }
 
+# no critic (InputOutput::ProhibitBacktickOperators)
 print header,
       start_html('Servila tempo'),
       h1('timestamp='.timestamp),

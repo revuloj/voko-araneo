@@ -50,8 +50,8 @@ my $count = scalar(keys %{$fe_refs}) + scalar(keys %{$oa_refs});
 my $icnt = scalar(keys %{$fe_refs}) + scalar(keys %{$inx_ofc});
 my $ncnt = 0;
 
-die "Tro malmultaj indekseroj ($icnt), verŝajne estas erara, ni ne daŭrigos...\n" unless ($icnt > 4000);
-die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos...\n" unless ($count > 6000);
+die "Tro malmultaj indekseroj ($icnt), verŝajne estas erara, ni ne daŭrigos...\n" if ($icnt < 4000);
+die "Tro malmultaj referencoj ($count), verŝajne estas erara, ni ne daŭrigos...\n" if ($count < 6000);
 
 # Preparu la indekson de Revo-oficialecoj por rapida aliro
 my $inx_ofc = {};
@@ -61,30 +61,30 @@ inx_prep();
 if ($test || $debug) {
     my $test = ref_mrk("absolut'","oa","oa_1");
     print "\nTEST - absolut': $test<br>\n";
-    my $test = ref_mrk("fruktaĵo","fe","UV");
+    $test = ref_mrk("fruktaĵo","fe","UV");
     print "\nTEST - fruktaĵo: $test<br>\n";
-    my $test = ref_mrk("persvad'i","oa","oa_9");
+    $test = ref_mrk("persvad'i","oa","oa_9");
     print "\nTEST - persvad'i: $test<br>\n";
-    my $test = ref_mrk("Acor'oj","oa","oa_10");
+    $test = ref_mrk("Acor'oj","oa","oa_10");
     print "\nTEST - Acor'oj: $test<br>\n";
-    my $test = ref_mrk("aer'um'","fe","");
+    $test = ref_mrk("aer'um'","fe","");
     print "\nTEST - aer'um': $test<br>\n";
-    my $test = ref_mrk("advent'","oa","oa_1");
+    $test = ref_mrk("advent'","oa","oa_1");
     print "\nTEST - advent': $test<br>\n";
-    my $test = ref_mrk("dis-","fe","UV");
+    $test = ref_mrk("dis-","fe","UV");
     print "\nTEST - dis-': $test<br>\n";
-    my $test = ref_mrk("ge","fe","UV");
+    $test = ref_mrk("ge","fe","UV");
     print "\nTEST - ge: $test<br>\n";
-    my $test = ref_mrk("teokratri'o","oa","oa_2");
+    $test = ref_mrk("teokratri'o","oa","oa_2");
     print "\nTEST - teokratri'o: $test<br>\n";   
-    my $test = ref_mrk("epifani'o","oa","oa_2");
+    $test = ref_mrk("epifani'o","oa","oa_2");
     print "\nTEST - epifani'o: $test<br>\n";       
 #exit;
 }
 
 # Konektiĝi kun la datumbazo kaj malplenigi la tabelon
 my $dbh = revodb::connect();
-my $sth = $dbh->prepare("TRUNCATE TABLE r3ofc") or die;
+my $sth = $dbh->prepare("TRUNCATE TABLE r3ofc") or die "Ne povis malplenigi la tabelon r3ofc: $!\n";
 $sth->execute();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
@@ -94,7 +94,7 @@ $dbh->do("set names utf8");
 # sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
 # per ON DUPLICATE...
 my $sth_insert = $dbh->prepare("INSERT INTO r3ofc (inx, mrk, fnt, dos, ref, skc) " 
-    ."VALUES (?,?,?,?,?,?)") or die;
+    ."VALUES (?,?,?,?,?,?)") or die "Ne povis prepari enig-komandon por r3ofc: $!\n";
 
 
 # traktu fundamentajn kaj poste oficialigitajn...
@@ -102,10 +102,12 @@ process("fe",$fe_refs);
 process("oa",$oa_refs);
 
 $sth_insert->finish();
-$dbh->disconnect() or die "DB disconnect ne funkcias";
+$dbh->disconnect() or die "DB-malkonekto ne funkcias.\n";
 
-print pre("daŭro: ".(time - $^T)." sekundoj por $ncnt / $count referencoj");	
+print pre("daŭro: ".(time - $^T)." sekundoj por $ncnt / $count referencoj");
 print end_html;
+
+## no critic (RegularExpressions::RequireExtendedFormatting)
 
 sub process {
     my ($fnt, $refs) = @_;
@@ -213,8 +215,9 @@ sub ref_mrk {
     if ($fnt eq 'fe') {
         $ofc = '*';
     } else {
-        $dos =~ /oa_(\d\d?)/;
-        $ofc = $1;
+        if ($dos =~ /oa_(\d\d?)/) {
+            $ofc = $1;
+        }
     }
 
     # normigu divid-strekojn, forigu evtl. finan krisignon
@@ -223,6 +226,7 @@ sub ref_mrk {
     my $i1 = $inx;
 
     # trovu la indekseron en la oficialecoj de Revo
+    ## no critic (ControlStructures::ProhibitCascadingIfElse)
     if (index($i1,"'") == length($i1)-1) {
         # se inx havas solan finan apostrofon, temas pri radiko
         $mrk = rv_rad($ofc,substr($i1,0,length($i1)-1));       
@@ -233,7 +237,7 @@ sub ref_mrk {
         # se apostrofo/streko estas antaŭlasta, ni forpurigu ilin antaŭ serĉi je derivaĵo
         $i1 =~ s/'//g;
         $mrk = rv_drv($ofc,$i1);       
-    }
+    };
 
     # se mrk ne troviĝis ni povas provi ankoraŭ forigi aŭ aldoni finaĵon kaj reserĉi
     if (! $mrk) {

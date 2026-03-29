@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-#
 # checkencode.pl
 # 
 # 2008-03-24 Wieland Pusch
 # ..2026 Wolfram Diestel
+
+# Kontrolu, ĉu artikoloj estas ĝuste koditaj laŭ liternomoj 
+# (vd. voko-grundo/dtd/vokosgn.dtd kaj perllib/revo/voko_entities.pm)
 
 use warnings; use strict;
 
@@ -14,8 +16,11 @@ use DBI();
 print header(-charset=>'utf-8'),
       start_html(-title => 'Enhavo de '.param('art').".xml");
 
+## no critic (RegularExpressions::RequireExtendedFormatting)
+
 if (param('arts')) {
   param('art', join('#', split /\r*\n/,param('arts')));
+
 } elsif (!param('art')) {
   print h1('arts = '.param('arts'));
   print h2('arts = '.join('#', split /\r*\n/,param('arts')));
@@ -62,10 +67,10 @@ my $verbose = param('verbose');
 
 my $art_count;
 my $last_art;
-foreach my $art (@arts) {
-  if ($art && $art ne $last_art) {
-    $art_count += checkencode($art, $xmldir);
-    $last_art = $art;
+foreach my $artikolo (@arts) {
+  if ($artikolo && $artikolo ne $last_art) {
+    $art_count += checkencode($artikolo);
+    $last_art = $artikolo;
   }
 }
   
@@ -75,7 +80,7 @@ print h1("Fino.");
 print end_html();
 
 sub checkencode {
-  my ($art, $xmldir) = @_;
+  my $art = shift;
   my $num;
   print "art=$art xmldir=$xmldir<br>\n";
 
@@ -83,106 +88,107 @@ sub checkencode {
 #    print "fname = $fname<br>\n";
     $num++;
 
-    open my $in, "<", $fname or die "open";
-    my $xml = join('', <$in>);
+    open my $in, "<", $fname 
+      or die "Ne povas legi $fname: $!\n";
+    my $xml = do { local $/ = undef; <$in> };
     close $in;
 
     my $xml2 = revo::decode::rvdecode($xml);
-
     my $xml3 = revo::encode::encode2($xml2, 20, 0);
 
-      $xml =~ s/&#8211;/&ndash;/g;
-      $xml =~ s/&#259;/&abreve;/g; 
-      $xml =~ s/&#355;/&tcedil;/g; 
-      $xml =~ s/&#225;/&aacute;/g; 
-      $xml =~ s/&#7944;/&Alfa_psili;/g; 
-      $xml =~ s/&#244;/&ocirc;/g; 
-      $xml =~ s/&#237;/&iacute;/g; 
-      $xml =~ s/&#365;/&ubreve;/g; 
-      $xml =~ s/&#233;/&eacute;/g; 
-      $xml =~ s/&#232;/&egrave;/g; 
-      $xml =~ s/&#322;/&lstroke;/g; 
-      $xml =~ s/&#231;/&ccedil;/g; 
-      $xml =~ s/&#227;/&atilde;/g; 
-      $xml =~ s/&#8166;/&ypsilon_circ;/g; 
-      $xml =~ s/&#x103;/&abreve;/g; 
-      $xml =~ s/&#1576;/&ba;/g; 
-      $xml =~ s/&#1607;/&ha;/g; 
-      $xml =~ s/&#1610;/&ya;/g; 
-      $xml =~ s/&#1605;/&mim;/g; 
-      $xml =~ s/&#1608;/&waw;/g; 
-      $xml =~ s/&#1579;/&tha;/g; 
-      $xml =~ s/&#1578;/&ta;/g; 
-  
-      $xml =~ s/&#234;/&ecirc;/g; 
-      $xml =~ s/&#x2192;/&#8594;/g; 
-      $xml =~ s/&#1632;/&ar_0;/g;
-      $xml =~ s/&#1633;/&ar_1;/g;
-      $xml =~ s/&#1634;/&ar_2;/g;
-      $xml =~ s/&#1635;/&ar_3;/g;
-      $xml =~ s/&#1636;/&ar_4;/g;
-      $xml =~ s/&#1637;/&ar_5;/g;
-      $xml =~ s/&#1638;/&ar_6;/g;
-      $xml =~ s/&#1639;/&ar_7;/g;
-      $xml =~ s/&#1640;/&ar_8;/g;
-      $xml =~ s/&#1641;/&ar_9;/g; 
-      $xml =~ s/&#x2286;/&#8838;/g; 
-      $xml =~ s/&#x2124;/&#8484;/g; 
-      $xml =~ s/&#243;/&oacute;/g; 
-      $xml =~ s/&#226;/&acirc;/g; 
-      $xml =~ s/&#250;/&uacute;/g; 
-      $xml =~ s/&#160;/&nbsp;/g; 
-      $xml =~ s/&#252;/&uuml;/g; 
-      $xml =~ s/&#1585;/&ra;/g; 
-      $xml =~ s/&#1606;/&nun1;/g; 
-      $xml =~ s/&#224;/&agrave;/g; 
-      $xml =~ s/&#x15F;/&scedil;/g; 
-      $xml =~ s/&#349;/&scirc;/g; 
-      $xml =~ s/&#201;/&Eacute;/g; 
-      $xml =~ s/&#7988;/&jota_psili_acute;/g; 
-      $xml =~ s/&#x221e;/&#8734;/g; 
-      $xml =~ s/&#8150;/&jota_circ;/g; 
-      $xml =~ s/&#8212;/&mdash;/g; 
-      $xml =~ s/&#942;/&eta_ton;/g; 
-      $xml =~ s/&#x2264;/&#8804;/g; 
-      $xml =~ s/&#x451;/&c_jo;/g; 
-      $xml =~ s/&#1111;/&c_ji;/g; 
-      $xml =~ s/&#x2282;/&#8834;/g; 
-      $xml =~ s/&#x2201;/&#8705;/g; 
-      $xml =~ s/&#x2228;/&#8744;/g; 
-      $xml =~ s/&#x2227;/&#8743;/g; 
-      $xml =~ s/&#x2261;/&#8801;/g; 
-      $xml =~ s/&#60;/&lt;/g; 
-      $xml =~ s/&#62;/&gt;/g; 
-      $xml =~ s/&#285;/&gcirc;/g; 
-      $xml =~ s/&#x163;/&tcedil;/g; 
-      $xml =~ s/&#x2116;/&#8470;/g; 
-      $xml =~ s/&#xd7;/&#215;/g; 
-      $xml =~ s/&#x2219;/&#8729;/g; 
-      $xml =~ s/&#x2020;/&#8224;/g; 
-      $xml =~ s/&#x2666;/&#9830;/g; 
-      $xml =~ s/&#x672C;/&#26412;/g; 
-      $xml =~ s/&#x307B;/&#12411;/g; 
-      $xml =~ s/&#x3093;/&#12435;/g; 
-      $xml =~ s/&#318;/&lcaron;/g; 
-      $xml =~ s/&#1108;/&c_jeu;/g; 
-      $xml =~ s/&#x305;/&#773;/g; 
-      $xml =~ s/&#x117;/&#279;/g; 
-      $xml =~ s/&#x2208;/&#8712;/g; 
-      $xml =~ s/&#182;/&para;/g; 
-      $xml =~ s/&#324;/&nacute;/g; 
-      $xml =~ s/&#263;/&cacute;/g; 
-      $xml =~ s/&#382;/&zcaron;/g; 
-      $xml =~ s/&#1118;/&c_w;/g;
-      $xml =~ s/&#x30A2;/&#12450;/g; 
-      $xml =~ s/&#x30EA;/&#12522;/g; 
-      $xml =~ s/&#x3042;/&#12354;/g; 
-      $xml =~ s/&#x308A;/&#12426;/g; 
-      $xml =~ s/&#x306E;/&#12398;/g; 
-      $xml =~ s/&#x5DE3;/&#24035;/g; 
-      $xml =~ s/&#x306E;/&#12398;/g; 
-      $xml =~ s/&#x3059;/&#12377;/g; 
-      $xml =~ s/&#351;/&scedil;/g; 
+    $xml =~ s/&#8211;/&ndash;/g;
+    $xml =~ s/&#259;/&abreve;/g; 
+    $xml =~ s/&#355;/&tcedil;/g; 
+    $xml =~ s/&#225;/&aacute;/g; 
+    $xml =~ s/&#7944;/&Alfa_psili;/g; 
+    $xml =~ s/&#244;/&ocirc;/g; 
+    $xml =~ s/&#237;/&iacute;/g; 
+    $xml =~ s/&#365;/&ubreve;/g; 
+    $xml =~ s/&#233;/&eacute;/g; 
+    $xml =~ s/&#232;/&egrave;/g; 
+    $xml =~ s/&#322;/&lstroke;/g; 
+    $xml =~ s/&#231;/&ccedil;/g; 
+    $xml =~ s/&#227;/&atilde;/g; 
+    $xml =~ s/&#8166;/&ypsilon_circ;/g; 
+    $xml =~ s/&#x103;/&abreve;/g; 
+    $xml =~ s/&#1576;/&ba;/g; 
+    $xml =~ s/&#1607;/&ha;/g; 
+    $xml =~ s/&#1610;/&ya;/g; 
+    $xml =~ s/&#1605;/&mim;/g; 
+    $xml =~ s/&#1608;/&waw;/g; 
+    $xml =~ s/&#1579;/&tha;/g; 
+    $xml =~ s/&#1578;/&ta;/g; 
+
+    $xml =~ s/&#234;/&ecirc;/g; 
+    $xml =~ s/&#x2192;/&#8594;/g; 
+    $xml =~ s/&#1632;/&ar_0;/g;
+    $xml =~ s/&#1633;/&ar_1;/g;
+    $xml =~ s/&#1634;/&ar_2;/g;
+    $xml =~ s/&#1635;/&ar_3;/g;
+    $xml =~ s/&#1636;/&ar_4;/g;
+    $xml =~ s/&#1637;/&ar_5;/g;
+    $xml =~ s/&#1638;/&ar_6;/g;
+    $xml =~ s/&#1639;/&ar_7;/g;
+    $xml =~ s/&#1640;/&ar_8;/g;
+    $xml =~ s/&#1641;/&ar_9;/g; 
+    $xml =~ s/&#x2286;/&#8838;/g; 
+    $xml =~ s/&#x2124;/&#8484;/g; 
+    $xml =~ s/&#243;/&oacute;/g; 
+    $xml =~ s/&#226;/&acirc;/g; 
+    $xml =~ s/&#250;/&uacute;/g; 
+    $xml =~ s/&#160;/&nbsp;/g; 
+    $xml =~ s/&#252;/&uuml;/g; 
+    $xml =~ s/&#1585;/&ra;/g; 
+    $xml =~ s/&#1606;/&nun1;/g; 
+    $xml =~ s/&#224;/&agrave;/g; 
+    $xml =~ s/&#x15F;/&scedil;/g; 
+    $xml =~ s/&#349;/&scirc;/g; 
+    $xml =~ s/&#201;/&Eacute;/g; 
+    $xml =~ s/&#7988;/&jota_psili_acute;/g; 
+    $xml =~ s/&#x221e;/&#8734;/g; 
+    $xml =~ s/&#8150;/&jota_circ;/g; 
+    $xml =~ s/&#8212;/&mdash;/g; 
+    $xml =~ s/&#942;/&eta_ton;/g; 
+    $xml =~ s/&#x2264;/&#8804;/g; 
+    $xml =~ s/&#x451;/&c_jo;/g; 
+    $xml =~ s/&#1111;/&c_ji;/g; 
+    $xml =~ s/&#x2282;/&#8834;/g; 
+    $xml =~ s/&#x2201;/&#8705;/g; 
+    $xml =~ s/&#x2228;/&#8744;/g; 
+    $xml =~ s/&#x2227;/&#8743;/g; 
+    $xml =~ s/&#x2261;/&#8801;/g; 
+    $xml =~ s/&#60;/&lt;/g; 
+    $xml =~ s/&#62;/&gt;/g; 
+    $xml =~ s/&#285;/&gcirc;/g; 
+    $xml =~ s/&#x163;/&tcedil;/g; 
+    $xml =~ s/&#x2116;/&#8470;/g; 
+    $xml =~ s/&#xd7;/&#215;/g; 
+    $xml =~ s/&#x2219;/&#8729;/g; 
+    $xml =~ s/&#x2020;/&#8224;/g; 
+    $xml =~ s/&#x2666;/&#9830;/g; 
+    $xml =~ s/&#x672C;/&#26412;/g; 
+    $xml =~ s/&#x307B;/&#12411;/g; 
+    $xml =~ s/&#x3093;/&#12435;/g; 
+    $xml =~ s/&#318;/&lcaron;/g; 
+    $xml =~ s/&#1108;/&c_jeu;/g; 
+    $xml =~ s/&#x305;/&#773;/g; 
+    $xml =~ s/&#x117;/&#279;/g; 
+    $xml =~ s/&#x2208;/&#8712;/g; 
+    $xml =~ s/&#182;/&para;/g; 
+    $xml =~ s/&#324;/&nacute;/g; 
+    $xml =~ s/&#263;/&cacute;/g; 
+    $xml =~ s/&#382;/&zcaron;/g; 
+    $xml =~ s/&#1118;/&c_w;/g;
+    $xml =~ s/&#x30A2;/&#12450;/g; 
+    $xml =~ s/&#x30EA;/&#12522;/g; 
+    $xml =~ s/&#x3042;/&#12354;/g; 
+    $xml =~ s/&#x308A;/&#12426;/g; 
+    $xml =~ s/&#x306E;/&#12398;/g; 
+    $xml =~ s/&#x5DE3;/&#24035;/g; 
+    $xml =~ s/&#x306E;/&#12398;/g; 
+    $xml =~ s/&#x3059;/&#12377;/g; 
+    $xml =~ s/&#351;/&scedil;/g; 
+
     if (param('samsignifa')) {
       $xml =~ s/ŭ/&ubreve;/g; 
       $xml =~ s/ĉ/&ccirc;/g; 
