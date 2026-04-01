@@ -4,10 +4,11 @@
 # sudo apt install libperl-critic-perl
 
 PC=/usr/bin/perlcritic
-SVR=4
-VRB=8
+SVR=3
+#VRB=8
+VRB="%f:%l:%c (S%s) %m\n"
 
-${PC} --verbose ${VRB} --severity ${SVR} cgi/admin
-${PC} --verbose ${VRB} --severity ${SVR} cgi/perllib
-${PC} --verbose ${VRB} --severity ${SVR} cgi/*.pl
-${PC} --verbose ${VRB} --severity ${SVR} etc/*.pm
+${PC} --verbose "${VRB}" --severity ${SVR} cgi/admin
+${PC} --verbose "${VRB}" --severity ${SVR} cgi/perllib
+${PC} --verbose "${VRB}" --severity ${SVR} cgi/*.pl
+${PC} --verbose "${VRB}" --severity ${SVR} etc/*.pm

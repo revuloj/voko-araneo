@@ -538,10 +538,14 @@ if ($errline) {
     $pos = length(join "\n", @pre);
   }
 } else {
+
+  # legu la lingvoliston
   my %lng;
   open my $in, '<', "$revo_base/cfg/lingvoj.xml" 
         or die "Ne povas malfermi dosieron lingvoj.xml\n";
-  while (<$in>) {
+  my @lingvoj = <$in>; close $in;
+
+  while (@lingvoj) {
     if (m{
       <lingvo\s+
       kodo="([^"]+)"
@@ -550,8 +554,8 @@ if ($errline) {
       $lng{$1} = 1;
     }
   }
-  close $in;
 
+  # kontrolu la lingvojn en la XML
   while ($xml =~ m{
     (<(?:trd|trdgrp)
     \s+lng=")(.*?)"
@@ -572,10 +576,11 @@ if ($errline) {
     }
   }
 
+  # apartigu snc/drv-elementojn
   if (!$pos && $xml =~ m{
     <(snc|drv)
     (\s+mrk="$mrk".*?)
-    (\n?\s*<\/\1>)
+    (\n?\s*</\1>)
   }xsmg) {
     my @prelines = split "\n", "$`$1$2";
     $postlines = split "\n", "$3$'";
@@ -681,10 +686,14 @@ EOD
 
 my (%fak, %stl);
 if ($art) {
+
+  # legu la fakoliston
   %fak = ('' => '');
-  open my $in, '<', "$revo_base/cfg/fakoj.xml" 
+  open my $FAK, '<', "$revo_base/cfg/fakoj.xml" 
     or die "Ne povas malfermi dosieron fakoj.xml\n";
-  while (<$in>) {
+  my @fakoj = <$FAK>; close $FAK;
+
+  while (@fakoj) {
     if (m{
         <fako\s+
         kodo="([^"]+)"
@@ -694,12 +703,14 @@ if ($art) {
       $fak{$1} = Encode::decode($enc, "$1-$2");
     }
   }
-  close $in;
 
+  # legu la stiloliston
   %stl = ('' => '');
-  open my $in, '<', "$revo_base/cfg/stiloj.xml" 
+  open my $STL, '<', "$revo_base/cfg/stiloj.xml" 
     or die "Ne povas malfermi dosieron stiloj.xml\n";
-  while (<$in>) {
+  my @stiloj = <$STL>; close $STL;
+
+  while (@stiloj) {
     if (m{
       <stilo\s+
       kodo="([^"]+)"
@@ -709,7 +720,6 @@ if ($art) {
       $stl{$1} = Encode::decode($enc, "$1-$2");
     }
   }
-  close $in;
 }
 
 # ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
@@ -745,12 +755,7 @@ print <<'EOD';
 <div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
 <p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Anta&#365;rigardo</b></span></p>
 EOD
-#  if ($debug) {
-#    print pre('open xalan');
-#    autoEscape(1);
-#    print pre(escapeHTML("xml2=\n$xml2"));
-#    autoEscape(0);
-#  }
+
   chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";
   
   my ($html, $err);
@@ -916,6 +921,8 @@ print <<'EOD';
 EOD
 }
 
+my $sth;
+
 if ($redaktanto) {
   # cxu iu redaktanto havas tiun retadreson? Kiu?
 
@@ -990,7 +997,8 @@ End_of_Mail
         # konektu al retposxtservilo
         open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
             or do {
-              print LOG "ne povas sendi per 'sendmail'\n";
+              #print LOG "ne povas sendi per 'sendmail'\n";
+              warn "ne povas sendi per 'sendmail'\n";
               return;
             };
         print {$sendmail} $mailtext; 

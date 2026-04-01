@@ -29,10 +29,9 @@ my $LIMIT_rec = 100;
   );
 #} 
 
-
 my $sercxata = '';
 
-if param('sercxata') {
+if (param('sercxata')) {
   $sercxata = param('sercxata'); 
   utf8::decode($sercxata);
 }
@@ -72,9 +71,9 @@ $dbh->do("set names utf8");
 $dbh->do('SET SESSION group_concat_max_len = 4048');
 
 # serĉesprimo enhavas iujn regulesprimajn signojn
-my $regulira = $sercxata =~ m{
-    [.^$\[\(\|+?{\\]  #..}
-  }x;
+my $regulira = ($sercxata =~ m{
+    [\\.^\$\[\(\|+?{]  #..}
+  }x);
 my $komparo = '=';
 
 if ($regulira) {

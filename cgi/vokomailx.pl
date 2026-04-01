@@ -112,7 +112,7 @@ unless ($redaktanto) {
           "Bv. legi la informpaĝojn <a href=\"$revuloj_url\">pri la redaktoservo ".
           "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>\n";
   }
-}
+};
 
 my $xml=normigu_xml($xmlTxt);
 
@@ -141,11 +141,11 @@ while ($xml =~ m{
   }xgi) {
   my ($art_,$p,$rest) = ($1,$2,$3);
   push @refs, [$art_,$p,$rest];
-}
+};
 
 if (@refs) {
   @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
-}
+};
 
 print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
 
@@ -180,20 +180,20 @@ if ($sxangxo =~ s{
 
 } elsif (!param('nova')) {  
   my $sxangxo_tajpita = ($sxangxo ne "klarigo de la sxangxo");
-  unless ($sxangxo and $sxangxo_tajpita)) {
+  unless ($sxangxo and $sxangxo_tajpita) {
     $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
   }
-}
+};
 
 if ($sxg_err) {
   print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>\n";
-}
+};
 
 # ĉu ni sendu la ŝanĝojn?
 if ($command eq 'forsendo') {
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
-  my $neniu_eraro = !$xml_err && !@ref_err && !$sxg_err;
+  my $neniu_eraro = (! $xml_err && ! @ref_err && ! $sxg_err);
   unless ($redaktanto && $permeso && $neniu_eraro) {
     print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne sendis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";

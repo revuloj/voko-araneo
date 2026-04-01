@@ -13,6 +13,8 @@ use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
+
+# apt install liblog-dispatch-perl liblog-dispatch-filerotate-perl
 use Log::Dispatch; use Log::Dispatch::FileRotate;
 
 # propraj perl moduloj estas en:
@@ -69,7 +71,7 @@ local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #autoflush $log 1;
 
 ## no critic (InputOutput::ProhibitBacktickOperators)
-$ret = `du -sh $homedir`;
+my $ret = `du -sh $homedir`;
 
 #print $log "du -> $exitcode\n$ret\n";
 $log->info("### du -> $exitcode\n$ret\n");
@@ -97,8 +99,6 @@ $dbfname =~ s{^
   $}
   {revodb-$1.sql.gz}x;
 $log->info("dbfname -> $dbfname\n");
-
-my $ret;
 
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
@@ -149,17 +149,21 @@ $log->info("pwd -> $exitcode\n$ret");
 #print pre($ret);
 
 if (open my $in, '<', "bv_forigu_tiujn.lst") {
+  my @forigendaj = <$in>;
+  close $in;
+
 #  print h2("open true");
   my $count = 0;
-  while (<$in>) {
+  while (@forigendaj) {
     chomp;
     if (m{^(?:
         revo|tgz
       )/}x
     and not m{(?:
-      \.\.
-      |[\s\*\?]
-    )}x and not m{^$}x) {
+        \.\.
+        |[\s\*\?]
+      )}x 
+    and not m{^$}x) {
 
       print h2("forigi $_");
       $log->info("forigi $_\n");
@@ -174,7 +178,6 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
       $log->warn("ne permesita $_\n");
     }
   }
-  close $in;
 
   print h2("forigis: $count");
   $log->info("forigis: $count\n");

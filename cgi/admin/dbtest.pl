@@ -39,7 +39,7 @@ $dbh->{'mysql_enable_utf8'}=1;
 
 #(2)No such file or directory: AH01620: Could not open password file: /var/www/web277/html/cgi-bin/admin/.htpasswd
 
-@SQL = (
+my @SQL = (
    # SHOW VARIABLES;
     # show session variables;
     "show session variables where variable_name like 'character%'",
@@ -57,7 +57,7 @@ for my $sql (@SQL) {
         $dbh->do($sql)
     } else {   
 
-        $sth = $dbh->prepare($sql);
+        my $sth = $dbh->prepare($sql);
         $sth->execute();
 
         while (my @vals = $sth->fetchrow_array()) {

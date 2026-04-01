@@ -16,11 +16,14 @@ use HTML::Entities;
 use CGI qw(:standard);  # nur por verbose
 
 ######################################################################
-sub encode {
-  my ($str, $verbose) = @_;
-  return encode2($str, 0, $verbose);
-}
 
+{
+  no warnings 'redefine';
+  sub encode($$;$) {
+    my ($str, $verbose) = @_;
+    return encode2($str, 0, $verbose);
+  }
+}
 ######################################################################
 sub encode2 {
   my ($str, $flag, $verbose) = @_;
@@ -753,9 +756,12 @@ sub encode2 {
 ################################################
 ## no critic (Modules::ProhibitMultiplePackages)
 package HTML::Entities;
-sub num_entity {
-  my ($char) = @_; sprintf "&#%u;", ord($char); return;
-}    
 
+{
+  no warnings 'redefine';
+  sub num_entity {
+    my ($char) = @_; return sprintf "&#%u;", ord($char);
+  }    
+}
 1;
 

@@ -91,11 +91,13 @@ print h2("pwd -> $exitcode");
 print pre($ret);
 
 if (open my $in, '<', "bv_forigu_tiujn.lst") {
+  my @forigendaj = <$in>;
+  close $in;
+  
 #  print h2("open true");
   my $count;
 
-  ## no critic(RegularExpressions::RequireExtendedFormatting)
-  while (<$in>) {
+  while (@forigendaj) {
     chomp;
     if (
       m{^(?:revo|tgz)/}x 
@@ -103,7 +105,7 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
       m{
         (?:\.\.|[\s\*\?])
       }x 
-    and not m{^$}) {
+    and not m{^$}x) {
 
       print h2("forigi $_");
 
@@ -118,9 +120,7 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
       print h2("ne permesita $_");
     }
   }
-  ## use critic
-  close $in;
-
+  
   print h2("forigis $count");
 }
 

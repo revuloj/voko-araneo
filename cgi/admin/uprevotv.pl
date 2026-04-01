@@ -34,6 +34,7 @@ my $log = Log::Dispatch->new(
         #[ 'Screen', min_level => $loglevel ],
     ],
 );
+# apt install liblog-dispatch-filerotate-perl
 $log->add(Log::Dispatch::FileRotate->new(
     name      => 'uprevo.log',
     min_level => $loglevel,
@@ -49,7 +50,7 @@ my $fname = param('fname');
 
 ## no critic (InputOutput::ProhibitBacktickOperators)
 
-$ret = `du -sh $homedir`;
+my $ret = `du -sh $homedir`;
 print h2("du -> $exitcode");
 print pre($ret);
 
@@ -71,8 +72,6 @@ unless ($fname =~ m{^
   exit 1;
 }
 
-my $ret;
-
 chdir $htmldir or die "'chdir $htmldir' ne funkciis: $!\n";
 
 $ret = `tar -tvzf alveno/$fname revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif 2>&1`;
@@ -92,7 +91,7 @@ if (0 && !$exitcode) {
   $exitcode = $?;
   print h2("rm -> $exitcode");
   $log->info("rm -> $exitcode\n");
-  $log->info("$ret\n" if $exitcode);
+  $log->info("$ret\n") if $exitcode;
   print pre($ret);
 #  if ($exitcode) {
 #    print $log "$ret\n";

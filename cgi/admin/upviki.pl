@@ -16,7 +16,7 @@ use Encode; use utf8; use open ':std', ':encoding(UTF-8)';
 use revodb;
 use fileutil;
 
-$debug = 0;
+my $debug = 0;
 
 my $homedir = "/hp/af/ag/ri";
 my $vikiref = "$homedir/www/revo/inx/vikiref.json";
@@ -45,7 +45,8 @@ $dbh->do("set names utf8");
 # sed sufiĉas unu referenco al Vikipedio. Ni lasas trakti tion al la datumbazo 
 # per ON DUPLICATE...
 my $sth_insert = $dbh->prepare("INSERT INTO r2_vikicelo (vik_celref, vik_artikolo) " 
-    ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") or  "Ne eblis prepari enig-komandon por r2_vikicelo\n";
+    ."VALUES (?,?) ON DUPLICATE KEY UPDATE vik_artikolo = vik_artikolo") 
+        or  die "Ne eblis prepari enig-komandon por r2_vikicelo\n";
 
 for my $ref (@$refs) {
     # ial json_parser ne aŭtomate supozas UTF8!?

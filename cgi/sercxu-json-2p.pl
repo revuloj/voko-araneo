@@ -10,6 +10,7 @@ use warnings; use strict;
 
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
+use List::Util;
 
 # propraj perl moduloj estas en:
 #use lib ("./perllib");
@@ -228,7 +229,9 @@ sub preflng {
       $}
       {$1}x;
       #unless (grep(/$l/,@preferataj_lingvoj)) { 
-      push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
+      #push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
+      push @preferataj_lingvoj, ($l) 
+        if ($l && $l ne 'eo' && List::Util::none { $_ eq $l } @preferataj_lingvoj);
       #}
 
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;

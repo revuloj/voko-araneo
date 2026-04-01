@@ -11,6 +11,7 @@ use warnings; use strict;
 
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
+use List::Util;
 use URI::Escape;
 
 # propraj perl moduloj estas en:
@@ -44,11 +45,13 @@ unless ($lng) {
 
   # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
   # utila eble estus ankaŭ JSON anst. XML-dosiero
-  ## no critic (InputOutput::RequireBriefOpen)
-  open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
-    or { die "ne povas malfermi dosieron lingvoj.xml\n"; }
 
-  while (<$in>) {
+  # legu la lingvoliston
+  open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
+    or die "Ne eblas malfermi dosieron lingvoj.xml\n";
+  my @lingvoj = <$in>; close $in;
+
+  for (@lingvoj) {
     if (m{
       <lingvo\s+
       kodo="([^"]+)"
@@ -57,7 +60,8 @@ unless ($lng) {
     }x) {
 #      print "lng $1 -> $2".br."\n";
       if ($1 ne "eo") {
-        if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
+        #if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
+        if (List::Util::none { $1 eq $pref_lng[$_] } @pref_lng) {
           $pref{$2} = $1;
         } else {
           $lng{$2} = $1;
@@ -65,7 +69,6 @@ unless ($lng) {
       }
     }
   }
-  close $in;
 
   foreach (sort keys %pref) {
     print a({href=>"?lng=$pref{$_}"}, "$_").br."\n";
@@ -191,13 +194,11 @@ sub print_nav {
       };
 
     for my $l ('a'..'z') {
-      ## no critic (RegularExpressions::RequireExtendedFormatting)
-      if ('qwxy' !~ /$l/) {
+      if ('qwxy' !~ /$l/x) {
         print a({
           href => "?lng=$lng&de=$l"
         }, "$l ")
       }
-      ## use critic
 
       # ĉ, ĝ...
       if ($super->{$l}) {
@@ -224,7 +225,9 @@ sub preflng {
       $}{$1}x;
       ## no critic (RegularExpressions::RequireExtendedFormatting)
       unless (grep {/$l/} @preferataj_lingvoj) {
-        push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
+        #push @preferataj_lingvoj, ($l) if ( $l && ($l ne 'eo') && (not $l ~~ @preferataj_lingvoj) );
+        push @preferataj_lingvoj, ($l) 
+          if ($l && $l ne 'eo' && List::Util::none { $_ eq $l } @preferataj_lingvoj);
       }
       ## use critic
       #print "DEBUG ".$#preferataj_lingvoj." ".$LIMIT_lng;

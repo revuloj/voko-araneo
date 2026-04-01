@@ -2,6 +2,10 @@
 
 # 2008 Wieland Pusch
 # 2020-2026 Wolfram Diestel
+#
+# Per tiu ĉi skripto submetiĝas redakto de artikolo al la
+# tabelo "submeto" kie ĝi atendas traktadon per la
+# redaktoservo (voko-formiko).
 
 use warnings; use strict;
 
@@ -73,7 +77,7 @@ if ($debug) {
   print "command: $command\n";
   print "xml: ".length($xmlTxt)."\n";
   print "</div>\n";
-}
+};
 
 
 # ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
@@ -101,7 +105,7 @@ check(! $redaktanto || $redaktanto =~ m{
   }x, "red rx"); 
 
 # Konektiĝu al la datumbazo...
-# ni bezonos gin por kontroli redaktanton kaj referencojn
+# ni bezonos ĝin por kontroli redaktanton kaj referencojn
 # kaj por submeti la redakton en la fino...
 my $dbh = revodb::connect();
 
@@ -119,7 +123,7 @@ unless ($redaktanto) {
           "Bv. legi la informpaĝojn <a href=\"$revuloj_url\">pri la redaktoservo ".
           "kaj kiel registriĝi</a>. Sen tio viaj ŝanĝoj ne estos sendataj!</div>\n";
   }
-}
+};
 
 my $xml=normigu_xml($xmlTxt);
 print substr($xmlTxt,0,1024) if ($debug);
@@ -153,67 +157,17 @@ while ($xml =~ m{
 
   my ($art_,$p,$rest) = ($1,$2,$3);
   push @refs, [$art_,$p,$rest];
-}
+};
 
 if (@refs) {
   @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
-}
+};
 
 print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
 
-# FARENDA: fakte kun la transiro al Git ni povas toleri
-# ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
-# kontroli processmail.pl antaŭ forigi tie ĉi
-my $flag = 0;
-my $sxg_err;
-## no critic (RegularExpressions::RequireExtendedFormatting)
-$flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
-$flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
-$flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
-$flag = $sxangxo =~ s/\x{0134}/Jx/g || $flag;
-$flag = $sxangxo =~ s/\x{0125}/hx/g || $flag;
-$flag = $sxangxo =~ s/\x{0124}/Hx/g || $flag;
-$flag = $sxangxo =~ s/\x{016D}/ux/g || $flag;
-$flag = $sxangxo =~ s/\x{016C}/Ux/g || $flag;
-$flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
-$flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
-$flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
-$flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
-## use critic
-
-### if ($flag) {
-###   $sxg_err =  "Esperantaj signoj en ŝanĝoteksto malunikoditaj.\n";
-### }
-
-# ni povus ankaŭ kolekti la erarojn anst. redoni nur la unuan!?
-if ($sxangxo =~ s{
-      ([\x{80}-\x{10FFFF}]+)
-    }
-    {<span style="color:red">$1</span>}gx  # ruĝigu eraran signon
-  ) {
-    # forigu ne-askiajn signojn
-    $sxg_err="Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo\n";
-
-} elsif ($sxangxo =~ s{
-    (--)
-    }
-    {<span style="color:red">$1</span>}gx # ruĝigu eraran --
-  ) { 
-    
-    # forigu '--'
-    $sxg_err="Eraro: '--' estas malpermesita en komento: $sxangxo\n";
-
-} elsif (!param('nova')) {
-    # ĉu tio ankoraŭ validas? Ni uzas nun atributon placeholder 
-    my $sxangxo_tajpita = $sxangxo ne "klarigo de la sxangxo";
-    unless ($sxangxo and $sxangxo_tajpita) {
-      $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
-    }
-}
-
-if ($sxg_err) {
-  print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>\n";
-}
+# normigu / kontrolu ŝanĝpriskribon
+my $sxg_err = '';
+$sxangxo = kontrolu_sxangxon($sxangxo);
 
 # ĉu ni sendu la ŝanĝojn?
 if ($command eq 'forsendo') { 
@@ -245,7 +199,7 @@ sub check {
     print end_html();
     exit;
   }
-}   
+};
 
 sub check_redaktanto {
   my ($red_anto) = @_;
@@ -257,19 +211,67 @@ sub check_redaktanto {
       $sth->execute($red_anto);
       ($permes_, $red_id) = $sth->fetchrow_array();
       $sth->finish;
-
-      # FARENDA: Ĉu ni bezonas la nomon entute? Se jes, ni povas aldoni ĝin tuj en la supra SQL per JOIN!
-      # Kiel nomigxas la redaktanto?
-      #$sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-      #$sth->execute($red_id);
-      #my ($red_nomo) = $sth->fetchrow_array();
-      ##  print "red_nomo=$red_nomo\n";
-      #$sth->finish;
-
   }
 
   return $permes_;
-}
+};
+
+sub kontrolu_sxangxon {
+
+  my $sgx = shift;
+  my $flag = 0;
+    
+  # FARENDA: fakte kun la transiro al Git ni povas toleri
+  # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
+  # kontroli processmail.pl antaŭ forigi tie ĉi
+
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
+  $flag = $sgx =~ s/\x{0109}/cx/g || $flag;
+  $flag = $sgx =~ s/\x{0108}/Cx/g || $flag;
+  $flag = $sgx =~ s/\x{0135}/jx/g || $flag;
+  $flag = $sgx =~ s/\x{0134}/Jx/g || $flag;
+  $flag = $sgx =~ s/\x{0125}/hx/g || $flag;
+  $flag = $sgx =~ s/\x{0124}/Hx/g || $flag;
+  $flag = $sgx =~ s/\x{016D}/ux/g || $flag;
+  $flag = $sgx =~ s/\x{016C}/Ux/g || $flag;
+  $flag = $sgx =~ s/\x{015D}/sx/g || $flag;
+  $flag = $sgx =~ s/\x{015C}/Sx/g || $flag;
+  $flag = $sgx =~ s/\x{011D}/gx/g || $flag;
+  $flag = $sgx =~ s/\x{011C}/Gx/g || $flag;
+  ## use critic
+
+  # ni povus ankaŭ kolekti la erarojn anst. redoni nur la unuan!?
+  if ($sgx =~ s{
+        ([\x{80}-\x{10FFFF}]+)
+      }
+      {<span style="color:red">$1</span>}gx  # ruĝigu eraran signon
+    ) {
+      # forigu ne-askiajn signojn
+      $sxg_err="Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sgx\n";
+
+  } elsif ($sgx =~ s{
+      (--)
+      }
+      {<span style="color:red">$1</span>}gx # ruĝigu eraran --
+    ) { 
+      
+      # forigu '--'
+      $sxg_err="Eraro: '--' estas malpermesita en komento: $sgx\n";
+
+  } elsif (!param('nova')) {
+      # ĉu tio ankoraŭ validas? Ni uzas nun atributon placeholder 
+      my $sgx_tajpita = $sgx ne "klarigo de la sxangxo";
+      unless ($sgx and $sgx_tajpita) {
+        $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
+      }
+  }
+
+  if ($sxg_err) {
+    print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>\n";
+  }
+
+  return $sgx;
+};
 
 sub normigu_xml {
   my $xml_txt = shift;
@@ -307,10 +309,10 @@ sub normigu_xml {
   # kodigu ne-askiajn signojn per literunuoj...
   return revo::encodex::xencode2($xml_txt, 20) if $xml_txt;
   return;
-}
+};
 
 sub submetu_xml {
-  my ($red_anto,$art_,$sxangxo_,$xml_) = @_;
+  my ($red_anto,$art_,$sxangx_,$xml_) = @_;
   my $red_cmd = "redakto";
   if (param('nova')) {
     $red_cmd = "aldono";
@@ -332,16 +334,16 @@ sub submetu_xml {
     or return "Ne povis submeti redakton: $DBI::errstr\n"; 
 
   return;
-}
+};
 
-sub forsendo() {
+sub forsendo {
   my %args = shift; #($red_anto,$art_,$sxangx_,$xml_,$permes_,$xerr,$sxerr) = @_;
 
-  $red_anto = $args{redaktanto};
-  $sxangx_ = $args{sxangxo};
-  $permes_ = $args{permeso};
-  $art_ = $args{art};
-  $xml_ = $args{xml};
+  my $red_anto = $args{redaktanto};
+  my $sxangx_ = $args{sxangxo};
+  my $permes_ = $args{permeso};
+  my $art_ = $args{art};
+  my $xml_ = $args{xml};
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   #  ni toleru referenc-erarojn: # && !@ref_err

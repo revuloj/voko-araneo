@@ -21,8 +21,8 @@ use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 use fileutil;
 
-$debug = 0;
-$test = 1;
+my $debug = 0;
+my $test = 1;
 
 my $homedir = "/hp/af/ag/ri";
 # el voko-formiko per 'ant -f ant/indekso.xml inx-oficialaj'
@@ -47,7 +47,7 @@ my $fe_refs = fileutil::read_json_file($fe_json);
 my $oa_refs = fileutil::read_json_file($oa_json);
 #print Dumper $refs if ($debug);
 my $count = scalar(keys %{$fe_refs}) + scalar(keys %{$oa_refs});
-my $icnt = scalar(keys %{$fe_refs}) + scalar(keys %{$inx_ofc});
+my $icnt = scalar(keys %{$fe_refs}) + scalar(keys %{$rv_inx});
 my $ncnt = 0;
 
 die "Tro malmultaj indekseroj ($icnt), verŝajne estas erara, ni ne daŭrigos...\n" if ($icnt < 4000);
@@ -158,7 +158,7 @@ sub inx_prep {
     print "preparante indekson..." if ($debug);
 
     for my $ofc (keys(%$rv_inx)) {
-        $lst = $rv_inx->{$ofc};
+        my $lst = $rv_inx->{$ofc};
 
         $inx_ofc->{$ofc} = {} if (! defined $inx_ofc->{$ofc});
 
@@ -175,7 +175,7 @@ sub inx_prep {
 
 sub ref_mrk {
     my ($inx,$fnt,$dos) = @_;
-    my $ofc, $mrk = '';
+    my $ofc = '', my $mrk = '';
 
     print "\n$inx $fnt $dos\n" if ($debug); 
 
@@ -239,7 +239,7 @@ sub ref_mrk {
         $mrk = rv_drv($ofc,$i1);       
     };
 
-    # se mrk ne troviĝis ni povas provi ankoraŭ forigi aŭ aldoni finaĵon kaj reserĉi
+    # se mrk ne troviĝis, ni povas provi ankoraŭ forigi aŭ aldoni finaĵon kaj reserĉi
     if (! $mrk) {
         my $i2 = lc($inx);
         my $I2 = uc(substr($i2,0,1)).substr($i2,1);
