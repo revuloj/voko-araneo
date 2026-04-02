@@ -8,10 +8,6 @@ use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
-#plan tests => 3; 
-#no_plan;
-
-# 0. ĉu kompilebla
 my $eldono = '2p';
 
 # 1. parametroj
@@ -27,7 +23,7 @@ $mech->add_header('Accept' => 'application/json');
 $mech->add_header('Accept-Language' => $lingvoj);
 
 # 3. petu la paĝon kaj kontrolu la rezulton
-# get_ok() kontralas la rezulton (stato 2xx)
+# get_ok() kontrolas la rezulton (stato 2xx)
 $mech->post_ok($url, [
     sxlosilo => 1887,
     sercxata => $sercxata

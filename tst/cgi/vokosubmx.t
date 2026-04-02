@@ -7,12 +7,6 @@ use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
-#plan tests => 3; 
-#no_plan;
-
-# 0. ĉu kompilebla
-use lib('./cgi');
-use lib('./cgi/perllib');
 
 # 1. parametroj
 my $url = "http://0.0.0.0:8088/cgi-bin/vokosubmx.pl";

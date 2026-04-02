@@ -10,6 +10,4 @@ use Test::More; use Test::Perl::Critic (-severity=>3, -verbose => '%f:%l:%c (S%s
 # perlcritic --severity 3 --verbose 8 cgi/<skripto>.pl
 
 all_critic_ok('cgi');
-#all_critic_ok('cgi/admin');
-#all_critic_ok('cgi/perllib');
-#all_critic_ok('cgi/perllib/revo');
+

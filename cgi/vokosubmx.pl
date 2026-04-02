@@ -337,18 +337,21 @@ sub submetu_xml {
 };
 
 sub forsendo {
-  my %args = shift; #($red_anto,$art_,$sxangx_,$xml_,$permes_,$xerr,$sxerr) = @_;
+  my $args = shift; #($red_anto,$art_,$sxangx_,$xml_,$permes_,$xerr,$sxerr) = @_;
 
-  my $red_anto = $args{redaktanto};
-  my $sxangx_ = $args{sxangxo};
-  my $permes_ = $args{permeso};
-  my $art_ = $args{art};
-  my $xml_ = $args{xml};
+  my $red_anto = $args->{redaktanto};
+  my $sxangx_ = $args->{sxangxo};
+  my $permes_ = $args->{permeso};
+  my $art_ = $args->{art};
+  my $xml_ = $args->{xml};
 
   # ni faras tion nur ĉe registrita redaktanto kaj se ne enestas eraroj
   #  ni toleru referenc-erarojn: # && !@ref_err
-  my $neniu_eraro = !$args{xml_err} && !$args{sxg_err};
+  my $neniu_eraro = !$args->{xml_err} && !$args->{sxg_err};
   unless ($red_anto && $permes_ && $neniu_eraro) {
+
+    print "r: $red_anto, p: $permes_, n: $neniu_eraro\n";
+
     print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne submetis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
 

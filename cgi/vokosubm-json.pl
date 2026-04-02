@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-# (c) 2021 ĉe Wolfram Diestel
+# (c) 2021-2026 ĉe Wolfram Diestel
 # laŭ GPL 2.0
+#
+# Redonas la liston de submetoj de donita redaktanto kiel JSON
 
 use warnings; use strict; use utf8;
 
