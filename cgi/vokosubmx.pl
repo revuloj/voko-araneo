@@ -66,7 +66,7 @@ print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
       start_html(
              -lang=>'eo', 
-             -title=>'vokomailx',
+             -title=>'vokosubmx',
 		         -encoding => 'UTF-8');
 
 if ($debug) {
@@ -150,9 +150,9 @@ my @ref_err;
 
 my @refs;
 while ($xml =~ m{
-    <ref\ [^>]*? # komenco de ref-elemento
-    cel="([^".]*)(\.)([^"]*?)" # cel-atributo, elprenante la dosiernomon (antaŭ punkto) kaj reston (post punkto)
-    > # fermo de <ref...>
+    <ref\s+[^>]*? # komenco de ref-elemento, evtl. kun atributo (tip=...)
+    cel="([^"\.]*)(\.)([^"]*?)" # cel-atributo, elprenante la dosiernomon (antaŭ punkto) kaj reston (post punkto)
+    [^>]*?> # evtl. plia atributo (lst=...) kaj fermo de <ref...>
   }gix) {
 
   my ($art_,$p,$rest) = ($1,$2,$3);
