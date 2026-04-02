@@ -330,10 +330,9 @@ sub submetu_xml {
   $sth->bind_param(5,$art_);
   $sth->bind_param(6,$$xml_);
 
-  $sth->execute()  
-    or return "Ne povis submeti redakton: $DBI::errstr\n"; 
+  return $sth->execute()  
+    || "Ne povis submeti redakton: $DBI::errstr\n"; 
 
-  return;
 };
 
 sub forsendo {
@@ -349,9 +348,6 @@ sub forsendo {
   #  ni toleru referenc-erarojn: # && !@ref_err
   my $neniu_eraro = !$args->{xml_err} && !$args->{sxg_err};
   unless ($red_anto && $permes_ && $neniu_eraro) {
-
-    print "r: $red_anto, p: $permes_, n: $neniu_eraro\n";
-
     print "<div id=\"malkonfirmo\" class=\"eraroj\">Pro trovitaj problemoj ni ankoraŭ ne submetis vian ŝanĝon ".
       "al la redaktoservo. Bv. korekti ilin unue.</div>\n";
 

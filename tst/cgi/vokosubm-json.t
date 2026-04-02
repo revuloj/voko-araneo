@@ -37,12 +37,11 @@ my $content = $mech->content; # malkodita enhavo
 
 if ($content) {
     # ĉu la JSON estas bonorda?
-    my $hashref = eval { $json_parser->decode($content) };
+    my $arrayref = eval { $json_parser->decode($content) };
     
-
-    if (!$@ && $hashref) {
+    if (!$@ && $arrayref) {
         # Split the formatted JSON by newlines and count them
-        my @lines = split /\n/, $json_parser->encode($hashref);
+        my @lines = split /\n/, $json_parser->encode($arrayref);
         my $line_count = scalar @lines;
         
         # tio montriĝas nur kun prove -v
@@ -51,11 +50,24 @@ if ($content) {
         #diag("Valida JSON ricevita, $line_count linioj.");
 
         # Kontrolu la enhavon
-        note($json_parser->encode($hashref));
+        note($json_parser->encode($arrayref));
 
         # FARENDA: por ricevi pli ol malplenan liston, ni unue devus submeti
         # redakton sukcese...
         # kiel ni faros tion ripeteble, sen balasti la tabelon?
+
+        cmp_deeply(
+            $arrayref,
+            superbagof({
+                "state" => "nov", 
+                "fname" => "test", 
+                "result" => undef, 
+                "id" => ignore(), 
+                "time" => ignore(), 
+                "desc" => "nur testo"
+            }),
+            "La respondo enhavas la novan submeton \'nur testo\'"
+        );
 
     } else {
         # Se ni ne povis malkodi la enhavon. Ni avertu.
