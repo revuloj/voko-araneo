@@ -6,6 +6,8 @@ use JSON;
 
 use HTTP::Request;
 use LWP::UserAgent;
+
+# debian/ubuntu: instalu: liburl-encode-perl
 use URL::Encode qw(url_encode);
 
 my $sercxata = url_encode(shift @ARGV || 'sen%');
