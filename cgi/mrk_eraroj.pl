@@ -2,12 +2,13 @@
 
 # mrk_eraroj.pl
 # 
-# (c) 2021 Wolfram Diestel
+# (c) 2021-2026 Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-# trovas malĝustajn markojn
-# drv@mrk tri- aŭ plipartaj
-# snc@mrk, subsnc@mrk kiuj ne havas drv@mrk kiel prefikson
+# Trovas malĝustajn markojn
+# - drv@mrk tri- aŭ plipartaj
+# - snc@mrk, subsnc@mrk kiuj ne havas drv@mrk kiel prefikson
+# - homonimoj sen inter-referencoj
 
 use warnings; use strict;
 
@@ -30,14 +31,18 @@ my $dbh = revodb::connect();
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set names utf8");
 
+# tripartaj drv-mrk: ili estu nur du-partaj!
 my ($drv) = $dbh->selectall_arrayref(
     "SELECT mrk,kap FROM r3kap WHERE mrk LIKE '%.%.%' LIMIT $limit");
+
+# markoj, kie la rilato al kapvorto estas rompita
+# kutime pro tio, ke snc-mrk ne konformas la drv-mrk
 my ($snc) = $dbh->selectall_arrayref(
-    "SELECT  r3mrk.mrk,ele,drv FROM r3mrk "
+    "SELECT r3mrk.mrk,ele,drv FROM r3mrk "
     ."LEFT JOIN r3kap ON r3kap.mrk = r3mrk.drv "
     ."WHERE r3kap.kap IS NULL LIMIT $limit");
 
-# homonimoj:
+# homonimoj, kie mankas interreferenco
 my $hom = $dbh->selectall_arrayref(
     "SELECT DISTINCT a.kap, a.mrk, b.mrk FROM r3kap a, r3kap b "
     ."WHERE a.kap=b.kap AND SUBSTRING_INDEX(a.mrk,'.',1) <> SUBSTRING_INDEX(b.mrk,'.',1) "

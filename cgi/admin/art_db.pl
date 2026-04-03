@@ -3,7 +3,7 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-## aktualigas la datumbazon el tez/*.json
+## Aktualigas la datumbazon el tez/*.json
 ## por unuopaj artikoloj, aŭ donitaj per parametro art=... (unu)
 ## aŭ arts=... (pluraj, maks. mil) aŭ prefix=... (ĉiuj komenciĝantaj tiel)
 ## Unuopa artikolo estas en-db-igita per la funkcioj en perllib/art_db.pm
