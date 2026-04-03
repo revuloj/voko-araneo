@@ -14,16 +14,19 @@ FROM alpine:3.23 AS builder
 # 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
 ARG SEVER=4
 COPY cgi/ /tmp/cgi/
+COPY tst/ /tmp/tst/
 
-# build and install rxp
+# testu la CGI-skriptoj
 RUN apk update \
   && apk upgrade \
   # instali kaj ruli perlcritic
-  && apk add --no-cache --virtual .tool-deps perl-critic \
-  && perlcritic --severity=${SEVER} /tmp/cgi/admin \
-  && perlcritic --severity=${SEVER} /tmp/cgi/perllib \
-  && perlcritic --severity=${SEVER} /tmp/cgi/*.pl
+  && apk add --no-cache --virtual .tool-deps perl-test-harness-utils perl-critic \
+  && /usr/bin/prove /tmp/tst/cgi/0*
+  #&& perlcritic --severity=${SEVER} /tmp/cgi/admin \
+  #&& perlcritic --severity=${SEVER} /tmp/cgi/perllib \
+  #&& perlcritic --severity=${SEVER} /tmp/cgi/*.pl
 
+# build and install rxp
 RUN apk add --no-cache \
           ca-certificates \
   && update-ca-certificates \
