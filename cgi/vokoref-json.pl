@@ -3,7 +3,9 @@
 # (c) 2021-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 #
-# provizas referencojn de la tezaŭro el la datumbazo (por montro en la artikoloj/derivaĵoj)
+# Provizas referencojn de la tezaŭro el la datumbazo (por montro en la artikoloj/derivaĵoj)
+# Kiel parametro 'art' oni sendas la koncernan artikolon. Resendiĝas JSON
+# kun ŝlosilvortoj tez, ofc, viki
 
 use warnings; use strict;
 

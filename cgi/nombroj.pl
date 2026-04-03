@@ -5,7 +5,7 @@
 # (c) 2021 Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-# redonas la nombron de kapvortoj kaj de tradukoj
+# Redonas la nombron de kapvortoj kaj de tradukoj
 
 use warnings; use strict;
 
