@@ -154,7 +154,7 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
 
 #  print h2("open true");
   my $count = 0;
-  while (@forigendaj) {
+  for (@forigendaj) {
     chomp;
     if (m{^(?:
         revo|tgz

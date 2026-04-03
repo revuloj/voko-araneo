@@ -545,7 +545,7 @@ if ($errline) {
         or die "Ne povas malfermi dosieron lingvoj.xml\n";
   my @lingvoj = <$in>; close $in;
 
-  while (@lingvoj) {
+  for (@lingvoj) {
     if (m{
       <lingvo\s+
       kodo="([^"]+)"
@@ -693,7 +693,7 @@ if ($art) {
     or die "Ne povas malfermi dosieron fakoj.xml\n";
   my @fakoj = <$FAK>; close $FAK;
 
-  while (@fakoj) {
+  for (@fakoj) {
     if (m{
         <fako\s+
         kodo="([^"]+)"
@@ -710,7 +710,7 @@ if ($art) {
     or die "Ne povas malfermi dosieron stiloj.xml\n";
   my @stiloj = <$STL>; close $STL;
 
-  while (@stiloj) {
+  for (@stiloj) {
     if (m{
       <stilo\s+
       kodo="([^"]+)"

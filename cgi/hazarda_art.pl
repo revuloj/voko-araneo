@@ -27,6 +27,7 @@ STDOUT->autoflush(1);
 my $revo_dir = '/hp/af/ag/ri/www/revo';
 
 my $senkadroj = param('senkadroj');
+
 unless ($senkadroj) {
   print "Content-type: text/html\n\n";
 
@@ -74,8 +75,7 @@ if ($hazarda_mrk =~
    $art = $1;
 }
 
-# tio legas kaj redonas adaptite la artikolon...
-# estonte ni ne plu uzos tion, sed ŝargos la artikolon per JS HTTPRequest.
+# Tio legas kaj redonas adaptite la artikolon...
 if ($senkadroj == 2 && $art) 
 {
   print header(-charset=>'utf-8');
@@ -84,7 +84,7 @@ if ($senkadroj == 2 && $art)
     or die "Ne eblas malfermi: '$art'\n";
   my @artikolo = <$in>; close $in;
 
-  while (@artikolo) {
+  for (@artikolo) {
     s{
       (\[<a\s+
         class="redakto"\s+
