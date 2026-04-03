@@ -3,6 +3,11 @@
 # 2008 Wieland Pusch
 # 2020-2026 Wolfram Diestel
 
+# Akceptas XML-teskton (redakton de artikolo)
+# kaj aŭ nur kontrolas ĝin: command = 'nur_kontrolo' 
+# aŭ post kontrolo submetas ĝin: command = 'forsendo'
+# Krome artikol-kopio estas sendata al la redaktanto.
+
 use warnings; use strict; use utf8;
 
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);

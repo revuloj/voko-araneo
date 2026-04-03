@@ -5,14 +5,22 @@
 # 
 # 2008-10-30 Wieland Pusch
 # 2026 Wolfram Diestel
+#
+# Malnova skripto de Revo-redaktilo:
+# Ĝi kreas la formularon por redaktado
+# kaj ĉe "konservu" kontrolas la XML-tekston kaj 
+# forsendas al redaktoservo kaj la redaktanto,
+# se ĉio estas en ordo.
 
-use warnings; use strict; use utf8;
+use warnings; use strict; 
+use utf8; use open ':std', ':encoding(UTF-8)';
 
 use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
 use IPC::Open3;
-use Encode;
+# use Encode;
+
 use Text::Tabs;
 use POSIX qw(strftime);
 
@@ -419,10 +427,10 @@ function setCookieConsent() {
 }    
 END
 
-my $enc = "utf-8";
+# my $enc = "utf-8";
 
 my @cookies;
-my $konsento = substr(cookie(-name=>'revo-konsento'),0,3) eq 'jes';
+my $konsento = substr(cookie(-name=>'revo-konsento')||'',0,3) eq 'jes';
 
 if ($konsento) {
     push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto'), -path => '/cgi-bin/') if param('redaktanto');
@@ -439,7 +447,7 @@ my $art = param('art');
 my $xml;
 my $xmlTxt = param('xmlTxt');
 if ($xmlTxt) {
-  $xmlTxt = Encode::decode($enc, $xmlTxt);
+  #$xmlTxt = Encode::decode($enc, $xmlTxt);
   $xmlTxt =~ s{\r\n}{\n}xg;
   $debugmsg .= "vor wrap -> $xmlTxt\n <- end wrap\n";
   my $id;
@@ -498,9 +506,9 @@ EOD
   close $in;
 
   $xml = revo::decode::rvdecode($xml);
-  $xml = Encode::decode($enc, $xml);
+  #$xml = Encode::decode($enc, $xml);
 }
-my $sxangxo = Encode::decode($enc, param('sxangxo'));
+my $sxangxo = param('sxangxo'); #Encode::decode($enc, param('sxangxo'));
 $debugmsg .= "sxangxo=$sxangxo" if $debug;
 my $mrk = param('mrk');
 my ($pos, $line, $lastline) = (0, 0, 1);
@@ -541,7 +549,7 @@ if ($errline) {
 
   # legu la lingvoliston
   my %lng;
-  open my $in, '<', "$revo_base/cfg/lingvoj.xml" 
+  open my $in, '<:encoding(UTF-8)', "$revo_base/cfg/lingvoj.xml" 
         or die "Ne povas malfermi dosieron lingvoj.xml\n";
   my @lingvoj = <$in>; close $in;
 
@@ -689,7 +697,7 @@ if ($art) {
 
   # legu la fakoliston
   %fak = ('' => '');
-  open my $FAK, '<', "$revo_base/cfg/fakoj.xml" 
+  open my $FAK, '<:encoding(UTF-8)', "$revo_base/cfg/fakoj.xml" 
     or die "Ne povas malfermi dosieron fakoj.xml\n";
   my @fakoj = <$FAK>; close $FAK;
 
@@ -700,13 +708,13 @@ if ($art) {
         [^>]*
         >([^<]+)</fako>
       }xi) {
-      $fak{$1} = Encode::decode($enc, "$1-$2");
+      $fak{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
     }
   }
 
   # legu la stiloliston
   %stl = ('' => '');
-  open my $STL, '<', "$revo_base/cfg/stiloj.xml" 
+  open my $STL, '<:encoding(UTF-8)', "$revo_base/cfg/stiloj.xml" 
     or die "Ne povas malfermi dosieron stiloj.xml\n";
   my @stiloj = <$STL>; close $STL;
 
@@ -717,7 +725,7 @@ if ($art) {
       [^>]*
       >([^<]+)</stilo>
     }xi) {
-      $stl{$1} = Encode::decode($enc, "$1-$2");
+      $stl{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
     }
   }
 }
@@ -748,8 +756,10 @@ my $dbh = revodb::connect();
 
 #print pre('dbconnect'." size=".length($xml2)) if $debug;
 
-print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
-if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
+#print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
+
+#if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
+if ( param('button') eq "antaŭrigardu" or param('button') eq 'konservu') {
 
 print <<'EOD';
 <div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
@@ -1176,7 +1186,8 @@ if (param('nova') or param('button') eq 'kreu') {
 } else {
   print br."\n&nbsp;&#348;an&#285;o: ".textfield(
        -name => 'sxangxo',
-       -value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
+       #-value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
+       -value => cookie(-name=>'sxangxo') || 'klarigo de la &#349;an&#285;o',
        -title => "Klarigu la ŝanĝon ĉi tie.",
        -size => 70,
        -maxlength => 80);
