@@ -52,10 +52,6 @@ if ($content) {
         # Kontrolu la enhavon
         note($json_parser->encode($arrayref));
 
-        # FARENDA: por ricevi pli ol malplenan liston, ni unue devus submeti
-        # redakton sukcese...
-        # kiel ni faros tion ripeteble, sen balasti la tabelon?
-
         cmp_deeply(
             $arrayref,
             superbagof({
