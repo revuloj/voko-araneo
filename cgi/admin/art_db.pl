@@ -12,7 +12,8 @@ use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use IO::Handle;
 
-use Encode; use utf8; use open ':std', ':encoding(UTF-8)';
+#use Encode; 
+use utf8; use open ':std', ':encoding(UTF-8)';
 
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
