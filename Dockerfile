@@ -10,21 +10,20 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
 FROM alpine:3.23 AS builder
   # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
 
+
+# testu la CGI-skriptojn - ĉar por sintakskontrolo ni
+# tamen bezonas ĉiujn Perl-modulojn, ni faros tion en la fina procezujo
 # kiom strikte ni kontrolu Perl-kodon 
 # 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
-ARG SEVER=4
-COPY cgi/ /tmp/cgi/
-COPY tst/ /tmp/tst/
+# ARG SEVER=4
+# COPY cgi/ /tmp/cgi/
+# COPY tst/ /tmp/tst/
+#RUN apk update \
+#  && apk upgrade \
+#  # instali kaj ruli perlcritic
+#  && apk add --no-cache --virtual .tool-deps perl-test-harness-utils perl-critic \
+#  && cd /tmp && /usr/bin/prove /tmp/tst/cgi/0*
 
-# testu la CGI-skriptoj
-RUN apk update \
-  && apk upgrade \
-  # instali kaj ruli perlcritic
-  && apk add --no-cache --virtual .tool-deps perl-test-harness-utils perl-critic \
-  && /usr/bin/prove /tmp/tst/cgi/0*
-  #&& perlcritic --severity=${SEVER} /tmp/cgi/admin \
-  #&& perlcritic --severity=${SEVER} /tmp/cgi/perllib \
-  #&& perlcritic --severity=${SEVER} /tmp/cgi/*.pl
 
 # build and install rxp
 RUN apk add --no-cache \
@@ -85,22 +84,24 @@ ARG REVO_DIR=/usr/local/apache2/htdocs/revo
 # mysql TLS atestilo problemo kun:  
 # mariadb-connector-c perl-dev mariadb-connector-c-dev zlib-dev openssl-dev
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
-    perl-cgi perl-fcgi perl-uri perl-unicode-string perl-json perl-datetime \
+    perl-cgi perl-fcgi perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths perl-http-message \
     perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
     sed perl-dev make build-base openssl ca-certificates \
     && update-ca-certificates \
-    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS \
+    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS Log::Dispatch::FileRotate \
     && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
-    && apk del build-base sed make perl-dev \
-    && rm -f /var/cache/apk/* && rm -rf /root/.cpanm/work/*
+    && apk del build-base sed make perl-dev && rm -rf /root/.cpanm/work/*
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
 
 COPY bin/* /usr/local/bin/
 COPY cgi/ /usr/local/apache2/cgi-bin/
+
+COPY tst/ /tmp/tst/
+
 COPY etc/revodb.pm /usr/local/apache2/cgi-bin/perllib/
 
 COPY --from=grundo build/ ${VOKO_TMP}/
@@ -119,6 +120,17 @@ COPY --from=grundo build/ ${VOKO_TMP}/
 #
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
+
+# bazaj testoj (sintakskontrolo, perlkritiko)
+RUN apk add perl-test-harness-utils \
+ # perl-critic: necesus instali tiel: && cpan -i Perl::Critic \
+  && ln -s /usr/local/apache2/cgi-bin /tmp/cgi && cd /tmp \
+  && /usr/bin/prove /tmp/tst/cgi/00* \
+  # por aldoni 01_perlcritic.t: /0*
+  && rm -rf /tmp/tst && rm /tmp/cgi \
+  && apk del perl-test-harness-utils \
+  && rm -f /var/cache/apk/* 
+
 RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apache2/htdocs/ \
   && mkdir -p ${HOME_DIR}/files \
   # ni uzas provizore -k pro atestilo-problemo kun Let's Encrypt - okaze forigu post kiam refunkcias en Alpine+curl (2021-10-09)
@@ -136,7 +148,7 @@ RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apach
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
   && ln -sT /usr/local/apache2/htdocs ${HTTP_DIR} \
   && mkdir -p ${HTTP_DIR}/tmp \
-  && chown -R ${DAEMON_UID} ${HTTP_DIR}/revo \
+  && chown -R ${DAEMON_UID} ${HTTP_DIR} \
   && rm -rf /tmp/*
 
 COPY sxangxoj.rdf ${HTTP_DIR}/

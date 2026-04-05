@@ -15,14 +15,22 @@ use warnings; use strict;
 package revodb;
 use DBI();
 
-open(my $fh,'<','/run/secrets/voko-abelo.mysql_password')
-  or die "Mi ne trovis la pasvort-sekreton: $!\n";
- 
-my $mysql_password = <$fh>;
-chomp $mysql_password;
-close $fh;
 
 ###################################################
+
+
+sub get_pwd {
+  my $secret_path = shift;
+  open(my $fh,'<',$secret_path)
+    or die "Mi ne trovis la pasvort-sekreton: $!\n";
+  
+  my $mysql_password = <$fh>;
+  close $fh;
+
+  chomp $mysql_password;
+  return $mysql_password;
+}
+
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub connect {
   # konekto al la datumbazo, agordu host=... en la publika servilo, 
@@ -30,8 +38,10 @@ sub connect {
   #### DBI->trace("2|CON");
   # my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306;mysql_ssl_optional=1;mysql_ssl_ca=/usr/local/share/ca-certificates/mysql-server-2.crt;mysql_ssl_verify_server_cert=0",
 
-my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306",
-                         "s314802_3159000", $mysql_password,
+  my $mysql_pwd = get_pwd('/run/secrets/voko-abelo.mysql_password');
+
+  my $dbh = DBI->connect("DBI:mysql:database=db314802x3159000;host=abelo;port=3306",
+                         "s314802_3159000", $mysql_pwd,
                          {
                           'RaiseError' => 1
                          }) or die "DB ne funkcias\n";
@@ -55,13 +65,8 @@ sub mail_to {
 ##################################################
 
 sub mysqldump {
-  open(my $fh,'<','/run/secrets/voko-abelo.mysql_root_password')
-    or die "Mi ne trovis la pasvort-sekreton: $!\n";
-  my $mysql_root_password = <$fh>;
-  chomp $mysql_root_password;
-  close $fh;
-
-  return "mysqldump --user=root --password=$mysql_root_password --databases db314802x3159000";
+  my $mysql_root_pwd = get_pwd('/run/secrets/voko-abelo.mysql_root_password');
+  return "mysqldump --user=root --password=$mysql_root_pwd --databases db314802x3159000";
 }
 
 1;
