@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# preparo por testo 22_adm_uprevo.t (vokata el ĝi)
+
 # trovu procezujon araneo
 araneo_id=$(docker ps --filter name=araneujo_araneo -q)
 
@@ -12,10 +14,11 @@ fi
 tempo=$(date +'%Y%m%d_%H%M%S')
 tmp_dir=$(mktemp -d)
 mkdir -p ${tmp_dir}/revo/xml
-art=revo/xml/test333.xml
-tgz=${tmp_dir}/revo-${tempo}.tgz
+art0=revo/xml/test000.xml # forigenda
+art=revo/xml/test333.xml  # aldonenda
+tgz=revo-${tempo}.tgz
 
-# preparu tgz-arĥivon por testi uprevo.pl
+# preparu XML-dosierojn por testi uprevo.pl
 cat << '~~~~~' > ${tmp_dir}/${art}
 <?xml version="1.0"?><!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd"><vortaro>
 <art mrk="$Id: test333.xml,v 1.116 2021/06/22 19:02:35 revo Exp $">
@@ -25,12 +28,21 @@ cat << '~~~~~' > ${tmp_dir}/${art}
 <fnt><bib>F</bib><lok>&FE; 12</lok></fnt>;</ekz>
 </dif></snc></drv></art></vortaro>
 ~~~~~
-tar -cvzf ${tgz} -C "$tmp_dir" ${art}
+
+# preparu forigliston
+echo "$art0\n" > ${tmp_dir}/bv_forigu_tiujn.lst
+
+# preparu tgz-arĥivon por testi uprevo.pl
+tar -cvzf ${tmp_dir}/${tgz} -C "$tmp_dir" ${art} bv_forigu_tiujn.lst
 
 # ĉio en ordo?
 echo ">>> ${tgz}"
-tar -tvzf ${tgz} ${art}
+tar -tvzf ${tmp_dir}/${tgz}
 
 # kopiu la arĥivon en Araneon
-docker cp ${tgz} ${araneo_id}:/hp/af/ag/ri/www/alveno/
+docker cp ${tmp_dir}/${art} ${araneo_id}:/hp/af/ag/ri/www/$art0
+docker exec -u root ${araneo_id} chown daemon /hp/af/ag/ri/www/$art0
+docker cp ${tmp_dir}/${tgz} ${araneo_id}:/hp/af/ag/ri/www/alveno/
+docker exec -u root ${araneo_id} chown daemon /hp/af/ag/ri/www/alveno/${tgz}
+
 rm -rf ${tmp_dir}

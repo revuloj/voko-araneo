@@ -103,6 +103,7 @@ $log->info("dbfname -> $dbfname\n");
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
 
+# forigu evtl. malnovan forigliston
 $ret = `rm bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 $log->info("rm bv_forigu_tiujn.lst -> $exitcode\n");
@@ -170,8 +171,8 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
 
       my $for = unlink $_;
       $count += $for;
-      print h2("forigi $_ malsukcesis") if !$for;
-      $log->warn("forigi $_ malsukcesis\n") if !$for;
+      print h2("forigi $_ malsukcesis: $!") if !$for;
+      $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
 
     } else {
       print h2("ne permesita $_");
