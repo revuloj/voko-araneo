@@ -108,7 +108,9 @@ $ret = `rm bv_forigu_tiujn.lst 2>&1`;
 $exitcode = $?;
 $log->info("rm bv_forigu_tiujn.lst -> $exitcode\n");
 
-$ret = `tar -xvzf alveno/$fname revo/dtd revo/art revo/hst tgz revo/xml revo/xsl revo/cfg revo/tez revo/bld revo/stl revo/jsc revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
+$ret = `tar -xvzf alveno/$fname revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx 2>&1`;
+# revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
+
 $exitcode = $?;
 print h2("tar -xv -> $exitcode");
 $log->info("tar -xv -> $exitcode\n$ret");
@@ -137,19 +139,13 @@ chdir $htmldir or die "'chdir $htmldir' ne funkciis\n";
 
 ### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
 
-$ret = `ls -l bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-#print h2("ls -> $exitcode");
-$log->info("forigi: ls -> $exitcode\n$ret");
-#print pre($ret);
-
 $ret = `pwd 2>&1`;
 $exitcode = $?;
 #print h2("pwd -> $exitcode");
 $log->info("pwd -> $exitcode\n$ret");
 #print pre($ret);
 
-if (open my $in, '<', "bv_forigu_tiujn.lst") {
+if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
   my @forigendaj = <$in>;
   close $in;
 
@@ -183,12 +179,6 @@ if (open my $in, '<', "bv_forigu_tiujn.lst") {
   print h2("forigis: $count");
   $log->info("forigis: $count\n");
 }
-
-$ret = `cat bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-#print h2("cat -> $exitcode");
-$log->info("cat -> $exitcode\n$ret");
-print pre($ret);
 
 $log->info("date: ".`date`."\n");
 

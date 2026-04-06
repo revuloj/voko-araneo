@@ -148,7 +148,8 @@ RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apach
   && ln -sT /usr/local/apache2/cgi-bin/perllib ${HOME_DIR}/files/perllib \
   && ln -sT /usr/local/apache2/htdocs ${HTTP_DIR} \
   && mkdir -p ${HTTP_DIR}/tmp \
-  && chown -R ${DAEMON_UID} ${HTTP_DIR} \
+  && chown -R ${DAEMON_UID} ${HTTP_DIR}/revo/art ${HTTP_DIR}/revo/hst ${HTTP_DIR}/revo/xml \
+                            ${HTTP_DIR}/revo/cfg ${HTTP_DIR}/revo/tez ${HTTP_DIR}/revo/bld ${HTTP_DIR}/revo/inx \
   && rm -rf /tmp/*
 
 COPY sxangxoj.rdf ${HTTP_DIR}/
