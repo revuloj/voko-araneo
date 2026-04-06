@@ -50,4 +50,5 @@ unzip -qo master.zip \
   && mv ${dirname}/revo revo/xml \
   && mv ${dirname}/cfg revo/cfg \
   && mv ${dirname}/bld revo/bld \
-  && rm -rf ${dirname} && rm master.zip
+  && rm -rf ${dirname} && rm master.zip \
+  && chown -R daemon /usr/local/apache2/htdocs

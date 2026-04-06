@@ -30,7 +30,7 @@ cat << '~~~~~' > ${tmp_dir}/${art}
 ~~~~~
 
 # preparu forigliston
-echo "$art0\n" > ${tmp_dir}/bv_forigu_tiujn.lst
+echo "$art0" > ${tmp_dir}/bv_forigu_tiujn.lst
 
 # preparu tgz-arĥivon por testi uprevo.pl
 tar -cvzf ${tmp_dir}/${tgz} -C "$tmp_dir" ${art} bv_forigu_tiujn.lst
@@ -40,6 +40,7 @@ echo ">>> ${tgz}"
 tar -tvzf ${tmp_dir}/${tgz}
 
 # kopiu la arĥivon en Araneon
+docker exec -u root ${araneo_id} rm /hp/af/ag/ri/www/$art
 docker cp ${tmp_dir}/${art} ${araneo_id}:/hp/af/ag/ri/www/$art0
 docker exec -u root ${araneo_id} chown daemon /hp/af/ag/ri/www/$art0
 docker cp ${tmp_dir}/${tgz} ${araneo_id}:/hp/af/ag/ri/www/alveno/

@@ -72,7 +72,7 @@ local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 
 ## no critic (InputOutput::ProhibitBacktickOperators)
 my $ret = `du -sh $homedir`;
-
+$exitcode = $?;
 #print $log "du -> $exitcode\n$ret\n";
 $log->info("### du -> $exitcode\n$ret\n");
 

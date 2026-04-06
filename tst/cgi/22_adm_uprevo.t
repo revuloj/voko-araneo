@@ -9,9 +9,12 @@ use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
+# por sencimigi Mechanize
+# use LWP::ConsoleLogger::Everywhere;
+
 # 1. parametroj
-my $url = "http://0.0.0.0:8088/cgi-bin/admin/uprevo.pl";
-my $xmlurl = "http://0.0.0.0:8088/revo/xml";
+my $url = "http://127.0.0.1:8088/cgi-bin/admin/uprevo.pl";
+my $xmlurl = "http://localhost:8088/revo/xml";
 my $tgzscr = "tst/cgi/22_adm_uprevo_tgz.sh";
 my $art0 = 'test000.xml';
 my $art = 'test333.xml';
@@ -28,10 +31,10 @@ if ($tgzsh =~ m{
     die "Mi ne trovis la nomon de tgz-arĥivo post kreo:\n".$tgzsh;
 }
 
-my $xmlmech = Test::WWW::Mechanize->new();
-$xmlmech->link_status_is("$xmlurl/$art0", 200, "$xmlurl/$art0 ekzistu (200)");
-$xmlmech->link_status_is("$xmlurl/$art", 404, "$xmlurl/$art ankoraŭ ne ekzistu (404)");
-
+#diag("$xmlurl/$art0");
+test_http_status("$xmlurl/$art0", 200, "$xmlurl/$art0 ekzistu (200)");
+#diag("$xmlurl/$art");
+test_http_status("$xmlurl/$art", 404, "$xmlurl/$art ankoraŭ ne ekzistu (404)");
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
@@ -63,11 +66,20 @@ if ($content) {
     $mech->has_tag_like('pre',qr/$art/, "Troviĝas <pre>$art...");
 
     # post trakto de la arĥivo $art0 devus ne plu ekzisti, sed ja $art 
-    $xmlmech->link_status_is("$xmlurl/$art", 200, "$xmlurl/$art nun ekzistu (200)");
-    $xmlmech->link_status_is("$xmlurl/$art0", 404, "$xmlurl/$art0 ne plu ekzistu (404)");
+    test_http_status("$xmlurl/$art", 200, "$xmlurl/$art nun ekzistu (200)");
+    test_http_status("$xmlurl/$art0", 404, "$xmlurl/$art0 ne plu ekzistu (404)");
    
 } else {
     diag("Ni ne ricevis rezulton kiel HTML.");
 }
 
 done_testing();
+
+sub test_http_status {
+    my ($url,$status,$msg) = @_;
+    my $statmech = WWW::Mechanize->new(autocheck => 0);
+    #diag("test: $url");
+    my $res = $statmech->head($url);
+    #diag("stat: ".$res->code);
+    is($res->code, $status, $msg || "Peto al $url redonas $status");
+}
