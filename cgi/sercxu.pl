@@ -192,7 +192,6 @@ EOD
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
-#use eosort;
 
 my $sercxata_eo = $sercxata;
 if (param('cx')) {

@@ -93,29 +93,8 @@ $}x or die "Ne valida lingvo $lng\n";
 
 print h2("mankantaj tradukoj [$lng]");
 
-
-#use eosort;
-
 # Malfermu la datumbazon
 my $dbh = revodb::connect();
-
-#$dbh->do("set names utf8");
-
-
-#  "select t.trd_snc_id, a.art_amrk, d.drv_mrk, d.drv_teksto, s.snc_mrk, s.snc_numero from trd t, snc s, drv d, art a where a.art_id = d.drv_art_id and s.snc_drv_id = d.drv_id and t.trd_snc_id = s.snc_id and t.trd_snc_id > ? and t.trd_lng <> 'la' $kapsql group by t.trd_snc_id
-#having min(if (t.trd_lng = ?, 1, 2)) = 2 and count(*) > 1 order by a.art_amrk, d.drv_teksto, s.snc_numero #limit $limit") or die "prepare sth";
-
-# trovu snc, por kiu ne ekzistas traduko en specifa lingvo nek por la derivaĵo, en kiu aperas la senco
-# se tia traduko mankas, LEFT JOIN ne funkcios kaj enhavas NULL por la kampoj de r3trd 
-
-# select r3mrk.*, r3trd.mrk as tmrk, r3trd.lng, r3trd.ind from r3mrk
-# left join r3trd on (r3trd.mrk = r3mrk.mrk or r3trd.mrk = r3mrk.drv) 
-#   and lng='de'
-# where r3mrk.mrk > 'a' and ele in ('snc','subsnc') and r3trd.mrk is NULL 
-# order by r3mrk.mrk
-# limit 270,30;
-
-# limit ^^^ kun start estas malrapida, prefere uzu mrk > <art> - kio estas dekoble pli rapida
 
 my $rows = $dbh->selectall_arrayref(
   "SELECT r3mrk.mrk, r3kap.kap, r3mrk.num FROM r3mrk "

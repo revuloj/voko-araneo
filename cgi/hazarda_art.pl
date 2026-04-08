@@ -54,7 +54,6 @@ unless ($senkadroj) {
 # propraj perl moduloj estas en:
 use lib("/hp/af/ag/ri//files/perllib");
 use revodb;
-use eosort;
 
 # Connect to the database.
 my $dbh = revodb::connect();
