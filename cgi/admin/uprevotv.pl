@@ -65,6 +65,7 @@ $log->info(">>> EKO uprevotv.pl je ".localtime()." with fname=$fname\n");
 unless ($fname =~ m{^
     revo-
     \d{8} # dato
+    _\d{6} # tempo
     \.tgz$
   }x) {
   $log->error("Nevalidaj parametroj\n");
@@ -74,11 +75,11 @@ unless ($fname =~ m{^
 
 chdir $htmldir or die "'chdir $htmldir' ne funkciis: $!\n";
 
-$ret = `tar -tvzf alveno/$fname revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif 2>&1`;
-$exitcode = $?;
-print h2("tar -tv revo/art tgz revo/xml revo/cfg revo/tez revo/bld revo/stl revo/smb revo/dok revo/inx revo/index.html revo/sercxo.html revo/titolo.html revo/revo.ico revo/araneo.gif revo/reto.gif revo/revo.jpg revo/revo.gif revo/travidebla.gif -> $exitcode");
-$log->info("tar -tv -> $exitcode\n$ret");
-print pre($ret);
+## $ret = `tar -tvzf alveno/$fname revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx 2>&1`;
+## $exitcode = $?;
+## print h2("tar -tv alveno/$fname revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx -> $exitcode");
+## $log->info("tar -tv -> $exitcode\n$ret");
+## print pre($ret);
 
 $ret = `tar -tvzf alveno/$fname 2>&1`;
 $exitcode = $?;
@@ -86,22 +87,7 @@ print h2("tar -tv -> $exitcode");
 $log->info("tar -tv -> $exitcode\n$ret");
 print pre($ret);
 
-if (0 && !$exitcode) {
-  $ret = `rm alveno/$fname 2>&1`;
-  $exitcode = $?;
-  print h2("rm -> $exitcode");
-  $log->info("rm -> $exitcode\n");
-  $log->info("$ret\n") if $exitcode;
-  print pre($ret);
-#  if ($exitcode) {
-#    print $log "$ret\n";
-#    exit 1;
-#  }
-}
-
 $log->info("<<< FINO de uprevotv.pl\n");
 print end_html;
-
-close $log;
 
 1;
