@@ -67,68 +67,51 @@ my $ret;
 
 chdir $htmldir or die "'chdir $htmldir' ne funkciis\n";
 
-## no critic (InputOutput::ProhibitBacktickOperators)
-$ret = `rm bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-print h2("rm -> $exitcode");
-print pre($ret);
 
-$ret = `tar -xvzf alveno/$fname bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-print h2("tar -xv -> $exitcode");
-print pre($ret);
+########### forigi ##############
 
-$ret = `ls -l bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-print h2("ls -> $exitcode");
-#print $log "cat -> $exitcode\n$ret";
-print pre($ret);
+### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
 
 $ret = `pwd 2>&1`;
 $exitcode = $?;
-print h2("pwd -> $exitcode");
-#print $log "cat -> $exitcode\n$ret";
-print pre($ret);
+#print h2("pwd -> $exitcode");
+$log->info("pwd -> $exitcode\n$ret");
+#print pre($ret);
 
-if (open my $in, '<', "bv_forigu_tiujn.lst") {
+if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
   my @forigendaj = <$in>;
   close $in;
-  
-#  print h2("open true");
-  my $count;
 
+#  print h2("open true");
+  my $count = 0;
   for (@forigendaj) {
     chomp;
-    if (
-      m{^(?:revo|tgz)/}x 
-    and not 
-      m{
-        (?:\.\.|[\s\*\?])
-      }x 
+    if (m{^(?:
+        revo|tgz
+      )/}x
+    and not m{(?:
+        \.\.
+        |[\s\*\?]
+      )}x 
     and not m{^$}x) {
 
       print h2("forigi $_");
-
-      $ret = `ls -l "$_" 2>&1`;
-      print pre($ret);
+      $log->info("forigi $_\n");
 
       my $for = unlink $_;
       $count += $for;
-      print h2("forigi $_ malsukcesis") if !$for;
+      print h2("forigi $_ malsukcesis: $!") if !$for;
+      $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
 
     } else {
       print h2("ne permesita $_");
+      $log->warn("ne permesita $_\n");
     }
   }
-  
-  print h2("forigis $count");
-}
 
-$ret = `cat bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-print h2("cat -> $exitcode");
-$log->info("cat -> $exitcode\n$ret");
-print pre($ret);
+  print h2("forigis: $count");
+  $log->info("forigis: $count\n");
+}
 
 $log->info("<<< FINO de uprevorm.pl\n");
 print end_html;
