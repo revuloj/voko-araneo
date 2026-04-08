@@ -4,9 +4,11 @@
 # laŭ permesilo GPL 2.0
 
 ############################################
-# Ŝanĝitaj / forigendaj dosieroj sendiĝas de Formiko (voko-formiko/ant/spegulo.xml)
+# Ŝanĝitaj / forigendaj dosieroj sendiĝas de Formiko 
 # kiel tgz-arĥivo. Poste ĝi vokas per HTTP tiun ĉi skripton por malpaki ĉiujn kaj
 # eventuale forigi dosierojn en listo bv_forigu_tiujn.lst
+# vd. (voko-formiko/ant/spegulo.xml:revo-upload2)
+#
 # En la fino ni ankoraŭ forigos ĉiujn arĥivojn pli malnovajn ol 7 tagojn
 
 use warnings; use strict;

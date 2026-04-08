@@ -3,8 +3,11 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
-# Tiu skripto aktualigas la referencojn el Revo-artikoloj al artikoloj de Vikipedia
+# Tiu skripto estas vokata el voko-formiko/ant/spegulo.xml:revo-viki-ligoj
+# kaj aktualigas la referencojn el Revo-artikoloj al artikoloj de Vikipedia
 # en la datumbazo. Ni legas la referencojn en JSON-dosiero (revo/inx/vikiref.json)
+# kiu estas kreata en voko-formiko/ant/indeksoj.xml:inx-viki-listo kaj
+# sendata kun la arĥivo de noktaj aktualigoj (voko-formiko/ant/spegulo.xml:revo-upload2)
 
 use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
