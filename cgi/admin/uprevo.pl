@@ -103,11 +103,6 @@ $log->info("dbfname -> $dbfname\n");
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
 
-# forigu evtl. malnovan forigliston
-$ret = `rm bv_forigu_tiujn.lst 2>&1`;
-$exitcode = $?;
-$log->info("rm bv_forigu_tiujn.lst -> $exitcode\n");
-
 $ret = `tar -xvzf alveno/$fname revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx 2>&1`;
 # revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
 
@@ -119,6 +114,9 @@ print pre($ret);
 
 chdir $xmldir
   or die "'chdir $xmldir' ne funkciis\n";
+
+# por ĉiuj XML-dosieroj en la tar-arĥivo ni traktas ankaŭ 
+# samnoman JSON-dosieron por aktualigi la datumbazon.  
 my @arts;
 while ($ret =~ m{
     revo/xml/
@@ -189,19 +187,13 @@ print pre($ret);
 ### forigu arĥivojn malnovajn je pli ol 7 tagoj
 my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
 $ret = `find $findargs`;
-$log->info("find $findargs -> \n$ret\n");
+$log->info("(malnovaj) find $findargs -> \n$ret\n");
 
-$ret = `find $findargs | xargs rm`;
-$log->info("find rm -> \n$ret\n");
-
-### forigu arĥivojn revodb*.gz malnovajn je pli ol 3 tagoj
-# (tio ne plu devus okazi!)
-#$findargs = "$htmldir/alveno -mtime +2 -name revodb\\*gz";
-#$ret = `find $findargs`;
-#$log->info("find $findargs -> \n$ret\n");
-#
-#$ret = `find $findargs | xargs rm`;
-#$log->info("find rm -> \n$ret\n");
+my @malnovaj = split(/\n/,$ret);
+for (@malnovaj) {
+  chomp;
+  unlink $_;
+}
 
 $log->info("<<< FINO de uprevo.pl\n\n");
 print end_html;
