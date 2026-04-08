@@ -3,6 +3,9 @@
 # (c) 2023-2026 ĉe Wolfram Diestel
 # laŭ permesilo GPL 2.0
 
+# Tiu skripto aktualigas la referencojn el Revo-artikoloj al artikoloj de Vikipedia
+# en la datumbazo. Ni legas la referencojn en JSON-dosiero (revo/inx/vikiref.json)
+
 use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 
