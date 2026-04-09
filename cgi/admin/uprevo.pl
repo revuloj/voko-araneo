@@ -34,28 +34,24 @@ my $htmldir = "$homedir/www";
 my $revodir = "$htmldir/revo";
 my $xmldir = "$revodir/xml";
 
-my $log = Log::Dispatch->new(
-    outputs => [
-        #[ 'File', min_level => $loglevel, filename => "$homedir/files/log/uprevo.log" ]
-        #[ 'Screen', min_level => $loglevel ],
-    ],
-);
-$log->add(Log::Dispatch::FileRotate->new(
-    name      => 'uprevo.log',
-    min_level => $loglevel,
-    filename  => "$homedir/files/log/uprevo.log",
-    mode      => 'append' ,
-    TZ        => 'UTC',
-    DatePattern => 'yyyy-dd-HH'),
-    max       => 31,
-    size      => 10 * 1024 * 1024
-) or die("Ne eblas skribi protokolon 'uprevo.log'\n");
+my $log = make_log();
 
+### tgz-arĥivo traktenda
 my $fname = param('fname');
 # kontrolu ĉu la malpakenda arĥivdosiero ekzistas
 if (! -s "$htmldir/alveno/$fname") {
   print header(-status => '404 Not Found', -type => 'text/html');
   exit;
+}
+
+# povas esti alternative nur_listigu | nur_forigu
+my $kmd = param('kmd') || 'malpaku';
+my $tarflags = '-xvzf';
+my $ujoj = 'revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx'; # malpaku nur tiujn
+
+if ($kmd eq 'nur_listigu') {
+  $tarflags = '-tvzf';
+  $ujoj = ''; # listigu ĉion
 }
 
 print header,
@@ -82,6 +78,7 @@ $log->info("### du -> $exitcode\n$ret\n");
 print pre($ret);
 
 $log->info(">>> EKO de uprevo.pl JE ".localtime()." kun fname=$fname\n");
+
 unless ($fname =~ m{^
     revo-
     \d\d\d\d\d\d\d\d_ # dato
@@ -93,19 +90,10 @@ unless ($fname =~ m{^
   exit 1;
 }
 
-my $dbfname = $fname;
-$dbfname =~ s{^
-  revo-(.*)_
-  \d\d\d\d\d\d
-  \.tgz
-  $}
-  {revodb-$1.sql.gz}x;
-$log->info("dbfname -> $dbfname\n");
-
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
 
-$ret = `tar -xvzf alveno/$fname revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx 2>&1`;
+$ret = `tar $tarflags alveno/$fname $ujoj 2>&1`;
 # revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
 
 $exitcode = $?;
@@ -114,90 +102,134 @@ $log->info("tar -xv -> $exitcode\n$ret");
 print pre($ret);
 # revorss::write($ret, $htmldir, -1, 0);
 
-chdir $xmldir
-  or die "'chdir $xmldir' ne funkciis\n";
-
-# por ĉiuj XML-dosieroj en la tar-arĥivo ni traktas ankaŭ 
-# samnoman JSON-dosieron por aktualigi la datumbazon.  
-my @arts;
-while ($ret =~ m{
-    revo/xml/
-    ([^.\s]+)
-    \.xml
-  }gmx) {
-  push @arts, $1;
+# traktu JSON-dosierojn samnomajn kiel XML-dosierojn
+# kaj aktualigu per ili la enhavon de la datumbazo 
+if ($kmd eq 'malpaku') {
+  art_db($ret);
 }
 
-# aktualigu la informojn pri la artikolo en la datumbazo
-my $dbh = revodb::connect();
-art_db::process($dbh,\@arts,$db_verbose);
-$dbh->disconnect() or die "DB-fermo ne funkcias\n";
-
-chdir $htmldir or die "'chdir $htmldir' ne funkciis\n";
-
-########### forigi ##############
-
-### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
-
-$ret = `pwd 2>&1`;
-$exitcode = $?;
-#print h2("pwd -> $exitcode");
-$log->info("pwd -> $exitcode\n$ret");
-#print pre($ret);
-
-if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
-  my @forigendaj = <$in>;
-  close $in;
-
-#  print h2("open true");
-  my $count = 0;
-  for (@forigendaj) {
-    chomp;
-    if (m{^(?:
-        revo|tgz
-      )/}x
-    and not m{(?:
-        \.\.
-        |[\s\*\?]
-      )}x 
-    and not m{^$}x) {
-
-      print h2("forigi $_");
-      $log->info("forigi $_\n");
-
-      my $for = unlink $_;
-      $count += $for;
-      print h2("forigi $_ malsukcesis: $!") if !$for;
-      $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
-
-    } else {
-      print h2("ne permesita $_");
-      $log->warn("ne permesita $_\n");
-    }
-  }
-
-  print h2("forigis: $count");
-  $log->info("forigis: $count\n");
+# forigu dosierojn el la listo
+if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
+  bv_forigu();
 }
 
 $log->info("date: ".`date`."\n");
 
-$ret = `du -sh $homedir`;
-#print h2("du -> $exitcode");
-print pre($ret);
-
 ### forigu arĥivojn malnovajn je pli ol 7 tagoj
-my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
-$ret = `find $findargs`;
-$log->info("(malnovaj) find $findargs -> \n$ret\n");
+if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
+  forigu_malnovajn();
 
-my @malnovaj = split(/\n/,$ret);
-for (@malnovaj) {
-  chomp;
-  unlink $_;
+  $ret = `du -sh $homedir`;
+  #print h2("du -> $exitcode");
+  print pre($ret);
 }
 
 $log->info("<<< FINO de uprevo.pl\n\n");
 print end_html;
 
-1;
+#############################
+
+sub make_log {
+
+  my $log = Log::Dispatch->new(
+      outputs => [
+          #[ 'File', min_level => $loglevel, filename => "$homedir/files/log/uprevo.log" ]
+          #[ 'Screen', min_level => $loglevel ],
+      ],
+  );
+  $log->add(Log::Dispatch::FileRotate->new(
+      name      => 'uprevo.log',
+      min_level => $loglevel,
+      filename  => "$homedir/files/log/uprevo.log",
+      mode      => 'append' ,
+      TZ        => 'UTC',
+      DatePattern => 'yyyy-dd-HH'),
+      max       => 31,
+      size      => 10 * 1024 * 1024
+  ) or die("Ne eblas skribi protokolon 'uprevo.log'\n");
+
+  return $log;
+}
+
+sub art_db {
+  my $files = shift;
+
+  chdir $xmldir
+    or die "'chdir $xmldir' ne funkciis\n";
+
+  # por ĉiuj XML-dosieroj en la tar-arĥivo ni traktas ankaŭ 
+  # samnoman JSON-dosieron por aktualigi la datumbazon.  
+  my @arts;
+  while ($files =~ m{
+      revo/xml/
+      ([^.\s]+)
+      \.xml
+    }gmx) {
+    push @arts, $1;
+  }
+
+  # aktualigu la informojn pri la artikolo en la datumbazo
+  my $dbh = revodb::connect();
+  art_db::process($dbh,\@arts,$db_verbose);
+  $dbh->disconnect() or die "DB-fermo ne funkcias\n";
+}
+
+sub bv_forigu {
+
+  chdir $htmldir or die "'chdir $htmldir' ne funkciis\n";
+
+  ########### forigi ##############
+
+  ### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
+
+  $ret = `pwd 2>&1`;
+  $exitcode = $?;
+  #print h2("pwd -> $exitcode");
+  $log->info("pwd -> $exitcode\n$ret");
+  #print pre($ret);
+
+  if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
+    my @forigendaj = <$in>;
+    close $in;
+
+  #  print h2("open true");
+    my $count = 0;
+    for (@forigendaj) {
+      chomp;
+      if (m{^revo/}x # forigu nur en dosierujoj ./revo/
+      and not m{(?:
+          \.\.        # ne permesu forigi en parencaj dosierujoj
+          |[\s\*\?]   # ne permesu spacojn aŭ ĵokerojn de forigendaj dosiernomoj
+        )}x 
+      and not m{^$}x) {
+
+        print h2("forigi $_");
+        $log->info("forigi $_\n");
+
+        my $for = unlink $_;
+        $count += $for;
+        print h2("forigi $_ malsukcesis: $!") if !$for;
+        $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
+
+      } else {
+        print h2("ne permesita $_");
+        $log->warn("ne permesita $_\n");
+      }
+    }
+
+    print h2("forigis: $count");
+    $log->info("forigis: $count\n");
+  }
+}
+
+sub forigu_malnovajn {
+  my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
+  $ret = `find $findargs`;
+  $log->info("(malnovaj) find $findargs -> \n$ret\n");
+
+  my @malnovaj = split(/\n/,$ret);
+  for (@malnovaj) {
+    chomp;
+    unlink $_;
+  }
+}
