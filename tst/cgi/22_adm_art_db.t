@@ -40,7 +40,7 @@ if ($content) {
 
     $mech->title_like(qr/aktualigu datumbazon.*json/, 'Titolo \'aktualigu...\' troviĝis');
     $mech->has_tag_like('pre',qr/$art/, "Troviĝas <pre>$art...");
-    $mech->has_tag_like('pre',qr/art: 1\s+kap: 1\s+mrk: 4\s+ref: 3\s+trd: 45/,'Analizrezulto troviĝis');   
+    $mech->has_tag_like('pre',qr/art: 1\s+kap: 1\s+mrk: 4\s+ref: 3\s+trd: 45/,'Aktualigrezulto troviĝis');   
    
 } else {
     diag("Ni ne ricevis rezulton kiel HTML.");
