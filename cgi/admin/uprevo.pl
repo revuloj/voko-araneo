@@ -10,11 +10,17 @@
 # vd. (voko-formiko/ant/spegulo.xml:revo-upload2)
 #
 # En la fino ni ankoraŭ forigos ĉiujn arĥivojn pli malnovajn ol 7 tagojn
+#
+# kun kmd=nur_listigu la enhavo de la arĥivo estas listigita, sed ne malpakita
+# kun kmd=nur_forigu ni ne malpakas novajn/ŝanĝitaj dosierojn, sed nur forigas dosierojn de la listo bv_forigu_tiujn.lst
 
 use warnings; use strict;
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
+
+use Symbol 'gensym';
+use IPC::Open3 'open3'; #$SIG{CHLD} = 'IGNORE';
 
 # apt install liblog-dispatch-perl liblog-dispatch-filerotate-perl
 use Log::Dispatch; use Log::Dispatch::FileRotate;
@@ -25,7 +31,6 @@ use art_db; # r3 - tezaŭro
 # use revorss;
 use revodb;
 
-my $exitcode;
 my $loglevel = 'info';
 my $db_verbose = 1;
 
@@ -65,47 +70,26 @@ local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
 local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 #print h1("PATH = ".$ENV{'PATH'});
 
-#open my $log, '>>', "$homedir/files/log/uprevo.log" or die("Ne eblas skribi protokolon 'uprevo.log'\n");
-#autoflush $log 1;
-
-## no critic (InputOutput::ProhibitBacktickOperators)
-my $ret = `du -sh $homedir`;
-$exitcode = $?;
-#print $log "du -> $exitcode\n$ret\n";
-$log->info("### du -> $exitcode\n$ret\n");
-
-
-print pre($ret);
-
 $log->info(">>> EKO de uprevo.pl JE ".localtime()." kun fname=$fname\n");
 
-unless ($fname =~ m{^
-    revo-
-    \d\d\d\d\d\d\d\d_ # dato
-    \d\d\d\d\d\d      # tempo
-    \.tgz
-  $}x) {
-  $log->error("Nevalidaj parametroj\n\n");
-  print h1("Nevalidaj parametroj"), end_html;
-  exit 1;
-}
+disk_usage();
+check_fname($fname);
 
+# montru/malpaku la tar-arĥivon
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
 
-$ret = `tar $tarflags alveno/$fname $ujoj 2>&1`;
-# revo/revo.ico revo/revo.jpg revo/revo.gif revo/travidebla.gif bv_forigu_tiujn.lst 2>&1`;
+my ($tar_xc,$tar_out,$tar_err) = sys_command("tar $tarflags alveno/$fname $ujoj");
+$log->error("### tar $tarflags... -> $tar_xc\n$tar_err") if ($tar_err);
+$log->info("### tar $tarflags... -> $tar_xc\n$tar_out");
 
-$exitcode = $?;
-print h2("tar -xv -> $exitcode");
-$log->info("tar -xv -> $exitcode\n$ret");
-print pre($ret);
-# revorss::write($ret, $htmldir, -1, 0);
+print h2("tar -xv -> $tar_xc");
+print pre($tar_err . $tar_out);
 
 # traktu JSON-dosierojn samnomajn kiel XML-dosierojn
 # kaj aktualigu per ili la enhavon de la datumbazo 
 if ($kmd eq 'malpaku') {
-  art_db($ret);
+  art_db($tar_out);
 }
 
 # forigu dosierojn el la listo
@@ -113,15 +97,13 @@ if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
   bv_forigu();
 }
 
-$log->info("date: ".`date`."\n");
+my ($dt_xc,$dt_out,$dt_err) = sys_command('date');
+$log->info("dato: $dt_out\n");
 
 ### forigu arĥivojn malnovajn je pli ol 7 tagoj
 if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
   forigu_malnovajn();
-
-  $ret = `du -sh $homedir`;
-  #print h2("du -> $exitcode");
-  print pre($ret);
+  disk_usage();
 }
 
 $log->info("<<< FINO de uprevo.pl\n\n");
@@ -131,13 +113,13 @@ print end_html;
 
 sub make_log {
 
-  my $log = Log::Dispatch->new(
+  my $logger = Log::Dispatch->new(
       outputs => [
           #[ 'File', min_level => $loglevel, filename => "$homedir/files/log/uprevo.log" ]
           #[ 'Screen', min_level => $loglevel ],
       ],
   );
-  $log->add(Log::Dispatch::FileRotate->new(
+  $logger->add(Log::Dispatch::FileRotate->new(
       name      => 'uprevo.log',
       min_level => $loglevel,
       filename  => "$homedir/files/log/uprevo.log",
@@ -148,7 +130,33 @@ sub make_log {
       size      => 10 * 1024 * 1024
   ) or die("Ne eblas skribi protokolon 'uprevo.log'\n");
 
-  return $log;
+  return $logger;
+}
+
+sub disk_usage {
+  my ($du_xc,$du_out,$du_err) = sys_command("du -sh $homedir");
+  $log->error("### du -> $du_xc\n$du_err") if ($du_err);
+  $log->info("### du -> $du_xc\n$du_out");
+
+  print pre($du_out);
+  return;
+}
+
+sub check_fname {
+  my $fn = shift;
+
+  unless ($fn =~ m{^
+      revo-
+      \d\d\d\d\d\d\d\d_ # dato
+      \d\d\d\d\d\d      # tempo
+      \.tgz
+    $}x) {
+    $log->error("Nevalidaj parametroj\n\n");
+    print h1("Nevalidaj parametroj"), end_html;
+    exit 1;
+  }
+
+  return;
 }
 
 sub art_db {
@@ -171,7 +179,9 @@ sub art_db {
   # aktualigu la informojn pri la artikolo en la datumbazo
   my $dbh = revodb::connect();
   art_db::process($dbh,\@arts,$db_verbose);
+
   $dbh->disconnect() or die "DB-fermo ne funkcias\n";
+  return;
 }
 
 sub bv_forigu {
@@ -182,12 +192,9 @@ sub bv_forigu {
 
   ### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
 
-  $ret = `pwd 2>&1`;
-  $exitcode = $?;
-  #print h2("pwd -> $exitcode");
-  $log->info("pwd -> $exitcode\n$ret");
-  #print pre($ret);
-
+  my ($pwd_xc,$pwd_out,$pwd_err) = sys_command('pwd');
+  $log->info("pwd -> $pwd_xc\n$pwd_out$pwd_err");
+  
   if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
     my @forigendaj = <$in>;
     close $in;
@@ -220,16 +227,35 @@ sub bv_forigu {
     print h2("forigis: $count");
     $log->info("forigis: $count\n");
   }
+  return;
 }
 
 sub forigu_malnovajn {
   my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
-  $ret = `find $findargs`;
-  $log->info("(malnovaj) find $findargs -> \n$ret\n");
 
-  my @malnovaj = split(/\n/,$ret);
+  my ($find_xc,$find_out,$find_err) = sys_command("find $findargs");
+  $log->error("### du -> $find_xc\n$find_err") if ($find_err);
+  $log->info("(malnovaj) find $findargs -> \n$find_out\n");
+
+  my @malnovaj = split(/\n/x,$find_out);
   for (@malnovaj) {
     chomp;
     unlink $_;
   }
+  return;
+}
+
+sub sys_command {
+  my $command = shift;
+
+  my $pid = open3(my $writer, my $reader, my $err = gensym, $command); 
+  close $writer; # ni ne skribas al la uzataj komandoj
+  my $output = do { local $/ = undef; <$reader> };  
+  my $errors = do { local $/ = undef; <$err> };
+  close $reader; close $err;
+
+  waitpid($pid, 0);
+  my $exit_code = $?; # >> 8;
+
+  return ($exit_code,$output,$errors);
 }
