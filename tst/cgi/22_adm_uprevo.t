@@ -36,14 +36,37 @@ test_http_status("$xmlurl/$art0", 200, "$xmlurl/$art0 ekzistu (200)");
 #diag("$xmlurl/$art");
 test_http_status("$xmlurl/$art", 404, "$xmlurl/$art ankoraŭ ne ekzistu (404)");
 
+# mankanta /malĝusta parametro fname
+test_http_status("$url", 400, "Parametro 'fname' mankas (400)");
+test_http_status("$url?fname=revo-blabla.tgz", 400, "Parametro 'fname' donas fuŝitan dosiernomon (400)");
+test_http_status("$url?fname=revo-20200401_000000.tgz", 404, "Parametro 'fname' donas neekzistan dosieron (404)");
+
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
 
 # kapoj
-$mech->add_header('Accept' => 'application/json');
+$mech->add_header('Accept' => 'text/html');
 
-# 3. petu la paĝon kaj kontrolu la rezulton
-# get_ok() kontrolas la rezulton (stato 2xx)
+# 3a. petu la paĝon kaj kontrolu la rezulton
+$mech->post_ok($url, [
+    kmd => 'nur_listigu',
+    fname => $tgz
+], "Peto al $url");
+
+# kmd=nur_listigu devus lasi la dosierojn netuŝitaj
+test_http_status("$xmlurl/$art0", 200, "$xmlurl/$art0 ekzistu (200)");
+test_http_status("$xmlurl/$art", 404, "$xmlurl/$art ankoraŭ ne ekzistu (404)");
+
+my $content = $mech->content; # malkodita enhavo
+
+if ($content) {
+    note($content);
+    $mech->has_tag_like('h2',qr|/bin/tar -tvzf|,"Troviĝas /bin/tar -tvzf...");
+    $mech->has_tag_like('pre',qr|revo/xml/test333.xml|,"Troviĝas revo/xml/test333.xml");
+    $mech->has_tag_like('pre',qr|bv_forigu_tiujn.lst|,"Troviĝas bv_forigu_tiujn.lst");
+}
+
+# 3b. nun malpaku/forigu dosierojn
 $mech->post_ok($url, [
     fname => $tgz
 ], "Peto al $url");
@@ -56,11 +79,11 @@ like(
 );
 
 # 4. kontrolu la enhavon
-my $content = $mech->content; # malkodita enhavo
+$content = $mech->content; # malkodita enhavo
 
 if ($content) {
 
-    diag($content);
+    note($content);
 
     $mech->title_is('Sendu sxangxitajn pagxojn', 'Titolo \'Sendu...\' troviĝis');
     $mech->has_tag_like('pre',qr/$art/, "Troviĝas <pre>$art...");
