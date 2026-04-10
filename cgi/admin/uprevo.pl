@@ -22,11 +22,12 @@ use IO::Handle;
 # debian/ubuntu: libipc-run-perl
 use IPC::Run qw(run); 
 
+# propraj perl moduloj estas en:
+use lib("/hp/af/ag/ri/files/perllib");
+
 # apt install liblog-dispatch-perl liblog-dispatch-filerotate-perl
 use Log::Dispatch; use Log::Dispatch::FileRotate;
 
-# propraj perl moduloj estas en:
-use lib("/hp/af/ag/ri/files/perllib");
 use art_db; # r3 - tezaŭro
 # use revorss;
 use revodb;
