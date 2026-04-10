@@ -77,7 +77,7 @@ $mech->post_ok($url, [
 like(
     $mech->response->header('Content-Type'),
     qr{text/html}i,
-    'Ĝusta enhavtipo (html, utf-8)'
+    'Ĝusta enhavtipo (html)'
 );
 
 # 4. kontrolu la enhavon

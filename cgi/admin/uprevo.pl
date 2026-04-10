@@ -248,7 +248,7 @@ sub sys_run {
     $log->error('['.join(' ',@command). "]: $!\n$err\n");
   };
   my $exit_code = $? >> 8;
-  $log->info('['.join(' ',@command). "]:$out\n") unless ($exit_code);
+  $log->info('['.join(' ',@command). "]:\n$out\n"); # unless ($exit_code);
   return $out;
 }
 
