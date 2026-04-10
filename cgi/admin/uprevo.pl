@@ -19,8 +19,8 @@ use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 use Cwd;
 use IO::Handle;
 
-use Symbol 'gensym';
-use IPC::Open3 'open3'; #$SIG{CHLD} = 'IGNORE';
+# debian/ubuntu: libipc-run-perl
+use IPC::Run qw(run); 
 
 # apt install liblog-dispatch-perl liblog-dispatch-filerotate-perl
 use Log::Dispatch; use Log::Dispatch::FileRotate;
@@ -51,12 +51,12 @@ if (! -s "$htmldir/alveno/$fname") {
 
 # povas esti alternative nur_listigu | nur_forigu
 my $kmd = param('kmd') || 'malpaku';
-my $tarflags = '-xvzf';
-my $ujoj = 'revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx'; # malpaku nur tiujn
+my @ujoj = qw(revo/art revo/hst revo/xml revo/cfg revo/tez revo/bld revo/inx); # malpaku nur tiujn
+my @tar_cmd = (qw(/bin/tar -xvzf), "alveno/$fname", @ujoj);
 
 if ($kmd eq 'nur_listigu') {
-  $tarflags = '-tvzf';
-  $ujoj = ''; # listigu ĉion
+  @tar_cmd = (qw(/bin/tar -tvzf), "alveno/$fname"); # listigu ĉion
+  @ujoj = (); 
 }
 
 print header,
@@ -79,16 +79,14 @@ check_fname($fname);
 chdir $htmldir
   or die "'chdir $htmldir' ne funkciis\n";
 
-my ($tar_xc,$tar_out,$tar_err) = sys_command("tar $tarflags alveno/$fname $ujoj");
-$log->error("### tar $tarflags... -> $tar_xc\n$tar_err") if ($tar_err);
-$log->info("### tar $tarflags... -> $tar_xc\n$tar_out");
+my $tar_out = sys_run(@tar_cmd);
 
-print h2("tar -xv -> $tar_xc");
-print pre($tar_err . $tar_out);
+print h2(join(' ',@tar_cmd));
+print pre($tar_out);
 
 # traktu JSON-dosierojn samnomajn kiel XML-dosierojn
 # kaj aktualigu per ili la enhavon de la datumbazo 
-if ($kmd eq 'malpaku') {
+if ($kmd eq 'malpaku' && $tar_out) {
   art_db($tar_out);
 }
 
@@ -97,8 +95,7 @@ if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
   bv_forigu();
 }
 
-my ($dt_xc,$dt_out,$dt_err) = sys_command('date');
-$log->info("dato: $dt_out\n");
+$log->info("dato: ".sys_run_nolog('date'));
 
 ### forigu arĥivojn malnovajn je pli ol 7 tagoj
 if ($kmd eq 'malpaku' || $kmd eq 'nur_forigu') {
@@ -134,10 +131,7 @@ sub make_log {
 }
 
 sub disk_usage {
-  my ($du_xc,$du_out,$du_err) = sys_command("du -sh $homedir");
-  $log->error("### du -> $du_xc\n$du_err") if ($du_err);
-  $log->info("### du -> $du_xc\n$du_out");
-
+  my $du_out = sys_run(qw(du -sh), $homedir);
   print pre($du_out);
   return;
 }
@@ -192,70 +186,71 @@ sub bv_forigu {
 
   ### PLIBONIGU: ankaŭ voku call forigu_art(*) por forigi ilin el la datumbazo!
 
-  my ($pwd_xc,$pwd_out,$pwd_err) = sys_command('pwd');
-  $log->info("pwd -> $pwd_xc\n$pwd_out$pwd_err");
-  
-  if (open my $in, '-|', "tar", "-xOzf","alveno/$fname","bv_forigu_tiujn.lst") {
-    my @forigendaj = <$in>;
-    close $in;
+  my $pwd_out = sys_run('pwd');  
+  my $forigendaj = sys_run(qw(/bin/tar -xOzf), "alveno/$fname", 'bv_forigu_tiujn.lst');
 
-  #  print h2("open true");
-    my $count = 0;
-    for (@forigendaj) {
-      chomp;
-      if (m{^revo/}x # forigu nur en dosierujoj ./revo/
-      and not m{(?:
-          \.\.        # ne permesu forigi en parencaj dosierujoj
-          |[\s\*\?]   # ne permesu spacojn aŭ ĵokerojn de forigendaj dosiernomoj
-        )}x 
-      and not m{^$}x) {
+#  print h2("open true");
+  my $count = 0;
+  for ( split(/\n/x, $forigendaj) ) {
+    chomp;
+    if (m{^revo/}x # forigu nur en dosierujoj ./revo/
+    and not m{(?:
+        \.\.        # ne permesu forigi en parencaj dosierujoj
+        |[\s\*\?]   # ne permesu spacojn aŭ ĵokerojn de forigendaj dosiernomoj
+      )}x 
+    and not m{^$}x) {
 
-        print h2("forigi $_");
-        $log->info("forigi $_\n");
+      print h2("forigi $_");
+      $log->info("forigi $_\n");
 
-        my $for = unlink $_;
-        $count += $for;
-        print h2("forigi $_ malsukcesis: $!") if !$for;
-        $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
+      my $for = unlink $_;
+      $count += $for;
+      print h2("forigi $_ malsukcesis: $!") if !$for;
+      $log->warn("forigi $_ malsukcesis: $!\n") if !$for;
 
-      } else {
-        print h2("ne permesita $_");
-        $log->warn("ne permesita $_\n");
-      }
+    } else {
+      print h2("ne permesita $_");
+      $log->warn("ne permesita $_\n");
     }
-
-    print h2("forigis: $count");
-    $log->info("forigis: $count\n");
   }
+
+  print h2("forigis: $count");
+  $log->info("forigis: $count\n");
   return;
 }
 
 sub forigu_malnovajn {
-  my $findargs = "$htmldir/alveno -mtime +7 -name \\*gz";
+  my @find_cmd = ('/usr/bin/find',"$htmldir/alveno",qw(-mtime +7 -name \\*gz));
 
-  my ($find_xc,$find_out,$find_err) = sys_command("find $findargs");
-  $log->error("### du -> $find_xc\n$find_err") if ($find_err);
-  $log->info("(malnovaj) find $findargs -> \n$find_out\n");
+  my $find_out = sys_run(@find_cmd);
 
-  my @malnovaj = split(/\n/x,$find_out);
-  for (@malnovaj) {
+  # forigi dosierojn listigitajn en $find_out
+  for ( split(/\n/x,$find_out) ) {
     chomp;
     unlink $_;
   }
   return;
 }
 
-sub sys_command {
-  my $command = shift;
+sub sys_run {
+  my @command = @_;
 
-  my $pid = open3(my $writer, my $reader, my $err = gensym, $command); 
-  close $writer; # ni ne skribas al la uzataj komandoj
-  my $output = do { local $/ = undef; <$reader> };  
-  my $errors = do { local $/ = undef; <$err> };
-  close $reader; close $err;
+  my ($out, $err);
+  run \@command, \undef, \$out, \$err or do {
+    $log->error('['.join(' ',@command). "]: $!\n$err\n");
+  };
+  my $exit_code = $? >> 8;
+  $log->info('['.join(' ',@command). "]:$out\n") unless ($exit_code);
+  return $out;
+}
 
-  waitpid($pid, 0);
-  my $exit_code = $?; # >> 8;
 
-  return ($exit_code,$output,$errors);
+sub sys_run_nolog {
+  my @command = @_;
+
+  my ($out, $err);
+  run \@command, \undef, \$out, \$err or do {
+    $log->error(join(' ',@command). ": $!\n$err\n");
+  };
+  return $out;
 }

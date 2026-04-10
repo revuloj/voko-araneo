@@ -84,7 +84,7 @@ ARG REVO_DIR=/usr/local/apache2/htdocs/revo
 # mysql TLS atestilo problemo kun:  
 # mariadb-connector-c perl-dev mariadb-connector-c-dev zlib-dev openssl-dev
 RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
-    perl-cgi perl-fcgi perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
+    perl-cgi perl-fcgi perl-ipc-run perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
     perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
     perl-app-cpanminus perl-extutils-installpaths perl-http-message \
     perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \

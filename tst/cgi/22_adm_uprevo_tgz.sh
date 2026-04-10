@@ -40,7 +40,7 @@ echo ">>> ${tgz}"
 tar -tvzf ${tmp_dir}/${tgz}
 
 # kopiu la arĥivon en Araneon
-docker exec -u root ${araneo_id} rm /hp/af/ag/ri/www/$art
+docker exec -u root ${araneo_id} rm -f /hp/af/ag/ri/www/$art
 docker cp ${tmp_dir}/${art} ${araneo_id}:/hp/af/ag/ri/www/$art0
 docker exec -u root ${araneo_id} chown daemon /hp/af/ag/ri/www/$art0
 docker cp ${tmp_dir}/${tgz} ${araneo_id}:/hp/af/ag/ri/www/alveno/

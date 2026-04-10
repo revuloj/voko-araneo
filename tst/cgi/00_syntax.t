@@ -48,8 +48,6 @@ sintaks_kontrolo("./cgi/admin/submeto.pl");
 sintaks_kontrolo("./cgi/admin/time.pl");
 sintaks_kontrolo("./cgi/admin/upofc.pl");
 sintaks_kontrolo("./cgi/admin/uprevo.pl");
-sintaks_kontrolo("./cgi/admin/uprevorm.pl");
-sintaks_kontrolo("./cgi/admin/uprevotv.pl");
 sintaks_kontrolo("./cgi/admin/upviki.pl");
 
 done_testing();
