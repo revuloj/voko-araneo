@@ -26,6 +26,9 @@ use IPC::Run qw(run);
 use lib("/hp/af/ag/ri/files/perllib");
 
 # apt install liblog-dispatch-perl liblog-dispatch-filerotate-perl
+# ĉe problemoj instali Log::Dispatch::FileRotate + Date::Manip en la servilo
+# oni povus alpendigi daton al la protokol-dosiernomo kaj
+# forigi malnovajn per find+unlink same kiel la arĥivojn
 use Log::Dispatch; use Log::Dispatch::FileRotate;
 
 use art_db; # r3 - tezaŭro

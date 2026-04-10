@@ -8,12 +8,13 @@ use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
+my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
 my $eldono = '2p';
 
 # 1. parametroj
 my $sercxata = url_encode('sen%');
 my $lingvoj = 'en,de,fr,nl';
-my $url = "http://0.0.0.0:8088/cgi-bin/sercxu-json-$eldono.pl";
+my $url = "$REVO_HOST/cgi-bin/sercxu-json-$eldono.pl";
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();

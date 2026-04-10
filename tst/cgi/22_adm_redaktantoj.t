@@ -11,7 +11,8 @@ use URL::Encode qw(url_encode);
 #no_plan;
 
 # 1. parametroj
-my $url = "http://0.0.0.0:8088/cgi-bin/admin/redaktantoj.pl";
+my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+my $url = "$REVO_HOST/cgi-bin/admin/redaktantoj.pl";
 my $CGI_USER = $ENV{CGI_USER};
 my $CGI_PWD = $ENV{CGI_PWD};
 # ni kontrolos ĉu la koncerna redaktanto estas en la listo

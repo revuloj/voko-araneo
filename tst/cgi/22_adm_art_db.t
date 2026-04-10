@@ -10,7 +10,8 @@ use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
 # 1. parametroj
-my $url = "http://0.0.0.0:8088/cgi-bin/admin/art_db.pl";
+my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+my $url = "REVO_HOST/cgi-bin/admin/art_db.pl";
 my $art = 'oktav';
 
 # 2. preparo de TTT-testkliento

@@ -18,7 +18,7 @@ use utf8; use open ':std', ':encoding(UTF-8)';
 use CGI qw(:standard *table); use CGI::Carp qw(fatalsToBrowser);
 use DBI();
 
-use IPC::Open3;
+use IPC::Open3; $SIG{CHLD} = 'IGNORE'; 
 # use Encode;
 
 use Text::Tabs;

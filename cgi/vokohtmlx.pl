@@ -7,7 +7,8 @@ use warnings; use strict; use utf8;
 
 use CGI qw(:standard); use CGI::Carp qw(fatalsToBrowser);
 
-use IPC::Open3; # uzata de xml2html.pm
+# uzata ankaŭ de xml2html.pm!
+use IPC::Open3 'open3'; # ni uzos waitpid malsupre: $SIG{CHLD} = 'IGNORE'; 
 use Encode;
 
 my $debug = 0;
@@ -70,7 +71,7 @@ sub konv {
     close $in;
   }
   
-  my $pid = IPC::Open3::open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
+  my $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
                       "$xsltproc");
   binmode(CHLD_IN, ":encoding(UTF-8)");               
   print CHLD_IN $$xml;
@@ -82,6 +83,9 @@ sub konv {
   close CHLD_OUT;
   $$err_ = do { local $/ = undef; <CHLD_ERR>};
   close CHLD_ERR;
+
+  waitpid($pid, 0);
+  #my $exit_code = $?; 
 
   {
     $$html_ =~ s{<!DOCTYPE\s+.*?>}{}smx;

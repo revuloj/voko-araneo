@@ -12,9 +12,11 @@ use URL::Encode qw(url_encode);
 # por sencimigi Mechanize
 # use LWP::ConsoleLogger::Everywhere;
 
+my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+
 # 1. parametroj
-my $url = "http://127.0.0.1:8088/cgi-bin/admin/uprevo.pl";
-my $xmlurl = "http://localhost:8088/revo/xml";
+my $url = "$REVO_HOST/cgi-bin/admin/uprevo.pl";
+my $xmlurl = "$REVO_HOST/revo/xml";
 my $tgzscr = "tst/cgi/22_adm_uprevo_tgz.sh";
 my $art0 = 'test000.xml';
 my $art = 'test333.xml';

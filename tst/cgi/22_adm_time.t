@@ -10,7 +10,8 @@ use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
 # 1. parametroj
-my $url = "http://0.0.0.0:8088/cgi-bin/admin/time.pl";
+my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+my $url = "$REVO_HOST/cgi-bin/admin/time.pl";
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();

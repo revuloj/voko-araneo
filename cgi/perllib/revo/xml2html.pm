@@ -46,6 +46,9 @@ sub konv {
   print "<pre>err=$$err</pre>\n" if $$err and $debug;
   close CHLD_ERR;
 
+  waitpid($pid, 0); # altenative metu $SIG{CHLD} = 'IGNORE'; 
+  # my $exit_code = $?; # >> 8;
+
 #  open IN, "<", "$homedir/html/revo/art/$art.html" or die "open";
 #  my $html = join '', <IN>;
 #  close IN;
