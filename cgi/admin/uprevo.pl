@@ -44,11 +44,8 @@ my $log = make_log();
 
 ### tgz-arĥivo traktenda
 my $fname = param('fname');
-# kontrolu ĉu la malpakenda arĥivdosiero ekzistas
-if (! -s "$htmldir/alveno/$fname") {
-  print header(-status => '404 Not Found', -type => 'text/html');
-  exit;
-}
+check_fname($fname);
+
 
 # povas esti alternative nur_listigu | nur_forigu
 my $kmd = param('kmd') || 'malpaku';
@@ -64,6 +61,7 @@ print header,
       start_html('Sendu sxangxitajn pagxojn'),
       h1('fname='.param('fname'));
 
+
 #print h1("homedir = $homedir");
 
 local $ENV{'LD_LIBRARY_PATH'} = "$homedir/files/lib";
@@ -74,7 +72,6 @@ local $ENV{'PATH'} = $ENV{'PATH'}.":$homedir/files/bin";
 $log->info(">>> EKO de uprevo.pl JE ".localtime()." kun fname=$fname\n");
 
 disk_usage();
-check_fname($fname);
 
 # montru/malpaku la tar-arĥivon
 chdir $htmldir
@@ -140,15 +137,22 @@ sub disk_usage {
 sub check_fname {
   my $fn = shift;
 
-  unless ($fn =~ m{^
+  unless ($fn && $fn =~ m{^
       revo-
       \d\d\d\d\d\d\d\d_ # dato
       \d\d\d\d\d\d      # tempo
       \.tgz
     $}x) {
     $log->error("Nevalidaj parametroj\n\n");
-    print h1("Nevalidaj parametroj"), end_html;
+    print header(-status => '400 Invalid request', -type => 'text/html');
+    #print h1("Nevalidaj parametroj"), end_html;
     exit 1;
+  }
+
+  # kontrolu ĉu la malpakenda arĥivdosiero ekzistas
+  if (! -s "$htmldir/alveno/$fname") {
+    print header(-status => '404 Not Found', -type => 'text/html');
+    exit;
   }
 
   return;
