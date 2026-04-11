@@ -22,7 +22,11 @@ my $revo_dir = "/hp/af/ag/ri/www/revo";
 my $redaktilo = "/cgi-bin/vokomail.pl?art=";
 my $LIMIT = 20;
 
-#my $sercxata = param('q2');
+# ĉu validaj parametroj?
+unless (param('sxlosilo') && ( param('sxlosilo') == 1859 )) {
+  print header(-status => '400 Invalid request', -type => 'text/html');
+  exit 1;
+}
 
 my $lng = param('lng');
 my $refmrk = param('de') || param('ghis') || 'a';
@@ -37,54 +41,7 @@ print header(
 ), "<article>";
 
 unless ($lng) {
-  my @pref_lng = preflng();
-  my %lng; 
-  my %pref;
-
-  print h2("Elektu la lingvon:"),br;
-
-  # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
-  # utila eble estus ankaŭ JSON anst. XML-dosiero
-
-  # legu la lingvoliston
-  open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
-    or die "Ne eblas malfermi dosieron lingvoj.xml\n";
-  my @lingvoj = <$in>; close $in;
-
-  for (@lingvoj) {
-    if (m{
-      <lingvo\s+
-      kodo="([^"]+)"
-      >([^<]+)
-      </lingvo>
-    }x) {
-#      print "lng $1 -> $2".br."\n";
-      if ($1 ne "eo") {
-        #if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
-        if (List::Util::none { $1 eq $pref_lng[$_] } @pref_lng) {
-          $pref{$2} = $1;
-        } else {
-          $lng{$2} = $1;
-        }
-      }
-    }
-  }
-
-  foreach (sort keys %pref) {
-    print a({href=>"?lng=$pref{$_}"}, "$_").br."\n";
-  }
-
-  print br."<p style='column-count: 3'>";
-
-  #my $i;
-  foreach (sort keys %lng) {
-    #$i++;
-    print a({href=>"?lng=$lng{$_}"}, "$_").br."\n";
-  }
-
-  print "</p>";
-
-  exit 0;
+  sendu_lingvo_elekton();
 }
 
 $lng =~ m{^
@@ -152,6 +109,59 @@ print "</article>";
 print end_html();
 
 #########################################################
+
+sub sendu_lingvo_elektron {
+
+  my @pref_lng = preflng();
+  my %lng; 
+  my %pref;
+
+  print h2("Elektu la lingvon:"),br;
+
+  # PLIBONIGU: lingvoliston ni bezonas ankaŭ en sercxu.pl, eble metu al iu util.pm
+  # utila eble estus ankaŭ JSON anst. XML-dosiero
+
+  # legu la lingvoliston
+  open my $in, '<', "$revo_dir/cfg/lingvoj.xml"
+    or die "Ne eblas malfermi dosieron lingvoj.xml\n";
+  my @lingvoj = <$in>; close $in;
+
+  for (@lingvoj) {
+    if (m{
+      <lingvo\s+
+      kodo="([^"]+)"
+      >([^<]+)
+      </lingvo>
+    }x) {
+#      print "lng $1 -> $2".br."\n";
+      if ($1 ne "eo") {
+        #if ( grep { $pref_lng[$_] ~~ $1 } @pref_lng ) {
+        if (List::Util::none { $1 eq $pref_lng[$_] } @pref_lng) {
+          $pref{$2} = $1;
+        } else {
+          $lng{$2} = $1;
+        }
+      }
+    }
+  }
+
+  foreach (sort keys %pref) {
+    print a({href=>"?lng=$pref{$_}"}, "$_").br."\n";
+  }
+
+  print br."<p style='column-count: 3'>";
+
+  #my $i;
+  foreach (sort keys %lng) {
+    #$i++;
+    print a({href=>"?lng=$lng{$_}"}, "$_").br."\n";
+  }
+
+  print "</p>";
+
+  exit;
+}
+
 
 sub print_nav {
   my ($de_,$ghis_,$head) = @_;
