@@ -143,33 +143,10 @@ my $dbh = revodb::connect();
 #print pre('dbconnect'." size=".length($xml2)) if $debug;
 #print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
 
-#if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
 if ( param('button') && 
   (param('button') eq "antaŭrigardu" or param('button') eq 'konservu')) {
 
-  chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";    
-  xml2html_print(\$xml2);
-
-  #### kontroloj...
-  # xml
-  print $checkxml.br."\n";
-  # lingoj
-  print $checklng.br.br."\n" if ($checklng);
-  # tradukoj
-  trd_kontrolo(\$xml2);
-  # referencoj
-  my @ref_err = ref_kontrolo(\$xml);
-  # fakoj
-  fak_kontrolo(\$xml2);
-  # markoj
-  mrk_kontrolo(\$xml2);
-  # ŝanĝindiko de la redaktanto
-  $sxangxo = trakti_sxangxon($sxangxo);
-
-  print <<'EOD';
-</div><br>
-EOD
-
+  xml2html_kaj_kontrolo();
 }
 
 my $sth;
@@ -882,7 +859,7 @@ sub ref_kontrolo {
     }
   }
 
-  return @ref_err
+  return; # @ref_err
 }
 
 sub fak_kontrolo {
@@ -1135,6 +1112,33 @@ sub xml_context {
     }
 
     return ('', 0, 0);
+}
+
+sub xml2html_kaj_kontrolo {
+  chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";    
+  xml2html_print(\$xml2);
+
+  #### kontroloj...
+  # xml
+  print $checkxml.br."\n";
+  # lingoj
+  print $checklng.br.br."\n" if ($checklng);
+  # tradukoj
+  trd_kontrolo(\$xml2);
+  # referencoj
+  # @ref_err = 
+  ref_kontrolo(\$xml);
+  # fakoj
+  fak_kontrolo(\$xml2);
+  # markoj
+  mrk_kontrolo(\$xml2);
+  # ŝanĝindiko de la redaktanto
+  $sxangxo = trakti_sxangxon($sxangxo);
+
+  print <<'EOD';
+</div><br>
+EOD
+  return;
 }
 
 sub xml2html_print {
