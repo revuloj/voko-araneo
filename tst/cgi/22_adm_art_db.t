@@ -11,8 +11,8 @@ use URL::Encode qw(url_encode);
 
 # 1. parametroj
 my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
-my $url = "REVO_HOST/cgi-bin/admin/art_db.pl";
-my $art = 'oktav';
+my $url = "$REVO_HOST/cgi-bin/admin/art_db.pl";
+my $art = 'sept';
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
@@ -38,10 +38,11 @@ like(
 my $content = $mech->content; # malkodita enhavo
 
 if ($content) {
+    note($content);
 
     $mech->title_like(qr/aktualigu datumbazon.*json/, 'Titolo \'aktualigu...\' troviĝis');
     $mech->has_tag_like('pre',qr/$art/, "Troviĝas <pre>$art...");
-    $mech->has_tag_like('pre',qr/art: 1\s+kap: 1\s+mrk: 4\s+ref: 3\s+trd: 45/,'Aktualigrezulto troviĝis');   
+    $mech->has_tag_like('pre',qr/art: 1\s+kap: 1\s+mrk: 3\s+ref: 4\s+trd: 35/,'Aktualigrezulto troviĝis');   
    
 } else {
     diag("Ni ne ricevis rezulton kiel HTML.");

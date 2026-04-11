@@ -13,7 +13,7 @@ use URL::Encode qw(url_encode);
 
 # 1. parametroj
 my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
-my $url = "REVO_HOST/cgi-bin/vokosubm-json.pl";
+my $url = "$REVO_HOST/cgi-bin/vokosubm-json.pl";
 my $url_submeto = "$REVO_HOST/cgi-bin/vokosubmx.pl";
 my $redaktanto = $ENV{TEST_RETADRESO} || '_registrita_testredaktanto_@retavortaro.de';
 
@@ -37,6 +37,7 @@ my $json_parser = JSON->new->pretty;
 my $content = $mech->content; # malkodita enhavo
 
 if ($content) {
+
     # ĉu la JSON estas bonorda?
     my $arrayref = eval { $json_parser->decode($content) };
     
