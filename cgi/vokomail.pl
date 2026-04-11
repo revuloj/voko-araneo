@@ -62,21 +62,7 @@ my $debugmsg;
 # check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
 
 ## validigu la ceterajn parametrojn...
-check(length(param('xmlTxt')||'') < $xml_max_len, "xmlTxt");
-check(length(param('art')||'') < $art_max_len, "art");
-check(length(param('sxangxo')||'') < $sxg_max_len, "sxangxo");
-check(length(param('redaktanto')||'') < $red_max_len, "redaktanto");
-check(param('art')||'' =~ m{^[a-z0-9]+$}x, "art rx");
-
-# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
-# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! param('redaktanto') 
-  || param('redaktanto')||'' =~ m{^
-    [\w\.-]+
-    @[\w\.-]+
-    \.\w{2,12}
-  $}x, 
-  "red rx"); 
+param_kontrolo();
 
 my $art = param('art');
 #$debugmsg .= "art = $art\n";
@@ -1549,7 +1535,25 @@ EOD
   return;
 }
 
-#######################################################################################
+sub param_kontrolo {
+  check(length(param('xmlTxt')||'') < $xml_max_len, "xmlTxt");
+  check(length(param('art')||'') < $art_max_len, "art");
+  check(length(param('sxangxo')||'') < $sxg_max_len, "sxangxo");
+  check(length(param('redaktanto')||'') < $red_max_len, "redaktanto");
+  check(param('art')||'' =~ m{^[a-z0-9]+$}x, "art rx");
+
+  # tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+  # la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+  check(! param('redaktanto') 
+    || param('redaktanto')||'' =~ m{^
+      [\w\.-]+
+      @[\w\.-]+
+      \.\w{2,12}
+    $}x, 
+    "red rx"); 
+
+  return 1;
+}
 
 sub check {
   my $cond = shift;
