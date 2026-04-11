@@ -49,6 +49,9 @@ local $ENV{'LOCPATH'} = "$homedir/files/locale";
 
 my $enc = "utf-8";
 
+use open ':std', ':encoding(UTF-8)';
+##binmode STDOUT, ":utf8";
+
 ## parametroj...
 my $art = param('art');
 my $xmlTxt = param('xmlTxt');
@@ -57,15 +60,20 @@ my $redaktanto = param('redaktanto');
 my $sxangxo = Encode::decode($enc, param('sxangxo'));
 my $command = param('command');
 
-use open ':std', ':encoding(UTF-8)';
-##binmode STDOUT, ":utf8";
+param_kontrolo();
 
-print header(-charset=>'utf-8',
-             -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
-      start_html(
-             -lang=>'eo', 
-             -title=>'vokomailx',
-		         -encoding => 'UTF-8');
+
+print 
+  header(
+    -charset=>'utf-8',
+    -pragma => 'no-cache', 
+    '-cache-control' =>  'no-cache'
+  ),
+  start_html(
+    -lang=>'eo', 
+    -title=>'vokomailx',
+    -encoding => 'UTF-8'
+  );
 
 if ($debug) {
   print "<div id=\"params\">";
@@ -76,28 +84,6 @@ if ($debug) {
   print "xml: ".length($xmlTxt)."\n";
   print "</div>\n";
 }
-
-
-# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
-check($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo'), "command");
-
-## validigu la ceteran parametrojn...
-check(length($xmlTxt) < $xml_max_len, "xmlTxt");
-check(length($art) < $art_max_len, "art");
-check(length($sxangxo) < $sxg_max_len, "sxangxo");
-check(length($redaktanto) < $red_max_len, "redaktanto");
-check($art =~ m{^
-    [a-z0-9]+
-  $}x, "art rx");
-
-# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
-# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! $redaktanto 
-  || $redaktanto =~ m{^
-    [\w\.-]+
-    @[\w\.-]+
-    \.\w{2,12}
-  $}x, "red rx"); 
 
 # Konektiĝu al la datumbazo...
 # ni bezonos gin por kontroli redaktanton kaj referencojn
@@ -136,63 +122,19 @@ print "<div id=\"xml_err\" class=\"eraroj\">\n$xml_err\n</div>\n";
 # en la datumbazo...
 #
 # krome ni povas eble ekskuldi artikol-internajn referencojn, aŭ facile antaŭkontroli ilin...
-my @ref_err;
-
-my @refs;
-while ($xml =~ m{
-    <ref\s+[^>]*?
-    cel="([^".]*)(\.)([^"]*?)"
-    >
-  }xgi) {
-  my ($art_,$p,$rest) = ($1,$2,$3);
-  push @refs, [$art_,$p,$rest];
-};
-
-if (@refs) {
-  @ref_err = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
-};
+my @ref_err = ref_kontrolo();
 
 print "<div id=\"ref_err\" class=\"eraroj\">\n".join("\n",@ref_err)."\n</div>\n";
 
-# FARENDA: fakte kun la transiro al Git ni povas toleri
-# ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
-# kontroli processmail.pl antaŭ forigi tie ĉi
-my $flag = 0;
 my $sxg_err;
-## no critic (RegularExpressions::RequireExtendedFormatting)
-$flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
-$flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
-$flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
-$flag = $sxangxo =~ s/\x{0134}/Jx/g || $flag;
-$flag = $sxangxo =~ s/\x{0125}/hx/g || $flag;
-$flag = $sxangxo =~ s/\x{0124}/Hx/g || $flag;
-$flag = $sxangxo =~ s/\x{016D}/ux/g || $flag;
-$flag = $sxangxo =~ s/\x{016C}/Ux/g || $flag;
-$flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
-$flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
-$flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
-$flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
-## use critic
+($sxangxo,$sxg_err) = traktu_sxangxon($sxangxo);
 
-if ($sxangxo =~ s{
-    ([\x{80}-\x{10FFFF}]+)
-  }
-  {<span style="color:red">$1</span>}xg) { # ruĝigu ne-askiajn signojn
-  $sxg_err="Eraro: La ŝanĝoteksto enhavu ne-askiajn signojn: $sxangxo\n";
-
-} elsif ($sxangxo =~ s{(--)}{<span style="color:red">$1</span>}xg) { # ruĝigu '--'
-  $sxg_err="Eraro: '--' estas malpermesita en komento: $sxangxo\n";
-
-} elsif (!param('nova')) {  
-  my $sxangxo_tajpita = ($sxangxo ne "klarigo de la sxangxo");
-  unless ($sxangxo and $sxangxo_tajpita) {
-    $sxg_err="Eraro: ŝanĝoteksto mankas.\n";
-  }
-};
 
 if ($sxg_err) {
   print "<div id=\"sxg_err\" class=\"eraroj\">\n$sxg_err\n</div>\n";
 };
+
+#####
 
 # ĉu ni sendu la ŝanĝojn?
 if ($command eq 'forsendo') {
@@ -219,6 +161,33 @@ print end_html();
 
 #######################################################################################
 
+
+sub param_kontrolo {
+
+  # ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
+  check($xmlTxt && ($command eq 'nur_kontrolo' || $command eq 'forsendo'), "command");
+
+  ## validigu la ceteran parametrojn...
+  check(length($xmlTxt) < $xml_max_len, "xmlTxt");
+  check(length($art) < $art_max_len, "art");
+  check(length($sxangxo) < $sxg_max_len, "sxangxo");
+  check(length($redaktanto) < $red_max_len, "redaktanto");
+  check($art =~ m{^
+      [a-z0-9]+
+    $}x, "art rx");
+
+  # tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+  # la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+  check(! $redaktanto 
+    || $redaktanto =~ m{^
+      [\w\.-]+
+      @[\w\.-]+
+      \.\w{2,12}
+    $}x, "red rx"); 
+
+  return 1;
+}  
+
 sub check {
   my $cond = shift;
 
@@ -227,8 +196,11 @@ sub check {
   ## }
 
   unless ($cond) {
-    print end_html();
+    print header(-status => '400 Invalid request', -type => 'text/html');
     exit;
+
+    # print end_html();
+    # exit;
   }
 }   
 
@@ -254,6 +226,70 @@ sub check_redaktanto {
   }
 
   return $permes_;
+}
+
+
+sub traktu_sxangxon {
+  my $sxg = shift;
+
+  # FARENDA: fakte kun la transiro al Git ni povas toleri
+  # ne-askiajn signojn en la ŝanĝ-priskribo, sed ni devas ankaŭ
+  # kontroli processmail.pl antaŭ forigi tie ĉi
+  my $flag = 0;
+  my $sxgerr;
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
+  $flag = $sxg =~ s/\x{0109}/cx/g || $flag;
+  $flag = $sxg =~ s/\x{0108}/Cx/g || $flag;
+  $flag = $sxg =~ s/\x{0135}/jx/g || $flag;
+  $flag = $sxg =~ s/\x{0134}/Jx/g || $flag;
+  $flag = $sxg =~ s/\x{0125}/hx/g || $flag;
+  $flag = $sxg =~ s/\x{0124}/Hx/g || $flag;
+  $flag = $sxg =~ s/\x{016D}/ux/g || $flag;
+  $flag = $sxg =~ s/\x{016C}/Ux/g || $flag;
+  $flag = $sxg =~ s/\x{015D}/sx/g || $flag;
+  $flag = $sxg =~ s/\x{015C}/Sx/g || $flag;
+  $flag = $sxg =~ s/\x{011D}/gx/g || $flag;
+  $flag = $sxg =~ s/\x{011C}/Gx/g || $flag;
+  ## use critic
+
+  if ($sxg =~ s{
+      ([\x{80}-\x{10FFFF}]+)
+    }
+    {<span style="color:red">$1</span>}xg) { # ruĝigu ne-askiajn signojn
+    $sxgerr="Eraro: La ŝanĝoteksto enhavu ne-askiajn signojn: $sxg\n";
+
+  } elsif ($sxg =~ s{(--)}{<span style="color:red">$1</span>}xg) { # ruĝigu '--'
+    $sxgerr="Eraro: '--' estas malpermesita en komento: $sxg\n";
+
+  } elsif (!param('nova')) {  
+    my $sxg_tajpita = ($sxg ne "klarigo de la sxangxo");
+    unless ($sxg and $sxg_tajpita) {
+      $sxgerr="Eraro: ŝanĝoteksto mankas.\n";
+    }
+  };
+
+  return($sxg,$sxgerr);
+}
+
+
+sub ref_kontrolo {
+  my @refs;
+  my @referr;
+
+  while ($xml =~ m{
+      <ref\s+[^>]*? # komenco de ref-elemento, evtl. kun atributo (tip=...)
+      cel="([^"\.]*)(\.)([^"]*?)" # cel-atributo, elprenante la dosiernomon (antaŭ punkto) kaj reston (post punkto)
+      [^>]*?> # evtl. plia atributo (lst=...) kaj fermo de <ref...>
+    }xgi) {
+    my ($art_,$p,$rest) = ($1,$2,$3);
+    push @refs, [$art_,$p,$rest];
+  };
+
+  if (@refs) {
+    @referr = revo::checkxml::check_ref_cel($dbh,$xml_dir,@refs); 
+  };
+
+  return @referr
 }
 
 sub normigu_xml {
