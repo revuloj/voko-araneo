@@ -31,12 +31,14 @@ my $dbh = revodb::connect();
 $dbh->{'mysql_enable_utf8'}=1;
 $dbh->do("set names utf8");
 
-print header(-type=>'application/json',-charset=>'utf-8');
 if ($art =~ m{^[a-z0-9]+$}x) {
+    print header(-type=>'application/json',-charset=>'utf-8');
     my $viki = viki_refs();
     my $tez = tez_refs();
     my $ofc = ofc_refs();
     print $json_parser->encode({viki=>$viki, tez=>$tez, ofc=>$ofc});
+} else {
+    print header(-status => '400 Invalid request',-type=>'application/json',-charset=>'utf-8');
 }
 
 # fino
