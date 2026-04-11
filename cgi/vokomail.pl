@@ -55,7 +55,658 @@ my $art_max_len = 25;
 my $red_max_len = 80;
 my $sxg_max_len = 255;
 
-my $JSCRIPT=<<'END';
+
+# my $enc = "utf-8";
+
+my $debugmsg;
+my $art = param('art');
+#$debugmsg .= "art = $art\n";
+my $mrk = param('mrk');
+
+my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
+my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
+
+my $sxangxo = param('sxangxo'); #Encode::decode($enc, param('sxangxo'));
+$debugmsg .= "sxangxo=$sxangxo" if $debug;
+
+######
+my $xml;
+my $xmlTxt = param('xmlTxt');
+
+if ($xmlTxt) {
+  #$xmlTxt = Encode::decode($enc, $xmlTxt);
+  $xmlTxt =~ s{\r\n}{\n}xg;
+  $debugmsg .= "vor wrap -> $xmlTxt\n <- end wrap\n";
+  my $id;
+  if ($xmlTxt =~ s{"\$(Id:.*?)\$"}{"\$Id:\$"}x) {
+    $debugmsg .= "ID: $1-\n";
+    $id = $1;
+  }
+  $xmlTxt = revo::wrap::wrap($xmlTxt);
+  $xmlTxt =~ s{"\$Id:\$"}{"\$$id\$"}x if $id;
+#  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
+}
+my $xml2 = '';
+$xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
+
+
+#$debugmsg .= "xmlTxt = $xmlTxt\n";
+
+if ($xml2) {
+  $xml = $xmlTxt;
+#  $debugmsg .= "1 xml=\n$xml" if $debug;
+
+} elsif (param('button') eq 'kreu') {
+  $xml2 = xml_nova_art();
+
+} elsif ($art) {
+#  $debugmsg .= "open\n";
+  open my $in, "<", "$homedir/www/revo/xml/$art.xml" 
+    or die "Ne povas legi $art.xml: $!\n";
+
+  $xml = do { local $/ = undef; <$in>};
+  close $in;
+
+  $xml = revo::decode::rvdecode($xml);
+  #$xml = Encode::decode($enc, $xml);
+}
+###########
+
+
+
+my ($pos, $line, $lastline) = (0, 0, 1);
+my ($prelines, $postlines);
+
+my ($checklng, $checkxml, $errline, $errchar);
+($checkxml, $errline, $errchar) = checkxml($xml2) if $xml2;
+#$debugmsg .= "errline = $errline\n";
+
+my $ne_konservu;
+
+if ($errline) {
+  $errline--;
+  $errchar--;
+  if ($xml =~ m{^
+    ([^\n]*\n)
+    {$errline}
+    [^\n]
+    {$errchar}
+  }xsmgp) {
+    my @prelines = split "\n", ${^MATCH};
+    $postlines = split "\n", ${^POSTMATCH};
+
+    my @pre = Text::Tabs::expand(@prelines);
+    $pos = length(join "\n", @pre);
+    $prelines = $#prelines;
+
+    $line = $prelines - 10;
+    $lastline = $prelines + $postlines + 30 - 25;
+  } else {
+#    $debugmsg .= "Ne trovis linio/pos $errline/$errchar\n";
+    $line = $lastline = 100;
+    my @prelines = split "\n", $xml;
+    my @pre = Text::Tabs::expand(@prelines);
+    $pos = length(join "\n", @pre);
+  }
+} else {
+
+  my %lingvoj = lng_listo();
+
+  # kontrolu la lingvojn en la XML
+  while ($xml =~ m{
+    (<(?:trd|trdgrp)
+    \s+lng=")(.*?)"
+  }xsmgp) {
+    if (!exists($lingvoj{$2})) {
+      $checklng = "Nekonata lingvo $2.";
+      $ne_konservu = 10;
+#      $debugmsg .= "lng = $2\n";
+      my @prelines = split "\n", "$`$1$2";
+      $postlines = split "\n", ${^POSTMATCH};
+
+      my @pre = Text::Tabs::expand(@prelines);
+      $pos = length(join "\n", @pre);
+      $prelines = $#prelines;
+      $line = $prelines - 20;
+      $lastline = $prelines + $postlines + 20 - 25;
+      last;
+    }
+  }
+
+  # apartigu snc/drv-elementojn
+  if (!$pos && $xml =~ m{
+    <(snc|drv)
+    (\s+mrk="$mrk".*?)
+    (\n?\s*</\1>)
+  }xsmg) {
+    my @prelines = split "\n", "$`$1$2";
+    $postlines = split "\n", "$3$'";
+
+    my @pre = Text::Tabs::expand(@prelines);
+    $pos = length(join "\n", @pre);
+    $prelines = $#prelines;
+#    $debugmsg .= "prelines = $prelines\n";
+
+    $pos++;
+    $line = $prelines - 20;
+    $lastline = $prelines + $postlines + 20 - 25;
+  }
+
+}
+$line = 0 if $line < 0;
+$line = $lastline if $line > $lastline;
+$lastline = 1 unless $lastline;
+#$debugmsg .= "line = $line\n";
+
+use open ':std', ':encoding(UTF-8)';
+## binmode STDOUT, ":utf8";
+
+my @coky = cookies();
+
+print 
+  header(
+  -charset=>'utf-8',
+  -pragma => 'no-cache', '-cache-control' =>  'no-cache',
+  -cookie => \@coky
+  ),
+      
+  start_html(
+    -style => {
+      -src=>'/revo/stl/artikolo.css',
+      -code  => css_stiloj()
+    },
+    -title => "redakti $art",
+    -lang  => 'eo', #'de',
+    -encoding => 'UTF-8',
+    -head => [ 
+      '<meta http-equiv="Cache-Control" content="no-cache">'
+		],
+    -script => js_skripto(),
+    -onLoad=>"sf($pos, $line, $lastline)"
+  );
+
+if ($art) {
+  print h1("Redakti ".a({href=>"/revo/art/$art.html"}, $art));
+}
+#my $referer =$ENV{HTTP_REFERER};
+#print pre("pos=$pos, referer=$referer\n") if $debug;
+#print pre("pre=".escapeHTML($prelines)."  post=".escapeHTML($postlines)."  lines=".($prelines + $postlines));
+#print pre("pre=".escapeHTML($line)."  post=".escapeHTML($lastline)."  div=".($line / $lastline));
+
+if ($debug and $debugmsg) {
+  autoEscape(1);
+#  $debugmsg .= "4 xml=\n$xml";
+  print pre(escapeHTML($debugmsg));
+  autoEscape(0);
+}
+
+## print <<'EOD' if 0;
+## <div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
+## <p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Provversio</b></span></p>
+## <p>Momente tiu pa&#x011D;o estas nur por elprovi</p>
+## <p><i>Viaj &#349;an&#x011D;oj momente estas sendataj al vi kaj al la a&#x016d;toro (sendepende de la subaj butonoj) !</i></p>
+## </div><br>
+## EOD
+
+my (%fakoj, %stiloj);
+
+if ($art) {
+  %fakoj = fak_listo();
+  %stiloj = stl_listo();
+}
+
+# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
+check(param('xmlTxt'),"xmlTxt");
+# check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
+
+## validigu la ceteran parametrojn...
+check(length(param('xmlTxt')) < $xml_max_len, "xmlTxt");
+check(length(param('art')) < $art_max_len, "art");
+check(length(param('sxangxo')) < $sxg_max_len, "sxangxo");
+check(length(param('redaktanto')) < $red_max_len, "redaktanto");
+check(param('art') =~ m{^[a-z0-9]+$}x, "art rx");
+
+# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+check(! param('redaktanto') 
+  || param('redaktanto') =~ m{^
+    [\w\.-]+
+    @[\w\.-]+
+    \.\w{2,12}
+  $}x, 
+  "red rx"); 
+
+# Connect to the database.
+my $dbh = revodb::connect();
+
+#print pre('dbconnect'." size=".length($xml2)) if $debug;
+
+#print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
+
+#if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
+if ( param('button') eq "antaŭrigardu" or param('button') eq 'konservu') {
+
+print <<'EOD';
+<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
+<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Anta&#365;rigardo</b></span></p>
+EOD
+
+chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";
+  
+my ($html, $err);
+revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
+#  $html = Encode::decode($enc, $html);
+if ($html and $debug) {
+  open my $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "Ne povas skribi al $art.html: $!\n";
+  print $ht $html;
+  close $ht;
+}
+
+$html =~ s{href="../stl/}{href="/revo/stl/}smgx;
+$html =~ s{src="../smb/}{src="/revo/smb/}smgx;
+$html =~ s{src="../bld/}{src="/revo/bld/}smgx;
+$html =~ s{<span\s+class="redakto">.*$}{}smx;
+$html =~ s{href="(?!http://)([a-z])}{href="/revo/art/$1}smgx;
+
+print $html;
+#  print pre('close xalan') if $debug;
+
+print <<'EOD';
+</div><br>
+<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
+<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
+EOD
+
+print $checkxml.br."\n";
+print $checklng.br.br."\n" if ($checklng);
+
+trd_kontrolo(\$xml2);
+my @ref_err = ref_kontrolo(\$xml);
+fak_kontrolo(\$xml2);
+mrk_kontrolo(\$xml2);
+
+
+$sxangxo = trakti_sxangxon($sxangxo);
+
+print <<'EOD';
+</div><br>
+EOD
+}
+
+my $sth;
+
+if ($redaktanto) {
+  # cxu iu redaktanto havas tiun retadreson? Kiu?
+
+  $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
+  eval { $sth->execute($redaktanto) }
+    or do { warn "Ne povis elekti datumojn el tabelo 'email'\n"};
+
+  my ($permeso, $red_id) = $sth->fetchrow_array();
+  $sth->finish;
+
+  # Kiel nomigxas la redaktanto?
+  $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
+  eval { $sth->execute($red_id) }
+    or do { warn "Ne povis elekti datumojn el tabelo 'redaktanto'\n"};
+
+  my ($red_nomo) = $sth->fetchrow_array();
+#  print "red_nomo=$red_nomo\n";
+  $sth->finish;
+
+  if (!$permeso) {
+    $ne_konservu = 2;
+
+    print <<'EOD';
+<div class="averto">
+Vi ($redaktanto) ne estas registrita kiel redaktanto !<br>
+Legu <a href="http://www.reta-vortaro.de/revo/dok/redinfo.html">&#265;i tie</a> kaj 
+  <a href="http://www.reta-vortaro.de/revo/dok/revoserv.html">&#265;i tie</a> kiel registri&#285;i.<br>
+Sen tio viaj &#349;an&#285;oj ne estos konservitaj !
+</div><br>
+EOD
+  }
+
+  if (param('button') eq 'konservu') {
+    print <<'EOD';
+<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
+<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
+EOD
+    print "Konservo</b></span></p>\n";
+    # $xml2
+    if ($ne_konservu) {
+      print "ne konservita";
+    } else {
+      my $from    = 'noreply@retavortaro.de';
+      my $name    = "\"Revo redaktu.pl $redaktanto\"";
+
+	    $name =~ s/\@/_/xg;
+      my (@to, $sxangxo2);
+      push @to, $redaktanto; # if param('sendu_al_tio');
+      push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
+#      push @to, 'wieland@wielandpusch.de'; # if param('sendu_al_admin');  # revodb::mail_to
+      if (param('nova')) {
+        $sxangxo2 = "aldono: $art";
+      } else {
+        $sxangxo2 = "redakto: $sxangxo";
+      }
+      if (my $to = join(', ', @to)) {
+        my $subject = "Revo redaktu.pl $art";
+		#my $smlog = "$homedir/logfiles/sendmail.log";
+
+        my $mailtext = <<'End_of_Mail';
+From: $name <$from>
+To: $to
+Reply-To: $redaktanto
+Subject: $subject
+X-retadreso: $ENV{REMOTE_ADDR}
+
+$sxangxo2
+
+$xml2
+End_of_Mail
+
+        # konektu al retposxtservilo
+        open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
+            or do {
+              #print LOG "ne povas sendi per 'sendmail'\n";
+              warn "ne povas sendi per 'sendmail'\n";
+              return;
+            };
+        print {$sendmail} $mailtext; 
+        close $sendmail;
+
+        print "sendita al $to";
+          
+        if (-s $smlog) {
+            open my $log, "<", $smlog or warn "Ne povas legi $smlog: $!\n";
+            my $ltxt = do { local $/ = undef, <$log>};
+            close $log;
+            print pre("sendmail.log: $ltxt");
+        }
+	
+      } else {
+        print "ne sendita, elektu adreson sube";
+      }
+    }
+    print <<'EOD';
+</div><br>
+EOD
+  }
+}
+
+$dbh->disconnect() if $dbh;
+
+# por ke la formulara ne konvertas &lt; al < ktp.
+## no critic (RegularExpressions::RequireExtendedFormatting)
+$xml =~ s/&lt;/&amp;lt;/g;
+$xml =~ s/&gt;/&amp;gt;/g;
+## use critic
+
+#$xml = Encode::encode($enc, $xml) if $xml2;
+if (param('xmlTxt')) {
+  param(-name=>'xmlTxt', -value => $xml);
+}
+param(-name=>'sxangxo', -value => $sxangxo);
+
+print start_form(-id => "f", -name => "f");
+
+my @fakoj = sort keys %fakoj;
+my @stiloj = sort keys %stiloj;
+print "\n&nbsp;prilabori:\n".
+      " <a class=\"butono1\" onclick=\"indent(2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston dekstren.\">&gt;&gt;</a>\n".
+      " <a class=\"butono1\" onclick=\"indent(-2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston maldekstren.\">&lt;&lt;</a>\n".
+      "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ".
+      checkbox(-name      => 'cx',
+               -checked   => defined(cookie(-name=>'cx')) ? cookie(-name=>'cx') : 1,
+               -value     => '1',
+               -accesskey => "x",
+               -onClick   => "document.f.xmlTxt.focus()",
+               -label     => 'anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux').
+      br."\n".
+      "<div id=\"ajxb\" style=\"display:\">".
+      "\n&nbsp;navigadi:\n".
+      " <a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,-1);return false\" href=\"#\" title=\"Serĉu antaŭan derivaĵon.\">drv</a>".
+      "-<a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,1);return false\" href=\"#\" href=\"#\" title=\"Serĉu sekvan derivaĵon.\">drv</a>\n".
+      "&nbsp;&nbsp;<a onclick=\"showhide(&#39;ajx&#39;);return false\" href=\"#\">montru pli</a><br>\n</div>".
+      "<div id=\"ajx\" style=\"display: none;\">\n".
+      "\n&nbsp;navigadi:\n".
+      " <a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,-1);return false\" href=\"#\">drv</a>".
+      "-<a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,1);return false\" href=\"#\">drv</a>\n".
+      "&nbsp;&nbsp;<a onclick=\"showhide(&#39;ajx&#39;);return false\" href=\"#\">montru malpli</a><br>\n".
+      "\n&nbsp;aldoni:\n".
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<drv mrk=\\&#34;$art.&#39;,&#39;\\&#34;>\\n&#39;+i+&#39;  <kap><tld/>...</kap>\\n&#39;+i+&#39;  <snc mrk=\\&#34;$art.\\&#34;>\\n&#39;+i+&#39;    <dif>\\n&#39;+i+&#39;      \\n&#39;+i+&#39;    </dif>\\n&#39;+i+&#39;  </snc>\\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan derivaĵon.\">drv</a>\n",
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<dif>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan difinon.\">dif</a>\n",
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<snc mrk=\\&#34;$art.&#39;,&#39;\\&#34;>\\n&#39;+i+&#39;  <dif>\\n&#39;+i+&#39;    \\n&#39;+i+&#39;  </dif>\\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan sencon.\">snc</a>\n",
+      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon pri oficialeco.\">ofc</a>",
+      "=".popup_menu(-id=>'ofc',
+		    -name    => 'ofc',
+ 			-title   => "Elektu indikon pri oficialeco.",
+            -values  => ['', '*', 1 .. 9],
+		    -default => '',
+      )."\n ",
+      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon pri gramatiko.\">gra</a>",
+      "=".popup_menu(-id=>'gra',
+		    -name    => 'gra',
+ 			-title   => "Elektu indikon pri gramatiko.",
+            -values  => ['<vspec>tr</vspec>', '<vspec>ntr</vspec>'],
+		    -default => '',
+		    -labels  => {'<vspec>tr</vspec>' => 'v tr', '<vspec>ntr</vspec>' => 'v ntr'},
+      )."\n ",
+#      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<refgrp cel=\\&#34;\\&#34;>&#39;,&#39;\\n&#39;+i+&#39;  <ref>&#39;,&#39;</ref>,\\n&#39;+i+&#39;  <ref></ref>\\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de refencoj.\">[refgrp tip]</a> ",
+      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<ref tip=\\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\\&#34; cel=\\&#34;\\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu referencon.\">ref tip</a> ",
+       " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<refgrp tip=\\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\\&#34;>\\n&#39;+i+&#39;  <ref cel=\\&#34;\\&#34;>&#39;,&#39;</ref>\\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de refencoj.\">refgrp tip</a> ",
+      "\n tip=".popup_menu(-id=>'reftip',
+		    -name   => 'reftip',
+ 			-title  => "Elektu tipon de referenco.",
+            -values => ['', qw/vid hom dif sin ant super sub prt malprt ekz/],
+		    -default=> '',
+		    -labels =>{'vid'=>'vid-u',
+                      'hom'=>'hom-onima',
+                      'dif'=>'dif-ina',
+                      'sin'=>'sin-onimo',
+                      'ant'=>'ant-onimo',
+                      'super'=>'super-nocio',
+                      'sub'=>'sub-nocio',
+                      'prt'=>'part-o',
+                      'malprt'=>'malpart-o',
+                      'ekz'=>'ekz-emplo',
+		    },
+#                    -size => 2,2
+#                    -maxlength => 3,
+#                    -value=> cookie(-name=>'reftip') || '',
+      )."\n ",
+      " <a class=\"butono1\" onclick=\"insertTags(&#39;<ref cel=\\&#34;\\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu referencon al grupo (sen tipo).\">ref</a> ",
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<rim>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu rimarkon.\">rim</a>\n",
+      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#drv'}, "helpo")."\n ".
+      a({target=>"_new", href=>'/revo/dok/dtd.html#drv'}, "dtd")."\n".
+      br.
+      "\n&nbsp;uzo:\n".
+      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<uzo tip=\\&#34;fak\\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu fakon (elektu dekstre).\">fak</a>",
+      "=".popup_menu(-id=>'uzofak',
+		    -name    => 'uzofak',
+  			-title   => "Elektu uzofakon.",
+            -values  => \@fakoj,
+		    -default => '',
+		    -labels  => \%fakoj,
+      )."\n ",
+      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<uzo tip=\\&#34;stl\\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu stilon (elektu dekstre).\">stl</a>",
+      "=".popup_menu(-id=>'uzostl',
+		    -name    => 'uzostl',
+  			-title   => "Elektu uzostilon.",
+            -values  => \@stiloj,
+		    -default => '',
+		    -labels  => \%stiloj,
+      )."\n ",
+      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#uzo'}, "helpo")."\n ".
+      a({target=>"_new", href=>'/revo/dok/dtd.html#uzo'}, "dtd")."\n".
+      br.
+      "\n&nbsp;ekzemplo:\n".
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<ekz>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu ekzemplon.\">ekz</a>\n",
+      " <a class=\"butono1\" onclick=\"insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu tildon (anstataŭigas la radikon).\">tld</a>\n",
+      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<fnt>\\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\\n&#39;+i+&#39;  <vrk><url ref=\\&#34;\\&#34;></url></vrk>,\\n&#39;+i+&#39;  <bib></bib>,\\n&#39;+i+&#39;  <lok></lok>\\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu fonton (kun kelkaj informoj).\">fnt</a>\n ",
+      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#ekz'}, "helpo")."\n ".
+      a({target=>"_new", href=>'/revo/dok/dtd.html#ekz'}, "dtd")."\n".
+      br.
+      "</div>".
+      "\n&nbsp;traduki: <a class=\"butono1\" accesskey=\"t\" onclick=\"insertTags2(&#39;<trd lng=\\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu tradukon.\"><u>t</u>rd lng</a> ",
+#      "\n&nbsp;<a onclick=\"var i=str_indent();insertTags(&#39;<trdgrp>\\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>\\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false\" href=\"#\">[trdgrp]</a> ",
+      "\n&nbsp;<a class=\"butono1\" onclick=\"var i=str_indent();insertTags2(&#39;<trdgrp lng=\\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\\&#34;>\\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\\n&#39;+i+&#39;  <trd></trd>\\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de tradukoj.\">trdgrp lng</a> ",
+      "\n lng=".textfield(-id=>'trdlng',
+		    -name=>'trdlng',
+ 			-title=> "Tajpu la lingvokodon por tradukoj ĉi tie.",
+            -size => 2,
+            -maxlength => 3,
+            -value=> cookie(-name=>'trdlng') || '',
+      ),
+      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu tradukon al grupo (sen lingvo).\">trd</a> ",
+      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu klarigon sen tipo.\">klr</a> ",
+      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags2(&#39;<klr tip=\\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu klarigon kun tipo.\">klr tip</a> ",
+      "\n tip=".popup_menu(-id=>'klrtip',
+		    -name=>'klrtip',
+ 			-title=> "Elektu la tipon de la klarigo.",
+            -values=>['', qw/ind amb/],
+		    -default=> cookie(-name=>'klrtip') || 'amb',
+		    -labels=>{'ind'=>'ind-ekso',
+                              'amb'=>'amb-aux',
+		    },
+      )."\n ",
+      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon por la indekso.\">ind</a> ",
+      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#trd'}, "helpo").
+      a({target=>"_new", href=>'/revo/dok/dtd.html#trd'}, "dtd").
+      br."\n",
+      hidden(-name=>'art', -default=>param('art')),
+      hidden(-name=>'mrk', -default=>param('mrk')),
+      "&nbsp;".textarea(-id    => 'xmlTxt', -name    => 'xmlTxt',
+               -rows    => 25,
+               -columns => 80,
+	           -default => $xml,
+               -onkeypress => "return klavo(event)",
+      ) if $art;
+if (param('nova') or param('button') eq 'kreu') {
+  print hidden(-name=>'nova', -default=>1);
+} else {
+  print br."\n&nbsp;&#348;an&#285;o: ".textfield(
+       -name => 'sxangxo',
+       #-value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
+       -value => cookie(-name=>'sxangxo') || 'klarigo de la &#349;an&#285;o',
+       -title => "Klarigu la ŝanĝon ĉi tie.",
+       -size => 70,
+       -maxlength => 80);
+}
+print br."\n&nbsp;Retpo&#349;ta adreso:".textfield(-name=>'redaktanto',
+                    -size      => 70,
+                    -maxlength => 80,
+                    -title     => "Skribu vian registritan retadreson ĉi tie.",
+                    -value     => (cookie(-name=>'redaktanto') || 'via retadreso')
+      ),
+      br."\n",
+      submit(-name => 'button', -label => 'antaŭrigardu'),
+      submit(-name => 'button', -label => 'konservu') if $art;
+print checkbox(-name    => 'sendu_al_revo',
+               -checked => 1,
+               -value   => '1',
+               -label   => 'sendu al ReVo') if $art and $debug and 0;
+print end_form if $art;
+
+print start_form(-id => "n", -name => "n");
+print "&nbsp;Preparu novan artikolon: ".textfield(-name=>'art', -size=>20, -maxlength=>20)."&nbsp;";
+print submit(-name => 'button', -label => 'kreu')."&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/revoserv.html'}, "[helpo]")."\n";
+print end_form;
+
+print <<"EOD" if $art;
+<h1>Klarigoj:</h1>
+<div class="averto">
+Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
+klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
+klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
+klavo kontrolo-F ebligas ser&#265;i<br>
+via retadreso estas $ENV{REMOTE_ADDR}<br>
+</div>
+
+<p class="piedlinio">
+<a class="redakto" title="Reta Vortaro, konstanta URL" target="_top"
+   href="http://purl.org/net/voko/revo/">&#x211B;evo</a> |
+<a class="redakto" title="Datumprotekta deklaro" target="_new"
+   href="/revo/dok/datumprotekto.html">datumprotekto</a> |
+<a class="redakto" title="Permeso de uzado" target="_new"
+   href="/revo/dok/copying.txt">permeso</a> |
+<a class="redakto" title="Alternativa redaktilo" target="_new"
+   href="https://revaj.steloj.de/">alia redaktilo</a> |
+<a class="redakto" title="Bibliografio" target="indekso"
+   href="/revo/dok/bibliogr.html">bibliografio</a> |
+<a class="redakto" title="Vortaraj mallongigoj" target="indekso"
+   href="/revo/dok/mallongigoj.html">mallongigoj</a> |
+<a class="redakto" title="Superserĉo per ViVo" target="_new"
+   href="http://kono.be/vivo">ViVo</a>
+</p>
+
+<div class="kuketoaverto" id="kuketoaverto">
+<p>
+  Ni uzas kuketojn (retumilajn memoretojn).
+  Uzante nian servon vi konsentas al konservado de informoj en kuketoj.
+  Eksciu pli pri la uzado de personaj datumoj en la
+  <a href="/revo/dok/datumprotekto.html">datumprotekta deklaro</a>.<br/>
+  <button name="konfirmo" onClick="setCookieConsent()">Mi konfirmas</button>
+</p>
+</div>
+EOD
+
+print p('<!-- svn versio: $Id: vokomail.pl 1141 2018-02-10 09:08:01Z wdiestel $'.br.
+	'hg versio: $HgId: vokomail.pl 62:d81c22cbe76e 2010/04/21 17:24:51 Wieland $ -->');
+
+print end_html();
+
+#################################################################
+# Helpfunkcioj
+
+sub css_stiloj {
+  return<<'EOD';
+a.butono1 {
+  background-color: LightGray;
+  font-family: monospace;
+  font-size: 90%;
+  letter-spacing: -0,1pt;
+  padding: 0px 1px 0px 1px;
+}
+a.butono1:link, a.butono1:visited {
+  border: 1px outset black;
+  line-height:150%;
+  color: #000;
+  text-decoration: none;
+  text-align: center;
+}
+a.butono1:hover {
+ border-color: red;
+ color: red;
+}
+.averto {
+  border: 2px solid #E0E0A0;
+  font-style: italic;
+  padding: 0.3em 0.5em;
+  width: 66%;
+}
+input {
+  margin: 3px 1px 0px 1px;
+}
+.rubriko {
+  text-align: right;
+}
+textarea {
+  margin: 3px 1px 0px 1px;
+}
+.piedlinio {color: #104040; text-align: center}
+.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
+		background-color: #c0c090; margin: 0; display: none;
+		border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
+	      }
+.kuketoaverto P { text-align:center }
+.kuketoaverto FORM { text-align:center }
+EOD
+}
+
+sub js_skripto {
+  return<<'END';
 function str_repeat(rStr, rNum) {
  var nStr="";
  for (var x=1;x<=rNum;x++) {nStr+=rStr;}
@@ -426,52 +1077,10 @@ function setCookieConsent() {
     document.getElementById('kuketoaverto').style.display = 'none'; 
 }    
 END
-
-# my $enc = "utf-8";
-
-my @cookies;
-my $konsento = substr(cookie(-name=>'revo-konsento')||'',0,3) eq 'jes';
-
-if ($konsento) {
-    push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto'), -path => '/cgi-bin/') if param('redaktanto');
-    push @cookies, cookie(-name=>'trdlng',     -value => param('trdlng'), -path => '/cgi-bin/')     if param('trdlng');
-    push @cookies, cookie(-name=>'klrtip',     -value => param('klrtip'), -path => '/cgi-bin/')     if param('klrtip');
-    push @cookies, cookie(-name=>'reftip',     -value => param('reftip'), -path => '/cgi-bin/')     if param('reftip');
-    push @cookies, cookie(-name=>'sxangxo',    -value => param('sxangxo'), -path => '/cgi-bin/')    if param('sxangxo');
-    push @cookies, cookie(-name=>'cx',         -value => param('cx') || 0 , -path => '/cgi-bin/');
 }
 
-my $debugmsg;
-my $art = param('art');
-#$debugmsg .= "art = $art\n";
-my $xml;
-my $xmlTxt = param('xmlTxt');
-if ($xmlTxt) {
-  #$xmlTxt = Encode::decode($enc, $xmlTxt);
-  $xmlTxt =~ s{\r\n}{\n}xg;
-  $debugmsg .= "vor wrap -> $xmlTxt\n <- end wrap\n";
-  my $id;
-  if ($xmlTxt =~ s{"\$(Id:.*?)\$"}{"\$Id:\$"}x) {
-    $debugmsg .= "ID: $1-\n";
-    $id = $1;
-  }
-  $xmlTxt = revo::wrap::wrap($xmlTxt);
-  $xmlTxt =~ s{"\$Id:\$"}{"\$$id\$"}x if $id;
-#  $debugmsg .= "wrap -> $xmlTxt\n <- end wrap\n";
-}
-my $xml2 = '';
-$xml2 = revo::encode::encode2($xmlTxt, 20) if $xmlTxt;
-
-my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
-my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
-
-#$debugmsg .= "xmlTxt = $xmlTxt\n";
-
-if ($xml2) {
-  $xml = $xmlTxt;
-#  $debugmsg .= "1 xml=\n$xml" if $debug;
-} elsif (param('button') eq 'kreu') {
-  $xml = <<'EOD';
+sub xml_nova_art {
+  my $xml_ =<<'EOD';
 <?xml version="1.0"?>
 <!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
 
@@ -497,56 +1106,69 @@ if ($xml2) {
 </art>
 </vortaro>
 EOD
-  $xml2 = revo::encode::encode2($xml, 20);
-} elsif ($art) {
-#  $debugmsg .= "open\n";
-  open my $in, "<", "$homedir/www/revo/xml/$art.xml" 
-    or die "Ne povas legi $art.xml: $!\n";
-  $xml = do { local $/ = undef; <$in>};
-  close $in;
-
-  $xml = revo::decode::rvdecode($xml);
-  #$xml = Encode::decode($enc, $xml);
+  return revo::encode::encode2($xml_, 20);
 }
-my $sxangxo = param('sxangxo'); #Encode::decode($enc, param('sxangxo'));
-$debugmsg .= "sxangxo=$sxangxo" if $debug;
-my $mrk = param('mrk');
-my ($pos, $line, $lastline) = (0, 0, 1);
-my ($prelines, $postlines);
 
-my ($checklng, $checkxml, $errline, $errchar);
-($checkxml, $errline, $errchar) = checkxml($xml2) if $xml2;
-#$debugmsg .= "errline = $errline\n";
+sub cookies {
 
-my $ne_konservu;
+  my @cookies;
+  my $konsento = substr(cookie(-name=>'revo-konsento')||'',0,3) eq 'jes';
 
-if ($errline) {
-  $errline--;
-  $errchar--;
-  if ($xml =~ m{^
-    ([^\n]*\n)
-    {$errline}
-    [^\n]
-    {$errchar}
-  }xsmgp) {
-    my @prelines = split "\n", ${^MATCH};
-    $postlines = split "\n", ${^POSTMATCH};
-
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
-    $prelines = $#prelines;
-
-    $line = $prelines - 10;
-    $lastline = $prelines + $postlines + 30 - 25;
-  } else {
-#    $debugmsg .= "Ne trovis linio/pos $errline/$errchar\n";
-    $line = $lastline = 100;
-    my @prelines = split "\n", $xml;
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
+  if ($konsento) {
+      push @cookies, cookie(-name=>'redaktanto', -value => param('redaktanto'), -path => '/cgi-bin/') if param('redaktanto');
+      push @cookies, cookie(-name=>'trdlng',     -value => param('trdlng'), -path => '/cgi-bin/')     if param('trdlng');
+      push @cookies, cookie(-name=>'klrtip',     -value => param('klrtip'), -path => '/cgi-bin/')     if param('klrtip');
+      push @cookies, cookie(-name=>'reftip',     -value => param('reftip'), -path => '/cgi-bin/')     if param('reftip');
+      push @cookies, cookie(-name=>'sxangxo',    -value => param('sxangxo'), -path => '/cgi-bin/')    if param('sxangxo');
+      push @cookies, cookie(-name=>'cx',         -value => param('cx') || 0 , -path => '/cgi-bin/');
   }
-} else {
 
+  return @cookies;
+}
+
+sub fak_listo {
+  # legu la fakoliston
+  my %fak = ('' => '');
+  open my $FAK, '<:encoding(UTF-8)', "$revo_base/cfg/fakoj.xml" 
+    or die "Ne povas malfermi dosieron fakoj.xml\n";
+  my @fakoj = <$FAK>; close $FAK;
+
+  for (@fakoj) {
+    if (m{
+        <fako\s+
+        kodo="([^"]+)"
+        [^>]*
+        >([^<]+)</fako>
+      }xi) {
+      $fak{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
+    }
+  }
+
+  return %fak;
+}
+
+sub stl_listo {
+  # legu la stiloliston
+  my %stl = ('' => '');
+  open my $STL, '<:encoding(UTF-8)', "$revo_base/cfg/stiloj.xml" 
+    or die "Ne povas malfermi dosieron stiloj.xml\n";
+  my @stiloj = <$STL>; close $STL;
+
+  for (@stiloj) {
+    if (m{
+      <stilo\s+
+      kodo="([^"]+)"
+      [^>]*
+      >([^<]+)</stilo>
+    }xi) {
+      $stl{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
+    }
+  }
+
+  return %stl;
+}
+
+sub lng_listo {
   # legu la lingvoliston
   my %lng;
   open my $in, '<:encoding(UTF-8)', "$revo_base/cfg/lingvoj.xml" 
@@ -563,266 +1185,90 @@ if ($errline) {
     }
   }
 
-  # kontrolu la lingvojn en la XML
-  while ($xml =~ m{
-    (<(?:trd|trdgrp)
-    \s+lng=")(.*?)"
-  }xsmgp) {
-    if (!exists($lng{$2})) {
-      $checklng = "Nekonata lingvo $2.";
-      $ne_konservu = 10;
-#      $debugmsg .= "lng = $2\n";
-      my @prelines = split "\n", "$`$1$2";
-      $postlines = split "\n", ${^POSTMATCH};
+  return %lng;
+}
 
-      my @pre = Text::Tabs::expand(@prelines);
-      $pos = length(join "\n", @pre);
-      $prelines = $#prelines;
-      $line = $prelines - 20;
-      $lastline = $prelines + $postlines + 20 - 25;
-      last;
+sub trakti_sxangxon {
+  my $sxg = shift;
+
+  my $flag = 0;
+  ## no critic (RegularExpressions::RequireExtendedFormatting)
+  $flag = $sxg =~ s/\x{0109}/cx/g || $flag;
+  $flag = $sxg =~ s/\x{0108}/Cx/g || $flag;
+  $flag = $sxg =~ s/\x{0135}/jx/g || $flag;
+  $flag = $sxg =~ s/\x{0134}/Jx/g || $flag;
+  $flag = $sxg =~ s/\x{0125}/hx/g || $flag;
+  $flag = $sxg =~ s/\x{0124}/Hx/g || $flag;
+  $flag = $sxg =~ s/\x{016D}/ux/g || $flag;
+  $flag = $sxg =~ s/\x{016C}/Ux/g || $flag;
+  $flag = $sxg =~ s/\x{015D}/sx/g || $flag;
+  $flag = $sxg =~ s/\x{015C}/Sx/g || $flag;
+  $flag = $sxg =~ s/\x{011D}/gx/g || $flag;
+  $flag = $sxg =~ s/\x{011C}/Gx/g || $flag;
+  ## use critic
+
+  if ($flag) {
+    print "Esperantaj signoj en ŝanĝoteksto malunikoditaj.<br>\n";
+  }
+  if ($sxg =~ s{
+      ([\x{80}-\x{10FFFF}]+) 
+      }{<span style="color:red">$1<\/span>}xg) { # ruĝigu ne-askiajn signojn
+    print "Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxg".br."\n";
+    $ne_konservu = 3;
+
+  } elsif ($sxg =~ s{
+    (--)
+    }{<span style="color:red">$1<\/span>}xg) {  # ruĝigu '--'
+    print "Eraro: '--' estas malpermesita en komento: $sxg".br."\n";
+    $ne_konservu = 3;
+
+  } elsif (!param('nova')) {
+    if ($sxg and $sxg ne "klarigo de la sxangxo") {
+      print "Ŝanĝoteksto en ordo: $sxg".br."\n";
+    } else {
+      print "Eraro: ŝanĝoteksto mankas: $sxg".br."\n";
+      $ne_konservu = 4;
     }
   }
 
-  # apartigu snc/drv-elementojn
-  if (!$pos && $xml =~ m{
-    <(snc|drv)
-    (\s+mrk="$mrk".*?)
-    (\n?\s*</\1>)
-  }xsmg) {
-    my @prelines = split "\n", "$`$1$2";
-    $postlines = split "\n", "$3$'";
+  return $sxg;
+}
 
-    my @pre = Text::Tabs::expand(@prelines);
-    $pos = length(join "\n", @pre);
-    $prelines = $#prelines;
-#    $debugmsg .= "prelines = $prelines\n";
-
-    $pos++;
-    $line = $prelines - 20;
-    $lastline = $prelines + $postlines + 20 - 25;
-  }
-
-}
-$line = 0 if $line < 0;
-$line = $lastline if $line > $lastline;
-$lastline = 1 unless $lastline;
-#$debugmsg .= "line = $line\n";
-
-my $mycss = <<'EOD';
-a.butono1 {
-  background-color: LightGray;
-  font-family: monospace;
-  font-size: 90%;
-  letter-spacing: -0,1pt;
-  padding: 0px 1px 0px 1px;
-}
-a.butono1:link, a.butono1:visited {
-  border: 1px outset black;
-  line-height:150%;
-  color: #000;
-  text-decoration: none;
-  text-align: center;
-}
-a.butono1:hover {
- border-color: red;
- color: red;
-}
-.averto {
-  border: 2px solid #E0E0A0;
-  font-style: italic;
-  padding: 0.3em 0.5em;
-  width: 66%;
-}
-input {
-  margin: 3px 1px 0px 1px;
-}
-.rubriko {
-  text-align: right;
-}
-textarea {
-  margin: 3px 1px 0px 1px;
-}
-.piedlinio {color: #104040; text-align: center}
-.kuketoaverto { position: fixed; bottom: 0px; left: 5%; width: 90%; min-height:7em;
-		background-color: #c0c090; margin: 0; display: none;
-		border-radius: 5px 5px 0 0; border: 1px solid #303030; border-bottom: none
-	      }
-.kuketoaverto P { text-align:center }
-.kuketoaverto FORM { text-align:center }
-EOD
-
-use open ':std', ':encoding(UTF-8)';
-## binmode STDOUT, ":utf8";
-
-print header(-charset=>'utf-8',
-             -pragma => 'no-cache', '-cache-control' =>  'no-cache',
-             -cookie=>\@cookies),
-      start_html(-style=>{-src=>'/revo/stl/artikolo.css',
-                 -code=>$mycss},
-                 -title=>"redakti $art",
-                 -lang=>'eo', #'de',
-		 -encoding => 'UTF-8',
-		 -head => [ '<meta http-equiv="Cache-Control" content="no-cache">'
-			  ],
-                 -script=>$JSCRIPT,
-                 -onLoad=>"sf($pos, $line, $lastline)"
-);
-
-if ($art) {
-  print h1("Redakti ".a({href=>"/revo/art/$art.html"}, $art));
-}
-#my $referer =$ENV{HTTP_REFERER};
-#print pre("pos=$pos, referer=$referer\n") if $debug;
-#print pre("pre=".escapeHTML($prelines)."  post=".escapeHTML($postlines)."  lines=".($prelines + $postlines));
-#print pre("pre=".escapeHTML($line)."  post=".escapeHTML($lastline)."  div=".($line / $lastline));
-
-if ($debug and $debugmsg) {
+sub trd_kontrolo { 
+  my $x = shift; # $xml2; 
+   # cxu cxiu <trd...> havas lng aux estas en trdgrp kun lng?
   autoEscape(1);
-#  $debugmsg .= "4 xml=\n$xml";
-  print pre(escapeHTML($debugmsg));
-  autoEscape(0);
-}
-
-print <<'EOD' if 0;
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Provversio</b></span></p>
-<p>Momente tiu pa&#x011D;o estas nur por elprovi</p>
-<p><i>Viaj &#349;an&#x011D;oj momente estas sendataj al vi kaj al la a&#x016d;toro (sendepende de la subaj butonoj) !</i></p>
-</div><br>
-EOD
-
-my (%fak, %stl);
-if ($art) {
-
-  # legu la fakoliston
-  %fak = ('' => '');
-  open my $FAK, '<:encoding(UTF-8)', "$revo_base/cfg/fakoj.xml" 
-    or die "Ne povas malfermi dosieron fakoj.xml\n";
-  my @fakoj = <$FAK>; close $FAK;
-
-  for (@fakoj) {
-    if (m{
-        <fako\s+
-        kodo="([^"]+)"
-        [^>]*
-        >([^<]+)</fako>
-      }xi) {
-      $fak{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
-    }
-  }
-
-  # legu la stiloliston
-  %stl = ('' => '');
-  open my $STL, '<:encoding(UTF-8)', "$revo_base/cfg/stiloj.xml" 
-    or die "Ne povas malfermi dosieron stiloj.xml\n";
-  my @stiloj = <$STL>; close $STL;
-
-  for (@stiloj) {
-    if (m{
-      <stilo\s+
-      kodo="([^"]+)"
-      [^>]*
-      >([^<]+)</stilo>
-    }xi) {
-      $stl{$1} = "$1-$2"; #Encode::decode($enc, "$1-$2");
-    }
-  }
-}
-
-# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
-check(param('xmlTxt'),"xmlTxt");
-# check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
-
-## validigu la ceteran parametrojn...
-check(length(param('xmlTxt')) < $xml_max_len, "xmlTxt");
-check(length(param('art')) < $art_max_len, "art");
-check(length(param('sxangxo')) < $sxg_max_len, "sxangxo");
-check(length(param('redaktanto')) < $red_max_len, "redaktanto");
-check(param('art') =~ m{^[a-z0-9]+$}x, "art rx");
-
-# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
-# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! param('redaktanto') 
-  || param('redaktanto') =~ m{^
-    [\w\.-]+
-    @[\w\.-]+
-    \.\w{2,12}
-  $}x, 
-  "red rx"); 
-
-# Connect to the database.
-my $dbh = revodb::connect();
-
-#print pre('dbconnect'." size=".length($xml2)) if $debug;
-
-#print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
-
-#if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
-if ( param('button') eq "antaŭrigardu" or param('button') eq 'konservu') {
-
-print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>Anta&#365;rigardo</b></span></p>
-EOD
-
-  chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";
-  
-  my ($html, $err);
-  revo::xml2html::konv(\$xml2, \$html, \$err, $debug);
-#  $html = Encode::decode($enc, $html);
-  if ($html and $debug) {
-    open my $ht, '>:encoding(UTF-8)', "../art2/$art.html" or die "Ne povas skribi al $art.html: $!\n";
-	  print $ht $html;
-    close $ht;
-  }
-
-  $html =~ s{href="../stl/}{href="/revo/stl/}smgx;
-  $html =~ s{src="../smb/}{src="/revo/smb/}smgx;
-  $html =~ s{src="../bld/}{src="/revo/bld/}smgx;
-  $html =~ s{<span\s+class="redakto">.*$}{}smx;
-  $html =~ s{href="(?!http://)([a-z])}{href="/revo/art/$1}smgx;
-
-  print $html;
-#  print pre('close xalan') if $debug;
-
-print <<'EOD';
-</div><br>
-EOD
-
-
-print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
-EOD
-  print $checkxml.br."\n";
-
-  print $checklng.br.br."\n" if $checklng;
-
-  { my $x = $xml2;  # cxu cxio trd havas lng aux estas en trdgrp kun lng?
-    autoEscape(1);
 #    print pre(escapeHTML("x=$x\n"));
-    $x =~ s{
-      <trdgrp\s+
-      lng\s*=.*?
-      </trdgrp>\s*
-      }{}xsmig;   # forigo de bonaj trdgrpoj
-    $x =~ s{
-      <trd\s+
-      lng\s*=.*?
-      </trd>\s*
-    }{}xsmig;   # forigo de bonaj trdoj
+  $$x =~ s{
+    <trdgrp\s+
+    lng\s*=.*?
+    </trdgrp>\s*
+    }{}xsmig;   # forigo de bonaj trdgrpoj
+
+  $$x =~ s{
+    <trd\s+
+    lng\s*=.*?
+    </trd>\s*
+  }{}xsmig;   # forigo de bonaj trdoj
+
 #    print pre(escapeHTML("x=$x\n"));
-	if ($x =~ m{
+	if ($$x =~ m{
       (<trd.*?</trd>)
       }x) {   # se restas trd, estas malbona
 	  print escapeHTML("Traduko $1")." ne havas lingvon.<br>\n";
-      $ne_konservu = 11;
+    $ne_konservu = 11;
 	}
-    autoEscape(0);
-  }
+  autoEscape(0);
+
+  return;
+}
   
-  while ($xml2 =~ m{
+sub ref_kontrolo {
+
+  my $xml_ = shift;
+  my @ref_err;
+
+  while ($$xml_ =~ m{
     <ref([^g>][^>]*)>
   }xgi) {
     my $ref = $1;
@@ -836,16 +1282,14 @@ EOD
 #      print "ref = $ref<br>\n";
 #      $ne_konservu = 9;
     }
-  }
-
-  my @ref_err;
+  }  
 
   #if (!$err) { # ĉu ni kontrolu referencojn, ĉiam? Povizore ni faros nur se la XML-sintakso estas e.o.
   my @refs;
-  while ($xml =~ m{
-    <ref\s+[^>]*?
-    cel="([^".]*)(\.)([^"]*?)"
-    >}xgi
+  while ($$xml_ =~ m{
+      <ref\s+[^>]*?
+      cel="([^".]*)(\.)([^"]*?)"
+      >}xgi
   ) {
     my ($art_,$p,$rest) = ($1,$2,$3);
     push @refs, [$art_,$p,$rest];
@@ -859,20 +1303,29 @@ EOD
     }
   }
 
+  return @ref_err
+}
 
-  while ($xml2 =~ m{
+sub fak_kontrolo {
+  my $xml_ = shift;
+  while ($$xml_ =~ m{
     <uzo\s+
     tip="fak"
     >(.*?)</uzo>}xgi
   ) {
     my $fako = $1;
-    if (! exists($fak{$fako})) {
+    if (! exists($fakoj{$fako})) {
       print "Fako $fako estas nekonata.<br>\n";
       $ne_konservu = 6;
     }
   }
 
-  while ($xml2 =~ m{
+  return;
+}
+
+sub mrk_kontrolo {
+  my $xml_ = shift;
+  while ($$xml_ =~ m{
       <(drv|snc)\s+
       mrk="(.*?)"
       >}xgi
@@ -887,373 +1340,8 @@ EOD
     }
   }
 
-  my $flag = 0;
-  ## no critic (RegularExpressions::RequireExtendedFormatting)
-  $flag = $sxangxo =~ s/\x{0109}/cx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0108}/Cx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0135}/jx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0134}/Jx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0125}/hx/g || $flag;
-  $flag = $sxangxo =~ s/\x{0124}/Hx/g || $flag;
-  $flag = $sxangxo =~ s/\x{016D}/ux/g || $flag;
-  $flag = $sxangxo =~ s/\x{016C}/Ux/g || $flag;
-  $flag = $sxangxo =~ s/\x{015D}/sx/g || $flag;
-  $flag = $sxangxo =~ s/\x{015C}/Sx/g || $flag;
-  $flag = $sxangxo =~ s/\x{011D}/gx/g || $flag;
-  $flag = $sxangxo =~ s/\x{011C}/Gx/g || $flag;
-  ## use critic
-
-  if ($flag) {
-    print "Esperantaj signoj en ŝanĝoteksto malunikoditaj.<br>\n";
-  }
-  if ($sxangxo =~ s{
-      ([\x{80}-\x{10FFFF}]+) 
-      }{<span style="color:red">$1<\/span>}xg) { # ruĝigu ne-askiajn signojn
-    print "Eraro: La ŝanĝoteksto enhavas ne-askiajn signojn: $sxangxo".br."\n";
-    $ne_konservu = 3;
-
-  } elsif ($sxangxo =~ s{
-    (--)
-    }{<span style="color:red">$1<\/span>}xg) {  # ruĝigu '--'
-    print "Eraro: '--' estas malpermesita en komento: $sxangxo".br."\n";
-    $ne_konservu = 3;
-
-  } elsif (!param('nova')) {
-    if ($sxangxo and $sxangxo ne "klarigo de la sxangxo") {
-      print "Ŝanĝoteksto en ordo: $sxangxo".br."\n";
-    } else {
-      print "Eraro: ŝanĝoteksto mankas: $sxangxo".br."\n";
-      $ne_konservu = 4;
-    }
-  }
-print <<'EOD';
-</div><br>
-EOD
+  return;
 }
-
-my $sth;
-
-if ($redaktanto) {
-  # cxu iu redaktanto havas tiun retadreson? Kiu?
-
-  $sth = $dbh->prepare("SELECT count(*), min(ema_red_id) FROM email WHERE LOWER(ema_email) = LOWER(?)");
-  eval { $sth->execute($redaktanto) }
-    or do { warn "Ne povis elekti datumojn el tabelo 'email'\n"};
-
-  my ($permeso, $red_id) = $sth->fetchrow_array();
-  $sth->finish;
-
-  # Kiel nomigxas la redaktanto?
-  $sth = $dbh->prepare("SELECT red_nomo FROM redaktanto WHERE red_id = ?");
-  eval { $sth->execute($red_id) }
-    or do { warn "Ne povis elekti datumojn el tabelo 'redaktanto'\n"};
-
-  my ($red_nomo) = $sth->fetchrow_array();
-#  print "red_nomo=$red_nomo\n";
-  $sth->finish;
-
-  if (!$permeso) {
-    $ne_konservu = 2;
-
-    print <<'EOD';
-<div class="averto">
-Vi ($redaktanto) ne estas registrita kiel redaktanto !<br>
-Legu <a href="http://www.reta-vortaro.de/revo/dok/redinfo.html">&#265;i tie</a> kaj 
-  <a href="http://www.reta-vortaro.de/revo/dok/revoserv.html">&#265;i tie</a> kiel registri&#285;i.<br>
-Sen tio viaj &#349;an&#285;oj ne estos konservitaj !
-</div><br>
-EOD
-  }
-
-  if (param('button') eq 'konservu') {
-    print <<'EOD';
-<div class="borderc8 backgroundc1" style="border-style: solid; border-width: medium; padding: 0.3em 0.5em;">
-<p><span style="color: rgb(207, 118, 6); font-size: 140%;"><b>
-EOD
-    print "Konservo</b></span></p>\n";
-    # $xml2
-    if ($ne_konservu) {
-      print "ne konservita";
-    } else {
-      my $from    = 'noreply@retavortaro.de';
-      my $name    = "\"Revo redaktu.pl $redaktanto\"";
-
-	    $name =~ s/\@/_/xg;
-      my (@to, $sxangxo2);
-      push @to, $redaktanto; # if param('sendu_al_tio');
-      push @to, 'revo@retavortaro.de'; # if not $debug or param('sendu_al_revo');
-#      push @to, 'wieland@wielandpusch.de'; # if param('sendu_al_admin');  # revodb::mail_to
-      if (param('nova')) {
-        $sxangxo2 = "aldono: $art";
-      } else {
-        $sxangxo2 = "redakto: $sxangxo";
-      }
-      if (my $to = join(', ', @to)) {
-        my $subject = "Revo redaktu.pl $art";
-		#my $smlog = "$homedir/logfiles/sendmail.log";
-
-        my $mailtext = <<'End_of_Mail';
-From: $name <$from>
-To: $to
-Reply-To: $redaktanto
-Subject: $subject
-X-retadreso: $ENV{REMOTE_ADDR}
-
-$sxangxo2
-
-$xml2
-End_of_Mail
-
-        # konektu al retposxtservilo
-        open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
-            or do {
-              #print LOG "ne povas sendi per 'sendmail'\n";
-              warn "ne povas sendi per 'sendmail'\n";
-              return;
-            };
-        print {$sendmail} $mailtext; 
-        close $sendmail;
-
-        print "sendita al $to";
-          
-        if (-s $smlog) {
-            open my $log, "<", $smlog or warn "Ne povas legi $smlog: $!\n";
-            my $ltxt = do { local $/ = undef, <$log>};
-            close $log;
-            print pre("sendmail.log: $ltxt");
-        }
-	
-      } else {
-        print "ne sendita, elektu adreson sube";
-      }
-    }
-    print <<'EOD';
-</div><br>
-EOD
-  }
-}
-
-$dbh->disconnect() if $dbh;
-
-# por ke la formulara ne konvertas &lt; al < ktp.
-## no critic (RegularExpressions::RequireExtendedFormatting)
-$xml =~ s/&lt;/&amp;lt;/g;
-$xml =~ s/&gt;/&amp;gt;/g;
-## use critic
-
-#$xml = Encode::encode($enc, $xml) if $xml2;
-if (param('xmlTxt')) {
-  param(-name=>'xmlTxt', -value => $xml);
-}
-param(-name=>'sxangxo', -value => $sxangxo);
-
-print start_form(-id => "f", -name => "f");
-
-my @fakoj = sort keys %fak;
-my @stiloj = sort keys %stl;
-print "\n&nbsp;prilabori:\n".
-      " <a class=\"butono1\" onclick=\"indent(2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston dekstren.\">&gt;&gt;</a>\n".
-      " <a class=\"butono1\" onclick=\"indent(-2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston maldekstren.\">&lt;&lt;</a>\n".
-      "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ".
-      checkbox(-name      => 'cx',
-               -checked   => defined(cookie(-name=>'cx')) ? cookie(-name=>'cx') : 1,
-               -value     => '1',
-               -accesskey => "x",
-               -onClick   => "document.f.xmlTxt.focus()",
-               -label     => 'anstata&#365;igu&nbsp; c<u>x</u>,&nbsp;gx,&nbsp;...,&nbsp;ux').
-      br."\n".
-      "<div id=\"ajxb\" style=\"display:\">".
-      "\n&nbsp;navigadi:\n".
-      " <a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,-1);return false\" href=\"#\" title=\"Serĉu antaŭan derivaĵon.\">drv</a>".
-      "-<a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,1);return false\" href=\"#\" href=\"#\" title=\"Serĉu sekvan derivaĵon.\">drv</a>\n".
-      "&nbsp;&nbsp;<a onclick=\"showhide(&#39;ajx&#39;);return false\" href=\"#\">montru pli</a><br>\n</div>".
-      "<div id=\"ajx\" style=\"display: none;\">\n".
-      "\n&nbsp;navigadi:\n".
-      " <a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,-1);return false\" href=\"#\">drv</a>".
-      "-<a class=\"butono1\" onclick=\"nextTag(&#39;<drv&#39,1);return false\" href=\"#\">drv</a>\n".
-      "&nbsp;&nbsp;<a onclick=\"showhide(&#39;ajx&#39;);return false\" href=\"#\">montru malpli</a><br>\n".
-      "\n&nbsp;aldoni:\n".
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<drv mrk=\\&#34;$art.&#39;,&#39;\\&#34;>\\n&#39;+i+&#39;  <kap><tld/>...</kap>\\n&#39;+i+&#39;  <snc mrk=\\&#34;$art.\\&#34;>\\n&#39;+i+&#39;    <dif>\\n&#39;+i+&#39;      \\n&#39;+i+&#39;    </dif>\\n&#39;+i+&#39;  </snc>\\n&#39;+i+&#39;</drv>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan derivaĵon.\">drv</a>\n",
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<dif>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</dif>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan difinon.\">dif</a>\n",
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<snc mrk=\\&#34;$art.&#39;,&#39;\\&#34;>\\n&#39;+i+&#39;  <dif>\\n&#39;+i+&#39;    \\n&#39;+i+&#39;  </dif>\\n&#39;+i+&#39;</snc>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu novan sencon.\">snc</a>\n",
-      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<ofc>&#39;,document.getElementById(&#34;ofc&#34;).value,&#39;</ofc>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon pri oficialeco.\">ofc</a>",
-      "=".popup_menu(-id=>'ofc',
-		    -name    => 'ofc',
- 			-title   => "Elektu indikon pri oficialeco.",
-            -values  => ['', '*', 1 .. 9],
-		    -default => '',
-      )."\n ",
-      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<gra>&#39;,document.getElementById(&#34;gra&#34;).value,&#39;</gra>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon pri gramatiko.\">gra</a>",
-      "=".popup_menu(-id=>'gra',
-		    -name    => 'gra',
- 			-title   => "Elektu indikon pri gramatiko.",
-            -values  => ['<vspec>tr</vspec>', '<vspec>ntr</vspec>'],
-		    -default => '',
-		    -labels  => {'<vspec>tr</vspec>' => 'v tr', '<vspec>ntr</vspec>' => 'v ntr'},
-      )."\n ",
-#      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<refgrp cel=\\&#34;\\&#34;>&#39;,&#39;\\n&#39;+i+&#39;  <ref>&#39;,&#39;</ref>,\\n&#39;+i+&#39;  <ref></ref>\\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de refencoj.\">[refgrp tip]</a> ",
-      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<ref tip=\\&#34;&#39;,document.getElementById(&#34;reftip&#34;).value,&#39;\\&#34; cel=\\&#34;\\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu referencon.\">ref tip</a> ",
-       " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<refgrp tip=\\&#34;&#39;+document.getElementById(&#34;reftip&#34;).value+&#39;\\&#34;>\\n&#39;+i+&#39;  <ref cel=\\&#34;\\&#34;>&#39;,&#39;</ref>\\n&#39;+i+&#39;</refgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de refencoj.\">refgrp tip</a> ",
-      "\n tip=".popup_menu(-id=>'reftip',
-		    -name   => 'reftip',
- 			-title  => "Elektu tipon de referenco.",
-            -values => ['', qw/vid hom dif sin ant super sub prt malprt ekz/],
-		    -default=> '',
-		    -labels =>{'vid'=>'vid-u',
-                      'hom'=>'hom-onima',
-                      'dif'=>'dif-ina',
-                      'sin'=>'sin-onimo',
-                      'ant'=>'ant-onimo',
-                      'super'=>'super-nocio',
-                      'sub'=>'sub-nocio',
-                      'prt'=>'part-o',
-                      'malprt'=>'malpart-o',
-                      'ekz'=>'ekz-emplo',
-		    },
-#                    -size => 2,2
-#                    -maxlength => 3,
-#                    -value=> cookie(-name=>'reftip') || '',
-      )."\n ",
-      " <a class=\"butono1\" onclick=\"insertTags(&#39;<ref cel=\\&#34;\\&#34;>&#39;,&#39;</ref>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu referencon al grupo (sen tipo).\">ref</a> ",
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<rim>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</rim>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu rimarkon.\">rim</a>\n",
-      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#drv'}, "helpo")."\n ".
-      a({target=>"_new", href=>'/revo/dok/dtd.html#drv'}, "dtd")."\n".
-      br.
-      "\n&nbsp;uzo:\n".
-      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<uzo tip=\\&#34;fak\\&#34;>&#39;,document.getElementById(&#34;uzofak&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu fakon (elektu dekstre).\">fak</a>",
-      "=".popup_menu(-id=>'uzofak',
-		    -name    => 'uzofak',
-  			-title   => "Elektu uzofakon.",
-            -values  => \@fakoj,
-		    -default => '',
-		    -labels  => \%fak,
-      )."\n ",
-      " <a class=\"butono1\" onclick=\"insertTags2(&#39;<uzo tip=\\&#34;stl\\&#34;>&#39;,document.getElementById(&#34;uzostl&#34;).value,&#39;</uzo>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu stilon (elektu dekstre).\">stl</a>",
-      "=".popup_menu(-id=>'uzostl',
-		    -name    => 'uzostl',
-  			-title   => "Elektu uzostilon.",
-            -values  => \@stiloj,
-		    -default => '',
-		    -labels  => \%stl,
-      )."\n ",
-      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#uzo'}, "helpo")."\n ".
-      a({target=>"_new", href=>'/revo/dok/dtd.html#uzo'}, "dtd")."\n".
-      br.
-      "\n&nbsp;ekzemplo:\n".
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<ekz>\\n&#39;+i+&#39;  &#39;,&#39;\\n&#39;+i+&#39;</ekz>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu ekzemplon.\">ekz</a>\n",
-      " <a class=\"butono1\" onclick=\"insertTags(&#39;<tld/>&#39;,&#39;&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu tildon (anstataŭigas la radikon).\">tld</a>\n",
-      " <a class=\"butono1\" onclick=\"var i=str_indent();insertTags(&#39;<fnt>\\n&#39;+i+&#39;  <aut>&#39;,&#39;</aut>,\\n&#39;+i+&#39;  <vrk><url ref=\\&#34;\\&#34;></url></vrk>,\\n&#39;+i+&#39;  <bib></bib>,\\n&#39;+i+&#39;  <lok></lok>\\n&#39;+i+&#39;</fnt>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu fonton (kun kelkaj informoj).\">fnt</a>\n ",
-      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#ekz'}, "helpo")."\n ".
-      a({target=>"_new", href=>'/revo/dok/dtd.html#ekz'}, "dtd")."\n".
-      br.
-      "</div>".
-      "\n&nbsp;traduki: <a class=\"butono1\" accesskey=\"t\" onclick=\"insertTags2(&#39;<trd lng=\\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\\&#34;>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu tradukon.\"><u>t</u>rd lng</a> ",
-#      "\n&nbsp;<a onclick=\"var i=str_indent();insertTags(&#39;<trdgrp>\\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>\\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false\" href=\"#\">[trdgrp]</a> ",
-      "\n&nbsp;<a class=\"butono1\" onclick=\"var i=str_indent();insertTags2(&#39;<trdgrp lng=\\&#34;&#39;,document.getElementById(&#34;trdlng&#34;).value,&#39;\\&#34;>\\n&#39;+i+&#39;  <trd>&#39;,&#39;</trd>,\\n&#39;+i+&#39;  <trd></trd>\\n&#39;+i+&#39;</trdgrp>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu grupon de tradukoj.\">trdgrp lng</a> ",
-      "\n lng=".textfield(-id=>'trdlng',
-		    -name=>'trdlng',
- 			-title=> "Tajpu la lingvokodon por tradukoj ĉi tie.",
-            -size => 2,
-            -maxlength => 3,
-            -value=> cookie(-name=>'trdlng') || '',
-      ),
-      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<trd>&#39;,&#39;</trd>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu unu tradukon al grupo (sen lingvo).\">trd</a> ",
-      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<klr>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu klarigon sen tipo.\">klr</a> ",
-      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags2(&#39;<klr tip=\\&#34;&#39;,document.getElementById(&#34;klrtip&#34;).value,&#39;\\&#34;>&#39;,&#39;</klr>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu klarigon kun tipo.\">klr tip</a> ",
-      "\n tip=".popup_menu(-id=>'klrtip',
-		    -name=>'klrtip',
- 			-title=> "Elektu la tipon de la klarigo.",
-            -values=>['', qw/ind amb/],
-		    -default=> cookie(-name=>'klrtip') || 'amb',
-		    -labels=>{'ind'=>'ind-ekso',
-                              'amb'=>'amb-aux',
-		    },
-      )."\n ",
-      "\n&nbsp;<a class=\"butono1\" onclick=\"insertTags(&#39;<ind>&#39;,&#39;</ind>&#39;,&#39;&#39;);return false\" href=\"#\" title=\"Aldonu indikon por la indekso.\">ind</a> ",
-      "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#trd'}, "helpo").
-      a({target=>"_new", href=>'/revo/dok/dtd.html#trd'}, "dtd").
-      br."\n",
-      hidden(-name=>'art', -default=>param('art')),
-      hidden(-name=>'mrk', -default=>param('mrk')),
-      "&nbsp;".textarea(-id    => 'xmlTxt', -name    => 'xmlTxt',
-               -rows    => 25,
-               -columns => 80,
-	           -default => $xml,
-               -onkeypress => "return klavo(event)",
-      ) if $art;
-if (param('nova') or param('button') eq 'kreu') {
-  print hidden(-name=>'nova', -default=>1);
-} else {
-  print br."\n&nbsp;&#348;an&#285;o: ".textfield(
-       -name => 'sxangxo',
-       #-value => Encode::decode($enc, cookie(-name=>'sxangxo')) || 'klarigo de la &#349;an&#285;o',
-       -value => cookie(-name=>'sxangxo') || 'klarigo de la &#349;an&#285;o',
-       -title => "Klarigu la ŝanĝon ĉi tie.",
-       -size => 70,
-       -maxlength => 80);
-}
-print br."\n&nbsp;Retpo&#349;ta adreso:".textfield(-name=>'redaktanto',
-                    -size      => 70,
-                    -maxlength => 80,
-                    -title     => "Skribu vian registritan retadreson ĉi tie.",
-                    -value     => (cookie(-name=>'redaktanto') || 'via retadreso')
-      ),
-      br."\n",
-      submit(-name => 'button', -label => 'antaŭrigardu'),
-      submit(-name => 'button', -label => 'konservu') if $art;
-print checkbox(-name    => 'sendu_al_revo',
-               -checked => 1,
-               -value   => '1',
-               -label   => 'sendu al ReVo') if $art and $debug and 0;
-print end_form if $art;
-
-print start_form(-id => "n", -name => "n");
-print "&nbsp;Preparu novan artikolon: ".textfield(-name=>'art', -size=>20, -maxlength=>20)."&nbsp;";
-print submit(-name => 'button', -label => 'kreu')."&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/revoserv.html'}, "[helpo]")."\n";
-print end_form;
-
-print <<"EOD" if $art;
-<h1>Klarigoj:</h1>
-<div class="averto">
-Se vi permesas kuketojn, vi ne da&#365;re devas entajpi vian retadreson kaj lingvon.<br>
-klavo kontrolo-Z malfaras la lastan &#349;an&#285;on<br>
-klavo kontrolo-Y refaras la lastan &#349;an&#285;on<br>
-klavo kontrolo-F ebligas ser&#265;i<br>
-via retadreso estas $ENV{REMOTE_ADDR}<br>
-</div>
-
-<p class="piedlinio">
-<a class="redakto" title="Reta Vortaro, konstanta URL" target="_top"
-   href="http://purl.org/net/voko/revo/">&#x211B;evo</a> |
-<a class="redakto" title="Datumprotekta deklaro" target="_new"
-   href="/revo/dok/datumprotekto.html">datumprotekto</a> |
-<a class="redakto" title="Permeso de uzado" target="_new"
-   href="/revo/dok/copying.txt">permeso</a> |
-<a class="redakto" title="Alternativa redaktilo" target="_new"
-   href="https://revaj.steloj.de/">alia redaktilo</a> |
-<a class="redakto" title="Bibliografio" target="indekso"
-   href="/revo/dok/bibliogr.html">bibliografio</a> |
-<a class="redakto" title="Vortaraj mallongigoj" target="indekso"
-   href="/revo/dok/mallongigoj.html">mallongigoj</a> |
-<a class="redakto" title="Superserĉo per ViVo" target="_new"
-   href="http://kono.be/vivo">ViVo</a>
-</p>
-
-<div class="kuketoaverto" id="kuketoaverto">
-<p>
-  Ni uzas kuketojn (retumilajn memoretojn).
-  Uzante nian servon vi konsentas al konservado de informoj en kuketoj.
-  Eksciu pli pri la uzado de personaj datumoj en la
-  <a href="/revo/dok/datumprotekto.html">datumprotekta deklaro</a>.<br/>
-  <button name="konfirmo" onClick="setCookieConsent()">Mi konfirmas</button>
-</p>
-</div>
-EOD
-
-print p('<!-- svn versio: $Id: vokomail.pl 1141 2018-02-10 09:08:01Z wdiestel $'.br.
-	'hg versio: $HgId: vokomail.pl 62:d81c22cbe76e 2010/04/21 17:24:51 Wieland $ -->');
-
-print end_html();
 
 sub checkxml {
     my $teksto = shift;

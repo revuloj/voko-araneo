@@ -58,15 +58,28 @@ my @buttons =
 
 diag explain @buttons;
 
-# vd. 22_adm_redaktantoj-json.t ?
 cmp_deeply(
     \@buttons,
     superbagof(
-        superhashof({
-            value => 'konservu'
-        }),    
+        methods(
+            name  => 'button',
+            type  => 'submit',
+            value => "anta\x{16d}rigardu"
+        )
     ),
-    "Troviĝas butono \'konservu\'"
-);    
+    'Troviĝas butono "antaŭrigardo"'
+);
+
+cmp_deeply(
+    \@buttons,
+    superbagof(
+        methods(
+            name  => 'button',
+            type  => 'submit',
+            value => "konservu"
+        )
+    ),
+    'Troviĝas butono "konservu"'
+);
 
 done_testing();
