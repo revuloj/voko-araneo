@@ -7,9 +7,9 @@ prove [-v] tst/cgi/0*
 ~~~
 
 - 0x - testskriptoj loke plenumeblaj
-- 1x - testskriptoj kiuj bezonas procezujon voko-araneo
-- 2x - testskriptoj kuj bezonas medion araneujo (revo-medioj/araneujo-s)
-- 2x_adm - testskriptoj por la protektiaj administraj skriptoj
+- 1x - testskriptoj kiuj bezonas nur procezujon voko-araneo
+- 2x - testskriptoj kuj bezonas kombinitan medion araneujo (revo-medioj/araneujo-s)
+- 2x_adm - testskriptoj por la protektitaj administraj skriptoj
 
 Por kelkaj testoj pri submeto vi devas doni retpoŝtadreson de valida redaktanto. Por faciligi vi povas aldoni tion kiel medivariablojn 
 en via .profile / .bashrc / sistemvariablolisto - depende de uzata operaciumo.

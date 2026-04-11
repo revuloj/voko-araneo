@@ -17,6 +17,7 @@ use URI::Escape;
 
 use utf8; use open ':std', ':encoding(UTF-8)';
 
+
 my $LIMIT_eo = 50;
 my $LIMIT_trd = 250;
 
@@ -47,70 +48,12 @@ my $kadroj = param('kadroj'); # uzata de kono.be/vivo
 #### serĉformularo aperas en HTML-kadraro ... ####
 
 if ($kadroj) {
-  # uzata de kono.be/vivo
-  print "Content-type: text/html; charset=utf-8\n\n";
-
-  utf8::encode($sercxata);
-  $sercxata = uri_escape($sercxata);
-
-  $sercxata .= "&lng=".uri_escape(param('lng')) if param('lng');
-  $sercxata .= "&trd=".uri_escape(param('trd')) if param('trd');
-
-  # kopiu index.html  
-  open my $in, '<', "../revo/index.html" 
-    or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'\n";
-  while (<$in>) {
-    s{src="inx/_eo.html"}
-      {src="sercxu.pl?cx=1&sercxata=$sercxata"}x;
-    s{src="titolo.html"}
-      {src="../revo/titolo.html"}x;
-    print;
-  }
-  close $in;
+  kadraro();
   exit 1;
 }
 
 #utf8::decode($sercxata);
-
-#### Javoskripto por la serĉormularo ####
-my $JSCRIPT=<<'END';
-function xAlUtf8(t, nomo) {
-  if (document.getElementById("x").checked) {
-    t = t.replace(/c[xX]/g, "\\u0109");
-    t = t.replace(/g[xX]/g, "\\u011d");
-    t = t.replace(/h[xX]/g, "\\u0125");
-    t = t.replace(/j[xX]/g, "\\u0135");
-    t = t.replace(/s[xX]/g, "\\u015d");
-    t = t.replace(/u[xX]/g, "\\u016d");
-    t = t.replace(/C[xX]/g, "\\u0108");
-    t = t.replace(/G[xX]/g, "\\u011c");
-    t = t.replace(/H[xX]/g, "\\u0124");
-    t = t.replace(/J[xX]/g, "\\u0134");
-    t = t.replace(/S[xX]/g, "\\u015c");
-    t = t.replace(/U[xX]/g, "\\u016c");
-    if (t != document.getElementById(nomo).value) {
-      document.getElementById(nomo).value = t;
-    }
-  }
-}
-function sf(){document.f.sercxata.focus();}
-top.document.title = "Reta Vortaro, serĉo de \\\"$sercxata\\\"";
-END
-
-#### eltrovu preferatan lingvon de la uzanto laŭ la retumilo ####
-
 #$ENV{HTTP_ACCEPT_LANGUAGE} = ''; # por testi
-
-my $preferata_lingvo;
-{
-  my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
-  $preferata_lingvo = shift @a;
-  $preferata_lingvo = shift @a if $preferata_lingvo =~ /^eo/x;
-  $preferata_lingvo =~ s{^
-    ([^;-]+).*
-  }{$1}x;
-#  $preferata_lingvo = 'nenio' if $preferata_lingvo eq '';
-}
 
 ###################################################################
 #  eligo de la rezulto laŭ diversaj formatoj                      #
@@ -118,54 +61,36 @@ my $preferata_lingvo;
 
 #### kaplinioj de la rezultodokumento kaj eble la serĉormularo denove ####
 
-print header(-charset=>'utf-8'),
-      start_html(
-                -dtd => ['-//W3C//DTD HTML 4.01 Transitional//EN',
-                            'http://www.w3.org/TR/html4/loose.dtd'],
-                -lang => 'eo',
-                -title => 'Revo',
-                -style=>{-src=>'/revo/stl/indeksoj.css'},
-                -script=>$JSCRIPT,
-                -onLoad=>"sf()"
+print header(-charset   =>'utf-8'),
+  start_html(
+    -dtd    => ['-//W3C//DTD HTML 4.01 Transitional//EN',
+                'http://www.w3.org/TR/html4/loose.dtd'],
+    -lang   => 'eo',
+    -title  => 'Revo',
+    -style  => {-src=>'/revo/stl/indeksoj.css'},
+    -script => js_literoj(),
+    -onLoad => "sf()"
 );
 
 print start_table(-cellspacing=>0),
-          Tr(
-          [
-            td({-class=>'aktiva'}, a({-href=>'/revo/inx/_eo.html'}, 'Esperanto')).
-            td({-class=>'fona'}, [a({-href=>'/revo/inx/_lng.html'}, 'Lingvoj'),
-          a({-href=>'/revo/inx/_fak.html'}, 'Fakoj'),
-          a({-href=>'/revo/inx/_ktp.html'}, 'ktp.')]),
-          ]
-          );
+  Tr(
+    [
+      td({-class =>'aktiva'}, 
+        a({-href => '/revo/inx/_eo.html'}, 'Esperanto')
+      ).
+      td({-class =>'fona'}, [
+        a({-href => '/revo/inx/_lng.html'}, 'Lingvoj'),
+        a({-href =>'/revo/inx/_fak.html'}, 'Fakoj'),
+        a({-href =>'/revo/inx/_ktp.html'}, 'ktp.')
+      ]),
+    ]
+  );
 
 print <<'EOD';
 <tr><td colspan="4" class="enhavo">
 EOD
 
-  print <<'EOD';
-<form method="post" action="" target="indekso" name="f">
-<input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" 
-  onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata"  placeholder="Ĵokeroj: % (pluraj) kaj _ (unu)">
-<input type="submit" value="trovu">
-<br>
-EOD
-
-  if (!param('cx')) {
-    print <<'EOD';
-<script type="text/javascript">
-document.write("<input type=\\\"checkbox\\\" id=\\\"x\\\" name=\\\"x\\\" onClick=\\\"xAlUtf8(document.f.sercxata.value,'sercxata')\\\" $cx2cx>anstata&#365;igu cx, gx, ..., ux");</script>
-<noscript><input type="hidden" id="cx" name="cx" value="1"></noscript>
-EOD
-  } else {
-    print <<'EOD';
-<input type="hidden" id="cx" name="cx" value="1">
-EOD
- }
-
-  print <<'EOD';
-</form>
-EOD
+print_form();
 
 
 if ($sercxata eq "") {
@@ -178,11 +103,7 @@ if ($sercxata eq "%") {
   exit;
 }
 
-print <<'EOD' if $formato ne "txt" and $formato ne "idx";
-<script type="text/javascript">
-document.write("<div id=\\\"atendu\\\" style=\\\"position:absolute; z-index:1\\\"><br><br><br><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Atendu iomete...</big><layer></layer></div>");
-</script>
-EOD
+print_atendu_script();
 
 ###################################################################
 #  serĉo en datumbazo                                             #
@@ -224,6 +145,8 @@ my $regulira = $sercxata =~ m{
   }x;
 
 ## no critic (RegularExpressions::RequireExtendedFormatting)
+my $preferata_lingvo = preferata_lingvo();
+
 if ($regulira) {
   Sercxu('REGEXP', $sercxata, $sercxata_eo, $preferata_lingvo);
 } elsif ($sercxata =~ /[%_]/) {
@@ -247,12 +170,137 @@ if (scalar keys %trovitajPagxoj == 1 and $formato ne "txt") {
   print '</script>' . "\n";
 }
 
-$dbh->disconnect() or die "Malkonekto de la datumbazo ne funkciis.\n";
-  
-#print h1("Fino.");
-  print "<br>" if $neniu_trafo and $formato ne "txt";
-  print "Neniu trafo..." if $neniu_trafo;
+$dbh->disconnect() 
+  or die "Malkonekto de la datumbazo ne funkciis.\n";
 
+#print h1("Fino.");
+print "<br>" 
+if ($neniu_trafo and $formato ne "txt");
+
+print "Neniu trafo..." 
+if ($neniu_trafo);
+
+print_atendu_kasxu();
+
+print 
+  "</td></tr>", 
+  end_table(), 
+  end_html() 
+if ($formato ne "txt");
+
+exit;
+#####
+
+
+###################################################################
+# helpunkcioj por serĉo                                           #
+###################################################################
+
+sub kadraro {
+  # uzata de kono.be/vivo
+  print "Content-type: text/html; charset=utf-8\n\n";
+
+  utf8::encode($sercxata);
+  $sercxata = uri_escape($sercxata);
+
+  $sercxata .= "&lng=".uri_escape(param('lng')) if param('lng');
+  $sercxata .= "&trd=".uri_escape(param('trd')) if param('trd');
+
+  # kopiu index.html  
+  open my $in, '<', "../revo/index.html" 
+    or die "serĉo en kadroj ne eblas ĉar mankas dosiero 'index.html'\n";
+  while (<$in>) {
+    s{src="inx/_eo.html"}
+      {src="sercxu.pl?cx=1&sercxata=$sercxata"}x;
+    s{src="titolo.html"}
+      {src="../revo/titolo.html"}x;
+    print;
+  }
+  close $in;
+  return;
+}
+
+sub preferata_lingvo {
+  my $pref_lingvo;
+  {
+    my @a = split ",", $ENV{HTTP_ACCEPT_LANGUAGE};
+    $pref_lingvo = shift @a;
+    $pref_lingvo = shift @a if $pref_lingvo =~ /^eo/x;
+    $pref_lingvo =~ s{^
+      ([^;-]+).*
+    }{$1}x;
+  #  $pref_lingvo = 'nenio' if $pref_lingvo eq '';
+  }
+  return $pref_lingvo;
+}
+
+#### Javoskripto por la serĉformularo ####
+sub js_literoj {
+  return<<'END';
+function xAlUtf8(t, nomo) {
+  if (document.getElementById("x").checked) {
+    t = t.replace(/c[xX]/g, "\\u0109");
+    t = t.replace(/g[xX]/g, "\\u011d");
+    t = t.replace(/h[xX]/g, "\\u0125");
+    t = t.replace(/j[xX]/g, "\\u0135");
+    t = t.replace(/s[xX]/g, "\\u015d");
+    t = t.replace(/u[xX]/g, "\\u016d");
+    t = t.replace(/C[xX]/g, "\\u0108");
+    t = t.replace(/G[xX]/g, "\\u011c");
+    t = t.replace(/H[xX]/g, "\\u0124");
+    t = t.replace(/J[xX]/g, "\\u0134");
+    t = t.replace(/S[xX]/g, "\\u015c");
+    t = t.replace(/U[xX]/g, "\\u016c");
+    if (t != document.getElementById(nomo).value) {
+      document.getElementById(nomo).value = t;
+    }
+  }
+}
+function sf(){document.f.sercxata.focus();}
+top.document.title = "Reta Vortaro, serĉo de \\\"$sercxata\\\"";
+END
+}
+
+## eligu la serĉformularon
+sub print_form {
+
+  print <<'EOD';
+<form method="post" action="" target="indekso" name="f">
+<input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" 
+  onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata"  placeholder="Ĵokeroj: % (pluraj) kaj _ (unu)">
+<input type="submit" value="trovu">
+<br>
+EOD
+
+  if (!param('cx')) {
+    print <<'EOD';
+<script type="text/javascript">
+document.write("<input type=\\\"checkbox\\\" id=\\\"x\\\" name=\\\"x\\\" onClick=\\\"xAlUtf8(document.f.sercxata.value,'sercxata')\\\" $cx2cx>anstata&#365;igu cx, gx, ..., ux");</script>
+<noscript><input type="hidden" id="cx" name="cx" value="1"></noscript>
+EOD
+  } else {
+    print <<'EOD';
+<input type="hidden" id="cx" name="cx" value="1">
+EOD
+  }
+
+  print <<'EOD';
+</form>
+EOD
+
+  return;
+}
+
+sub print_atendu_script {
+  print <<'EOD' if $formato ne "txt" and $formato ne "idx";
+<script type="text/javascript">
+document.write("<div id=\\\"atendu\\\" style=\\\"position:absolute; z-index:1\\\"><br><br><br><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Atendu iomete...</big><layer></layer></div>");
+</script>
+EOD
+return;
+}
+
+sub print_atendu_kasxu {
   print <<'EOD' if $formato ne "txt" and $formato ne "idx";
 <script type="text/javascript">
 <!--
@@ -276,17 +324,10 @@ if (window.navigator.userAgent.toLowerCase().match("gecko")) {
 //-->
 </script>
 EOD
+  return;
+}
 
-print "</td></tr>", end_table(), end_html() if $formato ne "txt";;
-
-exit;
-
-
-###################################################################
-# helpunkcioj por serĉo                                           #
-###################################################################
-
-
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub Sercxu
 {
   my ($komparo, $sercxata2, $sercxata2_eo, $pref_lng) = @_;

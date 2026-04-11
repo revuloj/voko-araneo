@@ -1,4 +1,4 @@
-#!/bin/perl
+#!/usr/bin/perl
 
 # necesas antaŭe instali perl-critic, ekz-e per 
 # sudo apt install libperl-critic-perl libtest-perl-critic-perl
