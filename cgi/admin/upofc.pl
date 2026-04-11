@@ -22,7 +22,7 @@ use revodb;
 use fileutil;
 
 my $debug = 0;
-my $test = 1;
+my $do_test = 1;
 
 my $homedir = "/hp/af/ag/ri";
 # el voko-formiko per 'ant -f ant/indekso.xml inx-oficialaj'
@@ -58,7 +58,7 @@ my $inx_ofc = {};
 inx_prep();
 
 ## kelkaj testoj...
-if ($test || $debug) {
+if ($do_test || $debug) {
     my $test = ref_mrk("absolut'","oa","oa_1");
     print "\nTEST - absolut': $test<br>\n";
     $test = ref_mrk("fruktaĵo","fe","UV");
