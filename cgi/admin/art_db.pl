@@ -40,7 +40,8 @@ if (param('arts')) {
   die "Tro multaj artikoloj, maks. 1000\n" if ($#arts > 1000);
 
 } elsif (param('art')) {
-  push @arts, param('art');
+  my $art = param('art');
+  push @arts, $art;
 
 } elsif (param('prefix')) {
   my $prefix = param('prefix');

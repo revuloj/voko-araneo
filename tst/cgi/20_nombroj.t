@@ -48,6 +48,10 @@ if ($content) {
         ok(exists $hashref->{kap}, "Respondo enhavas 'kap'");
         ok(exists $hashref->{trd}, "Respondo enhavas 'trd'");
 
+        note("Se la sekvaj testoj fiaskas, eble la datumbazo ankoraŭ pleniĝas post ĵusa lanĉo!");
+        ok($hashref->{kap}->[0] > 35000, "La datumbazo enhavas almenaŭ 35000 kapvortojn");
+        ok($hashref->{trd}->[0] > 800000, "La datumbazo enhavas almenaŭ 80000 tradukojn");
+
     } else {
         # Se ni ne povis malkodi la enhavon. Ni avertu.
         diag("Averto: Ni ricevis ion, kio ne estas valida JSON.");

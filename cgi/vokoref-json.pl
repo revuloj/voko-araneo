@@ -23,7 +23,7 @@ my $debug = 0;
 my $LIMIT = 250;
 
 my $json_parser = JSON->new->allow_nonref;
-my $art = param('art'); 
+my $art = param('art') || ''; 
 
 # serĉo en la datumbazo
 my $dbh = revodb::connect();
