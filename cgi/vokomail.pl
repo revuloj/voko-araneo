@@ -55,9 +55,32 @@ my $sxg_max_len = 255;
 # my $enc = "utf-8";
 
 my $debugmsg;
+
+
+# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
+##?? povu esti malplena, se ni havas ?art...: check(param('xmlTxt'),"xmlTxt");
+# check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
+
+## validigu la ceterajn parametrojn...
+check(length(param('xmlTxt')||'') < $xml_max_len, "xmlTxt");
+check(length(param('art')||'') < $art_max_len, "art");
+check(length(param('sxangxo')||'') < $sxg_max_len, "sxangxo");
+check(length(param('redaktanto')||'') < $red_max_len, "redaktanto");
+check(param('art')||'' =~ m{^[a-z0-9]+$}x, "art rx");
+
+# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
+# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
+check(! param('redaktanto') 
+  || param('redaktanto')||'' =~ m{^
+    [\w\.-]+
+    @[\w\.-]+
+    \.\w{2,12}
+  $}x, 
+  "red rx"); 
+
 my $art = param('art');
 #$debugmsg .= "art = $art\n";
-my $mrk = param('mrk');
+my $mrk = param('mrk') || '';
 
 my $redaktanto = param('redaktanto') || cookie(-name=>'redaktanto') || 'via registrita retadreso';
 my $debug = $redaktanto eq 'Wieland@wielandpusch.de';
@@ -68,8 +91,6 @@ $debugmsg .= "sxangxo=$sxangxo" if $debug;
 # akiru XML por redaktado (el parametro, ŝablono, ekzistanta artikolo)
 my $xmlTxt = param('xmlTxt');
 
-my $xml;
-
 my $xml2 = '';
 if ($xmlTxt) {
   $xml2 = normigu_xml($xmlTxt)
@@ -78,12 +99,15 @@ if ($xmlTxt) {
 #$debugmsg .= "xmlTxt = $xmlTxt\n";
 
 # redaktata artikolo
+my $xml;
+
+# sendiĝis redaktata XML
 if ($xml2) {
   $xml = $xmlTxt; # nenormigita xml
-#  $debugmsg .= "1 xml=\n$xml" if $debug;
+  # $debugmsg .= "1 xml=\n$xml" if $debug;
 
 # nova artikolo
-} elsif (param('button') eq 'kreu') {
+} elsif (param('button') && param('button') eq 'kreu') {
   $xml2 = xml_nova_art();
 
 # elŝutu XML por artikolo
@@ -127,27 +151,6 @@ if ($art) {
   %stiloj = stl_listo();
 }
 
-# ne faru ion ajn, se mankas la XML-teksto aŭ valida komando ...
-check(param('xmlTxt'),"xmlTxt");
-# check(param('button') eq 'konservu' || param('button') eq 'antaŭrigardu' || param('button') eq 'kreu'), "button");
-
-## validigu la ceteran parametrojn...
-check(length(param('xmlTxt')) < $xml_max_len, "xmlTxt");
-check(length(param('art')) < $art_max_len, "art");
-check(length(param('sxangxo')) < $sxg_max_len, "sxangxo");
-check(length(param('redaktanto')) < $red_max_len, "redaktanto");
-check(param('art') =~ m{^[a-z0-9]+$}x, "art rx");
-
-# tio ne estas tute preciza testo, sed poste ja ankaŭ trarigardas la liston...
-# la preciza estas iom longa: http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html
-check(! param('redaktanto') 
-  || param('redaktanto') =~ m{^
-    [\w\.-]+
-    @[\w\.-]+
-    \.\w{2,12}
-  $}x, 
-  "red rx"); 
-
 # Konektiĝu kun la datumbazo
 my $dbh = revodb::connect();
 
@@ -155,7 +158,8 @@ my $dbh = revodb::connect();
 #print pre('button='.Encode::decode($enc, param('button'))."   ".(Encode::is_utf8(param('button')))."-".(Encode::is_utf8("antaŭrigardu"))) if $debug;
 
 #if (Encode::decode($enc, param('button')) eq "antaŭrigardu" or param('button') eq 'konservu') {
-if ( param('button') eq "antaŭrigardu" or param('button') eq 'konservu') {
+if ( param('button') && 
+  (param('button') eq "antaŭrigardu" or param('button') eq 'konservu')) {
 
   chdir($revo_base."/xml") or die "Ne eblas 'chdir' al xml/: $!\n";    
   xml2html_print(\$xml2);
@@ -188,7 +192,7 @@ if ($redaktanto) {
 
   redaktanto_permeso();
 
-  if (param('button') eq 'konservu') {
+  if (param('button') && (param('button') eq 'konservu')) {
     konservu();
   }
 }
@@ -1228,6 +1232,9 @@ sub print_formularo {
   my @fakoj = sort keys %fakoj;
   my @stiloj = sort keys %stiloj;
 
+  my $p_mrk = param('art') ||'';
+  my $p_art = param('mrk') || '';
+
   print "\n&nbsp;prilabori:\n".
         " <a class=\"butono1\" onclick=\"indent(2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston dekstren.\">&gt;&gt;</a>\n".
         " <a class=\"butono1\" onclick=\"indent(-2);return false\" href=\"#\" title=\"Ŝovu la markitan tekston maldekstren.\">&lt;&lt;</a>\n".
@@ -1350,15 +1357,18 @@ sub print_formularo {
         "&nbsp; &nbsp; ".a({target=>"_new", href=>'/revo/dok/manlibro.html#trd'}, "helpo").
         a({target=>"_new", href=>'/revo/dok/dtd.html#trd'}, "dtd").
         br."\n",
-        hidden(-name=>'art', -default=>param('art')),
-        hidden(-name=>'mrk', -default=>param('mrk')),
-        "&nbsp;".textarea(-id    => 'xmlTxt', -name    => 'xmlTxt',
-                -rows    => 25,
-                -columns => 80,
-              -default => $xml,
-                -onkeypress => "return klavo(event)",
+        hidden(-name => 'art', -default => $p_art),
+        hidden(-name => 'mrk', -default => $p_mrk),
+        "&nbsp;".textarea(
+          -id    => 'xmlTxt', 
+          -name    => 'xmlTxt',
+          -rows    => 25,
+          -columns => 80,
+          -default => $xml,
+          -onkeypress => "return klavo(event)",
         ) if $art;
-  if (param('nova') or param('button') eq 'kreu') {
+
+  if (param('nova') or (param('button') && param('button') eq 'kreu')) {
     print hidden(-name=>'nova', -default=>1);
   } else {
     print br."\n&nbsp;&#348;an&#285;o: ".textfield(
@@ -1549,9 +1559,12 @@ sub check {
   ## }
 
   unless ($cond) {
-    print "eraro: ".shift,"!\n";
-    print end_html();
-    exit;
+    print header(-status => '400 Invalid request', -type => 'text/html');
+    exit 1;
+
+    ##print "eraro: ".shift,"!\n";
+    ##print end_html();
+    ##exit;
   }
 }  
 
