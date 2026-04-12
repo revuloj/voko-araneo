@@ -6,6 +6,7 @@ use JSON;
 # pakaĵo de Debian/Ubunto: libtest-www-mechanize-perl
 use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
+use Email::Valid;
 use URL::Encode qw(url_encode);
 
 #plan tests => 3; 
@@ -57,8 +58,8 @@ if ($content) {
         # tio montriĝas ĉiam
         #diag("Valida JSON ricevita, $line_count linioj.");
 
-        # Kontrolu la enhavon
-        note($json_parser->encode($arrayref));
+        # Kontrolu la enhavon, malkomentu por sencimigo
+        # note($json_parser->encode($arrayref));
 
         # ĉiuj eroj havas red_id, red_nomo, retadr
         cmp_deeply(
@@ -68,7 +69,14 @@ if ($content) {
                 {
                     red_id   => ignore(),
                     red_nomo => ignore(),
-                    retadr   => array_each(ignore()),
+                    ## retadr   => array_each(re(qr{^
+                    ##     [^@<>\s]+@[^@<>\s]+ # retadreso
+                    ##     $}x
+                    ## )), # ignore())
+                    retadr   => array_each(code(sub {
+                        my $email = shift;
+                        return Email::Valid->address($email) ? 1 : 0;
+                    }))
                 }
                 #)
             ),"La eroj de la redaktantolisto havas la ĝustan strukturon"
@@ -79,11 +87,7 @@ if ($content) {
             $arrayref,
             superbagof(
                 superhashof({
-                    retadr => array_each(
-                        any(
-                            $redaktanto
-                        )
-                    ),
+                    retadr => superbagof($redaktanto)
                 }),
             ),"La respondo enhavas la retadreson \'$redaktanto\'"
         );     
