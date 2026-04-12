@@ -13,9 +13,7 @@ FROM alpine:3.23 AS builder
 
 # testu la CGI-skriptojn - ĉar por sintakskontrolo ni
 # tamen bezonas ĉiujn Perl-modulojn, ni faros tion en la fina procezujo
-# kiom strikte ni kontrolu Perl-kodon 
-# 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
-# ARG SEVER=4
+# ARG SEVER=4 # 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
 # COPY cgi/ /tmp/cgi/
 # COPY tst/ /tmp/tst/
 #RUN apk update \
@@ -23,7 +21,6 @@ FROM alpine:3.23 AS builder
 #  # instali kaj ruli perlcritic
 #  && apk add --no-cache --virtual .tool-deps perl-test-harness-utils perl-critic \
 #  && cd /tmp && /usr/bin/prove /tmp/tst/cgi/0*
-
 
 # build and install rxp
 RUN apk add --no-cache \
@@ -125,8 +122,7 @@ WORKDIR /tmp
 RUN apk add perl-test-harness-utils \
  # perl-critic: necesus instali tiel: && cpan -i Perl::Critic \
   && ln -s /usr/local/apache2/cgi-bin /tmp/cgi && cd /tmp \
-  && /usr/bin/prove /tmp/tst/cgi/00* \
-  # por aldoni 01_perlcritic.t: /0*
+  && /usr/bin/prove /tmp/tst/cgi/0*.t \
   && rm -rf /tmp/tst && rm /tmp/cgi \
   && apk del perl-test-harness-utils \
   && rm -f /var/cache/apk/* 

@@ -173,6 +173,7 @@ sub inx_prep {
     return;
 }
 
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub ref_mrk {
     my ($inx,$fnt,$dos) = @_;
     my $ofc = '', my $mrk = '';
@@ -285,6 +286,7 @@ sub ref_mrk {
 
     return $mrk;
 }
+## use critic
 
 sub rv_rad {
     my ($ofc,$rad) = @_;

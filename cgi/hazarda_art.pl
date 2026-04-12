@@ -84,6 +84,7 @@ if ($senkadroj == 2 && $art)
   my @artikolo = <$in>; close $in;
 
   for (@artikolo) {
+    ## no critic (RegularExpressions::ProhibitComplexRegexes)
     s{
       (\[<a\s+
         class="redakto"\s+

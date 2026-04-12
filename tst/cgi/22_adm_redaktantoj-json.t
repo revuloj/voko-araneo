@@ -20,13 +20,17 @@ my $CGI_PWD = $ENV{CGI_PWD};
 my $redaktanto = $ENV{TEST_RETADRESO} || '_registrita_testredaktanto_@retavortaro.de';
 
 
-unless ($CGI_USER && $CGI_PWD) {
-    die "Necesas doni CGI_USER kaj CGI_PWD kiel mediovariabloj en la komandlinio";
-}
+# unless ($CGI_USER && $CGI_PWD) {
+#     die "Necesas doni CGI_USER kaj CGI_PWD kiel mediovariabloj en la komandlinio";
+# }
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
-$mech->credentials($CGI_USER,$CGI_PWD);
+
+if ($CGI_USER && $CGI_PWD) {
+    $mech->credentials($CGI_USER,$CGI_PWD);
+}
+
 
 # kapoj
 $mech->add_header('Accept' => 'application/json');
