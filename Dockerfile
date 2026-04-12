@@ -6,24 +6,13 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
   # ni bezonos la enhavon de voko-grundo build poste por kopi jsc, stl, dok
 
 
-##### staĝo 2: Ni devas mem kompili rxp por Alpine
+##### staĝo 2: Ni devas mem kompili rxp, perl-moduloj por Alpine
 FROM alpine:3.23 AS builder
   # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
 
-
-# testu la CGI-skriptojn - ĉar por sintakskontrolo ni
-# tamen bezonas ĉiujn Perl-modulojn, ni faros tion en la fina procezujo
-# ARG SEVER=4 # 1=tre severa, 5=kritiku nur krudajn malbonaĵojn
-# COPY cgi/ /tmp/cgi/
-# COPY tst/ /tmp/tst/
-#RUN apk update \
-#  && apk upgrade \
-#  # instali kaj ruli perlcritic
-#  && apk add --no-cache --virtual .tool-deps perl-test-harness-utils perl-critic \
-#  && cd /tmp && /usr/bin/prove /tmp/tst/cgi/0*
-
 # build and install rxp
-RUN apk add --no-cache \
+RUN apk update && apk upgrade \
+  && apk add --no-cache \
           ca-certificates \
   && update-ca-certificates \
       \
@@ -31,6 +20,7 @@ RUN apk add --no-cache \
   # Install tools for building
   && apk add --no-cache --virtual .tool-deps \
           curl file coreutils autoconf g++ libtool make \
+          build-base \
       \
   # Install  build dependencies
   && apk add --no-cache --virtual .build-deps \
@@ -44,6 +34,44 @@ RUN apk add --no-cache \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
   && ./configure && make install
+
+# instali kaj ruli perl test harness, perlcritic
+RUN apk add --no-cache bash mysql-client perl-dbd-mysql fcgi libxslt \
+    perl-cgi perl-fcgi perl-ipc-run perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
+    perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
+    perl-app-cpanminus perl-extutils-installpaths perl-http-message \
+    perl-lwp-protocol-https perl-lwp-useragent-determined  \
+    perl-dev openssl ca-certificates \
+    # konflikto kun perl-utils (el perl-dev?): perl-test-harness-utils
+    && update-ca-certificates \
+    && cpanm --notest Email::Sender::Simple Email::Sender::Transport::SMTPS \
+                      Log::Dispatch::FileRotate Perl::Critic Test::Perl::Critic
+    #&& apk del build-base sed make perl-dev && rm -rf /root/.cpanm/work/*
+
+##### staĝo 2a: Testi la CGI-skriptojn
+## PLIBONIGU: ĉar la fina staĝo ne dependas de tiu ĝi docker normale transaltos ĝin
+## FROM builder as perl-test
+
+# por testi sintakson, perl-critic
+COPY cgi/ /tmp/cgi/
+COPY tst/ /tmp/tst/
+
+WORKDIR /tmp
+
+# bazaj testoj por la CGI-skriptoj (sintakso, perlcritic)
+# /tmp/test_sukceso ni kopios en la fina staĝo, alie docker simple transsaltus ĝin!
+RUN /usr/bin/prove -v /tmp/tst/cgi/0* && touch /tmp/test_sukceso
+
+# kie estas Perl-moduloj instalitaj?
+RUN perl -e'print join("\n", @INC, "")' \
+  && perl -MLog::Dispatch::FileRotate -e 'print $INC{"Log/Dispatch/FileRotate.pm"} . "\n"' \
+  && perl -MEmail::Sender::Simple -e 'print $INC{"Email/Sender/Simple.pm"} . "\n"' \
+  && perl -MDBI -e 'print $INC{"DBI.pm"} . "\n"' \
+  && perl -MDate::Manip -e 'print $INC{"Date/Manip.pm"} . "\n"'
+# perl -MLog::Dispatch::FileRotate -e"print @INC"
+#RUN ls -l /usr/lib/perl* && ls /usr/share/perl* \
+#    # && ls -l /usr/lib/*/perl* && ls /usr/share/*/perl* \
+#    && ls -l /usr/local/lib/perl* && ls /usr/local/share/perl*
 
 
 ##### staĝo 3: Nun ni havas ĉion por krei la finan procezujon kun Apache-httpd, Perl...
@@ -78,18 +106,35 @@ ARG HTTP_DIR=/hp/af/ag/ri/www
 ARG VOKO_TMP=/tmp/voko
 ARG REVO_DIR=/usr/local/apache2/htdocs/revo   
 
+# certigu testoj estis faritaj kaj sukcesaj
+## COPY --from=perl-test /tmp/test_sukceso /tmp/
+
+# kopiu antaŭe faritajn perl-modulojn (cpanm)
+COPY --from=builder /usr/local/lib/perl5 /usr/local/lib/perl5
+COPY --from=builder /usr/local/share/perl5 /usr/local/share/perl5
+
+# kopiu antaŭe instalitajn perl-modulojn (apk)
+# PLIBONIGU: se la Alpine-eldono de httpd:..-alpine kaj alpine:...
+# diferencas, povus okazi problemoj kun *.so-dosieroj
+# eble necesus tiujn reinstali aŭ alie certigi kompatibilecon
+COPY --from=builder /usr/lib/perl5 /usr/lib/perl5
+COPY --from=builder /usr/share/perl5 /usr/share/perl5
+
 # mysql TLS atestilo problemo kun:  
 # mariadb-connector-c perl-dev mariadb-connector-c-dev zlib-dev openssl-dev
-RUN apk --update --update-cache --upgrade add bash mysql-client perl-dbd-mysql fcgi libxslt \
-    perl-cgi perl-fcgi perl-ipc-run perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
-    perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
-    perl-app-cpanminus perl-extutils-installpaths perl-http-message \
-    perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
-    sed perl-dev make build-base openssl ca-certificates \
+RUN apk --update --update-cache --upgrade add \
+    bash mysql-client perl-dbd-mysql fcgi libxslt \
+    #perl-cgi perl-fcgi perl-ipc-run perl-log-dispatch perl-uri perl-unicode-string perl-json perl-datetime \
+    #perl-email-simple perl-email-address perl-extutils-config perl-sub-exporter perl-net-smtp-ssl \
+    #perl-app-cpanminus perl-extutils-installpaths perl-http-message \
+    #perl-lwp-protocol-https perl-lwp-useragent-determined curl wget unzip jq \
+    # perl-dev make build-base \
+    perl curl wget unzip jq \
+    sed openssl ca-certificates \
     && update-ca-certificates \
-    && cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS Log::Dispatch::FileRotate \
-    && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd \
-    && apk del build-base sed make perl-dev && rm -rf /root/.cpanm/work/*
+    #&& cpanm Email::Sender::Simple Email::Sender::Transport::SMTPS Log::Dispatch::FileRotate \
+    && sed -i -e "s/daemon:x:2/daemon:x:${DAEMON_UID}/" /etc/passwd 
+    #&& apk del build-base sed make perl-dev && rm -rf /root/.cpanm/work/*
 
 COPY --from=builder /usr/local/bin/rxp /usr/local/bin/
 COPY --from=builder /usr/local/lib/librxp.* /usr/local/lib/
@@ -117,15 +162,6 @@ COPY --from=grundo build/ ${VOKO_TMP}/
 #
 # en revodb.pm estas la konekto-parametroj...
 WORKDIR /tmp
-
-# bazaj testoj (sintakskontrolo, perlkritiko)
-RUN apk add perl-test-harness-utils \
- # perl-critic: necesus instali tiel: && cpan -i Perl::Critic \
-  && ln -s /usr/local/apache2/cgi-bin /tmp/cgi && cd /tmp \
-  && /usr/bin/prove /tmp/tst/cgi/0*.t \
-  && rm -rf /tmp/tst && rm /tmp/cgi \
-  && apk del perl-test-harness-utils \
-  && rm -f /var/cache/apk/* 
 
 RUN /usr/local/bin/revo_download_gh.sh ${REVO_FONTO} && mv revo /usr/local/apache2/htdocs/ \
   && mkdir -p ${HOME_DIR}/files \
