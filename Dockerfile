@@ -75,7 +75,7 @@ RUN perl -e'print join("\n", @INC, "")' \
 
 
 ##### staĝo 3: Nun ni havas ĉion por krei la finan procezujon kun Apache-httpd, Perl...
-FROM httpd:2.4-alpine
+FROM httpd:2.4-alpine3.23
 LABEL Author=<diestel@steloj.de>
 LABEL org.opencontainers.image.description DESCRIPTION
 
