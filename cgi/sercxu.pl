@@ -141,7 +141,7 @@ $dbh->do("set names utf8");
 
 my %trovitajPagxoj;
 my $regulira = $sercxata =~ m{
-    [.^$\[\(\|+?{\\] #..}
+    [.^\$\[\(\|+?{\\] #..}
   }x;
 
 ## no critic (RegularExpressions::RequireExtendedFormatting)
@@ -264,7 +264,7 @@ END
 ## eligu la serĉformularon
 sub print_form {
 
-  print <<'EOD';
+  print <<"EOD";
 <form method="post" action="" target="indekso" name="f">
 <input type="text" id="sercxata" name="sercxata"  size="31" maxlength="255" 
   onKeyUp="xAlUtf8(this.value, 'sercxata')" value="$sercxata"  placeholder="Ĵokeroj: % (pluraj) kaj _ (unu)">
@@ -273,7 +273,7 @@ sub print_form {
 EOD
 
   if (!param('cx')) {
-    print <<'EOD';
+    print <<"EOD";
 <script type="text/javascript">
 document.write("<input type=\\\"checkbox\\\" id=\\\"x\\\" name=\\\"x\\\" onClick=\\\"xAlUtf8(document.f.sercxata.value,'sercxata')\\\" $cx2cx>anstata&#365;igu cx, gx, ..., ux");</script>
 <noscript><input type="hidden" id="cx" name="cx" value="1"></noscript>
@@ -292,7 +292,7 @@ EOD
 }
 
 sub print_atendu_script {
-  print <<'EOD' if $formato ne "txt" and $formato ne "idx";
+  print <<"EOD" if $formato ne "txt" and $formato ne "idx";
 <script type="text/javascript">
 document.write("<div id=\\\"atendu\\\" style=\\\"position:absolute; z-index:1\\\"><br><br><br><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Atendu iomete...</big><layer></layer></div>");
 </script>
@@ -313,13 +313,13 @@ if (window.navigator.userAgent.toLowerCase().match("gecko")) {
 }
   if (browserType == "gecko" )
      document.poppedLayer = 
-         eval('document.getElementById(\\'atendu\\')');
+         eval('document.getElementById(\'atendu\')');
   else if (browserType == "ie")
      document.poppedLayer = 
-        eval('document.all[\\'atendu\\']');
+        eval('document.all[\'atendu\']');
   else
      document.poppedLayer =   
-        eval('document.layers[\\'`atendu\\']');
+        eval('document.layers[\'atendu\']');
   document.poppedLayer.style.visibility = "hidden";
 //-->
 </script>
