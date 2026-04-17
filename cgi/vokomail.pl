@@ -94,7 +94,7 @@ if ($xml2) {
 
 # nova artikolo
 } elsif (param('button') && param('button') eq 'kreu') {
-  $xml2 = xml_nova_art();
+  $xml = xml_nova_art();
 
 # elŝutu XML por artikolo
 } elsif ($art) {
@@ -636,7 +636,7 @@ END
 }
 
 sub xml_nova_art {
-  my $xml_ =<<'EOD';
+  my $xml_ =<<"EOD";
 <?xml version="1.0"?>
 <!DOCTYPE vortaro SYSTEM "../dtd/vokoxml.dtd">
 
@@ -1457,7 +1457,7 @@ sub redaktanto_permeso {
   if (!$permeso) {
     $ne_konservu = 2;
 
-    print <<'EOD';
+    print <<"EOD";
 <div class="averto">
 Vi ($redaktanto) ne estas registrita kiel redaktanto !<br>
 Legu <a href="http://www.reta-vortaro.de/revo/dok/redinfo.html">&#265;i tie</a> kaj 
