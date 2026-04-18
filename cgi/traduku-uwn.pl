@@ -17,6 +17,12 @@ use lib("/hp/af/ag/ri/files/perllib");
 use revodb;
 
 use JSON;
+
+# lexwo.org ne plu aktivas ŝajne...
+print header(-status => '502 Bad Gateway', -type => 'application/json');
+exit;
+
+
 my $json_parser = JSON->new->allow_nonref;
 
 my $uwn_url = 'http://www.lexvo.org';
