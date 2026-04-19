@@ -1498,7 +1498,7 @@ EOD
       my $subject = "Revo redaktu.pl $art";
   #my $smlog = "$homedir/logfiles/sendmail.log";
 
-      my $mailtext = <<'End_of_Mail';
+      my $mailtext = <<"End_of_Mail";
 From: $name <$from>
 To: $to
 Reply-To: $redaktanto

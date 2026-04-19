@@ -338,7 +338,7 @@ sub send_xml {
   my $to = join(', ', @to);
   my $subject = "Revo redaktu.pl $art_";
 
-  my $mailtext = <<'END_OF_MAIL';
+  my $mailtext = <<"END_OF_MAIL";
 From: $name <$mail_from>
 To: $to
 Reply-To: $red_anto

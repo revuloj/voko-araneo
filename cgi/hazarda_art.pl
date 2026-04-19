@@ -134,7 +134,7 @@ print start_table(-cellspacing=>0),
   );
 
 #
-print <<'EOD';
+print <<"EOD";
 <td colspan="4" class="enhavo">
 <a href="/revo/art/$art.html" target="precipa">Hazarda artikolo.</a>
 </td>

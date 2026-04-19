@@ -236,7 +236,7 @@ sub preferata_lingvo {
 
 #### Javoskripto por la serĉformularo ####
 sub js_literoj {
-  return<<'END';
+  return<<"END";
 function xAlUtf8(t, nomo) {
   if (document.getElementById("x").checked) {
     t = t.replace(/c[xX]/g, "\\u0109");
