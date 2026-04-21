@@ -147,8 +147,9 @@ my $trovoj_eo;
 my $trovoj_trd;
 
 eval {
-  #print "\n\n$QUERY\n" if ($debug);
-  #print "serĉu: $sercxata\n" if ($debug);
+  # print "\n\n$QUERY\n" if ($debug);
+  # print "serĉu: $sercxata\n" if ($debug);
+
   $sth->execute($sercxata,$sercxata,$sercxata);
   1;
 } or do {
@@ -178,10 +179,15 @@ $QUERY =
   ."LIMIT $LIMIT_trd";
 $sth = $dbh->prepare($QUERY);
 
+#if ($debug) {
+#  print $json_parser->encode({
+#    sercxata => $sercxata,
+#    query => $QUERY
+#  });
+#  goto FINO;
+#}
+
 eval {
-  #my $debug = 1;
-  #print "\n\n$QUERY\n" if ($debug);
-  #print "serĉu: $sercxata\n" if ($debug);
   $sth->execute($sercxata);
   1;
 } or do {
