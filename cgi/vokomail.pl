@@ -791,24 +791,28 @@ sub trakti_sxangxon {
 }
 
 sub trd_kontrolo { 
+  # PLIBONIGU: ni devas kopii la XML en la variablo pro la
+  # detrua algoritmo de trd_kontrolo - eble oni povus refasoni ĝin
+  # tiel, ke ĝi ne ŝanĝas la XML-testkon
+
   my $x = shift; # $xml2; 
    # cxu cxiu <trd...> havas lng aux estas en trdgrp kun lng?
   autoEscape(1);
 #    print pre(escapeHTML("x=$x\n"));
-  $$x =~ s{
+  $x =~ s{
     <trdgrp\s+
     lng\s*=.*?
     </trdgrp>\s*
     }{}xsmig;   # forigo de bonaj trdgrpoj
 
-  $$x =~ s{
+  $x =~ s{
     <trd\s+
     lng\s*=.*?
     </trd>\s*
   }{}xsmig;   # forigo de bonaj trdoj
 
 #    print pre(escapeHTML("x=$x\n"));
-	if ($$x =~ m{
+	if ($x =~ m{
       (<trd.*?</trd>)
       }x) {   # se restas trd, estas malbona
 	  print escapeHTML("Traduko $1")." ne havas lingvon.<br>\n";
@@ -1124,7 +1128,7 @@ sub xml2html_kaj_kontrolo {
   # lingoj
   print $checklng.br.br."\n" if ($checklng);
   # tradukoj
-  trd_kontrolo(\$xml2);
+  trd_kontrolo($xml2);
   # referencoj
   # @ref_err = 
   ref_kontrolo(\$xml);
