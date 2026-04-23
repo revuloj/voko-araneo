@@ -21,7 +21,7 @@ use JSON;
 # lexwo.org ne plu aktivas ŝajne...
 print header(-status => '502 Bad Gateway', -type => 'application/json');
 exit;
-
+## no critic (ControlStructures::ProhibitUnreachableCode)
 
 my $json_parser = JSON->new->allow_nonref;
 
