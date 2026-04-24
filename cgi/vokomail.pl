@@ -1515,7 +1515,7 @@ $xml2
 End_of_Mail
 
       # konektu al retposxtservilo
-      open my $sendmail, '|-', "/usr/sbin/sendmail -t 2>&1 >$smlog" 
+      open my $sendmail, '|-', "/usr/sbin/sendmail -t >$smlog 2>&1" 
           or do {
             #print LOG "ne povas sendi per 'sendmail'\n";
             warn "ne povas sendi per 'sendmail'\n";

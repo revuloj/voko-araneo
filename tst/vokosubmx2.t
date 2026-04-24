@@ -7,9 +7,10 @@ use Test::WWW::Mechanize;
 use Test::More; use Test::Deep;
 use URL::Encode qw(url_encode);
 
+
 # 1. parametroj
-my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
-my $url = "$REVO_HOST/cgi-bin/vokomailx.pl";
+my $REVO_HOST = 'https://reta-vortaro.de'; # $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+my $url = "$REVO_HOST/cgi-bin/vokosubmx2.pl";
 
 # transdonu registrita test-redaktanton en medivariablo,
 # alie la testo fiaskos pro rifuzo de la redakto
@@ -41,6 +42,10 @@ $mech->scraped_id_like('ref_err', qr/^\s*$/,'Neniuj ref-eraroj');
 
 # redakto de spamanto rifuziĝu
 spamanto($xmlTxt,'Sendaĵo de spamanto rifuziĝu');
+
+forsendo($xmlTxt,'Provu frosendi artikolon \'kvin\'');
+# $mech->scraped_id_like('malkonfirmo', qr/problemo kun la retpoŝta servo/,'Send-eraro');
+$mech->scraped_id_like('konfirmo', qr/Bone/,'Konfirmo de submeto');
 
 # kontrolo de malbona XML devus doni koncernajn erarojn
 $xmlTxt =~ s/<rad>//;
@@ -80,11 +85,45 @@ sub nur_kontrolo {
         'Ĝusta enhavtipo (html, utf-8)'
     );
 
-    $mech->title_is('vokomailx', 'Titolo \'vokomailx\' troviĝis');
+    $mech->title_is('vokosubmx', 'Titolo \'vokosubmx\' troviĝis');
     $mech->content_like(qr/<body>/, 'body...');
     $mech->id_exists_ok('xml_err','Troviĝas alineo \'xml_err\'');
     $mech->id_exists_ok('ref_err','Troviĝas alineo \'ref_err\'');
 }
+
+
+sub forsendo {
+    my ($xml,$testo) = @_;
+
+    $mech->post_ok($url, 
+        [
+            art   => 'test',
+            redaktanto  => $redaktanto,
+            sxangxo  => 'nur testo', 
+            nova => 0,
+            command => 'forsendo',
+            xmlTxt => $xml
+        ],
+        $testo
+    );
+
+    note($mech->ct);
+    note($mech->content);
+
+    #$mech->content_is('text/html; charset=utf-8');
+    like(
+        $mech->response->header('Content-Type'),
+        qr{text/html;\s*charset=utf-?8}i,
+        'Ĝusta enhavtipo (html, utf-8)'
+    );
+
+    $mech->title_is('vokosubmx', 'Titolo \'vokosubmx\' troviĝis');
+    $mech->content_like(qr/<body>/, 'body...');
+    #$mech->content_like(qr/ni ne povas sendi al vi kopion/,'ne eblis sendi kopion');
+    $mech->id_exists_ok('xml_err','Troviĝas alineo \'xml_err\'');
+    $mech->id_exists_ok('ref_err','Troviĝas alineo \'ref_err\'');
+}
+
 
 
 sub spamanto {
@@ -112,9 +151,11 @@ sub spamanto {
         'Ĝusta enhavtipo (html, utf-8)'
     );
 
-    $mech->title_is('vokomailx', 'Titolo \'vokomailx\' troviĝis');
+    $mech->title_is('vokosubmx', 'Titolo \'vokosubmx\' troviĝis');
     $mech->content_like(qr/<body>/, 'body...');
     $mech->id_exists_ok('red_err','Troviĝas alineo \'red_err\'');
     $mech->scraped_id_like('red_err', qr/ne estas registrita kiel redaktanto/,'Enestu rifuzo'); 
 }
+
+
 

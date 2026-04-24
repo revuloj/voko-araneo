@@ -377,10 +377,8 @@ sub send_xml {
   my $name    = "\"Revo redaktu.pl $red_anto\"";
   $name =~ s{\@}{_}gx;
 
-  my (@to, $red_cmd);
-  push @to, $red_anto; 
-  # ne plu sendu al redaktoservo: push @to, $mail_to; 
-
+  my $red_cmd;
+  
   # unua linio de retpoŝto
   if (param('nova')) {
     $red_cmd = "aldono: $art_";
@@ -388,12 +386,11 @@ sub send_xml {
     $red_cmd = "redakto: $sxangx_";
   }
 
-  my $to = join(', ', @to);
   my $subject = "Revo redaktu.pl $art_";
 
   my $mailtext = <<"END_OF_MAIL";
 From: $name <$mail_from>
-To: $to
+To: $red_anto
 Reply-To: $red_anto
 Subject: $subject
 X-retadreso: $ENV{REMOTE_ADDR}
@@ -404,12 +401,19 @@ $$xml_
 END_OF_MAIL
   
   # konektiĝu al retpoŝtservo
-  open my $sendmail, '|-', "$mail_cmd 2>&1 >$smlog" or do {
+  open my $sendmail, '|-', "$mail_cmd >$smlog 2>&1" or do {
     warn "Ne povas voki $mail_cmd\n";
     return 0;
   };
 
   print {$sendmail} $mailtext;
   close $sendmail;
-  return;
+
+  if ($? != 0) {
+    print "<div>Averto: Via ŝanĝo submetiĝis al la redaktoservo, sed pro retpoŝtproblemo ".
+      "ni ne povas sendi al vi kopion de via redakto.</div>\n";
+      # return 0; ... tamen sukcesa submeto
+  }
+
+  return 1;
 }

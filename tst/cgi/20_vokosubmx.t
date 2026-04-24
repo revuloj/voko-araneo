@@ -34,6 +34,9 @@ my $xmlTxt = << '~~~~~';
 </snc></drv></art></vortaro>
 ~~~~~
 
+
+note($xmlTxt);
+
 # kontrolo de bona XML devus doni neniujn erarojn
 nur_kontrolo($xmlTxt,'Kontrolu bonordan artikolon \'kvin\'');
 # aldonaj testoj pri la enhavo
@@ -43,20 +46,18 @@ $mech->scraped_id_like('ref_err', qr/^\s*$/,'Neniuj ref-eraroj');
 # redakto de spamanto rifuziĝu
 spamanto($xmlTxt,'Sendaĵo de spamanto rifuziĝu');
 
-# kontrolo de malbona XML devus doni koncernajn erarojn
-my $xmlTxt2 = $xmlTxt;
-$xmlTxt2 =~ s/<rad>//;
-$xmlTxt2 =~ s/cel="nombr.0o.MAT"/cel="noXmbr.MAT"/;
-note($xmlTxt2);
+forsendo($xmlTxt,'Provu frosendi artikolon \'kvin\'');
+# $mech->scraped_id_like('malkonfirmo', qr/problemo kun la retpoŝta servo/,'Send-eraro');
+$mech->scraped_id_like('konfirmo', qr/Bone/,'Konfirmo de submeto');
 
-nur_kontrolo($xmlTxt2,'Kontrolu malbonan artikolon \'kvin\'');
+# kontrolo de malbona XML devus doni koncernajn erarojn
+$xmlTxt =~ s/<rad>//;
+$xmlTxt =~ s/cel="nombr.0o.MAT"/cel="noXmbr.MAT"/;
+note($xmlTxt);
+
+nur_kontrolo($xmlTxt,'Kontrolu malbonan artikolon \'kvin\'');
 $mech->scraped_id_like('xml_err', qr/^\s*Eraro:\s+Malkongrua elementofino.*kap.*pozicio 3:27\s*$/,'Sintaks-eraro');
 $mech->scraped_id_like('ref_err', qr/Referenco celas al marko "noXmbr.MAT", kiu ne ekzistas\./,'Referenc-eraro');
-
-forsendo($xmlTxt,'Provu frosendi artikolon \'kvin\'');
-$mech->scraped_id_like('malkonfirmo', qr/problemo kun la retpoŝta servo/,'Send-eraro');
-# $mech->scraped_id_like('ref_err', qr/Referenco celas al marko "noXmbr.MAT", kiu ne ekzistas\./,'Referenc-eraro');
-
 
 done_testing();
 
@@ -121,6 +122,7 @@ sub forsendo {
 
     $mech->title_is('vokosubmx', 'Titolo \'vokosubmx\' troviĝis');
     $mech->content_like(qr/<body>/, 'body...');
+    $mech->content_like(qr/ni ne povas sendi al vi kopion/,'ne eblis sendi kopion');
     $mech->id_exists_ok('xml_err','Troviĝas alineo \'xml_err\'');
     $mech->id_exists_ok('ref_err','Troviĝas alineo \'ref_err\'');
 }
