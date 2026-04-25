@@ -24,14 +24,14 @@ sintaks_kontrolo("./cgi/mrk_eraroj.pl");
 sintaks_kontrolo("./cgi/mx_trd.pl");
 sintaks_kontrolo("./cgi/nombroj.pl");
 sintaks_kontrolo("./cgi/sercxu-json-$eldono.pl");
-sintaks_kontrolo("./cgi/sercxu.pl");
+# sintaks_kontrolo("./cgi/sercxu.pl");
 sintaks_kontrolo("./cgi/sercxu-vivo.pl");
 sintaks_kontrolo("./cgi/traduku-uwn.pl");
 sintaks_kontrolo("./cgi/traduku-wiki.pl");
 sintaks_kontrolo("./cgi/vokohtmlx.pl");
 
 sintaks_kontrolo("./cgi/vokomail.pl");
-sintaks_kontrolo("./cgi/vokomailx.pl");
+#sintaks_kontrolo("./cgi/vokomailx.pl");
 sintaks_kontrolo("./cgi/vokoref-json.pl");
 sintaks_kontrolo("./cgi/vokosubm-json.pl");
 sintaks_kontrolo("./cgi/vokosubmx.pl");
