@@ -91,7 +91,7 @@ ARG REVO_FONTO=revo-fonto
 #
 # https://medium.com/@lojorider/docker-with-cgi-perl-a4558ab6a329
 
-COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY etc/httpd.conf /usr/local/apache2/conf/httpd.conf
 
 # tio devas koincidi kun uzanto sesio de voko-sesio
 ARG DAEMON_UID=13731
