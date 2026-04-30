@@ -70,16 +70,18 @@ $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("set names utf8");
 $dbh->do('SET SESSION group_concat_max_len = 4048');
 
-# serĉesprimo enhavas iujn regulesprimajn signojn
-my $regulira = ($sercxata =~ m{
-    [\\.^\$\[\(\|+?{]  #..}
-  }x);
-my $komparo = '=';
+### serĉesprimo enhavas iujn regulesprimajn signojn
+## my $regulira = ($sercxata =~ m{
+##     [\\.^\$\[\(\|+?{]  #..}
+##   }x);
+## my $komparo = '=';
+## 
+## if ($regulira) {
+##   $komparo = 'REGEXP';
+## 
+## } els
 
-if ($regulira) {
-  $komparo = 'REGEXP';
-
-} elsif ($sercxata =~ /[%_]/x) {
+if ($sercxata =~ /[%_]/x) {
   $komparo = 'LIKE';
 }
 
@@ -146,8 +148,6 @@ if ($@) {
 
 $dbh->disconnect() or die "Ni ne povis fermi la datumbazon!\n";
 exit;
-
-
 
 
 ###################################################################

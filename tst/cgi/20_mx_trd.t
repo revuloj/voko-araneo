@@ -46,27 +46,5 @@ like(
 $mech->title_like(qr/^mankantaj tradukoj/, "Titolo \'mankantaj tradukoj...\' troviĝis");
 $mech->has_tag_like('body',qr/.*/, 'Troviĝas <body>...');
 $mech->has_tag('h2', 'mankantaj tradukoj [de]', "Troviĝas h2[redakti]");
-#
-#my @input = $mech->grep_inputs({
-#    type => qr/^text$/,
-#    name => qr/^sercxata$/
-#});
-#diag explain @input;
-#
-#is(@input,1,"Troviĝis serĉkampo \'sercxata\'");
-#
-#my @submit = $mech->grep_inputs({
-#    type => qr/^submit$/,
-#    value => qr/^trovu$/
-#});
-#diag explain @submit;
-
-#is(@submit,1,"Troviĝis serĉbutono");
-#
-#
-#my @buttons =
-#    $mech->grep_inputs({
-#        type => "submit"
-#    });
 
 done_testing();
