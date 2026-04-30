@@ -74,7 +74,7 @@ $dbh->do('SET SESSION group_concat_max_len = 4048');
 ## my $regulira = ($sercxata =~ m{
 ##     [\\.^\$\[\(\|+?{]  #..}
 ##   }x);
-## my $komparo = '=';
+my $komparo = '=';
 ## 
 ## if ($regulira) {
 ##   $komparo = 'REGEXP';

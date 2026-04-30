@@ -77,7 +77,7 @@ RUN perl -e'print join("\n", @INC, "")' \
 ##### staĝo 3: Nun ni havas ĉion por krei la finan procezujon kun Apache-httpd, Perl...
 FROM httpd:2.4-alpine3.23
 LABEL Author=<diestel@steloj.de>
-LABEL org.opencontainers.image.description DESCRIPTION
+LABEL org.opencontainers.image.description="Retpaĝoj de Reta Vortaro"
 
 # REVO_FONTO povas esti ŝanĝita al revo-fonto-testo ekstere per --build-arg, jam konsiderata en 'bin/eldono.sh kreo-test'
 ARG REVO_FONTO=revo-fonto

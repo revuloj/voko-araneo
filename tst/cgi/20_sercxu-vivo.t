@@ -11,7 +11,7 @@ use URL::Encode qw(url_encode);
 # 1. parametroj
 my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
 my $url = "$REVO_HOST/cgi-bin/sercxu-vivo.pl";
-# my $sercxata = url_encode('fünf');
+# my $sercxata = url_encode('fünf'); #utf-8!?
 my $sercxata = url_encode('five');
 
 # 2. preparo de TTT-testkliento
