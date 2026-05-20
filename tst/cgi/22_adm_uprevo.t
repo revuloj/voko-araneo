@@ -13,6 +13,8 @@ use URL::Encode qw(url_encode);
 # use LWP::ConsoleLogger::Everywhere;
 
 my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
+chomp(my $encoded_auth=`tst/cgi/22_adm_credentials.sh`);
+# note($encoded_auth);
 
 # 1. parametroj
 my $url = "$REVO_HOST/cgi-bin/admin/uprevo.pl";
@@ -45,6 +47,8 @@ test_http_status("$url?fname=revo-20200401_000000.tgz", 404, "Parametro 'fname' 
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
+
+$mech->add_header('Authorization' => "Basic $encoded_auth");
 
 # kapoj
 $mech->add_header('Accept' => 'text/html');
@@ -103,6 +107,8 @@ done_testing();
 sub test_http_status {
     my ($url,$status,$msg) = @_;
     my $statmech = WWW::Mechanize->new(autocheck => 0);
+    $statmech->add_header('Authorization' => "Basic $encoded_auth");
+
     #diag("test: $url");
     my $res = $statmech->head($url);
     #diag("stat: ".$res->code);

@@ -3,11 +3,12 @@
 # preparo por testo 22_adm_checkencode.t (vokata el ĝi)
 
 # trovu procezujon araneo
-araneo_id=$(docker ps --filter name=araneujo_araneo -q)
+stack=araneujotesto
+araneo_id=$(docker ps --filter name=${stack}_araneo -q)
 
 if [[ -z ${araneo_id} ]]; then
-    echo "La procezujo araneujo_araneo ne estas aktiva!"
-    echo "Unu lanĉu Araneujon (revo-medioj/araneujo-s/bin/as-start)."
+    echo "La procezujo ${stack}_araneo ne estas aktiva!"
+    echo "Unue lanĉu Araneujon (revo-medioj/araneujo-t/bin/as-start)."
     exit 1;
 fi
 

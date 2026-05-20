@@ -19,6 +19,11 @@ my $mech = Test::WWW::Mechanize->new();
 # kapoj
 $mech->add_header('Accept' => 'application/json');
 
+chomp(my $encoded_auth=`tst/cgi/22_adm_credentials.sh`);
+# note($encoded_auth);
+$mech->add_header('Authorization' => "Basic $encoded_auth");
+
+
 # 3. petu la paĝon kaj kontrolu la rezulton
 # get_ok() kontrolas la rezulton (stato 2xx)
 $mech->post_ok($url, [], "Peto al $url");

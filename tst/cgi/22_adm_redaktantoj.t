@@ -14,22 +14,16 @@ use URL::Encode qw(url_encode);
 # 1. parametroj
 my $REVO_HOST = $ENV{REVO_HOST} || 'http://127.0.0.1:8088';
 my $url = "$REVO_HOST/cgi-bin/admin/redaktantoj.pl";
-my $CGI_USER = $ENV{CGI_USER};
-my $CGI_PWD = $ENV{CGI_PWD};
+
 # ni kontrolos ĉu la koncerna redaktanto estas en la listo
 my $redaktanto = $ENV{TEST_RETADRESO} || '_registrita_testredaktanto_@retavortaro.de';
-
-
-# unless ($CGI_USER && $CGI_PWD) {
-#     die "Necesas doni CGI_USER kaj CGI_PWD kiel mediovariabloj en la komandlinio";
-# }
 
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
 
-if ($CGI_USER && $CGI_PWD) {
-    $mech->credentials($CGI_USER,$CGI_PWD);
-}
+chomp(my $encoded_auth=`tst/cgi/22_adm_credentials.sh`);
+# note($encoded_auth);
+$mech->add_header('Authorization' => "Basic $encoded_auth");
 
 # kapoj
 $mech->add_header('Accept' => 'application/json');

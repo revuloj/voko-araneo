@@ -17,6 +17,11 @@ my $art = 'sept';
 # 2. preparo de TTT-testkliento
 my $mech = Test::WWW::Mechanize->new();
 
+chomp(my $encoded_auth=`tst/cgi/22_adm_credentials.sh`);
+# note($encoded_auth);
+$mech->add_header('Authorization' => "Basic $encoded_auth");
+
+
 # kapoj
 $mech->add_header('Accept' => 'application/json');
 

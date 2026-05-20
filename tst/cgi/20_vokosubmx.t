@@ -46,7 +46,7 @@ $mech->scraped_id_like('ref_err', qr/^\s*$/,'Neniuj ref-eraroj');
 # redakto de spamanto rifuziĝu
 spamanto($xmlTxt,'Sendaĵo de spamanto rifuziĝu');
 
-forsendo($xmlTxt,'Provu frosendi artikolon \'kvin\'');
+forsendo($xmlTxt,'Provu forsendi artikolon \'kvin\'');
 # $mech->scraped_id_like('malkonfirmo', qr/problemo kun la retpoŝta servo/,'Send-eraro');
 $mech->scraped_id_like('konfirmo', qr/Bone/,'Konfirmo de submeto');
 
