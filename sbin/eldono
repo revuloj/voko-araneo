@@ -56,7 +56,6 @@ servilo)
     #scp cgi/perllib/parse* ${perllib}/
 
     ## scp cgi/vokosubmx.pl ${cgibin}/
-    ## scp cgi/vokomailx.pl ${cgibin}/
     #scp cgi/vokosubm-json.pl ${cgibin}/
     #scp cgi/admin/submeto.pl ${cgibin}/admin/
     #scp cgi/mrk_eraroj.pl ${cgibin}/
@@ -75,11 +74,11 @@ index)
     ;;
 index-mn)
     ## sendu el malnovaj URL-oj al la aktuala eldono...
-    scp revo/index.html ${revo}/dlg/index-2a.html
-    scp revo/index.html ${revo}/dlg/index-2b.html
-    scp revo/index.html ${revo}/dlg/index-2c.html
-    scp revo/index.html ${revo}/dlg/index-2d.html
-    scp revo/index.html ${revo}/dlg/index-2e.html
+    #scp revo/index.html ${revo}/dlg/index-2a.html
+    #scp revo/index.html ${revo}/dlg/index-2b.html
+    #scp revo/index.html ${revo}/dlg/index-2c.html
+    #scp revo/index.html ${revo}/dlg/index-2d.html
+    #scp revo/index.html ${revo}/dlg/index-2e.html
     scp revo/index.html ${revo}/dlg/index-2f.html
     scp revo/index.html ${revo}/dlg/index-2g.html
     scp revo/index.html ${revo}/dlg/index-2h.html
@@ -88,7 +87,8 @@ index-mn)
     scp revo/index.html ${revo}/dlg/index-2k.html    
     scp revo/index.html ${revo}/dlg/index-2l.html    
     scp revo/index.html ${revo}/dlg/index-2m.html    
-    #scp revo/index.html ${revo}/dlg/index-2n.html    
+    scp revo/index.html ${revo}/dlg/index-2n.html    
+    #scp revo/index.html ${revo}/dlg/index-2o.html    
     ;;
 ofc)
     # PLIBONIGU: tio funkcias nur ĉe mi loke pro aranĝo de projektoj
