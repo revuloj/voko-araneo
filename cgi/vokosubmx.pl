@@ -23,6 +23,11 @@ use revo::checkxml;
 use revo::wrap;
 use revodb;
 
+my $enc = 'utf-8';
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+##binmode(STDOUT, ":encoding(UTF-8)");
+
 #$| = 1;
 my $debug = 0; #0|1;
 
@@ -48,19 +53,17 @@ local $ENV{'PATH'} = "$ENV{'PATH'}:$homedir/files/bin";
 local $ENV{'LOCPATH'} = "$homedir/files/locale";
 #autoEscape(0);
 
-my $enc = "utf-8";
-
 ## parametroj...
 my $art = param('art');
 my $xmlTxt = param('xmlTxt');
 my $redaktanto = param('redaktanto');
 #my $mrk = param('mrk');
-my $sxangxo = Encode::decode($enc, param('sxangxo'));
-my $command = param('command');
 
-use utf8;
-use open ':std', ':encoding(UTF-8)';
-##binmode(STDOUT, ":encoding(UTF-8)");
+my $sxangxo = param('sxangxo');
+unless (is_utf8($sxangxo)) {
+  $sxangxo = Encode::decode($enc, $sxangxo);
+}
+my $command = param('command');
 
 print header(-charset=>'utf-8',
              -pragma => 'no-cache', '-cache-control' =>  'no-cache'),
