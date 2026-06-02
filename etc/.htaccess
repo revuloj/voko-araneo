@@ -1,0 +1,6 @@
+# kopiu en la radikan dosierujon htdocs/
+# ne ekskludu GoogleBot kaj Google-InspectionTool
+RewriteEngine On
+RewriteCond %{HTTP_USER_AGENT} (applebot|meta-externalagent|meta-webindexer|bingbot|yatcybot|aliyunsecbot|serankingbacklinksbot|barkrowler|semrushbot) [NC]
+RewriteCond %{REQUEST_URI} ^/(cgi-bin|revo/(cfg|smb|jsc|stl|tez|hst|xml|xsl))/ [NC]
+RewriteRule ^ - [F,L]
