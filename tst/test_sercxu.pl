@@ -16,8 +16,8 @@ my $sercxata = url_encode(shift @ARGV || 'sen%');
 
 my $json_parser = JSON->new->pretty; #allow_nonref;
 
-#my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-2p.pl';
-my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-2p.pl';
+#my $sercxu_url = 'https://reta-vortaro.de/cgi-bin/sercxu-json-2q.pl';
+my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/sercxu-json-2q.pl';
 #my $sercxu_url = 'http://0.0.0.0:8088/cgi-bin/admin/perltest.pl';
 my $header = ['Accept' => 'application/json', 'Accept-Language' => 'en,de,fr,nl'];
 #my $request = HTTP::Request->new(GET=>"$sercxu_url?sxlosilo=1887&sercxata=kubo",$header);
