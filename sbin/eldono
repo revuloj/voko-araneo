@@ -122,6 +122,7 @@ preparo)
     sed -i 's,/revo-[1-9][a-z]-min\.,/revo-'${eldono}'-min\.,g' revo/dlg/*
 
     sed -i 's,/sercxu-json-[1-9][a-z]\.,/sercxu-json-'${eldono}'\.,g' tst/test_sercxu.pl
+    sed -i "s,eldono[[:space:]]*=[[:space:]]*'[1-9][a-z]',eldono = '${eldono}',g" tst/cgi/00_syntax.t
 
     #sed -ri 's/FROM voko-grundo:[1-9][a-z]/FROM voko-grundo:'${eldono}'/' Dockerfile
     #sed -ri 's/ARG ([A-Z_]+)=[1-9][a-z]$/ARG \1='${eldono}'/' Dockerfile
