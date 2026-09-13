@@ -6,7 +6,7 @@ use Test::More;
 
 #use lib('./cgi');
 my $LIB ='./cgi/perllib';
-my $eldono = '2q';
+my $eldono = '2r';
 
 sub sintaks_kontrolo {
     my $cgi = shift;
