@@ -10,6 +10,9 @@ FROM ghcr.io/revuloj/voko-grundo/voko-grundo:${VERSION} AS grundo
 FROM alpine:3.23 AS builder
   # https://github.com/docker-library/httpd/blob/c9c8c54099b541910797a90ca9b406e76966902f/2.4/alpine/Dockerfile
 
+#COPY rxp_1.5.0.orig.tar.gz /tmp/rxp.tar.gz
+COPY rxp-1.5.2.tar.gz /tmp/rxp.tar.gz
+
 # build and install rxp
 RUN apk update && apk upgrade \
   && apk add --no-cache \
@@ -26,11 +29,11 @@ RUN apk update && apk upgrade \
   && apk add --no-cache --virtual .build-deps \
           linux-headers \
       \
-  # Download and prepare rxp sources
-  && curl -fL -o /tmp/rxp.tar.gz \
-    https://www.inf.ed.ac.uk/research/isddarch/admin/rxp-1.5.2.tar.gz \
-  && (echo "	b2a7dbe5350b15078979c63904157f42  /tmp/rxp.tar.gz" \
-          | md5sum -c -) \
+  # Download and prepare rxp sources (ofte ne atingebla servilo, do ni havas ankaŭ lokan kopion 1.5.0 provizore)
+  #&& curl -fL -o /tmp/rxp.tar.gz \
+  #  https://www.inf.ed.ac.uk/research/isddarch/admin/rxp-1.5.2.tar.gz \
+  #&& (echo "	b2a7dbe5350b15078979c63904157f42  /tmp/rxp.tar.gz" \
+  #        | md5sum -c -) \
   && tar -xzf /tmp/rxp.tar.gz -C /tmp/ \
   && cd /tmp/rxp-* \
   && ./configure && make install
