@@ -1,6 +1,10 @@
 name: procezujo voko-araneo
 # https://github.com/actions/starter-workflows/blob/master/ci/docker-push.yml
 
+permissions:
+  contents: read
+  packages: write
+
 # SOLVENDA: ni bezonas la eldonon de voko-grundo respondan al la aktuala eldono de voko-araneo (docker pull...)
 # momente ni uzas la etikedon de la branĉo, ekz-e v2d -> :2d sed tio ne funkcias por la ĉefa branĉo (master)
 # pli bone estus enrigardi en iun dosieron (Dockerfile, eldono.sh a.s.) por eltrovi la ĝustan eldonon
